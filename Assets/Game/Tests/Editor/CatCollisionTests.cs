@@ -48,6 +48,25 @@ public class CatCollisionTests
         Assert.That((bool)controller.GetType().GetProperty("Grounded").GetValue(controller), Is.True);
         Input("ReleaseJump"); Input("PressJump"); Tick(); Assert.That(body.linearVelocity.y, Is.GreaterThan(10));
     }
+    // Verify actual rigidbody motion with explicit physics steps, independent of
+    // headless Play Mode focus, fixed-update scheduling, and Transform interpolation.
+    [TestCase(-1f)]
+    [TestCase(1f)]
+    public void ScriptedPhysicsMovesAndJumpsInBothDirections(float direction)
+    {
+        Assert.That((bool)controller.GetType().GetProperty("Grounded").GetValue(controller), Is.True,
+            "The cat must start grounded for the jump to trigger.");
+        var start = body.position;
+        Input("SetMove", direction);
+        Input("PressJump");
+        for (int i = 0; i < 5; i++) Tick();
+
+        var displacement = body.position - start;
+        var state = $"Direction={direction}, start={start}, actual={body.position}, " +
+            $"velocity={body.linearVelocity}, simulation={Physics2D.simulationMode}";
+        Assert.That(displacement.x * direction, Is.GreaterThan(0.05f), state);
+        Assert.That(displacement.y, Is.GreaterThan(0.05f), state);
+    }
     [Test] public void RetryRestoresPositionAndClearsVelocityAndBufferedInput()
     {
         Input("SetMove", 1f); Input("PressJump"); Tick();

@@ -101,6 +101,14 @@ actions work together. Desktop launcher behavior and settings schema are unchang
 See the [integration review and captures](design/menu-movement-integration/README.md)
 for conflict resolutions and the menu/course regression test included in final validation.
 
+The regression checks separate scene/input lifecycle from rigidbody simulation:
+`MenuMovementIntegrationTests` verifies menu entry, update-message preservation, focus
+loss/recovery, input shutdown and re-entry without frame-timing-dependent movement assertions.
+`CatCollisionTests` calls the controller's fixed-step logic and `Physics2D.Simulate`
+explicitly, then checks `Rigidbody2D.position` for running in both directions and jumping.
+Do not assert physics movement using interpolated `Transform.position` after a fixed number
+of `WaitForFixedUpdate` yields in headless Unity test runs.
+
 Preview builds include state inspection controls (checking, available/pop-up,
 download progress, ready, current, error, warning and unsupported platform).
 Example releases are labeled as simulations and appear only in preview builds.
