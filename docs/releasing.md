@@ -8,6 +8,9 @@ Run **Actions > Release** on main. No mode or version input is needed.
 Conventional Commits since the last release determine the version: fix/perf = patch, feat = minor, !/BREAKING CHANGE = major.
 Docs/chore/test alone produce no release. The first release is 0.1.0. Later releases follow Conventional Commits; a breaking change can promote 0.x to 1.0.0.
 The workflow reruns tests and both platform builds, packages and smoke-checks the payloads, then publishes only if everything succeeds.
+Linux startup checks use Xvfb: this Unity player still requires a valid window backend with
+`-batchmode -nographics`. Prepare merge also runs the Linux payload check. Both workflows retain
+startup logs as artifacts; a virtual-display smoke check does not verify a graphical installation.
 Git tags are the version source; no bot version commits. Builds remain unsigned until signing is configured.
 
 ## Updates

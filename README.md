@@ -21,7 +21,7 @@ These are development goals. The six-level journey, combat and final level desig
 
 LegendOfCat is in early development in Unity. The current foundation includes a start menu, settings and update integration; Play currently opens a test view. The adventure described above is not yet available as a complete game.
 
-**Windows and Linux are the target platforms.** There are currently no published releases. When builds are available, get them only from the [official GitHub Releases](https://github.com/LeonHorner/LegendOfCat/releases), and read the release notes for their contents and limitations. Actual installation and version-to-version updates on both platforms still require verification.
+**Windows and Linux are the target platforms.** Early development builds are available from the [official GitHub Releases](https://github.com/LeonHorner/LegendOfCat/releases). Read the release notes for their contents and limitations: these builds contain the current foundation, not the finished adventure. Windows downloads use Setup.exe; Linux downloads use AppImage. Actual graphical installation and version-to-version updates on both platforms still require verification.
 
 ## Feedback
 

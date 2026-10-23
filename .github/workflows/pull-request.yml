@@ -132,6 +132,25 @@ jobs:
           dotnet-version: 8.0.x
       - name: Build self-contained launcher
         run: dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:RestoreLockedMode=true -o "${{ runner.temp }}/launcher-${{ matrix.platform }}"
+      - name: Prepare Linux startup validation
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y xvfb xauth
+          cp -r build/linux/Game "${{ runner.temp }}/launcher-linux/Game"
+          chmod +x "${{ runner.temp }}/launcher-linux/LegendOfCat" "${{ runner.temp }}/launcher-linux/Game/LegendOfCat"
+      - name: Smoke test Linux payload
+        if: matrix.platform == 'linux'
+        shell: pwsh
+        run: ./tools/smoke-test.ps1 -Executable '${{ runner.temp }}/launcher-linux/LegendOfCat' -LogPath 'artifacts/smoke/linux.log' -VirtualDisplay
+      - name: Preserve Linux startup diagnostics
+        if: always() && matrix.platform == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-smoke-linux
+          path: artifacts/smoke
+          if-no-files-found: ignore
+          retention-days: 7
   gate:
     name: Record merge readiness
     if: always() && needs.preflight.outputs.sha != ''
