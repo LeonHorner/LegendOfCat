@@ -35,6 +35,13 @@ The tests and structural assertions are *nonpublishing*. They cannot simulate Un
 - On that run, image downloads from `unityci/editor` took approximately **82 s** (test), **87 s** (Windows builder) and **83 s** (Linux builder). These fresh GitHub-hosted Docker pulls dominate the individual job durations and are not solved by caching `Library` alone.
 - [Release run 40003386957](https://github.com/LeonHorner/LegendOfCat/actions/runs/40003386957) succeeded from **18:27:09–18:35:51 UTC** (about **8m42s**), using the old serialized plan → test → build → package → publish DAG.
 
+## First parallel ready-PR validation: October 23, 2026
+
+- [PR #34 — automatic Prepare merge run 40007552835](https://github.com/LeonHorner/LegendOfCat/actions/runs/40007552835) ran on exact PR head `95a6a19e218e97d0409efab19fe81a8c0c971bfa`, **18:57:28–19:01:36 UTC** (about **4m08s**). Preflight, 7/7 Node gate regression tests, Unity EditMode tests, Windows build/launcher, Linux build/launcher/Xvfb smoke, and final `merge-ready` all succeeded. The initial draft event [40007528018](https://github.com/LeonHorner/LegendOfCat/actions/runs/40007528018) was skipped. GameCI did not create a separate neutral `Test Results` job.
+- Unity tests ran about **2m40s** (18:57:42–19:00:22), Windows about **2m50s** (18:57:42–19:00:32), and Linux about **3m43s** (18:57:42–19:01:25). All three started immediately after preflight, demonstrating independent scheduling; Linux plus the final gate was the critical path. Concurrent GameCI Unity jobs and activation succeeded on this run, but one success does not guarantee license capacity under heavier load.
+- Compared with the earlier **5m57s** complete manual run, this is **1m49s faster (approximately 31%)** in observed wall-clock time. Hosted-runner variability and differing commits prevent treating the comparison as a controlled benchmark. Both builders still reported a missing asset database after `Library` cache restores, so no cache fix is claimed.
+- Adding these measurements changes the PR head and therefore requires automatic exact-SHA validation again before merging; the prior successful status must not be reused for the newer revision.
+
 ## Optimization and follow-up evidence
 
 Parallelism removes the unnecessary test-to-build dependency while keeping independent results mandatory. The issue's **3–4 minute** Prepare merge target is an estimate, not a benchmark result or a pass/fail threshold. After the implementation PR's first successful ready-PR run, record its actual checked head SHA, scheduling, start/end time and critical path here and in the PR. If licensing or runner contention makes concurrent Unity jobs unreliable, reduce concurrency while preserving the gate.
