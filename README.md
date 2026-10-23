@@ -44,10 +44,23 @@ Git tags are the version source; no bot version commits. Builds remain unsigned 
 
 ## Updates
 Launcher/ is a self-contained C# launcher using Velopack.
-It checks public GitHub Releases once per launch, applies available updates before starting the game, and starts the installed version if checking/downloading fails.
+The package entry opens the Unity start menu immediately without a launcher window.
+Play opens a test view; Settings contains the future Language option and Versions & Updates.
+The updater checks public stable GitHub Releases in the background. Each new available version
+prompts once with Update now / Later; Later persists across restarts and leaves a Settings badge.
+Versions & Updates shows stable release history and release notes. Older versions cannot be installed.
+Only the latest newer compatible stable version can be installed. Prereleases are excluded.
+Downloads show progress while Unity remains open. Once ready, Unity exits and the background
+helper waits for both game and package entry to exit, installs the update and restarts the game.
+Network/download failures leave the current game playable with Retry / Later. Settings and
+update diagnostics are stored under Application.persistentDataPath; incomplete installation
+attempts show a warning on the next successful game start.
+Editor/uninstalled builds and the internal Unity executable launched without the package entry
+do not offer installation. Use the normal installed shortcut or AppImage for updates.
 Saves belong in Application.persistentDataPath. Windows downloads use Setup.exe; Linux uses AppImage.
 Keep update packages and feeds attached to releases. Old Java builds cannot self-update to this project.
 Actual installation and N -> N+1 updates on Windows/Linux still require verification before promoting releases to players.
+Follow [the first release test runbook](RELEASE-TEST.md) and record both platforms' actual results.
 
 ## License and provenance
 Original code: PolyForm Noncommercial 1.0.0 (LICENSE).

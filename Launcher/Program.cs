@@ -1,54 +1,109 @@
 using System.Diagnostics;
+using System.Net.Http.Json;
+using System.Text.Json;
 using Velopack;
 using Velopack.Sources;
 
-VelopackApp.Build().Run();
-var smokeTest = args.Contains("--smoke-test");
-if (!smokeTest)
-{
-    try
-    {
-        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-        var manager = new UpdateManager(new GithubSource(
-            "https://github.com/LeonHorner/LegendOfCat", accessToken: null, prerelease: false));
-        if (manager.IsInstalled)
-        {
-            var update = await manager.CheckForUpdatesAsync().WaitAsync(timeout.Token);
-            if (update != null)
-            {
-                await manager.DownloadUpdatesAsync(update);
-                manager.ApplyUpdatesAndRestart(update);
-                return 0;
-            }
-        }
-    }
-    catch (Exception error)
-    {
-        // Update failures must not prevent offline play.
-        var logDirectory = Path.Combine(Environment.GetFolderPath(
-            Environment.SpecialFolder.LocalApplicationData), "LegendOfCat");
-        try
-        {
-            Directory.CreateDirectory(logDirectory);
-            File.AppendAllText(Path.Combine(logDirectory, "launcher.log"),
-                DateTimeOffset.UtcNow + " " + error.Message + Environment.NewLine);
-        }
-        catch { /* Logging must not prevent play either. */ }
-    }
-}
+VelopackApp.Build().SetAutoApplyOnStartup(false).Run();
+if (args.Length == 5 && args[0] == "--update-service")
+    return await UpdateService.Run(int.Parse(args[1]), int.Parse(args[2]), args[3], args[4]);
+// One running game per installation prevents an update replacing another game's files.
+using var instance = new Mutex(false, "LegendOfCat-" + Convert.ToHexString(
+    System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(
+        Environment.GetEnvironmentVariable("APPIMAGE") ?? AppContext.BaseDirectory))));
+try { if (!instance.WaitOne(0)) return 2; } catch (AbandonedMutexException) { }
 var game = Path.Combine(AppContext.BaseDirectory, "Game",
     OperatingSystem.IsWindows() ? "LegendOfCat.exe" : "LegendOfCat");
-if (!File.Exists(game))
-{
-    Console.Error.WriteLine("Game files are missing. Reinstall LegendOfCat.");
-    return 1;
-}
+if (!File.Exists(game)) return 1;
 var start = new ProcessStartInfo(game) {
-    UseShellExecute = false,
-    WorkingDirectory = Path.GetDirectoryName(game)!
+    UseShellExecute = false, WorkingDirectory = Path.GetDirectoryName(game)!
 };
 foreach (var arg in args) start.ArgumentList.Add(arg);
+start.ArgumentList.Add("--launcher-pid");
+start.ArgumentList.Add(Environment.ProcessId.ToString());
 using var process = Process.Start(start);
 if (process == null) return 1;
 await process.WaitForExitAsync();
 return process.ExitCode;
+
+static class UpdateService
+{
+    const string Repository = "https://github.com/LeonHorner/LegendOfCat";
+    static readonly object OutputLock = new();
+    static void Send(object message)
+    {
+        lock (OutputLock) { Console.WriteLine(JsonSerializer.Serialize(message)); Console.Out.Flush(); }
+    }
+    public static async Task<int> Run(int gamePid, int launcherPid, string stateDirectory, string installedVersion)
+    {
+        Directory.CreateDirectory(stateDirectory);
+        var marker = Path.Combine(stateDirectory, "update-pending.txt");
+        var log = Path.Combine(stateDirectory, "updates.log");
+        var manager = new UpdateManager(new GithubSource(Repository, null, false));
+        if (File.Exists(marker)) {
+            var target = await File.ReadAllTextAsync(marker);
+            if (target != installedVersion)
+                Send(new { state = "warning", message = "The previous update did not complete. Retry from Settings. See updates.log and Velopack logs." });
+            File.Delete(marker);
+        }
+        UpdateInfo? update = null;
+        bool downloaded = false;
+        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("LegendOfCat-Updater/1.0");
+        while (await Console.In.ReadLineAsync() is { } command)
+        {
+            try {
+                if (command == "check") {
+                    Send(new { state = "checking" });
+                    var releases = new List<object>();
+                    for (var page = 1; ; page++) {
+                        var batch = await client.GetFromJsonAsync<JsonElement[]>(
+                            $"https://api.github.com/repos/LeonHorner/LegendOfCat/releases?per_page=100&page={page}") ?? [];
+                        foreach (var release in batch) {
+                            if (!UpdatePolicy.IsStableRelease(release.GetProperty("draft").GetBoolean(),
+                                release.GetProperty("prerelease").GetBoolean())) continue;
+                            releases.Add(new { version = release.GetProperty("tag_name").GetString(),
+                                notes = release.GetProperty("body").GetString() ?? "",
+                                url = release.GetProperty("html_url").GetString() });
+                        }
+                        if (batch.Length < 100) break;
+                    }
+                    Send(new { state = "history", releases });
+                    if (!manager.IsInstalled) { Send(new { state = "development" }); continue; }
+                    update = await manager.CheckForUpdatesAsync().WaitAsync(TimeSpan.FromSeconds(20));
+                    if (update != null && !UpdatePolicy.IsNewerStableVersion(
+                        update.TargetFullRelease.Version.ToString(), manager.CurrentVersion?.ToString() ?? installedVersion))
+                        update = null;
+                    downloaded = false;
+                    Send(new { state = update == null ? "current" : "available",
+                        version = update?.TargetFullRelease.Version.ToString() ?? "" });
+                } else if (command == "download" && update != null) {
+                    Send(new { state = "downloading", progress = 0 });
+                    using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(30));
+                    await manager.DownloadUpdatesAsync(update,
+                        progress => Send(new { state = "downloading", progress }), timeout.Token);
+                    downloaded = true;
+                    Send(new { state = "ready" });
+                } else if (command == "apply" && update != null && downloaded) {
+                    await File.WriteAllTextAsync(marker, update.TargetFullRelease.Version.ToString());
+                    await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Applying {update.TargetFullRelease.Version}\n");
+                    Send(new { state = "applying" });
+                    // Both Unity and the entry process must release their files before installation.
+                    await WaitForExit(gamePid);
+                    if (launcherPid > 0) await WaitForExit(launcherPid);
+                    manager.ApplyUpdatesAndRestart(update);
+                    return 0;
+                }
+            } catch (Exception error) {
+                try { await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} {error}\n"); } catch { }
+                Send(new { state = "error", message = "Update failed. You can keep playing and retry from Settings." });
+            }
+        }
+        return 0;
+    }
+    static async Task WaitForExit(int pid)
+    {
+        try { using var process = Process.GetProcessById(pid); await process.WaitForExitAsync(); }
+        catch (ArgumentException) { /* Already exited. */ }
+    }
+}
