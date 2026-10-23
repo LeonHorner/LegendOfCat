@@ -1,5 +1,6 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
+import { assertFeedAsset, packageName } from './delta-release.mjs';
 import { fileURLToPath } from 'node:url';
 
 export const DOWNLOADS = Object.freeze({
@@ -15,7 +16,9 @@ function requireSingle(files, suffix, platform) {
   return matches[0];
 }
 
-export function prepareAssets(sourceDir, destinationDir) {
+export function prepareAssets(sourceDir, destinationDir, version) {
+  if (!/^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$/.test(version))
+    throw new Error('Explicit release version required for asset staging');
   const source = resolve(sourceDir);
   const destination = resolve(destinationDir);
   if (source === destination || destination.startsWith(source + '/'))
@@ -32,18 +35,25 @@ export function prepareAssets(sourceDir, destinationDir) {
       throw new Error(platform + ': empty or invalid Velopack update feed');
 
     const packageNames = files.filter(name => name.endsWith('.nupkg'));
-    if (!packageNames.length) throw new Error(platform + ': missing update packages');
+    const expectedFull = packageName(version, platform);
+    const expectedDelta = packageName(version, platform, 'delta');
+    if (!packageNames.includes(expectedFull) ||
+        packageNames.some(name => name !== expectedFull && name !== expectedDelta))
+      throw new Error(platform + ': unexpected release package version, channel or missing full package');
     const referenced = new Set();
     for (const entry of feed.Assets) {
       const filename = entry.FileName;
       if (entry.PackageId !== PACKAGE_ID || typeof filename !== 'string' ||
-          !filename.endsWith('.nupkg') || basename(filename) !== filename ||
-          !packageNames.includes(filename))
+          basename(filename) !== filename || !packageNames.includes(filename))
         throw new Error(platform + ': invalid or missing update package referenced by feed: ' + filename);
+      const type = filename === expectedFull ? 'full' : 'delta';
+      if (referenced.has(filename)) throw new Error(platform + ': duplicate feed package');
+      assertFeedAsset(entry, join(directory, filename), version, platform, type);
       referenced.add(filename);
     }
-    if (packageNames.some(name => !referenced.has(name)))
-      throw new Error(platform + ': an update package is missing from its feed');
+    if (packageNames.some(name => !referenced.has(name)) ||
+        referenced.size !== packageNames.length)
+      throw new Error(platform + ': a package is missing from the release feed');
 
     function add(filename, publicName = filename) {
       if (output.has(publicName)) throw new Error('Duplicate published asset: ' + publicName);
@@ -73,6 +83,6 @@ export function prepareAssets(sourceDir, destinationDir) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const files = prepareAssets(process.argv[2] ?? 'artifacts/releases', process.argv[3] ?? 'artifacts/published');
+  const files = prepareAssets(process.argv[2] ?? 'artifacts/releases', process.argv[3] ?? 'artifacts/published', process.argv[4]);
   console.log('Verified release assets: ' + files.join(', '));
 }
