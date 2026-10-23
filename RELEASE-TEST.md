@@ -14,16 +14,23 @@ release merely to exercise the updater; use the next small, real fix for N+1.
   do not verify a graphical installation. WSLg may be useful for supplementary testing but is
   not a substitute for the target Linux desktop installation/update test.
 - Download stable packages only from https://github.com/LeonHorner/LegendOfCat/releases.
-  Keep the release feeds and update packages attached. Builds are currently unsigned.
+  Keep the release feeds and update packages attached. Player downloads are now named
+  `LegendOfCat-Windows-Installer.exe`, `LegendOfCat-Windows-Portable.zip`, and
+  `LegendOfCat-Linux-x86_64.AppImage`. Builds are currently unsigned.
 
 ## Version N: fresh installation
 
 1. After explicit authorization, run `Release` on main (no mode input). Let the workflow
    select the version; record it as N. Verify both platform packages and feeds were published.
-2. On Windows, install using Setup.exe. On Linux, make the AppImage executable, place it in a
+   Check that the release shows the three player downloads plus the two `releases.*.json`
+   feeds and referenced `.nupkg` files; do not ship `assets.*.json` or legacy `RELEASES`.
+   Verify the three player links in the release notes and the README `latest/download/` URLs.
+   When upgrading from v0.2.0, expect its existing asset names to differ.
+2. On Windows, install using `LegendOfCat-Windows-Installer.exe`. On Linux,
+   make `LegendOfCat-Linux-x86_64.AppImage` executable, place it in a
    writable location and launch it from a graphical session with required AppImage support.
 3. Open the normal package entry. Unity's menu must appear without a separate launcher window.
-   Verify Play, the test view, Back to menu, Settings, disabled Language, Versions & Updates,
+   Verify Play, the movement prototype, Back to menu, Settings, disabled Language, Versions & Updates,
    displayed installed version, official release links and Quit.
 4. Disconnect networking and restart. The menu must stay usable; a failed background check
    must offer Retry/Later without preventing play. Restore networking and retry.
@@ -37,6 +44,8 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 1. Deliver a small real visible fix through its own ready PR and exact-revision `Prepare merge`
    validation. After separately authorized merge and release, record the new tag as N+1.
 2. Start installed N while online. Verify one pop-up for N+1 with Update now and Later.
+   If N is an older release with the original Velopack installer/AppImage names,
+   confirm its update succeeds without reinstalling or migrating user data.
 3. Choose Later, quit and restart. The same version must not prompt again. Settings and
    Versions & Updates must continue to show the available update.
 4. Open Versions & Updates, select Update now and observe download percentage. Unity remains
@@ -56,6 +65,7 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 | --- | --- | --- |
 | OS / desktop / installation location | Pending | Pending |
 | N tag / commit / release workflow | Pending | Pending |
+| Public download names, direct links and retained update feeds | Not run | Not run |
 | Fresh install and graphical menu | Not run | Not run |
 | Offline start and retry | Not run | Not run |
 | N+1 tag / commit / release workflow | Pending | Pending |

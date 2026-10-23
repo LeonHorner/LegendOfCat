@@ -2,6 +2,16 @@
 
 A charming 2D adventure starring **Mika the cat**. A little cat, a big adventure: LegendOfCat is being built around beautifully painted worlds, tricky jumps and memorable boss encounters.
 
+## Download (early development)
+
+| Platform | Download |
+| --- | --- |
+| Windows x64 — installer (recommended) | [Download Windows Installer](https://github.com/LeonHorner/LegendOfCat/releases/latest/download/LegendOfCat-Windows-Installer.exe) |
+| Linux x64 — AppImage | [Download Linux AppImage](https://github.com/LeonHorner/LegendOfCat/releases/latest/download/LegendOfCat-Linux-x86_64.AppImage) |
+| Windows x64 — portable (optional) | [Download Portable ZIP](https://github.com/LeonHorner/LegendOfCat/releases/latest/download/LegendOfCat-Windows-Portable.zip) |
+
+These builds are **unfinished previews**, not the complete game. Downloads are unsigned and graphical installation / version-to-version updates still need real Windows and Linux verification. If a direct link is not yet available during the transition to the new asset names, use the [latest release page](https://github.com/LeonHorner/LegendOfCat/releases/latest).
+
 ![Golden River Ruins concept art showing Mika in a painted adventure world](docs/design/references/golden-river-ruins-v2.png)
 
 *Golden River Ruins — early concept art, not a gameplay screenshot. Final environments and encounters may change. [Art direction and provenance](docs/design/art-direction.md).*
@@ -17,11 +27,11 @@ The planned adventure brings together:
 
 These are development goals. The six-level journey, combat and final level designs are still being developed; the concepts do not represent a finished, playable campaign.
 
-## Development status and downloads
+## Development status
 
-LegendOfCat is in early development in Unity. The current foundation includes a start menu, settings and update integration; Play currently opens a test view. The adventure described above is not yet available as a complete game.
+LegendOfCat is in early development in Unity. The current foundation includes a playable movement prototype, a start menu, settings and update integration. The adventure described above is not yet available as a complete game.
 
-**Windows and Linux are the target platforms.** Early development builds are available from the [official GitHub Releases](https://github.com/LeonHorner/LegendOfCat/releases). Read the release notes for their contents and limitations: these builds contain the current foundation, not the finished adventure. Windows downloads use Setup.exe; Linux downloads use AppImage. Actual graphical installation and version-to-version updates on both platforms still require verification.
+**Windows x64 and Linux x64 are the target platforms.** See the [release notes](https://github.com/LeonHorner/LegendOfCat/releases/latest) for shipped features, limitations and previous builds. On Linux, make the downloaded AppImage executable before running it. Settings and future saves are stored outside the installation so updates do not overwrite them.
 
 ## Feedback
 
