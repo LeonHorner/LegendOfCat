@@ -4,6 +4,9 @@ import { execFileSync } from 'node:child_process';
 import { readdirSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { basename } from 'node:path';
+import { DOWNLOADS } from './release-assets.mjs';
+import { downloadNotes } from './release-notes.mjs';
 
 const initial = await firstReleasePlan();
 if (initial === null) {
@@ -15,13 +18,15 @@ if (initial === null) {
     throw new Error('Release version changed after validation.');
   const collect = directory => readdirSync(directory, { withFileTypes: true })
     .flatMap(entry => entry.isDirectory() ? collect(join(directory, entry.name)) : [join(directory, entry.name)]);
-  const assets = collect('artifacts/releases');
-  if (!assets.some(file => file.endsWith('Setup.exe')) || !assets.some(file => file.endsWith('.AppImage')))
-    throw new Error('Both platform packages are required.');
+  const assets = collect('artifacts/published');
+  for (const filename of Object.values(DOWNLOADS)) {
+    if (!assets.some(file => basename(file) === filename))
+      throw new Error('Missing player download: ' + filename);
+  }
   const temporary = mkdtempSync(join(tmpdir(), 'legendofcat-release-'));
   try {
     const notes = join(temporary, 'notes.md');
-    writeFileSync(notes, release.notes);
+    writeFileSync(notes, downloadNotes(release.gitTag) + '\n\n' + release.notes);
     // Publish only after all files have uploaded successfully.
     execFileSync('gh', ['release', 'create', release.gitTag, ...assets,
       '--repo', 'LeonHorner/LegendOfCat', '--target', release.gitHead,

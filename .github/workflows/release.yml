@@ -194,6 +194,10 @@ jobs:
           pattern: release-*
           merge-multiple: true
           path: artifacts/releases
+      - name: Test release asset and download-link contract
+        run: node --test tools/release-assets.test.mjs
+      - name: Stage clean player downloads and update packages
+        run: node tools/release-assets.mjs artifacts/releases artifacts/published
       - name: Confirm release version has not changed
         id: final-plan
         run: npm run release:plan

@@ -13,6 +13,33 @@ Linux startup checks use Xvfb: this Unity player still requires a valid window b
 startup logs as artifacts; a virtual-display smoke check does not verify a graphical installation.
 Git tags are the version source; no bot version commits. Builds remain unsigned until signing is configured.
 
+## Public download assets
+
+The release workflow first lets Velopack create its normal Windows/Linux packages. After
+both platform builds and packaging succeed, `tools/release-assets.mjs` verifies the
+`releases.win.json` and `releases.linux.json` feeds against their original referenced
+`.nupkg` files, then stages the public release assets separately.
+
+The three fixed player-facing asset names are:
+
+- `LegendOfCat-Windows-Installer.exe` (the Velopack `*-Setup.exe` payload, renamed)
+- `LegendOfCat-Windows-Portable.zip` (optional, not a self-contained save-data folder)
+- `LegendOfCat-Linux-x86_64.AppImage` (the original Velopack AppImage, renamed)
+
+The `LeonHorner.LegendOfCat` package ID, the `releases.*.json` feed contents,
+all referenced `.nupkg` files and updater channels `win`/`linux` stay unchanged.
+The `assets.*.json` upload manifests (only needed for Velopack deployment commands)
+and legacy Squirrel `RELEASES` files are not attached to GitHub Releases.
+Do not remove the feed files or `.nupkg` packages: `GithubSource` needs them for updates.
+The staging script fails closed on missing, inconsistent or duplicate publish assets.
+The packaging outputs themselves are not renamed or rewritten.
+
+README links target `/releases/latest/download/<fixed-asset-name>`, while each release
+description links to the exact release tag and puts the downloads above the changelog.
+The README direct links will not resolve against v0.2.0, which still uses Velopack's
+original names: coordinate merging the README change with the next separately authorized
+release; do not claim new links are live until that release is available.
+
 ## Updates
 Launcher/ is a self-contained C# launcher using Velopack.
 The package entry opens the Unity start menu immediately without a launcher window.
@@ -28,7 +55,29 @@ update diagnostics are stored under Application.persistentDataPath; incomplete i
 attempts show a warning on the next successful game start.
 Editor/uninstalled builds and the internal Unity executable launched without the package entry
 do not offer installation. Use the normal installed shortcut or AppImage for updates.
-Saves belong in Application.persistentDataPath. Windows downloads use Setup.exe; Linux uses AppImage.
+## User data and install paths
+
+Unity's release builds set company name `LeonHorner` and product name `LegendOfCat`.
+Current menu/update state is stored under `Application.persistentDataPath`:
+
+- Windows: `%USERPROFILE%\AppData\LocalLow\LeonHorner\LegendOfCat\`
+- Linux: `~/.config/unity3d/LeonHorner/LegendOfCat/` (or below
+  `$XDG_CONFIG_HOME/unity3d/LeonHorner/LegendOfCat/` when set)
+
+`menu-settings.json` stores versioned menu/update reminder settings.
+`updates.log` and `update-pending.txt` support update diagnostics and recovery;
+versioned settings backups may also exist. Gameplay saves/editable levels are **not yet
+implemented**; when added, they must use this persistent-data directory and the
+[storage migration contract](data-migrations.md). Preview builds use a separate product
+directory to avoid overwriting release data.
+
+Windows installs to `%LOCALAPPDATA%\LeonHorner.LegendOfCat\` by default
+(per-user Velopack installation). On Linux, users choose where to keep the
+self-updating AppImage. The Windows portable ZIP still stores settings in the
+standard Unity directory, not next to the portable executable. Updates replace
+application files, not this separate user data. Do not change the Unity
+company/product names just to change the public installer filenames.
+
 Menu settings use a versioned format with backup-before-migration and atomic writes. The
 [persistent data contract](data-migrations.md) governs future settings, save and level formats.
 Keep update packages and feeds attached to releases. Old Java builds cannot self-update to this project.
@@ -37,7 +86,7 @@ Follow [the first release test runbook](../RELEASE-TEST.md) and record both plat
 
 ## Setup status
 Unity activation secrets are configured. The setup PR tracks final Windows/Linux validation.
-Prepare merge and Release are separate manually triggered workflows. Neither runs automatically on pushes or PR events.
+Ready PRs automatically trigger Prepare merge checks; Draft PRs skip them. Release remains separately and manually triggered.
 Release tooling audit reports transitive braces/micromatch and npm/ip-address advisories even with current direct dependencies. Recheck before the first release.
 
 ## Asset provenance

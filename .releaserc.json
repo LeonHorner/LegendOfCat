@@ -10,6 +10,7 @@
         "preset": "conventionalcommits"
       }
     ],
+    "./tools/release-notes.mjs",
     [
       "@semantic-release/release-notes-generator",
       {
@@ -23,7 +24,7 @@
         "failComment": false,
         "assets": [
           {
-            "path": "artifacts/releases/**/*"
+            "path": "artifacts/published/*"
           }
         ]
       }
