@@ -41,3 +41,7 @@
 - Stage only task-related files. Never commit credentials, license secrets, generated build directories or unrelated assets.
 - Use English Conventional Commits, including fix/perf/feat and BREAKING CHANGE when appropriate.
 - A normal merge from main into a feature branch is allowed to update its base; merging a feature into main is squash-only.
+
+## Design references
+- Before gameplay or visual work, read docs/design/game-direction.md, docs/design/art-direction.md and the linked implementation plan. Preserve the agreed readability requirements and ask about unresolved product choices before locking them in.
+- Track issue dependencies using native GitHub blocked-by relationships, not dependency lists in issue bodies. Read those relationships before starting work.

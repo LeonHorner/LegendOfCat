@@ -1,0 +1,60 @@
+# Development
+
+Maintainer documentation for the Unity project. For player information, see the [README](../README.md). Follow [AGENTS.md](../AGENTS.md) for binding agent rules.
+
+## Open
+Install Unity Hub and Unity **6000.3.27f1**, then add this folder as a project.
+Use **LegendOfCat > Create starter scene** to create/open the initial scene.
+Commit generated Unity settings, Packages/packages-lock.json and any new .meta files after the first import.
+The starter scene test and Windows player build have passed in CI; full platform validation is recorded in the setup PR.
+
+## Repository language
+Use English for maintained code, comments, documentation, filenames, branches, commits, PRs, UI text and release notes. Preserve third-party legal notices and proper names verbatim.
+
+## Issue-to-feature development
+Tell an agent: "Implement issue #123." The agent reads [AGENTS.md](../AGENTS.md), the issue and related work, then reuses or creates a feature branch and PR.
+One coherent feature can contain several issues and stays on one branch until complete.
+Draft PRs track unfinished features. List every related issue, acceptance criterion, remaining task and documentation change.
+Use an English Conventional Commit PR title describing the complete user-visible result. Squash merge turns it into one commit and one release-note entry.
+External code contributions are not accepted; public bug reports and feature requests are welcome.
+
+## Prepare a merge
+Pushes, PR creation and individual commits do not run tests or builds.
+Once the entire feature is complete:
+
+1. Merge current main into the feature branch without rewriting published history.
+2. Mark the PR ready and finish its documentation and self-review.
+3. Run **Actions > Prepare merge** and enter the PR number.
+   CLI equivalent: `gh workflow run pull-request.yml -f pr_number=123`.
+4. The workflow validates the title and branch, then runs Unity tests and Windows/Linux player and launcher builds on the exact PR head SHA.
+5. A successful run sets the required **merge-ready** status on that SHA. New commits require another final run; a newer main must first be merged into the branch.
+6. Merge only when explicitly authorized: `gh pr merge 123 --squash --delete-branch --match-head-commit <validated-sha>`.
+
+Main requires a PR, resolved conversations, the merge-ready status and an up-to-date branch. No reviewer approval is required.
+Normal merge commits and rebase merges into main are disabled. Force-pushes and deletion of main are blocked, with no bypass actors.
+Agents must never force-push any branch. Feature branches may merge main normally to update their base.
+A requested issue implementation stops at a ready PR with final validation results; it does not imply permission to merge or release.
+
+## Local Windows UI preview
+
+Run Unity in batch mode with `-executeMethod BuildGame.BuildPreview` and
+`-previewOutput <absolute-output-folder>/LegendOfCatPreview.exe` to build a windowed UI preview.
+Keep the entire output folder with the executable; Unity players are not single-file applications.
+Preview-only buttons show the update pop-up and simulate downloads/errors without networking,
+installing updates or quitting to an updater. Preview settings use a separate persistent data
+directory (`LeonHorner/LegendOfCat Preview`). The normal start menu, Settings and Play test view
+are the same UI as the release build; simulation tools are compiled out of release builds.
+
+## Official Unity agent connection
+The official com.unity.pipeline package is pinned to 0.9.0-exp.1. Open this project in Unity before using the connection.
+The verified local CLI version is 1.0.0-beta.13. Run unity status to check readiness, then unity command get_hierarchy for a read-only check.
+For Codex, configure a local MCP server running unity mcp --project-path <absolute-project-path>. Keep machine-specific executable and project paths out of Git.
+The setup machine has a local .codex/config.toml excluded through .git/info/exclude. Reopen the project in Codex to load the connection.
+CLI and MCP use the same Pipeline backend: CLI is convenient for scripts; MCP exposes discoverable structured tools directly to agents.
+No tests are run by connecting MCP. Follow the manual final-validation policy in [AGENTS.md](../AGENTS.md).
+
+## Design references
+
+Read the [game direction](design/game-direction.md), [art direction](design/art-direction.md) and [implementation plan](design/implementation-plan.md) before gameplay or visual work. The Unity adventure reimagines the earlier Java game rather than copying its gameplay specification.
+
+For release operations and updater behavior, see [Releasing](releasing.md).
