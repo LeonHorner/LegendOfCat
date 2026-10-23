@@ -72,7 +72,7 @@ jobs:
       - name: Run CI workflow contract tests
         run: node --test tools/ci-workflow.test.mjs
       - name: Check release download and Delta contracts
-        run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
+        run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs tools/linux-update-contract.test.mjs
       - name: Check Unity activation
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
