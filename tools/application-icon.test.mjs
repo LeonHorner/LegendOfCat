@@ -27,6 +27,9 @@ test('both workflows package installers and desktop integration using original-d
     assert.match(yaml, /dotnet vpk pack/);
   }
 });
+test('validation packaging uses a version accepted by Velopack without publishing', () => {
+  assert.match(read('.github/workflows/pull-request.yml'), /--packVersion 0\.0\.1 /);
+});
 test('fixed history navigation precedes the scrolling content and uses unique release controls', () => {
   const ui = read('Assets/Game/Scripts/StarterScreen.Presentation.cs');
   assert.ok(ui.indexOf('Button("Back to settings", fixedNavigation: true)') < ui.indexOf('scroll = GUILayout.BeginScrollView(scroll)'));

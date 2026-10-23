@@ -152,8 +152,8 @@ jobs:
           targetPlatform: ${{ matrix.target }}
           buildMethod: BuildGame.Build
           versioning: Custom
-          version: 0.0.0
-          customParameters: -releaseVersion 0.0.0 -releaseOutput build/${{ matrix.platform }}/Game/${{ matrix.player }}
+          version: 0.0.1
+          customParameters: -releaseVersion 0.0.1 -releaseOutput build/${{ matrix.platform }}/Game/${{ matrix.player }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
@@ -215,7 +215,7 @@ jobs:
           path: publish/Game
       - name: Publish launcher
         run: |
-          dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:Version=0.0.0 -o publish
+          dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:Version=0.0.1 -o publish
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Make Linux player executable
         if: matrix.platform == 'linux'
@@ -240,7 +240,7 @@ jobs:
       - name: Package installer and update feed
         run: |
           $icon = if ($IsWindows) { 'tools/icon.ico' } else { 'Assets/Game/Branding/icon.png' }
-          dotnet vpk pack --packId LeonHorner.LegendOfCat --packVersion 0.0.0 --packDir publish --mainExe ${{ matrix.executable }} --runtime ${{ matrix.rid }} --channel ${{ matrix.platform }} --packTitle LegendOfCat --icon $icon --outputDir artifacts/releases/${{ matrix.platform }}
+          dotnet vpk pack --packId LeonHorner.LegendOfCat --packVersion 0.0.1 --packDir publish --mainExe ${{ matrix.executable }} --runtime ${{ matrix.rid }} --channel ${{ matrix.platform }} --packTitle LegendOfCat --icon $icon --outputDir artifacts/releases/${{ matrix.platform }}
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $folder = 'artifacts/releases/${{ matrix.platform }}'
           if (-not (Get-ChildItem $folder -Filter '*.nupkg')) { throw 'Missing update package' }
