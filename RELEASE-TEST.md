@@ -6,9 +6,9 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 
 ## Preparation
 
-- Finish the feature PR, merge current main normally, and run the manual `Prepare merge`
-  workflow (`pull-request.yml`, `pr_number=<number>`) for the ready PR. Every test and both player/helper builds must pass on
-  the exact head SHA before an explicitly authorized squash merge.
+- Finish the feature PR, merge current main normally and mark the PR ready. Automatic `Prepare merge`
+  validation (manual `pull-request.yml`/`pr_number=<number>` fallback) checks the exact head SHA.
+  Every Unity test and both player/helper builds must pass before an explicitly authorized squash merge.
 - Record the workflow URL, commit, tag, package names, OS version and installation location.
 - Reserve a Windows desktop and a Linux desktop or graphical VM. Docker payload smoke tests
   do not verify a graphical installation. WSLg may be useful for supplementary testing but is
@@ -34,7 +34,7 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 
 ## Version N+1: installed update
 
-1. Deliver a small real visible fix through its own PR and exact-revision `prepare_merge`
+1. Deliver a small real visible fix through its own ready PR and exact-revision `Prepare merge`
    validation. After separately authorized merge and release, record the new tag as N+1.
 2. Start installed N while online. Verify one pop-up for N+1 with Update now and Later.
 3. Choose Later, quit and restart. The same version must not prompt again. Settings and
