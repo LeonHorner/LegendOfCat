@@ -121,7 +121,7 @@ test('previous full package must match the signed-off feed checksum', () => {
             Version: '0.2.0', Type: 'Full', SHA1: 'wrong', Size: 12 }]
         })
       )
-    }), /checksum mismatch/);
+    }), /SHA-1 mismatch/);
   });
 });
 
@@ -151,6 +151,46 @@ test('Delta larger than threshold is discarded after successful patch verificati
     assert.equal(result.publishDelta, false);
     assert.equal(existsSync(deltaPath), false);
     assert.deepEqual(JSON.parse(readFileSync(join(directory, feedName), 'utf8')).Assets.map(a => a.FileName), [full]);
+  });
+});
+
+test('exactly 10% savings is an eligible Delta', () => {
+  temporary(root => {
+    const { directory, stateFile, full, delta, deltaPath, feedName } = fixture(root);
+    writeFileSync(deltaPath, Buffer.alloc(900, 17));
+    const feedPath = join(directory, feedName);
+    const feed = JSON.parse(readFileSync(feedPath, 'utf8'));
+    feed.Assets[1] = entry(delta, deltaPath, 'Delta');
+    writeFileSync(feedPath, JSON.stringify(feed));
+    const result = finalizeRelease('win', version, directory, stateFile, {
+      patch: (_base, _patch, destination) => copyFileSync(join(directory, full), destination)
+    });
+    assert.equal(result.publishDelta, true);
+  });
+});
+
+test('SHA-256 feed hashes are verified for full and Delta packages when present', () => {
+  temporary(root => {
+    const { directory, stateFile, feedName } = fixture(root);
+    const feedPath = join(directory, feedName);
+    const feed = JSON.parse(readFileSync(feedPath, 'utf8'));
+    for (const asset of feed.Assets) {
+      asset.SHA256 = createHash('sha256').update(readFileSync(join(directory, asset.FileName)))
+        .digest('hex').toUpperCase();
+    }
+    writeFileSync(feedPath, JSON.stringify(feed));
+    const result = finalizeRelease('win', version, directory, stateFile, {
+      patch: (_base, _patch, destination) => copyFileSync(join(directory, feed.Assets[0].FileName), destination)
+    });
+    assert.equal(result.publishDelta, true);
+  });
+  temporary(root => {
+    const { directory, stateFile, feedName } = fixture(root);
+    const feedPath = join(directory, feedName);
+    const feed = JSON.parse(readFileSync(feedPath, 'utf8'));
+    feed.Assets[1].SHA256 = 'BAD';
+    writeFileSync(feedPath, JSON.stringify(feed));
+    assert.throws(() => finalizeRelease('win', version, directory, stateFile), /SHA-256 mismatch/);
   });
 });
 
