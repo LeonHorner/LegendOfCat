@@ -40,7 +40,6 @@ The README direct links will not resolve against v0.2.0, which still uses Velopa
 original names: coordinate merging the README change with the next separately authorized
 release; do not claim new links are live until that release is available.
 
-
 ## Updates
 Launcher/ is a self-contained C# launcher using Velopack.
 The package entry opens the Unity start menu immediately without a launcher window.
@@ -61,7 +60,7 @@ do not offer installation. Use the normal installed shortcut or AppImage for upd
 Unity's release builds set company name `LeonHorner` and product name `LegendOfCat`.
 Current menu/update state is stored under `Application.persistentDataPath`:
 
-- Windows: `%USERPROFILE%\\AppData\\LocalLow\\LeonHorner\\LegendOfCat\\`
+- Windows: `%USERPROFILE%\AppData\LocalLow\LeonHorner\LegendOfCat\`
 - Linux: `~/.config/unity3d/LeonHorner/LegendOfCat/` (or below
   `$XDG_CONFIG_HOME/unity3d/LeonHorner/LegendOfCat/` when set)
 
@@ -72,7 +71,7 @@ implemented**; when added, they must use this persistent-data directory and the
 [storage migration contract](data-migrations.md). Preview builds use a separate product
 directory to avoid overwriting release data.
 
-Windows installs to `%LOCALAPPDATA%\\LeonHorner.LegendOfCat\\` by default
+Windows installs to `%LOCALAPPDATA%\LeonHorner.LegendOfCat\` by default
 (per-user Velopack installation). On Linux, users choose where to keep the
 self-updating AppImage. The Windows portable ZIP still stores settings in the
 standard Unity directory, not next to the portable executable. Updates replace
