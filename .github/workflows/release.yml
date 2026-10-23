@@ -107,7 +107,7 @@ jobs:
   package:
     needs: [plan, build]
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - os: windows-2022
@@ -139,18 +139,23 @@ jobs:
       - name: Make Linux player executable
         if: matrix.platform == 'linux'
         run: chmod +x publish/Game/LegendOfCat publish/LegendOfCat
+      - name: Install virtual display for Linux startup
+        if: matrix.platform == 'linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y xvfb xauth
       - name: Smoke test complete payload
         run: |
-          $player = Join-Path (Get-Location) 'publish/${{ matrix.executable }}'
-          $startOptions = @{
-            FilePath = $player
-            ArgumentList = @('--smoke-test','-batchmode','-nographics','-logFile','smoke.log')
-            PassThru = $true
-          }
-          if ($IsWindows) { $startOptions.WindowStyle = 'Hidden' }
-          $process = Start-Process @startOptions
-          if (-not $process.WaitForExit(90000)) { $process.Kill($true); throw 'Game startup timed out' }
-          if ($process.ExitCode -ne 0) { throw "Game exited with $($process.ExitCode)" }
+          ./tools/smoke-test.ps1 -Executable 'publish/${{ matrix.executable }}' -LogPath 'artifacts/smoke/${{ matrix.platform }}.log' -VirtualDisplay:($IsLinux)
+      - name: Preserve startup diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-${{ matrix.platform }}
+          path: artifacts/smoke
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Package installer and update feed
         run: |
           $icon = if ($IsWindows) { 'tools/icon.ico' } else { 'tools/icon.png' }
