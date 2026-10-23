@@ -56,6 +56,30 @@ test('refuses missing feed packages without creating an incomplete release', () 
   });
 });
 
+test('rejects incomplete player downloads and inconsistent package identity', () => {
+  fixture((source, destination) => {
+    writeFileSync(join(source, 'win', 'releases.win.json'),
+      JSON.stringify({ Assets: [{ FileName: 'LeonHorner.LegendOfCat-0.3.0-win-full.nupkg',
+        PackageId: 'Another.Application' }] }));
+    assert.throws(() => prepareAssets(source, destination), /invalid or missing update package/);
+  });
+});
+
+test('README links and semantic-release asset paths agree with the staging contract', () => {
+  const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+  const releaseConfig = JSON.parse(readFileSync(new URL('../.releaserc.json', import.meta.url), 'utf8'));
+  for (const name of Object.values(DOWNLOADS)) {
+    assert.ok(readme.includes('/releases/latest/download/' + name), name);
+  }
+  const notesIndex = releaseConfig.plugins.indexOf('./tools/release-notes.mjs');
+  assert.ok(notesIndex !== -1);
+  assert.ok(notesIndex < releaseConfig.plugins.findIndex(plugin =>
+    Array.isArray(plugin) && plugin[0] === '@semantic-release/release-notes-generator'));
+  const github = releaseConfig.plugins.find(plugin =>
+    Array.isArray(plugin) && plugin[0] === '@semantic-release/github');
+  assert.equal(github[1].assets[0].path, 'artifacts/published/*');
+});
+
 test('release notes link to the same stable names for a specific version', () => {
   const notes = downloadNotes('v0.3.0');
   for (const name of Object.values(DOWNLOADS)) {
