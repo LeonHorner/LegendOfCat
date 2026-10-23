@@ -120,3 +120,22 @@ public static class MenuSettings
                 throw new InvalidDataException("lastOfferedVersion must be a string.");
         });
 }
+
+public static class DisplaySettings
+{
+    public const int CurrentVersion = 0;
+
+    public static VersionedJsonFile Open(string path) => new VersionedJsonFile(path, CurrentVersion,
+        () => new JObject { ["width"] = 1280, ["height"] = 720, ["fullscreen"] = false },
+        data => {
+            if (data["width"] == null) data["width"] = 1280;
+            if (data["height"] == null) data["height"] = 720;
+            if (data["fullscreen"] == null) data["fullscreen"] = false;
+            if (data["width"].Type != JTokenType.Integer || data["height"].Type != JTokenType.Integer ||
+                data["fullscreen"].Type != JTokenType.Boolean)
+                throw new InvalidDataException("Invalid display preference types.");
+            int width = data["width"].Value<int>(), height = data["height"].Value<int>();
+            if (width < 640 || width > 16384 || height < 360 || height > 16384)
+                throw new InvalidDataException("Display dimensions are outside safe bounds.");
+        });
+}
