@@ -12,7 +12,6 @@ A charming 2D adventure starring **Mika the cat**. A little cat, a big adventure
 
 These builds are **unfinished previews**, not the complete game. Downloads are unsigned and graphical installation / version-to-version updates still need real Windows and Linux verification. If a direct link is not yet available during the transition to the new asset names, use the [latest release page](https://github.com/LeonHorner/LegendOfCat/releases/latest).
 
-
 ![Golden River Ruins concept art showing Mika in a painted adventure world](docs/design/references/golden-river-ruins-v2.png)
 
 *Golden River Ruins — early concept art, not a gameplay screenshot. Final environments and encounters may change. [Art direction and provenance](docs/design/art-direction.md).*
