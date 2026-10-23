@@ -30,7 +30,7 @@ release merely to exercise the updater; use the next small, real fix for N+1.
    make `LegendOfCat-Linux-x86_64.AppImage` executable, place it in a
    writable location and launch it from a graphical session with required AppImage support.
 3. Open the normal package entry. Unity's menu must appear without a separate launcher window.
-   Verify Play, the test view, Back to menu, Settings, disabled Language, Versions & Updates,
+   Verify Play, the movement prototype, Back to menu, Settings, disabled Language, Versions & Updates,
    displayed installed version, official release links and Quit.
 4. Disconnect networking and restart. The menu must stay usable; a failed background check
    must offer Retry/Later without preventing play. Restore networking and retry.
