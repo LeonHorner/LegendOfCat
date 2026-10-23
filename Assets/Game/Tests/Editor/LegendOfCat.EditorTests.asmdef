@@ -1,5 +1,10 @@
 {
   "name": "LegendOfCat.EditorTests",
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "Newtonsoft.Json.dll",
+    "nunit.framework.dll"
+  ],
   "includePlatforms": [
     "Editor"
   ],

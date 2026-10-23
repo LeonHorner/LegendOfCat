@@ -10,6 +10,7 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../Assets/Game/Scripts/UpdatePolicy.cs" Link="UpdatePolicy.cs" />
     <PackageReference Include="Velopack" Version="1.2.161" />
   </ItemGroup>
 </Project>

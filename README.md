@@ -44,10 +44,35 @@ Git tags are the version source; no bot version commits. Builds remain unsigned 
 
 ## Updates
 Launcher/ is a self-contained C# launcher using Velopack.
-It checks public GitHub Releases once per launch, applies available updates before starting the game, and starts the installed version if checking/downloading fails.
+The package entry opens the Unity start menu immediately without a launcher window.
+Play opens a test view; Settings contains the future Language option and Versions & Updates.
+The updater checks public stable GitHub Releases in the background. Each new available version
+prompts once with Update now / Later; Later persists across restarts and leaves a Settings badge.
+Versions & Updates shows stable release history and release notes. Older versions cannot be installed.
+Only the latest newer compatible stable version can be installed. Prereleases are excluded.
+Downloads show progress while Unity remains open. Once ready, Unity exits and the background
+helper waits for both game and package entry to exit, installs the update and restarts the game.
+Network/download failures leave the current game playable with Retry / Later. Settings and
+update diagnostics are stored under Application.persistentDataPath; incomplete installation
+attempts show a warning on the next successful game start.
+Editor/uninstalled builds and the internal Unity executable launched without the package entry
+do not offer installation. Use the normal installed shortcut or AppImage for updates.
 Saves belong in Application.persistentDataPath. Windows downloads use Setup.exe; Linux uses AppImage.
+Menu settings use a versioned format with backup-before-migration and atomic writes. The
+[persistent data contract](docs/data-migrations.md) governs future settings, save and level formats.
 Keep update packages and feeds attached to releases. Old Java builds cannot self-update to this project.
 Actual installation and N -> N+1 updates on Windows/Linux still require verification before promoting releases to players.
+Follow [the first release test runbook](RELEASE-TEST.md) and record both platforms' actual results.
+
+## Local Windows UI preview
+
+Run Unity in batch mode with `-executeMethod BuildGame.BuildPreview` and
+`-previewOutput <absolute-output-folder>/LegendOfCatPreview.exe` to build a windowed UI preview.
+Keep the entire output folder with the executable; Unity players are not single-file applications.
+Preview-only buttons show the update pop-up and simulate downloads/errors without networking,
+installing updates or quitting to an updater. Preview settings use a separate persistent data
+directory (`LeonHorner/LegendOfCat Preview`). The normal start menu, Settings and Play test view
+are the same UI as the release build; simulation tools are compiled out of release builds.
 
 ## License and provenance
 Original code: PolyForm Noncommercial 1.0.0 (LICENSE).
