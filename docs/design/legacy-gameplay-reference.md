@@ -1,4 +1,4 @@
-# Portable Java gameplay reference
+# Legacy gameplay reference
 
 Recorded from the local Java source on 2026-10-23. This document is self-contained: agents do not need the author's disk paths or a Java installation to plan the Unity implementation. It records observed legacy behavior, not mandatory Unity requirements. The agreed redesign in game-direction.md takes precedence.
 
