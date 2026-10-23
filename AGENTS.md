@@ -5,7 +5,7 @@
 - Unity version is pinned in ProjectSettings/ProjectVersion.txt. Commit Packages/packages-lock.json after Editor import.
 - One coherent feature per branch/PR; several related issues can share it. Never force-push any branch.
 - Squash PR titles must be Conventional Commits. Do not require external review approval for this solo workflow.
-- Run automated tests only in manual prepare-merge validation once a feature is ready, and in explicitly requested releases. Do not trigger tests for individual commits. Require the merge-ready status before squash merge.
+- Run automatic merge validation for open, ready-for-review PRs; each update to a ready PR revalidates its exact head. Draft PRs skip full validation. A manual Prepare merge dispatch remains available as fallback. Releases run only with explicit user authorization. Always require the merge-ready status before squash merge.
 - Compilation and static inspection are allowed during development. Do not claim unrun checks passed.
 - Do not trigger or publish a release unless the user explicitly requests it.
 - Preserve all Unity .meta files; never hand-edit serialized scenes when Editor tooling is available.
@@ -29,10 +29,10 @@
 4. Implement the agreed feature, update relevant documentation and asset provenance, and add meaningful tests for the behavior. Do not expand into unrelated issues.
 5. Open a draft PR early for multi-issue features; list all related issues and remaining acceptance criteria. Use "Closes #123" only for issues fully completed by the PR. Keep incomplete issues explicitly listed as remaining work.
 6. Keep the PR title, summary and checklist current as the feature evolves. The final title describes the complete player-visible result and becomes the single squash commit/changelog entry.
-7. Perform static checks and self-review while developing. Do not run CI/tests after every commit, on every push, or merely because a draft PR exists.
-8. Once implementation, documentation and self-review are complete, review other merged PRs and merge current main normally into the feature branch (never force-push/rebase shared history). Resolve conflicts preserving both features' intended behavior, inspect relevant end-to-end integration, and update the PR's integration notes and remaining risks. Mark the PR ready and run the manual Prepare merge workflow (pull-request.yml) with pr_number=<number>. Inspect results and fix failures; rerun only after fixes or invalidated results.
+7. Perform static checks and self-review while developing. Keep unfinished work as a Draft PR to avoid automatic full CI. Ready PRs run validation on creation and relevant changes; do not request redundant manual runs after every commit.
+8. Once implementation, documentation and self-review are complete, review other merged PRs and merge current main normally into the feature branch (never force-push/rebase shared history). Resolve conflicts preserving both features' intended behavior, inspect relevant end-to-end integration, and update the PR's integration notes and remaining risks. Mark the PR ready; `pull_request` automatically runs Prepare merge. Inspect results and fix failures. If the automatic run did not occur, manually dispatch `pull-request.yml` with `pr_number=<number>`.
 9. Every test and both Windows/Linux player and launcher builds must pass for the exact PR revision. A new commit or invalidated base requires fresh final validation; merge a newer main first. Do not bypass the merge-ready status.
-10. Report the PR URL, implemented issues, documentation changes, validation results and remaining blockers. "Implement issue #123" authorizes the work through a ready PR and final checks when the feature is complete; it does not authorize merging or publishing a release.
+10. Report the PR URL, implemented issues, documentation changes, validation results and remaining blockers. "Implement issue #123" authorizes the work through a ready PR and automatic final checks when the feature is complete; it does not authorize merging or publishing a release.
 11. Merge only when explicitly requested, using squash and the validated head SHA. If the feature contains unfinished issues, leave the PR as a draft and report progress without triggering final validation.
 
 ## Parallel work and ownership

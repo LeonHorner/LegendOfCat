@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-  checks: write
 concurrency:
   group: stable-release
   cancel-in-progress: false
@@ -60,6 +59,8 @@ jobs:
         with:
           testMode: editmode
           artifactsPath: artifacts/tests
+          # The Unity job and XML artifacts carry the results; omit the neutral check.
+          githubToken: ''
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -67,7 +68,8 @@ jobs:
           path: artifacts/tests
           retention-days: 7
   build:
-    needs: [plan, test]
+    needs: plan
+    if: needs.plan.outputs.version != ''
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
@@ -172,7 +174,9 @@ jobs:
           path: artifacts/releases
           retention-days: 1
   publish:
-    needs: [plan, package]
+    # Publishing waits for tests, both player builds and both complete packages.
+    needs: [plan, test, build, package]
+    if: needs.plan.result == 'success' && needs.test.result == 'success' && needs.build.result == 'success' && needs.package.result == 'success'
     runs-on: ubuntu-22.04
     permissions:
       contents: write

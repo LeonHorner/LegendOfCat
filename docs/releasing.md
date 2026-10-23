@@ -7,7 +7,7 @@ Configure Actions secrets UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD (GameCI 
 Run **Actions > Release** on main. No mode or version input is needed.
 Conventional Commits since the last release determine the version: fix/perf = patch, feat = minor, !/BREAKING CHANGE = major.
 Docs/chore/test alone produce no release. The first release is 0.1.0. Later releases follow Conventional Commits; a breaking change can promote 0.x to 1.0.0.
-The workflow reruns tests and both platform builds, packages and smoke-checks the payloads, then publishes only if everything succeeds.
+After successful version planning, Unity EditMode tests and Windows/Linux player builds run in parallel. Platform packaging (including the self-contained launchers, startup smoke checks, installers and update feeds) may proceed after both player builds, but **publish** waits for all tests, both builds and both packages to succeed. Failed, skipped or cancelled required jobs cannot publish. The final release plan/version recheck still runs immediately before publication. GitHub Release dispatch remains manual and restricted to `main`; no PR event publishes a release.
 Linux startup checks use Xvfb: this Unity player still requires a valid window backend with
 `-batchmode -nographics`. Prepare merge also runs the Linux payload check. Both workflows retain
 startup logs as artifacts; a virtual-display smoke check does not verify a graphical installation.
