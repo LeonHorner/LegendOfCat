@@ -3,7 +3,7 @@
 Unity starter for a 2D game with optional 3D visuals. The previous Java game is not migrated.
 
 ## Open
-Install Unity Hub and Unity **6000.3.0f1**, then add this folder as a project.
+Install Unity Hub and Unity **6000.3.27f1**, then add this folder as a project.
 Use **LegendOfCat > Create starter scene** to create/open the initial scene.
 The first import generates Unity settings and asset metadata; commit them.
 Unity is not installed on the machine used to create this scaffold, so the Editor build has not yet been verified.
