@@ -11,7 +11,7 @@ List incomplete acceptance criteria. Keep the PR as a draft while the feature is
 Describe documentation and asset-provenance updates.
 
 ## Final validation
-Do not run tests after every commit. Once the feature is complete, run Actions > Release with mode=prepare_merge and this PR number.
+Do not run tests after every commit. Once the feature is complete, run Actions > Prepare merge with this PR number.
 Record the workflow URL and validated head SHA. Never claim skipped or failed checks passed.
 New commits or a changed base require final validation again.
 

@@ -23,8 +23,8 @@ Pushes, PR creation and individual commits do not run tests or builds.
 Once the entire feature is complete:
 1. Merge current main into the feature branch without rewriting published history.
 2. Mark the PR ready and finish its documentation and self-review.
-3. Run **Actions > Release**, select **prepare_merge**, and enter the PR number.
-   CLI equivalent: `gh workflow run release.yml -f mode=prepare_merge -f pr_number=123`.
+3. Run **Actions > Prepare merge** and enter the PR number.
+   CLI equivalent: `gh workflow run pull-request.yml -f pr_number=123`.
 4. The workflow validates the title and branch, then runs Unity tests and Windows/Linux player and launcher builds on the exact PR head SHA.
 5. A successful run sets the required **merge-ready** status on that SHA. New commits require another final run; a newer main must first be merged into the branch.
 6. Merge only when explicitly authorized: `gh pr merge 123 --squash --delete-branch --match-head-commit <validated-sha>`.
@@ -36,9 +36,9 @@ A requested issue implementation stops at a ready PR with final validation resul
 
 ## Release
 Configure Actions secrets UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD (GameCI activation).
-Run **Actions > Release** on main and explicitly choose **release**. No version input is needed.
+Run **Actions > Release** on main. No mode or version input is needed.
 Conventional Commits since the last release determine the version: fix/perf = patch, feat = minor, !/BREAKING CHANGE = major.
-Docs/chore/test alone produce no release. The first release is 1.0.0.
+Docs/chore/test alone produce no release. The first release is 0.1.0. Later releases follow Conventional Commits; a breaking change can promote 0.x to 1.0.0.
 The workflow reruns tests and both platform builds, packages and smoke-checks the payloads, then publishes only if everything succeeds.
 Git tags are the version source; no bot version commits. Builds remain unsigned until signing is configured.
 
@@ -57,7 +57,7 @@ AI provenance does not guarantee copyright protection.
 
 ## Setup status
 Unity activation secrets are configured. The setup PR tracks final Windows/Linux validation.
-The first workflow setup PR remains open until its final checks pass; the already-registered Release workflow can be dispatched on that setup branch for bootstrapping.
+Prepare merge and Release are separate manually triggered workflows. Neither runs automatically on pushes or PR events.
 Release tooling audit reports transitive braces/micromatch and npm/ip-address advisories even with current direct dependencies. Recheck before the first release.
 
 ## Official Unity agent connection
