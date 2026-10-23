@@ -12,6 +12,7 @@
 - Keep Unity MCP local, editor-only, and pinned to a reviewed revision before adding it.
 - Generated scenes and asset metadata must be committed after the first Editor import.
 - Store saves/settings under Application.persistentDataPath, never inside the install folder.
+- Follow docs/data-migrations.md for every persistent-data format change. Start each format at schemaVersion 0 and use independent counters for settings, saves and editable levels. Migrate only formats shipped in published stable releases; unreleased formats may evolve in place without compatibility migrations. Preserve originals/backups and unknown future files, and commit regression fixtures/tests when changing a released format incompatibly. Never silently reset a player's save.
 - Use only original/generated assets or assets whose license allows public source redistribution.
 - Record asset source, generator/model, date, license and human creative decisions in ASSETS.md.
 - No unlicensed characters, brands, fonts, music or copied code. Preserve dependency notices.

@@ -28,6 +28,8 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 4. Disconnect networking and restart. The menu must stay usable; a failed background check
    must offer Retry/Later without preventing play. Restore networking and retry.
 5. Capture the displayed version and the files under Unity's `Application.persistentDataPath`.
+   Record the actual stable tag and shipped schema versions in the published format ledger in
+   `docs/data-migrations.md`; do not freeze compatibility for unreleased preview data.
    Leave N installed on both systems. Do not install N+1 manually over these test installations.
 
 ## Version N+1: installed update

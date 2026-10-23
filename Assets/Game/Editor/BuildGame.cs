@@ -49,6 +49,45 @@ public static class BuildGame
             throw new BuildFailedException("Unity player build failed.");
     }
 
+    // Local UI inspection only. No installer, update feed or release publication is produced.
+    public static void BuildPreview()
+    {
+        CreateStarterScene();
+        var company = PlayerSettings.companyName;
+        var product = PlayerSettings.productName;
+        var version = PlayerSettings.bundleVersion;
+        var fullscreen = PlayerSettings.fullScreenMode;
+        var width = PlayerSettings.defaultScreenWidth;
+        var height = PlayerSettings.defaultScreenHeight;
+        try {
+            PlayerSettings.companyName = "LeonHorner";
+            PlayerSettings.productName = "LegendOfCat Preview";
+            PlayerSettings.bundleVersion = "0.0.0-preview";
+            PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
+            PlayerSettings.defaultScreenWidth = 1100;
+            PlayerSettings.defaultScreenHeight = 800;
+            var output = Argument("-previewOutput");
+            Directory.CreateDirectory(Path.GetDirectoryName(output));
+            var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
+                scenes = new[] { ScenePath },
+                target = BuildTarget.StandaloneWindows64,
+                locationPathName = output,
+                options = BuildOptions.Development,
+                extraScriptingDefines = new[] { "LEGEND_OF_CAT_PREVIEW" }
+            });
+            if (report.summary.result != BuildResult.Succeeded)
+                throw new BuildFailedException("Windows preview build failed.");
+        }
+        finally {
+            PlayerSettings.companyName = company;
+            PlayerSettings.productName = product;
+            PlayerSettings.bundleVersion = version;
+            PlayerSettings.fullScreenMode = fullscreen;
+            PlayerSettings.defaultScreenWidth = width;
+            PlayerSettings.defaultScreenHeight = height;
+        }
+    }
+
     static string Argument(string key)
     {
         var args = Environment.GetCommandLineArgs();

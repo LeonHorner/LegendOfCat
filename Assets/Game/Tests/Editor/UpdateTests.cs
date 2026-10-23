@@ -56,6 +56,7 @@ public class UpdateTests
         gameObject = new GameObject("Update test");
         screen = gameObject.AddComponent(screenType);
         Set("preferencesPath", Path.Combine(directory, "settings.json"));
+        screenType.GetMethod("LoadPreferences", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(screen, null);
     }
     FieldInfo Field(string name) => screenType.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
     void Set(string name, object value) => Field(name).SetValue(screen, value);
@@ -79,9 +80,7 @@ public class UpdateTests
         CreateScreen();
         Receive("{\"state\":\"available\",\"version\":\"1.1.0\"}");
         Assert.That(Get("popup"), Is.True);
-        var saved = File.ReadAllText((string)Get("preferencesPath"));
-        var preferencesType = screenType.GetNestedType("Preferences");
-        Set("preferences", JsonUtility.FromJson(saved, preferencesType));
+        screenType.GetMethod("LoadPreferences", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(screen, null);
         Set("popup", false);
         Receive("{\"state\":\"available\",\"version\":\"1.1.0\"}");
         Assert.That(Get("popup"), Is.False);

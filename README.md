@@ -58,9 +58,21 @@ attempts show a warning on the next successful game start.
 Editor/uninstalled builds and the internal Unity executable launched without the package entry
 do not offer installation. Use the normal installed shortcut or AppImage for updates.
 Saves belong in Application.persistentDataPath. Windows downloads use Setup.exe; Linux uses AppImage.
+Menu settings use a versioned format with backup-before-migration and atomic writes. The
+[persistent data contract](docs/data-migrations.md) governs future settings, save and level formats.
 Keep update packages and feeds attached to releases. Old Java builds cannot self-update to this project.
 Actual installation and N -> N+1 updates on Windows/Linux still require verification before promoting releases to players.
 Follow [the first release test runbook](RELEASE-TEST.md) and record both platforms' actual results.
+
+## Local Windows UI preview
+
+Run Unity in batch mode with `-executeMethod BuildGame.BuildPreview` and
+`-previewOutput <absolute-output-folder>/LegendOfCatPreview.exe` to build a windowed UI preview.
+Keep the entire output folder with the executable; Unity players are not single-file applications.
+Preview-only buttons show the update pop-up and simulate downloads/errors without networking,
+installing updates or quitting to an updater. Preview settings use a separate persistent data
+directory (`LeonHorner/LegendOfCat Preview`). The normal start menu, Settings and Play test view
+are the same UI as the release build; simulation tools are compiled out of release builds.
 
 ## License and provenance
 Original code: PolyForm Noncommercial 1.0.0 (LICENSE).

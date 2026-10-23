@@ -14,9 +14,15 @@ public sealed class StarterScreen : MonoBehaviour
         public Release[] releases;
     }
     [Serializable] public class Preferences { public string lastOfferedVersion = ""; }
+#if LEGEND_OF_CAT_PREVIEW
+    static readonly bool Preview = true;
+#else
+    static readonly bool Preview = false;
+#endif
     readonly ConcurrentQueue<string> messages = new ConcurrentQueue<string>();
     Process helper;
     Preferences preferences = new Preferences();
+    VersionedJsonFile settingsFile;
     Release[] releases = new Release[0];
     string page = "menu", state = "development", available = "", error = "", warning = "";
     string preferencesPath;
@@ -32,11 +38,11 @@ public sealed class StarterScreen : MonoBehaviour
     {
         if (Environment.GetCommandLineArgs().Contains("--smoke-test")) { Application.Quit(0); return; }
         preferencesPath = Path.Combine(Application.persistentDataPath, "menu-settings.json");
-        try {
-            if (File.Exists(preferencesPath))
-                preferences = JsonUtility.FromJson<Preferences>(File.ReadAllText(preferencesPath)) ?? new Preferences();
-        } catch (Exception) { warning = "Settings could not be read. Defaults are in use."; }
-        if (Application.isEditor) return;
+        LoadPreferences();
+#if LEGEND_OF_CAT_PREVIEW
+        messages.Enqueue("{\"state\":\"history\",\"releases\":[{\"version\":\"0.1.0 (preview example)\",\"notes\":\"Sample release notes for UI inspection. No release has been published.\",\"url\":\"https://github.com/LeonHorner/LegendOfCat/releases/\"}]}");
+#endif
+        if (Application.isEditor || Preview) return;
         var executable = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..",
             Application.platform == RuntimePlatform.WindowsPlayer ? "LegendOfCat.exe" : "LegendOfCat"));
         if (!File.Exists(executable)) return;
@@ -62,9 +68,23 @@ public sealed class StarterScreen : MonoBehaviour
             Send("check");
         } catch (Exception) { state = "error"; error = "Update service could not start. You can keep playing."; }
     }
+    void LoadPreferences()
+    {
+        settingsFile = MenuSettings.Open(preferencesPath);
+        preferences.lastOfferedVersion = (string)settingsFile.Data["lastOfferedVersion"];
+        warning = settingsFile.Warning;
+    }
     static string Quote(string value) => "\"" + value.Replace("\"", "\\\"") + "\"";
     void Send(string command)
     {
+#if LEGEND_OF_CAT_PREVIEW
+        if (Preview) {
+            if (command == "check") messages.Enqueue("{\"state\":\"available\",\"version\":\"0.1.0\"}");
+            if (command == "download") { popup = false; page = "updates"; StartCoroutine(PreviewDownload()); }
+            if (command == "apply") state = "previewComplete";
+            return;
+        }
+#endif
         try {
             helper.StandardInput.WriteLine(command);
             helper.StandardInput.Flush();
@@ -89,9 +109,13 @@ public sealed class StarterScreen : MonoBehaviour
                     popup = true;
                     preferences.lastOfferedVersion = available;
                     try {
-                        Directory.CreateDirectory(Application.persistentDataPath);
-                        File.WriteAllText(preferencesPath, JsonUtility.ToJson(preferences));
-                    } catch (Exception) { warning = "The update reminder could not be saved."; }
+                        if (settingsFile == null) settingsFile = MenuSettings.Open(preferencesPath);
+                        settingsFile.Data["lastOfferedVersion"] = available;
+                        settingsFile.Save();
+                    } catch (Exception) {
+                        warning = settingsFile != null && !string.IsNullOrEmpty(settingsFile.Warning)
+                            ? settingsFile.Warning : "The update reminder could not be saved. Existing settings are preserved.";
+                    }
                 }
             }
             if (state == "current") available = "";
@@ -103,6 +127,16 @@ public sealed class StarterScreen : MonoBehaviour
             catch (InvalidOperationException) { }
         }
     }
+#if LEGEND_OF_CAT_PREVIEW
+    System.Collections.IEnumerator PreviewDownload()
+    {
+        for (int value = 0; value <= 100; value += 5) {
+            messages.Enqueue("{\"state\":\"downloading\",\"progress\":" + value + "}");
+            yield return new WaitForSecondsRealtime(0.1f);
+        }
+        messages.Enqueue("{\"state\":\"ready\"}");
+    }
+#endif
     void OnApplicationQuit()
     {
         if (helper == null || applying) return;
@@ -123,6 +157,7 @@ public sealed class StarterScreen : MonoBehaviour
         GUILayout.BeginArea(new Rect((Screen.width - width) / 2, (Screen.height - height) / 2, width, height), GUI.skin.box);
         GUILayout.Label("LegendOfCat", titleStyle);
         GUILayout.Label("Version " + Application.version, textStyle);
+        if (Preview) GUILayout.Label("Local UI preview — updates are simulated; nothing is installed.", textStyle);
         if (!string.IsNullOrEmpty(warning)) GUILayout.Label(warning, textStyle);
         GUI.enabled = !popup && state != "applying";
         scroll = GUILayout.BeginScrollView(scroll);
@@ -148,7 +183,7 @@ public sealed class StarterScreen : MonoBehaviour
             if (!string.IsNullOrEmpty(warning)) GUILayout.Label(warning, textStyle);
             if (!string.IsNullOrEmpty(error)) GUILayout.Label(error, textStyle);
             bool busy = state == "checking" || state == "downloading" || state == "ready" || state == "applying";
-            GUI.enabled = !popup && !busy && helper != null;
+            GUI.enabled = !popup && !busy && (helper != null || Preview);
             if (Button(state == "error" ? "Retry" : "Check for updates")) Send("check");
             if (!string.IsNullOrEmpty(available) && Button("Update now — " + available)) Send("download");
             GUI.enabled = !popup;
@@ -162,6 +197,17 @@ public sealed class StarterScreen : MonoBehaviour
             if (Button(state == "error" ? "Later" : "Back")) page = "settings";
         }
         GUILayout.EndScrollView();
+#if LEGEND_OF_CAT_PREVIEW
+        if (Preview) {
+            GUI.enabled = !popup && state != "downloading";
+            GUILayout.Label("Preview tools", textStyle);
+            if (Button("Show update pop-up")) { popup = true; available = "0.1.0"; }
+            if (Button("Simulate download error")) {
+                popup = false; page = "updates"; available = "0.1.0";
+                messages.Enqueue("{\"state\":\"error\",\"message\":\"Simulated download failure. Retry or choose Later.\"}");
+            }
+        }
+#endif
         GUI.enabled = true;
         GUILayout.EndArea();
         if (popup) {
@@ -184,6 +230,7 @@ public sealed class StarterScreen : MonoBehaviour
             case "downloading": return "Downloading update: " + progress + "%";
             case "ready": case "applying": return "Restarting to install the update…";
             case "current": return "You are up to date.";
+            case "previewComplete": return "Preview download complete. No update was installed.";
             case "error": return "Update unavailable. Your installed version is still playable.";
             default: return "Development build: update installation is unavailable.";
         }
