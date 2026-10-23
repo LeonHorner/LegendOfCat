@@ -1,4 +1,6 @@
 # Agent rules
+- Use English for all repository content: code identifiers, comments, documentation, filenames, branch names, commits, PR titles and descriptions, maintainer-authored issues, UI text, logs, and release notes. This applies even when user instructions are in another language. Preserve third-party legal notices and proper names verbatim.
+- One coherent feature or fix per branch and PR. Use an English Conventional Commit PR title describing the user-visible result; it becomes the squash commit and release-note entry. Keep implementation details in the PR description.
 - Keep the project small; no framework layers without a concrete need.
 - Unity version is pinned in ProjectSettings/ProjectVersion.txt. Commit Packages/packages-lock.json after Editor import.
 - One task per short branch: feat/*, fix/*, chore/*. Never force-push main.

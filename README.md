@@ -8,6 +8,9 @@ Use **LegendOfCat > Create starter scene** to create/open the initial scene.
 The first import generates Unity settings and asset metadata; commit them.
 Unity is not installed on the machine used to create this scaffold, so the Editor build has not yet been verified.
 
+## Repository language
+All maintained repository content is English, including code, comments, documentation, branch names, commits, pull requests, UI text, and release notes. Preserve third-party legal notices and proper names verbatim.
+
 ## Development
 Use short `feat/*`, `fix/*`, or `chore/*` branches and squash PRs into main.
 PR titles must use Conventional Commits. No automatic CI on pushes or PRs.
