@@ -29,6 +29,53 @@ public sealed partial class StarterScreen : MonoBehaviour
     int progress;
     Vector2 scroll;
     MovementCourse course;
+    [Serializable] sealed class DisplayPreferences
+    {
+        public int schemaVersion = 0;
+        public int width = 1280, height = 720;
+        public bool fullscreen;
+    }
+    DisplayPreferences display = new DisplayPreferences();
+    string displayPath;
+    int lastWidth, lastHeight;
+    float changedAt;
+
+    void LoadDisplay()
+    {
+        displayPath = Path.Combine(Application.persistentDataPath, "display-settings.json");
+        try {
+            if (File.Exists(displayPath)) {
+                var read = JsonUtility.FromJson<DisplayPreferences>(File.ReadAllText(displayPath));
+                if (read != null && read.schemaVersion == 0 && read.width >= 640 && read.height >= 360)
+                    display = read;
+            }
+        } catch (Exception) { /* Preserve the original and use defaults. */ }
+        Screen.SetResolution(display.width, display.height,
+            display.fullscreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed);
+        lastWidth = display.width; lastHeight = display.height;
+        changedAt = Time.unscaledTime;
+    }
+
+    void SaveDisplay()
+    {
+        try {
+            Directory.CreateDirectory(Path.GetDirectoryName(displayPath));
+            var tmp = displayPath + ".tmp";
+            File.WriteAllText(tmp, JsonUtility.ToJson(display));
+            if (File.Exists(displayPath)) File.Replace(tmp, displayPath, null);
+            else File.Move(tmp, displayPath);
+        } catch (Exception) { warning = "Display preferences could not be saved."; }
+    }
+
+    void SetFullscreen(bool value)
+    {
+        display.fullscreen = value;
+        Screen.SetResolution(display.width, display.height,
+            value ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed);
+        changedAt = Time.unscaledTime;
+        SaveDisplay();
+    }
+
 
     void OpenCourse()
     {
@@ -57,6 +104,7 @@ public sealed partial class StarterScreen : MonoBehaviour
         if (Environment.GetCommandLineArgs().Contains("--smoke-test")) { Application.Quit(0); return; }
         preferencesPath = Path.Combine(Application.persistentDataPath, "menu-settings.json");
         LoadPreferences();
+        if (!Preview) LoadDisplay();
 #if LEGEND_OF_CAT_PREVIEW
         messages.Enqueue("{\"state\":\"history\",\"releases\":[{\"version\":\"0.1.0 (preview example)\",\"notes\":\"Sample release notes for UI inspection. No release has been published.\",\"url\":\"https://github.com/LeonHorner/LegendOfCat/releases/\"}]}");
 #endif
@@ -93,6 +141,26 @@ public sealed partial class StarterScreen : MonoBehaviour
     }
     void Update()
     {
+        if (!Preview && displayPath != null) {
+            if (Input.GetKeyDown(KeyCode.Return) &&
+                (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)))
+                SetFullscreen(!display.fullscreen);
+            if (Screen.fullScreen != display.fullscreen) {
+                display.fullscreen = Screen.fullScreen;
+                changedAt = Time.unscaledTime;
+                SaveDisplay();
+            }
+            if (!display.fullscreen && Screen.width >= 640 && Screen.height >= 360) {
+                if (lastWidth != Screen.width || lastHeight != Screen.height) {
+                    lastWidth = Screen.width; lastHeight = Screen.height;
+                    changedAt = Time.unscaledTime;
+                } else if ((display.width != lastWidth || display.height != lastHeight) &&
+                           Time.unscaledTime - changedAt > 1.5f) {
+                    display.width = lastWidth; display.height = lastHeight;
+                    SaveDisplay();
+                }
+            }
+        }
         while (platform != null && platform.TryReceive(out var incoming)) messages.Enqueue(incoming);
         while (messages.TryDequeue(out var line)) {
             Message message;
