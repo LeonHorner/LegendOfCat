@@ -1,5 +1,7 @@
 name: Prepare merge
 on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize, edited, converted_to_draft]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -8,16 +10,18 @@ on:
         type: string
 permissions:
   contents: read
-  checks: write
   statuses: write
 concurrency:
-  group: pr-validation-${{ inputs.pr_number }}
+  group: pr-validation-${{ github.event.pull_request.number || inputs.pr_number }}
   cancel-in-progress: true
 jobs:
   preflight:
     name: PR preflight
+    # Skip Draft pushes and untrusted forks; still invalidate when a ready PR becomes Draft.
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.full_name == github.repository && (!github.event.pull_request.draft || github.event.action == 'converted_to_draft'))
     runs-on: ubuntu-22.04
     outputs:
+      number: ${{ steps.pr.outputs.number }}
       sha: ${{ steps.pr.outputs.sha }}
       base: ${{ steps.pr.outputs.base }}
       title: ${{ steps.pr.outputs.title }}
@@ -29,27 +33,38 @@ jobs:
           PR_NUMBER: ${{ inputs.pr_number }}
         with:
           script: |
-            if (!/^[1-9][0-9]*$/.test(process.env.PR_NUMBER)) throw new Error('A valid PR number is required.');
-            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
-            if (pr.state !== 'open' || pr.draft || pr.base.ref !== 'main' ||
-                pr.head.repo.full_name !== context.payload.repository.full_name) {
-              throw new Error('Use an open, ready PR from this repository targeting main.');
+            // The same exact-head validation path handles manual and ready-PR events.
+            const input = process.env.PR_NUMBER;
+            const number = context.eventName === 'workflow_dispatch'
+              ? (/^[1-9][0-9]*$/.test(input) ? Number(input) : NaN)
+              : context.payload.pull_request?.number;
+            if (!Number.isSafeInteger(number) || number < 1) throw new Error('A valid PR number is required.');
+            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: number});
+            const repository = context.repo.owner + '/' + context.repo.repo;
+            if (pr.head.repo?.full_name !== repository) {
+              throw new Error('Only same-repository PR branches may use the Unity secrets.');
             }
+            core.setOutput('number', String(number));
             core.setOutput('sha', pr.head.sha);
             core.setOutput('base', pr.base.sha);
             core.setOutput('title', pr.title);
             await github.rest.repos.createCommitStatus({
               ...context.repo, sha: pr.head.sha, state: 'pending', context: 'merge-ready',
-              description: 'Final tests and builds are running.',
+              description: 'Validating the exact PR revision, Unity tests and both builds.',
               target_url: context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId
             });
+            if (pr.state !== 'open' || pr.draft || pr.base.ref !== 'main') {
+              throw new Error('Use an open, ready PR targeting main; Draft PRs are not merge-ready.');
+            }
             if (!/^(feat|fix|perf|docs|style|refactor|test|build|ci|chore|revert)(\([^)]+\))?!?: .+/.test(pr.title)) {
               throw new Error('The PR title must be an English Conventional Commit.');
             }
             const {data: comparison} = await github.rest.repos.compareCommitsWithBasehead({
               ...context.repo, basehead: pr.base.sha + '...' + pr.head.sha
             });
-            if (comparison.behind_by !== 0) throw new Error('Merge main into the feature branch before validation. Do not rebase published branches.');
+            if (comparison.behind_by !== 0) {
+              throw new Error('Merge main into the feature branch before validation; never rebase published branches.');
+            }
       - name: Check Unity activation
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -83,6 +98,8 @@ jobs:
         with:
           testMode: editmode
           artifactsPath: artifacts/tests
+          # Keep Unity's exit code and XML artifacts; omit the redundant neutral check.
+          githubToken: ''
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -91,7 +108,7 @@ jobs:
           retention-days: 3
   build:
     name: Build (${{ matrix.platform }})
-    needs: [preflight, test]
+    needs: preflight
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
@@ -159,7 +176,7 @@ jobs:
     steps:
       - uses: actions/github-script@v7
         env:
-          PR_NUMBER: ${{ inputs.pr_number }}
+          PR_NUMBER: ${{ needs.preflight.outputs.number }}
           CHECKED_SHA: ${{ needs.preflight.outputs.sha }}
           CHECKED_BASE: ${{ needs.preflight.outputs.base }}
           CHECKED_TITLE: ${{ needs.preflight.outputs.title }}
@@ -169,10 +186,20 @@ jobs:
         with:
           script: |
             const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
-            const unchanged = pr.state === 'open' && !pr.draft &&
+            const unchanged = pr.state === 'open' && !pr.draft && pr.base.ref === 'main' &&
+              pr.head.repo?.full_name === context.repo.owner + '/' + context.repo.repo &&
               pr.head.sha === process.env.CHECKED_SHA && pr.base.sha === process.env.CHECKED_BASE &&
               pr.title === process.env.CHECKED_TITLE;
-            const passed = unchanged && ['PREFLIGHT', 'TEST', 'BUILD'].every(name => process.env[name] === 'success');
+            let currentWithBase = false;
+            if (unchanged) {
+              const {data: comparison} = await github.rest.repos.compareCommitsWithBasehead({
+                ...context.repo, basehead: pr.base.sha + '...' + pr.head.sha
+              });
+              currentWithBase = comparison.behind_by === 0;
+            }
+            // Matrix failure or cancellation is not success; only complete, unchanged validation passes.
+            const passed = unchanged && currentWithBase &&
+              ['PREFLIGHT', 'TEST', 'BUILD'].every(name => process.env[name] === 'success');
             await github.rest.repos.createCommitStatus({
               ...context.repo, sha: process.env.CHECKED_SHA,
               state: passed ? 'success' : 'failure', context: 'merge-ready',
