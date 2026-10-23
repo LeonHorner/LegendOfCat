@@ -55,20 +55,27 @@ static class UpdateService
             try {
                 if (command == "check") {
                     Send(new { state = "checking" });
-                    var releases = new List<object>();
-                    for (var page = 1; ; page++) {
-                        var batch = await client.GetFromJsonAsync<JsonElement[]>(
-                            $"https://api.github.com/repos/LeonHorner/LegendOfCat/releases?per_page=100&page={page}") ?? [];
-                        foreach (var release in batch) {
-                            if (!UpdatePolicy.IsStableRelease(release.GetProperty("draft").GetBoolean(),
-                                release.GetProperty("prerelease").GetBoolean())) continue;
-                            releases.Add(new { version = release.GetProperty("tag_name").GetString(),
-                                notes = release.GetProperty("body").GetString() ?? "",
-                                url = release.GetProperty("html_url").GetString() });
+                    // Release history is optional. A REST API rate limit must not prevent
+                    // checking the independent Velopack update feed.
+                    try {
+                        var releases = new List<object>();
+                        for (var page = 1; ; page++) {
+                            var batch = await client.GetFromJsonAsync<JsonElement[]>(
+                                $"https://api.github.com/repos/LeonHorner/LegendOfCat/releases?per_page=100&page={page}") ?? [];
+                            foreach (var release in batch) {
+                                if (!UpdatePolicy.IsStableRelease(release.GetProperty("draft").GetBoolean(),
+                                    release.GetProperty("prerelease").GetBoolean())) continue;
+                                releases.Add(new { version = release.GetProperty("tag_name").GetString(),
+                                    notes = release.GetProperty("body").GetString() ?? "",
+                                    url = release.GetProperty("html_url").GetString() });
+                            }
+                            if (batch.Length < 100) break;
                         }
-                        if (batch.Length < 100) break;
+                        Send(new { state = "history", releases });
+                    } catch (Exception historyError) when (historyError is HttpRequestException or TaskCanceledException or JsonException) {
+                        await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Optional release history unavailable: {historyError.GetType().Name} (HTTP {(historyError as HttpRequestException)?.StatusCode})\n");
+                        Send(new { state = "warning", message = "Release history is temporarily unavailable. Update checking continues." });
                     }
-                    Send(new { state = "history", releases });
                     if (!manager.IsInstalled) { Send(new { state = "development" }); continue; }
                     update = await manager.CheckForUpdatesAsync().WaitAsync(TimeSpan.FromSeconds(20));
                     if (update != null && !UpdatePolicy.IsNewerStableVersion(
@@ -90,8 +97,17 @@ static class UpdateService
                     Send(new { state = "applying" });
                     // Both Unity and the entry process must release their files before installation.
                     await WaitForExit(gamePid);
-                    if (launcherPid > 0) await WaitForExit(launcherPid);
-                    manager.ApplyUpdatesAndRestart(update);
+                    await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Game exited\n");
+                    if (OperatingSystem.IsLinux()) {
+                        // Launch Velopack while the AppImage mount/runtime is still alive.
+                        // Velopack handles waiting for the remaining application processes.
+                        await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Starting Linux Velopack handoff\n");
+                        manager.ApplyUpdatesAndRestart(update);
+                    } else {
+                        if (launcherPid > 0) await WaitForExit(launcherPid);
+                        await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Starting Windows Velopack handoff\n");
+                        manager.ApplyUpdatesAndRestart(update);
+                    }
                     return 0;
                 }
             } catch (Exception error) {
