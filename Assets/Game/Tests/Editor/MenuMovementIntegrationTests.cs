@@ -35,19 +35,26 @@ public class MenuMovementIntegrationTests
         Assert.That(course, Is.Not.Null);
         Call(screen, "OpenCourse");
         Assert.That(Field(screen, "course"), Is.SameAs(course), "Repeated entry must not create another course.");
-        yield return new WaitForFixedUpdate();
         var cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
+        var spawnX = cat.GetComponent<Rigidbody2D>().position.x;
         var input = cat.GetComponent(RuntimeType("CatInput"));
-        input.SendMessage("OnApplicationFocus", true); // Simulate foreground play in the headless final-validation Editor.
+        // Headless Editor focus varies. Explicitly exercise foreground, loss, and recovery.
+        input.SendMessage("OnApplicationFocus", true);
         var actions = input.GetType().GetProperty("Actions").GetValue(input);
         Assert.That(actions.GetType().GetProperty("enabled").GetValue(actions), Is.True);
         var motion = cat.GetType().GetField("Motion").GetValue(cat);
-        var start = cat.transform.position;
         motion.GetType().GetMethod("SetMove").Invoke(motion, new object[] { 1f });
         motion.GetType().GetMethod("PressJump").Invoke(motion, null);
-        for (int i = 0; i < 5; i++) yield return new WaitForFixedUpdate();
-        Assert.That(cat.transform.position.x, Is.GreaterThan(start.x));
-        Assert.That(cat.transform.position.y, Is.GreaterThan(start.y));
+        input.SendMessage("OnApplicationFocus", false);
+        Assert.That(actions.GetType().GetProperty("enabled").GetValue(actions), Is.False);
+        var afterFocusLoss = (Vector2)motion.GetType().GetMethod("Step").Invoke(motion,
+            new object[] { Time.fixedDeltaTime, true, Vector2.zero });
+        Assert.That(afterFocusLoss.x, Is.Zero, "Focus loss must clear movement input.");
+        Assert.That((bool)motion.GetType().GetProperty("Jumped").GetValue(motion), Is.False,
+            "Focus loss must clear buffered jumps.");
+        input.SendMessage("OnApplicationFocus", true);
+        Assert.That(actions.GetType().GetProperty("enabled").GetValue(actions), Is.True);
+        // Movement is verified separately with scripted physics in CatCollisionTests.
         Assert.That(course.GetComponentInChildren<Camera>(), Is.Not.Null);
 
         ((ConcurrentQueue<string>)Field(screen, "messages")).Enqueue("{\"state\":\"warning\",\"message\":\"Preserve this notice\"}");
@@ -64,7 +71,11 @@ public class MenuMovementIntegrationTests
         Assert.That(course == null, Is.True);
         Call(screen, "OpenCourse");
         var next = (Component)Field(screen, "course");
-        Assert.That(((Component)next.GetType().GetProperty("Cat").GetValue(next)).transform.position.x, Is.EqualTo(start.x).Within(0.01f));
+        Assert.That(next, Is.Not.Null);
+        Assert.That(next, Is.Not.SameAs(course), "Re-entry must create a new course.");
+        var nextCat = (Component)next.GetType().GetProperty("Cat").GetValue(next);
+        Assert.That(nextCat.GetComponent<Rigidbody2D>().position.x, Is.EqualTo(spawnX).Within(0.01f),
+            "Re-entry must start at the original spawn.");
         Call(screen, "CloseCourse");
         yield return null;
     }
