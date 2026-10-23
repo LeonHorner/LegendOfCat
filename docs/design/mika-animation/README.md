@@ -73,7 +73,9 @@ the remaining criteria and provenance integration are complete.
 
 Unity 6000.3.27f1 compiled the runtime, Editor and test assemblies and completed
 candidate import/prefab generation successfully. `Packages/packages-lock.json`
-was unchanged after import. `git diff --check` passed. Tests were added but not
+was unchanged after import. The source/documentation whitespace check passed;
+the complete diff reports Unity-generated empty-field trailing spaces in metadata,
+sprites and the prefab, which are preserved as generated. Tests were added but not
 executed; no player/launcher builds or full final validation were run for this
 unfinished draft.
 
