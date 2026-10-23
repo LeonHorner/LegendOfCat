@@ -1,6 +1,8 @@
 # First installation and update test
 
-Status: **not executed**. This document is a runbook, not evidence of verified update support.
+Status: **partially observed on Windows** (v0.1.0 -> v0.2.0, maintainer report); the full
+platform validation remains incomplete. This document is a runbook with clearly labeled
+observations, not evidence of fully verified cross-platform update support.
 Publishing N and N+1 requires separate explicit release authorization. Do not create an artificial
 release merely to exercise the updater; use the next small, real fix for N+1.
 
@@ -59,6 +61,22 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 7. Confirm a second normal launch of the same installation cannot run a competing game/update.
    Directly launching the internal Unity player intentionally disables update installation.
 
+## Observed Windows update: v0.1.0 -> v0.2.0
+
+Recorded on 2026-10-23 from the maintainer's report of a real Windows installation:
+
+- In-app update from stable v0.1.0 to stable v0.2.0 completed successfully.
+- Existing settings were preserved.
+- The game automatically restarted after the update.
+
+This is a user-reported functional smoke test, not a CI result or a recorded
+comprehensive platform validation. The Windows version/build, installation path,
+download progress, log captures, Later/reminder behavior, interruption/retry,
+release history, and detailed update package selection were not reported.
+The update used the release process *before* public installer filenames were
+changed; this observation does not validate Delta packages or new download names.
+Linux installation/update behavior remains unverified.
+
 ## Evidence
 
 | Check | Windows | Linux |
@@ -70,10 +88,12 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 | Offline start and retry | Not run | Not run |
 | N+1 tag / commit / release workflow | Pending | Pending |
 | Later persists across restart | Not run | Not run |
-| Settings update / progress / restart to N+1 | Not run | Not run |
+| Installed N -> N+1 update / automatic restart | PASS (maintainer report, v0.1.0 -> v0.2.0) | Not run |
+| Settings update path and download progress | Not reported | Not run |
 | First-pop-up Update now | Not run | Not run |
 | Interrupted download / retry | Not run | Not run |
-| Preferences preserved / old version read-only | Not run | Not run |
+| Preferences preserved across update | PASS (maintainer report) | Not run |
+| Old version release history read-only | Not reported | Not run |
 | Logs / screenshots / remaining defects | Pending | Pending |
 
 Do not mark update support verified until both real platform tests pass. If the game cannot
