@@ -120,6 +120,7 @@ public sealed partial class StarterScreen
         GUI.enabled = !popup && !applying && state != "applying";
         // Fade page content only; controls are immediately interactive. No moving scenery.
         GUI.color = new Color(1, 1, 1, Mathf.Lerp(0.75f, 1, Mathf.Clamp01((Time.unscaledTime - pageStarted) / 0.16f)));
+        if (page == "updates" && Button("Back to settings")) page = "settings";
         scroll = GUILayout.BeginScrollView(scroll);
         if (!string.IsNullOrEmpty(warning)) { GUILayout.Space(16); Label("Notice", headingStyle); Label(warning); }
         if (page == "menu") {
@@ -165,11 +166,18 @@ public sealed partial class StarterScreen
             foreach (var release in releases) {
                 GUILayout.Space(12);
                 Label(release.version, headingStyle);
-                Label(release.notes);
-                if (Button("Release notes - " + release.version) && IsReleaseUrl(release.url)) Application.OpenURL(release.url);
+                foreach (var raw in release.notes.Replace("\r", "").Split('\n')) {
+                    var line = raw.Trim();
+                    if (line.StartsWith("## Download LegendOfCat") || line.StartsWith("- **Windows") || line.StartsWith("- **Linux") || line.StartsWith("> Early development")) continue;
+                    line = System.Text.RegularExpressions.Regex.Replace(line, @"\[([^\]]+)\]\(https?://[^)]+\)", "$1");
+                    line = System.Text.RegularExpressions.Regex.Replace(line, @"^#{1,6}\s*", "");
+                    line = line.Replace("**", "").Replace("`", "");
+                    if (line.StartsWith("* ") || line.StartsWith("- ")) line = "• " + line.Substring(2);
+                    if (line.Length > 0) Label(line, smallStyle);
+                }
+                if (Button("View full notes on GitHub - " + release.version) && IsReleaseUrl(release.url)) Application.OpenURL(release.url);
             }
             Label("Older releases are for reference. Downgrades are not supported.", smallStyle);
-            if (Button(state == "error" ? "Later" : "Back to settings")) page = "settings";
         }
 #if LEGEND_OF_CAT_PREVIEW
         if (Preview) DrawPreviewTools();
