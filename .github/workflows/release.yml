@@ -129,6 +129,9 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
       - run: dotnet tool restore
       - uses: actions/download-artifact@v4
         with:
@@ -158,16 +161,22 @@ jobs:
           path: artifacts/smoke
           if-no-files-found: ignore
           retention-days: 7
+      - name: Fetch and verify previous stable full package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/delta-release.mjs prepare ${{ matrix.platform }} ${{ needs.plan.outputs.version }} artifacts/releases/${{ matrix.platform }}
       - name: Package installer and update feed
         run: |
           $icon = if ($IsWindows) { 'tools/icon.ico' } else { 'tools/icon.png' }
-          dotnet vpk pack --packId LeonHorner.LegendOfCat --packVersion ${{ needs.plan.outputs.version }} --packDir publish --mainExe ${{ matrix.executable }} --runtime ${{ matrix.rid }} --channel ${{ matrix.platform }} --packTitle LegendOfCat --icon $icon --outputDir artifacts/releases/${{ matrix.platform }}
+          dotnet vpk pack --packId LeonHorner.LegendOfCat --packVersion ${{ needs.plan.outputs.version }} --packDir publish --mainExe ${{ matrix.executable }} --runtime ${{ matrix.rid }} --channel ${{ matrix.platform }} --packTitle LegendOfCat --icon $icon --delta BestSpeed --outputDir artifacts/releases/${{ matrix.platform }}
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $folder = 'artifacts/releases/${{ matrix.platform }}'
           if (-not (Get-ChildItem $folder -Filter '*.nupkg')) { throw 'Missing update package' }
           if (-not (Test-Path "$folder/releases.${{ matrix.platform }}.json")) { throw 'Missing update feed' }
           $extension = if ('${{ matrix.platform }}' -eq 'win') { '*Setup.exe' } else { '*.AppImage' }
           if (-not (Get-ChildItem $folder -Filter $extension)) { throw 'Missing installer/AppImage' }
+      - name: Verify Delta reconstruction and release feed
+        run: node tools/delta-release.mjs finalize ${{ matrix.platform }} ${{ needs.plan.outputs.version }} artifacts/releases/${{ matrix.platform }}
       - uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
@@ -195,9 +204,9 @@ jobs:
           merge-multiple: true
           path: artifacts/releases
       - name: Test release asset and download-link contract
-        run: node --test tools/release-assets.test.mjs
+        run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
       - name: Stage clean player downloads and update packages
-        run: node tools/release-assets.mjs artifacts/releases artifacts/published
+        run: node tools/release-assets.mjs artifacts/releases artifacts/published ${{ needs.plan.outputs.version }}
       - name: Confirm release version has not changed
         id: final-plan
         run: npm run release:plan
