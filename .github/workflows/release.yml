@@ -1,36 +1,15 @@
 name: Release
 on:
   workflow_dispatch:
-    inputs:
-      mode:
-        description: Prepare a PR for merge or publish a release
-        type: choice
-        options: [prepare_merge, release]
-        default: prepare_merge
-        required: true
-      pr_number:
-        description: PR number (required for prepare_merge)
-        type: string
-        required: false
 permissions:
   contents: read
   checks: write
 concurrency:
-  group: manual-${{ inputs.mode }}-${{ inputs.pr_number }}
+  group: stable-release
   cancel-in-progress: false
 jobs:
-  prepare-merge:
-    if: inputs.mode == 'prepare_merge'
-    uses: ./.github/workflows/pull-request.yml
-    permissions:
-      contents: read
-      statuses: write
-      checks: write
-    with:
-      pr_number: ${{ inputs.pr_number }}
-    secrets: inherit
   plan:
-    if: github.ref == 'refs/heads/main' && inputs.mode == 'release'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-22.04
     permissions:
       contents: write

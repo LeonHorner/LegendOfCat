@@ -1,4 +1,4 @@
-import semanticRelease from 'semantic-release';
+import { planRelease } from './release-engine.mjs';
 import { appendFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
@@ -16,7 +16,7 @@ const invalid = subjects.filter(subject => !convention.test(subject));
 if (invalid.length) {
   throw new Error('Non-conventional commits since the last release:\n' + invalid.join('\n'));
 }
-const result = await semanticRelease({ dryRun: true, ci: true });
+const result = await planRelease();
 const version = result ? result.nextRelease.version : '';
 if (process.env.GITHUB_OUTPUT)
   appendFileSync(process.env.GITHUB_OUTPUT, 'version=' + version + '\n');

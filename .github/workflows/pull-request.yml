@@ -1,8 +1,9 @@
-name: Pull request validation
+name: Prepare merge
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       pr_number:
+        description: PR number to validate before squash merge
         required: true
         type: string
 permissions:
