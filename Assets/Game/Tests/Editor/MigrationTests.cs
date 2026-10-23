@@ -30,6 +30,37 @@ public class MigrationTests
     }
     [TearDown] public void Cleanup() => Directory.Delete(directory, true);
 
+    object OpenDisplay() => RuntimeType("DisplaySettings").GetMethod("Open").Invoke(null, new object[] { path });
+
+    [Test]
+    public void DisplayPreferencesRoundTripAndPreserveUnknownFields()
+    {
+        var store = OpenDisplay();
+        Assert.That((int)Data(store)["width"], Is.EqualTo(1280));
+        Assert.That((int)Data(store)["height"], Is.EqualTo(720));
+        Assert.That((bool)Data(store)["fullscreen"], Is.False);
+        Data(store)["width"] = 1440;
+        Data(store)["fullscreen"] = true;
+        Data(store)["custom"] = "keep";
+        Save(store);
+        var loaded = OpenDisplay();
+        Assert.That((int)Data(loaded)["width"], Is.EqualTo(1440));
+        Assert.That((bool)Data(loaded)["fullscreen"], Is.True);
+        Assert.That((string)Data(loaded)["custom"], Is.EqualTo("keep"));
+    }
+
+    [TestCase("{\"schemaVersion\":99,\"width\":1280,\"height\":720,\"fullscreen\":false}")]
+    [TestCase("{\"schemaVersion\":0,\"width\":200,\"height\":720,\"fullscreen\":false}")]
+    [TestCase("{\"schemaVersion\":0,\"width\":1280,\"height\":720,\"fullscreen\":\"yes\"}")]
+    public void UnsafeDisplayFilesRemainUntouched(string original)
+    {
+        File.WriteAllText(path, original);
+        var store = OpenDisplay();
+        Assert.That(Property(store, "CanWrite"), Is.False);
+        Assert.That((string)Property(store, "Warning"), Is.Not.Empty);
+        CollectionAssert.AreEqual(System.Text.Encoding.UTF8.GetBytes(original), File.ReadAllBytes(path));
+    }
+
     [Test] public void InitialFormatStartsAtZeroWithoutAMigration()
     {
         var original = Fixture("settings-v0.json");
