@@ -58,3 +58,46 @@ No tests are run by connecting MCP. Follow the manual final-validation policy in
 Read the [game direction](design/game-direction.md), [art direction](design/art-direction.md) and [implementation plan](design/implementation-plan.md) before gameplay or visual work. The Unity adventure reimagines the earlier Java game rather than copying its gameplay specification.
 
 For release operations and updater behavior, see [Releasing](releasing.md).
+
+## Painted menu inspection
+
+The menu retains IMGUI and the existing settings schema (`schemaVersion: 0`).
+`StarterScreen.Presentation.cs` owns styling and layout; `IMenuPlatformService`
+is the small update boundary. Desktop launch detection and the unchanged line-based
+service protocol live in `DesktopMenuPlatformService`. Other platforms and direct
+player/editor launches use `UnavailableMenuPlatformService`: the menu/settings
+remain usable, update actions are disabled, and no executable is assumed to exist.
+The launcher still owns installation and automatic restart after a consented download.
+
+Desktop player and preview windows can be resized by dragging their borders or corners.
+Both build entry points enable Unity's resizable-window setting.
+
+The content region follows `Screen.safeArea`, with a 420-pixel logical width reference,
+bounded scaling and scrollable content. Buttons are at least 48 physical pixels high.
+Tab/Shift+Tab or arrow keys move focus; Enter/Space activates buttons. A gold border
+marks focus independently of text color. A short page opacity transition leaves input
+immediate; scenery does not move. Update dialogs trap menu interaction and offer
+Later as their initial focus. The build exploration view explicitly says gameplay is
+unavailable.
+
+Preview builds include state inspection controls (checking, available/pop-up,
+download progress, ready, current, error, warning and unsupported platform).
+Example releases are labeled as simulations and appear only in preview builds.
+Optional player arguments produce actual rendered captures and exit:
+
+```text
+LegendOfCatPreview.exe -screen-fullscreen 0 -screen-width 1280 -screen-height 720 --preview-view menu --preview-capture <absolute-path>.png
+```
+
+`--preview-view` also accepts `settings`, `play`, `popup`, `available`, `checking`,
+`downloading`, `ready`, `current`, `error`, `warning`, and `development` (unsupported).
+`--preview-suite <absolute-directory>` captures the full state/size matrix and exits.
+Keep the preview window visible during capture; a hidden window can produce black
+images even while the simulation runs. The Preview tools / Capture view matrix
+button writes the matrix to `Application.persistentDataPath/menu-preview-captures`
+and exits. Direct3D 11 can be selected with `-force-d3d11` on Windows.
+Allow the capture sequence to finish before closing it.
+Add `--preview-cutout` to simulate 50-pixel side insets and 25-pixel top/bottom
+insets. This is local visual inspection, not mobile store or touch-gameplay support.
+Preview builds use a separate settings directory and never contact the update feed.
+See [menu preview captures](design/menu-preview/README.md) for inspection evidence.

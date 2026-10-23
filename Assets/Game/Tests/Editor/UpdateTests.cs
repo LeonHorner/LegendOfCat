@@ -113,6 +113,19 @@ public class UpdateTests
     }
 
     [Test]
+    public void UnsupportedPlatformKeepsSharedMenuWithoutSendingUpdates()
+    {
+        CreateScreen();
+        Set("platform", Activator.CreateInstance(RuntimeType("UnavailableMenuPlatformService")));
+        var supported = screenType.GetProperty("UpdatesSupported", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.That(supported.GetValue(screen), Is.False);
+        screenType.GetMethod("Send", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(screen, new object[] { "check" });
+        Assert.That(Get("page"), Is.EqualTo("menu"));
+        Assert.That(Get("state"), Is.EqualTo("development"));
+        Assert.That(Get("applying"), Is.False);
+    }
+
+    [Test]
     public void HistoryAndInstallationWarningDoNotReplaceUpdateState()
     {
         CreateScreen();

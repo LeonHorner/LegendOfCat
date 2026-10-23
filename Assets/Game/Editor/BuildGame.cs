@@ -34,6 +34,7 @@ public static class BuildGame
     public static void Build()
     {
         CreateStarterScene();
+        PlayerSettings.resizableWindow = true;
         PlayerSettings.companyName = "LeonHorner";
         PlayerSettings.productName = "LegendOfCat";
         PlayerSettings.bundleVersion = Argument("-releaseVersion");
@@ -53,6 +54,7 @@ public static class BuildGame
     public static void BuildPreview()
     {
         CreateStarterScene();
+        PlayerSettings.resizableWindow = true;
         var company = PlayerSettings.companyName;
         var product = PlayerSettings.productName;
         var version = PlayerSettings.bundleVersion;
