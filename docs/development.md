@@ -25,16 +25,16 @@ Agree on a small interface, an integration owner or dependency sequencing when c
 do not independently edit another feature's entry point or metadata. See AGENTS.md for the full rules.
 
 ## Prepare a merge
-Pushes, PR creation and individual commits do not run tests or builds.
-Once the entire feature is complete:
+Draft PRs do not trigger full CI. Ready-for-review PRs automatically run **Prepare merge** on opening, reopening, becoming ready and new commits; title/base edits also revalidate. A new run for the same PR cancels the older one, never another PR's run. There is no automatic merge.
 
 1. Review newly merged PRs, merge current main normally into the feature branch, and preserve both features when resolving conflicts. Inspect the relevant end-to-end behavior and update PR integration/risk notes without rewriting published history.
-2. Mark the PR ready and finish its documentation and self-review.
-3. Run **Actions > Prepare merge** and enter the PR number.
-   CLI equivalent: `gh workflow run pull-request.yml -f pr_number=123`.
-4. The workflow validates the title and branch, then runs Unity tests and Windows/Linux player and launcher builds on the exact PR head SHA.
-5. A successful run sets the required **merge-ready** status on that SHA. New commits require another final run; a newer main must first be merged into the branch.
+2. Finish documentation/self-review and mark the PR **Ready for review**. This triggers automatic validation; subsequent pushes and normal `main` merges trigger a fresh run. Draft work remains unvalidated.
+3. If the automatic workflow did not run, use **Actions > Prepare merge** and enter the PR number. CLI fallback: `gh workflow run pull-request.yml -f pr_number=123`. Do not start both unnecessarily.
+4. Preflight checks the live PR's title, branch and base. Unity tests and the Windows/Linux player and launcher builds then run independently, all checked out at the exact PR head SHA; Linux also receives the packaged-payload startup smoke check.
+5. After every required job passes, the final gate rechecks the PR revision/base/title and marks **merge-ready** on the exact head. Tests and logs remain as downloadable workflow artifacts. An outdated base, changed PR, failed or skipped required job cannot grant readiness.
 6. Merge only when explicitly authorized: `gh pr merge 123 --squash --delete-branch --match-head-commit <validated-sha>`.
+
+See [CI validation and measurements](ci-validation.md) for the trigger, safety and performance contracts.
 
 Main requires a PR, resolved conversations, the merge-ready status and an up-to-date branch. No reviewer approval is required.
 Normal merge commits and rebase merges into main are disabled. Force-pushes and deletion of main are blocked, with no bypass actors.
@@ -57,7 +57,7 @@ The verified local CLI version is 1.0.0-beta.13. Run unity status to check readi
 For Codex, configure a local MCP server running unity mcp --project-path <absolute-project-path>. Keep machine-specific executable and project paths out of Git.
 The setup machine has a local .codex/config.toml excluded through .git/info/exclude. Reopen the project in Codex to load the connection.
 CLI and MCP use the same Pipeline backend: CLI is convenient for scripts; MCP exposes discoverable structured tools directly to agents.
-No tests are run by connecting MCP. Follow the manual final-validation policy in [AGENTS.md](../AGENTS.md).
+No tests are run by connecting MCP. Follow the ready-PR automatic validation rules in [AGENTS.md](../AGENTS.md).
 
 ## Design references
 
