@@ -65,6 +65,12 @@ jobs:
             if (comparison.behind_by !== 0) {
               throw new Error('Merge main into the feature branch before validation; never rebase published branches.');
             }
+      - name: Check CI workflow contracts
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.sha }}
+      - name: Run CI workflow contract tests
+        run: node --test tools/ci-workflow.test.mjs
       - name: Check Unity activation
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
