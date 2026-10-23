@@ -17,8 +17,7 @@ function requireSingle(files, suffix, platform) {
 }
 
 export function prepareAssets(sourceDir, destinationDir, version) {
-  if (!/^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$/.test(version))
-    throw new Error('Explicit release version required for asset staging');
+  packageName(version, 'win'); // Reject missing or invalid release versions.
   const source = resolve(sourceDir);
   const destination = resolve(destinationDir);
   if (source === destination || destination.startsWith(source + '/'))
