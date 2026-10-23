@@ -157,6 +157,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - name: Check launcher download byte reporting
+        run: dotnet run --project tools/LauncherProgressTests/LauncherProgressTests.csproj --configuration Release
       - name: Build self-contained launcher
         run: dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:RestoreLockedMode=true -o "${{ runner.temp }}/launcher-${{ matrix.platform }}"
       - name: Prepare Linux startup validation

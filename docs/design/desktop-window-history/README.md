@@ -20,3 +20,13 @@ shortcut activation, installed shortcut appearance or N-to-N+1 update support.
 Manual Windows/Linux real-install and update checks remain in RELEASE-TEST.md.
 The documented responsive fallback deliberately does not enforce native minimum
 window dimensions or repeatedly resize the OS window.
+
+
+## Download payload sizes
+
+[Download progress at 1280 x 720](download-progress.png) shows a simulated 47 MB
+received out of 100 MB, with 53 MB remaining, in the actual Windows preview player.
+The payload size line remains separate from overall preparation percentage.
+The launcher byte-observer integration is exercised with deterministic in-memory
+HTTP responses on both native CI platforms; this capture is a layout check, not a
+live update or installation test.

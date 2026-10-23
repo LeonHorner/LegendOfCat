@@ -13,6 +13,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     [Serializable] public class Message {
         public string state, version, message;
         public int progress;
+        public long downloadedBytes, totalBytes;
         public Release[] releases;
     }
     [Serializable] public class Preferences { public string lastOfferedVersion = ""; }
@@ -30,6 +31,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     string preferencesPath;
     bool popup, applying;
     int progress;
+    long downloadedBytes, totalBytes;
     Vector2 scroll;
     MovementCourse course;
     VersionedJsonFile displayFile;
@@ -140,7 +142,7 @@ public sealed partial class StarterScreen : MonoBehaviour
         }
         platform.Send(command);
         if (command == "check") { state = "checking"; error = ""; }
-        if (command == "download") { state = "downloading"; error = ""; popup = false; page = "updates"; }
+        if (command == "download") { downloadedBytes = totalBytes = 0; state = "downloading"; error = ""; popup = false; page = "updates"; }
     }
     void Update()
     {
@@ -158,7 +160,9 @@ public sealed partial class StarterScreen : MonoBehaviour
             if (message.state == "history") { releases = message.releases ?? new Release[0]; continue; }
             if (message.state == "warning") { warning = message.message; continue; }
             state = message.state;
-            progress = message.progress;
+            progress = Mathf.Clamp(message.progress, 0, 100);
+            downloadedBytes = Math.Max(0, message.downloadedBytes);
+            totalBytes = Math.Max(0, message.totalBytes);
             if (state == "error") error = message.message;
             if (state == "available") {
                 available = message.version;
@@ -202,7 +206,7 @@ public sealed partial class StarterScreen : MonoBehaviour
             foreach (string viewName in new[] { "history", "history-bottom", "history-minimum", "history-wide", "history-narrow", "menu", "settings", "play", "popup", "checking", "available", "downloading", "ready", "current", "error", "warning", "development", "narrow", "cutout", "popup-narrow" }) {
                 popup = false; warning = ""; error = ""; previewUnsupported = false;
                 available = "0.1.0 (preview example)"; progress = 47;
-                state = viewName; page = "updates"; scroll = Vector2.zero;
+                state = viewName; page = "updates"; scroll = Vector2.zero; downloadedBytes = totalBytes = 0;
                 simulateCutout = viewName == "cutout";
                 bool narrow = viewName == "narrow" || viewName == "popup-narrow";
                 Screen.SetResolution(narrow ? 390 : viewName == "cutout" ? 640 : 1280, narrow ? 844 : viewName == "cutout" ? 480 : 720, FullScreenMode.Windowed);
@@ -219,6 +223,7 @@ public sealed partial class StarterScreen : MonoBehaviour
                 if (viewName == "menu" || viewName == "settings" || viewName == "play") page = viewName;
                 if (viewName == "narrow" || viewName == "cutout") page = "settings";
                 if (viewName == "popup" || viewName == "popup-narrow") { state = "available"; popup = true; }
+                if (viewName == "downloading") { downloadedBytes = 47000000; totalBytes = 100000000; }
                 if (viewName == "error") error = "Simulated download failure. Retry or choose Later.";
                 if (viewName == "warning") { state = "current"; available = ""; warning = "Preview warning: settings could not be saved. Existing settings are preserved."; }
                 if (viewName == "development") { previewUnsupported = true; available = ""; }
@@ -240,7 +245,7 @@ public sealed partial class StarterScreen : MonoBehaviour
             state = view;
             available = "0.1.0 (preview example)";
             if (view == "popup") { state = "available"; popup = true; }
-            if (view == "downloading") progress = 47;
+            if (view == "downloading") { progress = 47; downloadedBytes = 47000000; totalBytes = 100000000; }
             if (view == "error") error = "Simulated download failure. Retry or choose Later.";
             if (view == "warning") { state = "current"; available = ""; warning = "Preview warning: settings could not be saved. Existing settings are preserved."; }
             if (view == "current" || view == "development") available = "";
@@ -258,7 +263,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     System.Collections.IEnumerator PreviewDownload()
     {
         for (int value = 0; value <= 100; value += 5) {
-            messages.Enqueue("{\"state\":\"downloading\",\"progress\":" + value + "}");
+            messages.Enqueue("{\"state\":\"downloading\",\"progress\":" + value + ",\"downloadedBytes\":" + (value * 1000000L) + ",\"totalBytes\":100000000}");
             yield return new WaitForSecondsRealtime(0.1f);
         }
         messages.Enqueue("{\"state\":\"ready\"}");
@@ -271,7 +276,10 @@ public sealed partial class StarterScreen : MonoBehaviour
         switch (state) {
             case "checking": return "Checking for updates...";
             case "available": return "Update available: " + available;
-            case "downloading": return "Downloading update: " + progress + "%";
+            case "downloading":
+                var size = DownloadProgress.Format(downloadedBytes, totalBytes);
+                return (totalBytes > 0 && downloadedBytes >= totalBytes ? "Download complete. Preparing update: " : "Downloading update: ") +
+                    progress + "%" + (size.Length > 0 ? "\n" + size : "");
             case "ready": case "applying": return "Restarting to install the update...";
             case "current": return "You are up to date.";
             case "previewComplete": return "Preview download complete. No update was installed.";

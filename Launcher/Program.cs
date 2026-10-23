@@ -39,7 +39,9 @@ static class UpdateService
         Directory.CreateDirectory(stateDirectory);
         var marker = Path.Combine(stateDirectory, "update-pending.txt");
         var log = Path.Combine(stateDirectory, "updates.log");
-        var manager = new UpdateManager(new GithubSource(Repository, null, false));
+        var transfer = new ReportingDownloader((progress, downloadedBytes, totalBytes) =>
+            Send(new { state = "downloading", progress, downloadedBytes, totalBytes }));
+        var manager = new UpdateManager(new GithubSource(Repository, null, false, transfer));
         if (File.Exists(marker)) {
             var target = await File.ReadAllTextAsync(marker);
             if (target != installedVersion)
@@ -78,10 +80,11 @@ static class UpdateService
                     Send(new { state = update == null ? "current" : "available",
                         version = update?.TargetFullRelease.Version.ToString() ?? "" });
                 } else if (command == "download" && update != null) {
-                    Send(new { state = "downloading", progress = 0 });
+                    transfer.Configure(update);
+                    transfer.ReportOverall(0);
                     using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(30));
                     await manager.DownloadUpdatesAsync(update,
-                        progress => Send(new { state = "downloading", progress }), timeout.Token);
+                        transfer.ReportOverall, timeout.Token);
                     downloaded = true;
                     Send(new { state = "ready" });
                 } else if (command == "apply" && update != null && downloaded) {

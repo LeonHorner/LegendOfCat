@@ -13,11 +13,14 @@
 *.sln
 *.slnx
 !Launcher/*.csproj
+!tools/LauncherProgressTests/*.csproj
 !**/*.asmdef
 node_modules/
 artifacts/
 publish/
 Launcher/bin/
 Launcher/obj/
+tools/LauncherProgressTests/bin/
+tools/LauncherProgressTests/obj/
 *.ulf
 .env

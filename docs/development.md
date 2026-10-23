@@ -172,3 +172,30 @@ BuildGame configures default/standalone icons before automated player builds, an
 Launcher.csproj embeds the original ICO. Both Prepare merge and Release package
 Windows installers/shortcuts and Linux AppImages using these icons. Prepare merge
 packages are validation artifacts and never publish a release.
+
+
+## Update download size display
+
+Downloading updates show remaining and total payload MB (1 MB = 1,000,000 bytes),
+with one decimal place rounded up. The launcher observes completed writes through
+Velopack's existing HTTP downloader, including responses without Content-Length;
+it does not estimate bytes from the overall percentage, which also covers Delta
+patch preparation. Concurrent Delta files contribute to the same total. If
+Velopack falls back to a full package, the displayed total switches to that full
+package and the byte count restarts. A transport retry resets only its own file.
+Once payload bytes are complete, the UI says that the update is being prepared.
+Wire overhead and previous failed-attempt traffic are not included in these numbers.
+
+Optional downloadedBytes/totalBytes fields extend existing downloading messages;
+older launcher helpers continue to show percentage only. No commands, release
+feeds, persistent settings or update ownership changed. The byte observer delegates
+HTTP, redirects, retries, checksum verification, Delta selection and application to
+the pinned Velopack implementation. Progress messages are limited to four byte-only
+updates per second, plus existing percentage/transfer-boundary notifications.
+
+
+The native downloader integration checks run on Windows and Linux in Prepare merge:
+`dotnet run --project tools/LauncherProgressTests/LauncherProgressTests.csproj --configuration Release`.
+They drive the actual pinned downloader override with in-memory HTTP responses
+without Content-Length, concurrent Delta files, full fallback and repeated attempts;
+no installation or live update is performed.

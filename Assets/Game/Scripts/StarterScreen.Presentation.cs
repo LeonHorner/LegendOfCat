@@ -241,7 +241,7 @@ public sealed partial class StarterScreen
         if (Button("Show checking")) PreviewState("checking");
         if (Button("Show no update")) PreviewState("current");
         if (Button("Show ready to apply")) PreviewState("ready");
-        if (Button("Show download progress")) { PreviewState("downloading"); progress = 47; }
+        if (Button("Show download progress")) { PreviewState("downloading"); progress = 47; downloadedBytes = 47000000; totalBytes = 100000000; }
         if (Button("Show warning")) { warning = "Preview warning: settings could not be saved. Existing settings are preserved."; page = "updates"; }
         if (Button("Show unsupported platform")) { state = "development"; available = ""; page = "updates"; previewUnsupported = true; }
         if (Button("Toggle display cutout")) simulateCutout = !simulateCutout;
