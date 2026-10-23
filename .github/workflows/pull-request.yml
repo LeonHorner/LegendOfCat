@@ -130,7 +130,7 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Build self-contained launcher
-        run: dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:RestoreLockedMode=true -o build/${{ matrix.platform }}/Launcher
+        run: dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:RestoreLockedMode=true -o "${{ runner.temp }}/launcher-${{ matrix.platform }}"
   gate:
     name: Record merge readiness
     if: always() && needs.preflight.outputs.sha != ''
