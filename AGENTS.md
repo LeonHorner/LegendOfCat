@@ -5,7 +5,7 @@
 - Unity version is pinned in ProjectSettings/ProjectVersion.txt. Commit Packages/packages-lock.json after Editor import.
 - One task per short branch: feat/*, fix/*, chore/*. Never force-push main.
 - Squash PR titles must be Conventional Commits. Do not require external review approval for this solo workflow.
-- Automated tests run ONLY during the manually triggered Release workflow. Do not run tests during normal tasks.
+- Automated tests run in pull request validation and the manual release workflow. Every PR must pass the required PR validation gate before squash merge. Do not bypass failed or missing checks.
 - Compilation and static inspection are allowed during development. Do not claim unrun checks passed.
 - Do not trigger or publish a release unless the user explicitly requests it.
 - Preserve all Unity .meta files; never hand-edit serialized scenes when Editor tooling is available.

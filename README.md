@@ -13,7 +13,7 @@ All maintained repository content is English, including code, comments, document
 
 ## Development
 Use short `feat/*`, `fix/*`, or `chore/*` branches and squash PRs into main.
-PR titles must use Conventional Commits. No automatic CI on pushes or PRs.
+PR titles must use Conventional Commits. Pull requests run required Unity tests, Windows/Linux player builds, and launcher builds. Branch pushes without a PR do not run CI.
 See AGENTS.md. External code contributions are not accepted; issues are welcome.
 
 ## Release
@@ -21,7 +21,7 @@ Configure Actions secrets UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD (GameCI act
 Run Actions > Release on main. No version input:
 fix/perf = patch, feat = minor, !/BREAKING CHANGE = major.
 docs/chore/test alone produce no release. The first release is 1.0.0.
-Tests and Windows/Linux builds run only in this workflow. Publishing happens only after all jobs succeed.
+Tests and Windows/Linux builds run both in PR validation and this release workflow. Publishing happens only after all jobs succeed.
 Git tags are the version source; no bot version commits.
 Builds are unsigned until a signing certificate is configured.
 
@@ -40,4 +40,4 @@ Third-party components retain their own licenses. AI provenance does not guarant
 
 Release tooling dependency audit currently flags transitive braces/micromatch and npm/ip-address advisories even on latest direct packages. The affected pattern inputs are repository-controlled; no issue content is executed. Recheck before the first release.
 
-Branch protection requires squash PRs, blocks deletion/force-push, and requires resolved conversations; no reviewer approval or CI checks are required. Conventional Commit subjects are validated by the manual release preflight (GitHub rejected its commit-pattern ruleset for this repository).
+Branch protection requires squash PRs, blocks deletion/force-push, and requires resolved conversations; no reviewer approval is required. The PR validation check must pass on an up-to-date branch before merging. Conventional Commit subjects are validated by the manual release preflight (GitHub rejected its commit-pattern ruleset for this repository).

@@ -2,7 +2,7 @@
 Describe the user-visible result in English.
 
 ## Verification
-List only checks actually performed. Automated tests run only during the manual release workflow.
+List only checks actually performed. Automated tests run during PR validation and the manual release workflow.
 
 ## Merge requirements
 - Keep the PR focused on one coherent feature, fix, or maintenance task.

@@ -1,0 +1,109 @@
+name: Pull request validation
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+permissions:
+  contents: read
+concurrency:
+  group: pr-validation-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  preflight:
+    name: PR preflight
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Validate Conventional Commit title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          node -e 'if (!/^(feat|fix|perf|docs|style|refactor|test|build|ci|chore|revert)(\([^)]+\))?!?: .+/.test(process.env.PR_TITLE)) process.exit(1)'
+      - name: Check Unity activation
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        run: |
+          test -n "$UNITY_LICENSE" && test -n "$UNITY_EMAIL" && test -n "$UNITY_PASSWORD" || {
+            echo "::error::Configure UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD in Actions secrets."
+            exit 1
+          }
+  test:
+    name: Unity tests
+    needs: preflight
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: unity-pr-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ github.sha }}
+          restore-keys: |
+            unity-pr-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
+      - uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          testMode: editmode
+          artifactsPath: artifacts/tests
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr-test-results
+          path: artifacts/tests
+          retention-days: 3
+  build:
+    name: Build (${{ matrix.platform }})
+    needs: test
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - target: StandaloneWindows64
+            platform: win
+            player: LegendOfCat.exe
+            rid: win-x64
+          - target: StandaloneLinux64
+            platform: linux
+            player: LegendOfCat
+            rid: linux-x64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: unity-pr-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ github.sha }}
+          restore-keys: |
+            unity-pr-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ matrix.target }}
+          buildMethod: BuildGame.Build
+          versioning: Custom
+          version: 0.0.0
+          customParameters: -releaseVersion 0.0.0 -releaseOutput build/${{ matrix.platform }}/Game/${{ matrix.player }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build self-contained launcher
+        run: dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true --locked-mode -o build/${{ matrix.platform }}/Launcher
+  gate:
+    name: PR validation
+    if: always()
+    needs: [preflight, test, build]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Require every validation job to succeed
+        env:
+          PREFLIGHT: ${{ needs.preflight.result }}
+          TEST: ${{ needs.test.result }}
+          BUILD: ${{ needs.build.result }}
+        run: test "$PREFLIGHT" = success && test "$TEST" = success && test "$BUILD" = success
+
