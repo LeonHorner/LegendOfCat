@@ -166,12 +166,16 @@ public sealed partial class StarterScreen
             foreach (var release in releases) {
                 GUILayout.Space(12);
                 Label(release.version, headingStyle);
-                foreach (var raw in release.notes.Replace("\r", "").Split('\n')) {
+                bool skipDownloads = false;
+                foreach (var raw in (release.notes ?? "").Replace("\r", "").Split('\n')) {
                     var line = raw.Trim();
-                    if (line.StartsWith("## Download LegendOfCat") || line.StartsWith("- **Windows") || line.StartsWith("- **Linux") || line.StartsWith("> Early development")) continue;
+                    if (line.StartsWith("## Download LegendOfCat")) { skipDownloads = true; continue; }
+                    if (skipDownloads && line.StartsWith("## ")) skipDownloads = false;
+                    if (skipDownloads || line.StartsWith("> Early development")) continue;
                     line = System.Text.RegularExpressions.Regex.Replace(line, @"\[([^\]]+)\]\(https?://[^)]+\)", "$1");
                     line = System.Text.RegularExpressions.Regex.Replace(line, @"^#{1,6}\s*", "");
                     line = line.Replace("**", "").Replace("`", "");
+                    line = System.Text.RegularExpressions.Regex.Replace(line, @"\s*\([0-9a-f]{7,40}\)", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                     if (line.StartsWith("* ") || line.StartsWith("- ")) line = "• " + line.Substring(2);
                     if (line.Length > 0) Label(line, smallStyle);
                 }
