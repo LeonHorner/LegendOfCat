@@ -43,7 +43,7 @@ function mock(options = {}) {
   const statuses = [];
   const outputs = {};
   const failures = [];
-  const results = { PREFLIGHT: 'success', TEST: 'success', BUILD: 'success', PACKAGE: 'success', ...options.results };
+  const results = { PREFLIGHT: 'success', TEST: 'success', BUILD: 'success', PACKAGE: 'success', DELTA_INTEGRATION: 'success', ...options.results };
   return {
     pr,
     statuses,
@@ -133,6 +133,9 @@ test('the gate rejects failures, cancellations, skips and stale PR revisions', a
     { results: { PACKAGE: 'failure' } },
     { results: { PACKAGE: 'cancelled' } },
     { results: { PACKAGE: 'skipped' } },
+    { results: { DELTA_INTEGRATION: 'failure' } },
+    { results: { DELTA_INTEGRATION: 'cancelled' } },
+    { results: { DELTA_INTEGRATION: 'skipped' } },
     { results: { PREFLIGHT: 'failure' } },
     { pr: { head: { sha: 'different-commit', repo: { full_name: 'LeonHorner/LegendOfCat' } } } },
     { pr: { base: { ref: 'main', sha: 'new-main-commit' } } },
@@ -156,7 +159,7 @@ test('automatic CI is limited to ready same-repo PRs; manual fallback remains', 
   assert.match(prYaml, /!github\.event\.pull_request\.draft/);
   assert.match(prYaml, /group: pr-validation-\$\{\{ github\.event\.pull_request\.number \|\| inputs\.pr_number \}\}/);
   assert.match(prYaml, /cancel-in-progress: true/);
-  assert.match(prYaml, /needs: \[preflight, test, build, package\]/);
+  assert.match(prYaml, /needs: \[preflight, test, build, package, delta-integration\]/);
   assert.match(prYaml, /build:\n    name: Build \(\$\{\{ matrix\.platform \}\}\)\n    needs: preflight/);
   assert.match(prYaml, /githubToken: ''/);
 });

@@ -72,7 +72,7 @@ jobs:
       - name: Run CI workflow contract tests
         run: node --test tools/ci-workflow.test.mjs
       - name: Check release download contracts
-        run: node --test tools/release-assets.test.mjs
+        run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
       - name: Check application icons and packaging contracts
         run: node --test tools/application-icon.test.mjs
       - name: Check Unity activation
@@ -254,10 +254,37 @@ jobs:
           name: pr-package-${{ matrix.platform }}
           path: artifacts/releases
           retention-days: 1
+  delta-integration:
+    name: Real Velopack Delta (${{ matrix.platform }})
+    needs: preflight
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            platform: win
+          - os: ubuntu-22.04
+            platform: linux
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: dotnet tool restore
+      - name: Reconstruct a real stable full package with Velopack Delta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node tools/integration-delta.mjs ${{ matrix.platform }}
   gate:
     name: Record merge readiness
     if: always() && needs.preflight.outputs.sha != ''
-    needs: [preflight, test, build, package]
+    needs: [preflight, test, build, package, delta-integration]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/github-script@v7
@@ -270,6 +297,7 @@ jobs:
           TEST: ${{ needs.test.result }}
           BUILD: ${{ needs.build.result }}
           PACKAGE: ${{ needs.package.result }}
+          DELTA_INTEGRATION: ${{ needs.delta-integration.result }}
         with:
           script: |
             const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
@@ -286,7 +314,7 @@ jobs:
             }
             // Matrix failure or cancellation is not success; only complete, unchanged validation passes.
             const passed = unchanged && currentWithBase &&
-              ['PREFLIGHT', 'TEST', 'BUILD', 'PACKAGE'].every(name => process.env[name] === 'success');
+              ['PREFLIGHT', 'TEST', 'BUILD', 'PACKAGE', 'DELTA_INTEGRATION'].every(name => process.env[name] === 'success');
             await github.rest.repos.createCommitStatus({
               ...context.repo, sha: process.env.CHECKED_SHA,
               state: passed ? 'success' : 'failure', context: 'merge-ready',
