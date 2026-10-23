@@ -44,3 +44,4 @@
 
 ## Design references
 - Before gameplay or visual work, read docs/design/game-direction.md, docs/design/art-direction.md and the linked implementation plan. Preserve the agreed readability requirements and ask about unresolved product choices before locking them in.
+- Track issue dependencies using native GitHub blocked-by relationships, not dependency lists in issue bodies. Read those relationships before starting work.
