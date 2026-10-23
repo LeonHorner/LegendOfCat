@@ -96,6 +96,17 @@ public sealed class MovementCourse : MonoBehaviour
     }
     void LateUpdate()
     {
+        // Preserve a constant 16:9 playable view without showing more of the level
+        // on ultrawide or portrait windows.
+        if (courseCamera != null && Screen.height > 0) {
+            float windowAspect = (float)Screen.width / Screen.height;
+            float targetAspect = 16f / 9f;
+            courseCamera.rect = windowAspect > targetAspect
+                ? new Rect((1f - targetAspect / windowAspect) * 0.5f, 0,
+                    targetAspect / windowAspect, 1)
+                : new Rect(0, (1f - windowAspect / targetAspect) * 0.5f,
+                    1, windowAspect / targetAspect);
+        }
         var velocity = Cat.Motion.Velocity;
         if (Mathf.Abs(velocity.x) > 0.1f) facing = Mathf.Sign(velocity.x);
         visual.localScale = new Vector3(facing, 1, 1);
