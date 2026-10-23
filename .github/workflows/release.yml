@@ -1,14 +1,36 @@
 name: Release
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Prepare a PR for merge or publish a release
+        type: choice
+        options: [prepare_merge, release]
+        default: prepare_merge
+        required: true
+      pr_number:
+        description: PR number (required for prepare_merge)
+        type: string
+        required: false
 permissions:
   contents: read
+  checks: write
 concurrency:
-  group: stable-release
+  group: manual-${{ inputs.mode }}-${{ inputs.pr_number }}
   cancel-in-progress: false
 jobs:
+  prepare-merge:
+    if: inputs.mode == 'prepare_merge'
+    uses: ./.github/workflows/pull-request.yml
+    permissions:
+      contents: read
+      statuses: write
+      checks: write
+    with:
+      pr_number: ${{ inputs.pr_number }}
+    secrets: inherit
   plan:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && inputs.mode == 'release'
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -52,6 +74,7 @@ jobs:
             unity-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
       - uses: game-ci/unity-test-runner@v4
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
@@ -87,6 +110,7 @@ jobs:
             unity-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
       - uses: game-ci/unity-builder@v4
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
