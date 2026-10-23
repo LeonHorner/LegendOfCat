@@ -4,6 +4,11 @@ Captured from the actual Unity 6000.3.27f1 Windows preview on 2026-10-23.
 These are rendered game views, not concept images. All example versions and release
 notes are explicitly simulated; no update was installed or release published.
 
+These PR #31 captures predate movement integration. The build exploration entry
+now leads to **Movement lab (prototype) > Enter movement lab**; the historical
+`play.png` remains evidence of the earlier menu-only build. See the
+[movement prototype](../movement-prototype.md) for the current flow and integration review.
+
 | Capture | Inspection |
 |---|---|
 | [Menu](menu.png) | Painted backdrop, readable panel and honest build exploration entry at 1280 x 720 |

@@ -1,0 +1,39 @@
+using UnityEngine;
+
+// Device-independent fixed-step rules. Presentation and collision queries live outside this class.
+public sealed class CatMotion
+{
+    public const float Speed = 7, Acceleration = 55, Braking = 80;
+    public const float JumpSpeed = 12, Gravity = 30, FallSpeed = 20;
+    public const float CoyoteTime = 0.10f, BufferTime = 0.12f, ReleaseSpeed = 5;
+    public Vector2 Velocity { get; private set; }
+    public bool Jumped { get; private set; }
+    float move, pulse, grace, buffer;
+    bool held;
+
+    public void SetMove(float value) { move = Mathf.Clamp(value, -1, 1); if (move != 0) pulse = move; }
+    public void PressJump() { buffer = BufferTime; held = true; }
+    public void ReleaseJump() => held = false;
+    public void Reset() { Velocity = Vector2.zero; move = pulse = grace = buffer = 0; held = false; }
+
+    public Vector2 Step(float dt, bool grounded, Vector2 actualVelocity)
+    {
+        Jumped = false;
+        grace = grounded ? CoyoteTime : Mathf.Max(0, grace - dt);
+        var velocity = actualVelocity;
+        float axis = move != 0 ? move : pulse;
+        pulse = 0;
+        velocity.x = Mathf.MoveTowards(velocity.x, axis * Speed,
+            (Mathf.Abs(axis) < 0.01f || axis * velocity.x < 0 ? Braking : Acceleration) * dt);
+        if (grounded && velocity.y < 0) velocity.y = 0;
+        if (buffer > 0 && grace > 0) {
+            velocity.y = JumpSpeed;
+            buffer = grace = 0;
+            Jumped = true;
+        }
+        if (!held && velocity.y > ReleaseSpeed) velocity.y = ReleaseSpeed;
+        velocity.y = Mathf.Max(velocity.y - Gravity * dt, -FallSpeed);
+        buffer = Mathf.Max(0, buffer - dt);
+        return Velocity = velocity;
+    }
+}

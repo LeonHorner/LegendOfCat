@@ -28,6 +28,26 @@ public sealed partial class StarterScreen : MonoBehaviour
     bool popup, applying;
     int progress;
     Vector2 scroll;
+    MovementCourse course;
+
+    void OpenCourse()
+    {
+        if (course != null || popup || applying) return;
+        course = Instantiate(Resources.Load<MovementCourse>("MovementCourse"));
+        course.BackToMenu = CloseCourse;
+    }
+
+    void CloseCourse()
+    {
+        if (course == null) return;
+        // Stop input and rendering immediately, before deferred destruction at the end of the frame.
+        course.gameObject.SetActive(false);
+        Destroy(course.gameObject);
+        course = null;
+        page = "menu";
+        lastPage = null;
+        previousFocus.Clear();
+    }
 
     public static bool ShouldOffer(string availableVersion, string lastOfferedVersion)
         => UpdatePolicy.ShouldOffer(availableVersion, lastOfferedVersion);

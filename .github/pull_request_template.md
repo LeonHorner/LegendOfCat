@@ -7,6 +7,11 @@ List all related issues. Use "Closes #123" only for completed issues.
 ## Remaining work
 List incomplete acceptance criteria. Keep the PR as a draft while the feature is unfinished.
 
+## Coordination (if relevant)
+For independent changes, write "None". Otherwise note related open PRs, shared components/configuration,
+required integration and its owner, and end-to-end behavior to validate. Link native GitHub blocked-by
+relationships for issue dependencies; do not duplicate dependency graphs in issue bodies.
+
 ## Documentation
 Describe documentation and asset-provenance updates.
 

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.inputsystem": "1.17.0",
     "com.unity.nuget.newtonsoft-json": "3.2.2",
     "com.unity.test-framework": "1.4.5",
     "com.unity.modules.physics2d": "1.0.0",

@@ -91,6 +91,7 @@ public sealed partial class StarterScreen
 
     void OnGUI()
     {
+        if (course != null) return;
         PrepareStyles();
         var oldColor = GUI.color;
         var oldMatrix = GUI.matrix;
@@ -125,13 +126,14 @@ public sealed partial class StarterScreen
             Label("The adventure is taking shape.", headingStyle);
             Label("Explore the current build and make yourself at home. Mika's campaign is still in development.");
             GUILayout.Space(18);
-            if (Button("Explore this build")) page = "play";
+            if (Button("Movement lab (prototype)")) page = "play";
             if (Button(string.IsNullOrEmpty(available) ? "Settings" : "Settings - Update available")) page = "settings";
             if (Button("Quit")) Application.Quit();
         } else if (page == "play") {
-            Label("Under construction", headingStyle);
-            Label("Gameplay is not available yet. This build lets you explore the menu, settings and desktop update flow.");
+            Label("Movement lab prototype", headingStyle);
+            Label("Try running and jumping through a temporary test course. Mika's campaign is still in development; this is a movement prototype with placeholder art.");
             GUILayout.Space(16);
+            if (Button("Enter movement lab")) OpenCourse();
             if (Button("Back to menu")) page = "menu";
         } else if (page == "settings") {
             Label("Settings", headingStyle);
@@ -231,6 +233,7 @@ public sealed partial class StarterScreen
 #endif
     void OnDestroy()
     {
+        if (course != null) { course.gameObject.SetActive(false); Destroy(course.gameObject); }
         foreach (var texture in new[] { panelTexture, buttonTexture, hoverTexture, focusTexture })
             if (texture != null) Destroy(texture);
     }

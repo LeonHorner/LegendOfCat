@@ -1,0 +1,17 @@
+using UnityEngine;
+
+public sealed class CatCamera : MonoBehaviour
+{
+    public Transform target;
+    bool snap = true;
+    public void Snap() => snap = true;
+    void LateUpdate()
+    {
+        // Read the interpolated render transform, never the fixed-step Rigidbody position.
+        float halfWidth = GetComponent<Camera>().orthographicSize * GetComponent<Camera>().aspect;
+        var desired = new Vector3(Mathf.Clamp(target.position.x + 2, halfWidth - 5, 48 - halfWidth),
+            Mathf.Clamp(target.position.y + 1.2f, 2.5f, 5), -10);
+        transform.position = snap ? desired : Vector3.Lerp(transform.position, desired, 1 - Mathf.Exp(-8 * Time.deltaTime));
+        snap = false;
+    }
+}
