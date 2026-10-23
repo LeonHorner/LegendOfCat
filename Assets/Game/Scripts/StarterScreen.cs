@@ -46,7 +46,7 @@ public sealed partial class StarterScreen : MonoBehaviour
         try {
             if (File.Exists(displayPath)) {
                 var read = JsonUtility.FromJson<DisplayPreferences>(File.ReadAllText(displayPath));
-                if (read != null && read.schemaVersion == 0 && read.width >= 640 && read.height >= 360)
+                if (read != null && read.schemaVersion == 0 && read.width >= 640 && read.height >= 360 && read.width <= 16384 && read.height <= 16384)
                     display = read;
             }
         } catch (Exception) { /* Preserve the original and use defaults. */ }
@@ -145,11 +145,6 @@ public sealed partial class StarterScreen : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Return) &&
                 (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)))
                 SetFullscreen(!display.fullscreen);
-            if (Screen.fullScreen != display.fullscreen) {
-                display.fullscreen = Screen.fullScreen;
-                changedAt = Time.unscaledTime;
-                SaveDisplay();
-            }
             if (!display.fullscreen && Screen.width >= 640 && Screen.height >= 360) {
                 if (lastWidth != Screen.width || lastHeight != Screen.height) {
                     lastWidth = Screen.width; lastHeight = Screen.height;
