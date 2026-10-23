@@ -135,7 +135,7 @@ public static class DisplaySettings
                 data["fullscreen"].Type != JTokenType.Boolean)
                 throw new InvalidDataException("Invalid display preference types.");
             int width = data["width"].Value<int>(), height = data["height"].Value<int>();
-            if (width < 640 || width > 16384 || height < 360 || height > 16384)
+            if (width < 320 || width > 16384 || height < 180 || height > 16384)
                 throw new InvalidDataException("Display dimensions are outside safe bounds.");
         });
 }

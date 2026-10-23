@@ -130,3 +130,45 @@ Add `--preview-cutout` to simulate 50-pixel side insets and 25-pixel top/bottom
 insets. This is local visual inspection, not mobile store or touch-gameplay support.
 Preview builds use a separate settings directory and never contact the update feed.
 See [menu preview captures](design/menu-preview/README.md) for inspection evidence.
+
+
+## Desktop display and compact release history
+
+Players start in a resizable 1280×720 window. Settings and Alt+Enter select
+borderless fullscreen; returning restores the last window dimensions. The independent
+`display-settings.json` schema 0 follows the versioned-file contract and preserves
+unknown fields. Resize observations debounce for 1.5 seconds; quitting or entering
+fullscreen flushes the last observed window dimensions. Mode requests wait for actual
+Unity/compositor observations (multiple frames and a settling interval); rejected
+requests time out after five seconds and never save the requested mode as observed.
+Minimized surfaces are ignored. Preview players use the same display behavior in
+the separate Preview product data directory; the Editor does not change its host window.
+
+960×540 is the target usable size, not a native enforced minimum. Unity's common
+standalone settings expose resizability but no portable minimum client dimensions.
+Win32 window procedure hooks would require lifetime/subclassing management; Linux
+would need separate X11 and Wayland/compositor behavior. Those native dependencies
+are not justified here. The fallback uses safe-area layout, readable minimum text
+scale and scrolling content, with fixed top history navigation. It never calls
+SetResolution in a resize loop or fights the window manager. Very small windows
+below the target cannot guarantee the same amount of visible content. Positive
+window sizes down to 320×180 can be retained; invalid/future files remain untouched.
+Gameplay always uses the same orthographic 16:9 framing, with black letter/pillar
+bars and a fixed camera width; menu layout fills the available window independently.
+
+History uses the launcher's existing release messages, without changing feeds or
+update ownership. A bounded line/token parser supports headings, bullet/numbered
+lists, inline emphasis/code and link labels; generated download sections, commit
+links, URLs, fenced code, tables and reference definitions are omitted. Each card
+links to the full original GitHub notes. At most 100 cards, 120 content blocks per
+card and 32 KiB of Markdown per release are rendered; parsed summaries are cached.
+The top Back to settings control is outside the scroll area and keyboard focus does
+not scroll the content when that fixed control is selected. Full Markdown remains
+on GitHub. This is intentionally a compact summary renderer, not CommonMark.
+
+The authoritative application icon is tools/icon.ico. Regenerate its lossless PNG
+variant with `node tools/application-icon.mjs`; do not edit the variant independently.
+BuildGame configures default/standalone icons before automated player builds, and
+Launcher.csproj embeds the original ICO. Both Prepare merge and Release package
+Windows installers/shortcuts and Linux AppImages using these icons. Prepare merge
+packages are validation artifacts and never publish a release.

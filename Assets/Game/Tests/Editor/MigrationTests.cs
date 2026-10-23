@@ -49,6 +49,10 @@ public class MigrationTests
         Assert.That((string)Data(loaded)["custom"], Is.EqualTo("keep"));
     }
 
+    [TestCase("not json")]
+    [TestCase("{\"schemaVersion\":0,\"width\":999999999999999}")]
+    [TestCase("{\"width\":1280}")]
+    [TestCase("{\"schemaVersion\":0,\"height\":null}")]
     [TestCase("{\"schemaVersion\":99,\"width\":1280,\"height\":720,\"fullscreen\":false}")]
     [TestCase("{\"schemaVersion\":0,\"width\":200,\"height\":720,\"fullscreen\":false}")]
     [TestCase("{\"schemaVersion\":0,\"width\":1280,\"height\":720,\"fullscreen\":\"yes\"}")]
@@ -58,6 +62,7 @@ public class MigrationTests
         var store = OpenDisplay();
         Assert.That(Property(store, "CanWrite"), Is.False);
         Assert.That((string)Property(store, "Warning"), Is.Not.Empty);
+        Assert.Throws<TargetInvocationException>(() => Save(store));
         CollectionAssert.AreEqual(System.Text.Encoding.UTF8.GetBytes(original), File.ReadAllBytes(path));
     }
 

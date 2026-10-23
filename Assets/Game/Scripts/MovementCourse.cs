@@ -61,6 +61,13 @@ public sealed class MovementCourse : MonoBehaviour
         courseCamera.clearFlags = CameraClearFlags.SolidColor;
         courseCamera.backgroundColor = new Color(0.09f, 0.13f, 0.18f);
         courseCamera.depth = 1;
+        // A lower camera clears the whole surface; the gameplay camera only clears its viewport.
+        var bars = new GameObject("Viewport bars").AddComponent<Camera>();
+        bars.transform.SetParent(transform, false);
+        bars.depth = 0.5f;
+        bars.clearFlags = CameraClearFlags.SolidColor;
+        bars.backgroundColor = Color.black;
+        bars.cullingMask = 0;
         var follow = courseCamera.gameObject.AddComponent<CatCamera>();
         follow.target = player.transform;
         Cat.ReturnedToStart += follow.Snap;
@@ -96,8 +103,10 @@ public sealed class MovementCourse : MonoBehaviour
     }
     void LateUpdate()
     {
-        if (courseCamera != null)
+        if (courseCamera != null) {
             courseCamera.rect = MenuLayout.Letterbox16By9(Screen.width, Screen.height);
+            courseCamera.aspect = 16f / 9f;
+        }
         var velocity = Cat.Motion.Velocity;
         if (Mathf.Abs(velocity.x) > 0.1f) facing = Mathf.Sign(velocity.x);
         visual.localScale = new Vector3(facing, 1, 1);

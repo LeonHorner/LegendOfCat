@@ -73,6 +73,8 @@ jobs:
         run: node --test tools/ci-workflow.test.mjs
       - name: Check release download contracts
         run: node --test tools/release-assets.test.mjs
+      - name: Check application icons and packaging contracts
+        run: node --test tools/application-icon.test.mjs
       - name: Check Unity activation
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -176,10 +178,86 @@ jobs:
           path: artifacts/smoke
           if-no-files-found: ignore
           retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr-player-${{ matrix.platform }}
+          path: build/${{ matrix.platform }}/Game
+          retention-days: 1
+  package:
+    needs: [preflight, build]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            platform: win
+            rid: win-x64
+            executable: LegendOfCat.exe
+          - os: ubuntu-22.04
+            platform: linux
+            rid: linux-x64
+            executable: LegendOfCat
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet tool restore
+      - uses: actions/download-artifact@v4
+        with:
+          name: pr-player-${{ matrix.platform }}
+          path: publish/Game
+      - name: Publish launcher
+        run: |
+          dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:Version=0.0.0 -o publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Make Linux player executable
+        if: matrix.platform == 'linux'
+        run: chmod +x publish/Game/LegendOfCat publish/LegendOfCat
+      - name: Install virtual display for Linux startup
+        if: matrix.platform == 'linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y xvfb xauth
+      - name: Smoke test complete payload
+        run: |
+          ./tools/smoke-test.ps1 -Executable 'publish/${{ matrix.executable }}' -LogPath 'artifacts/smoke/${{ matrix.platform }}.log' -VirtualDisplay:($IsLinux)
+      - name: Preserve startup diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-package-smoke-${{ matrix.platform }}
+          path: artifacts/smoke
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Package installer and update feed
+        run: |
+          $icon = if ($IsWindows) { 'tools/icon.ico' } else { 'Assets/Game/Branding/icon.png' }
+          dotnet vpk pack --packId LeonHorner.LegendOfCat --packVersion 0.0.0 --packDir publish --mainExe ${{ matrix.executable }} --runtime ${{ matrix.rid }} --channel ${{ matrix.platform }} --packTitle LegendOfCat --icon $icon --outputDir artifacts/releases/${{ matrix.platform }}
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $folder = 'artifacts/releases/${{ matrix.platform }}'
+          if (-not (Get-ChildItem $folder -Filter '*.nupkg')) { throw 'Missing update package' }
+          if (-not (Test-Path "$folder/releases.${{ matrix.platform }}.json")) { throw 'Missing update feed' }
+          $extension = if ('${{ matrix.platform }}' -eq 'win') { '*Setup.exe' } else { '*.AppImage' }
+          if (-not (Get-ChildItem $folder -Filter $extension)) { throw 'Missing installer/AppImage' }
+      - name: Inspect embedded application and package icons
+        run: ./tools/check-package-icons.ps1 -PackageDirectory 'artifacts/releases/${{ matrix.platform }}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr-package-${{ matrix.platform }}
+          path: artifacts/releases
+          retention-days: 1
   gate:
     name: Record merge readiness
     if: always() && needs.preflight.outputs.sha != ''
-    needs: [preflight, test, build]
+    needs: [preflight, test, build, package]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/github-script@v7
@@ -191,6 +269,7 @@ jobs:
           PREFLIGHT: ${{ needs.preflight.result }}
           TEST: ${{ needs.test.result }}
           BUILD: ${{ needs.build.result }}
+          PACKAGE: ${{ needs.package.result }}
         with:
           script: |
             const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
@@ -207,7 +286,7 @@ jobs:
             }
             // Matrix failure or cancellation is not success; only complete, unchanged validation passes.
             const passed = unchanged && currentWithBase &&
-              ['PREFLIGHT', 'TEST', 'BUILD'].every(name => process.env[name] === 'success');
+              ['PREFLIGHT', 'TEST', 'BUILD', 'PACKAGE'].every(name => process.env[name] === 'success');
             await github.rest.repos.createCommitStatus({
               ...context.repo, sha: process.env.CHECKED_SHA,
               state: passed ? 'success' : 'failure', context: 'merge-ready',

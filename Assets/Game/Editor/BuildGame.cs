@@ -11,6 +11,25 @@ public static class BuildGame
 {
     const string ScenePath = "Assets/Game/Scenes/Main.unity";
 
+    public static void ConfigureDesktop()
+    {
+        PlayerSettings.resizableWindow = true;
+        PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
+        PlayerSettings.defaultScreenWidth = 1280;
+        PlayerSettings.defaultScreenHeight = 720;
+        PlayerSettings.allowFullscreenSwitch = false;
+        var icon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Game/Branding/icon.png");
+        if (icon == null) throw new BuildFailedException("Missing generated application icon.");
+        var importer = (TextureImporter)AssetImporter.GetAtPath("Assets/Game/Branding/icon.png");
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+        importer.mipmapEnabled = false;
+        importer.alphaIsTransparency = true;
+        importer.SaveAndReimport();
+        PlayerSettings.SetIcons(NamedBuildTarget.Unknown, new[] { icon }, IconKind.Any);
+        var sizes = PlayerSettings.GetIconSizes(NamedBuildTarget.Standalone, IconKind.Any);
+        PlayerSettings.SetIcons(NamedBuildTarget.Standalone, sizes.Select(_ => icon).ToArray(), IconKind.Any);
+    }
+
     [MenuItem("LegendOfCat/Create starter scene")]
     public static void CreateStarterScene()
     {
@@ -34,7 +53,7 @@ public static class BuildGame
     public static void Build()
     {
         CreateStarterScene();
-        PlayerSettings.resizableWindow = true;
+        ConfigureDesktop();
         PlayerSettings.companyName = "LeonHorner";
         PlayerSettings.productName = "LegendOfCat";
         PlayerSettings.bundleVersion = Argument("-releaseVersion");
@@ -54,7 +73,7 @@ public static class BuildGame
     public static void BuildPreview()
     {
         CreateStarterScene();
-        PlayerSettings.resizableWindow = true;
+        ConfigureDesktop();
         var company = PlayerSettings.companyName;
         var product = PlayerSettings.productName;
         var version = PlayerSettings.bundleVersion;
@@ -66,8 +85,8 @@ public static class BuildGame
             PlayerSettings.productName = "LegendOfCat Preview";
             PlayerSettings.bundleVersion = "0.0.0-preview";
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
-            PlayerSettings.defaultScreenWidth = 1100;
-            PlayerSettings.defaultScreenHeight = 800;
+            PlayerSettings.defaultScreenWidth = 1280;
+            PlayerSettings.defaultScreenHeight = 720;
             var output = Argument("-previewOutput");
             Directory.CreateDirectory(Path.GetDirectoryName(output));
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
