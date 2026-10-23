@@ -100,6 +100,20 @@ export function prepareRelease(channel, targetVersion, outputDir, stateFile, dep
     const basePath = join(outputDir, previous.full);
     if (!existsSync(basePath) || !statSync(basePath).isFile() || statSync(basePath).size === 0)
       throw new Error('Failed to download previous full package: ' + previous.full);
+    const scratch = mkdtempSync(join(tmpdir(), 'legendofcat-base-feed-'));
+    try {
+      (deps.downloadFeed ?? ((base) => github([
+        'release', 'download', base.tag, '--repo', REPOSITORY,
+        '--pattern', `releases.${channel}.json`, '--dir', scratch
+      ])))(previous, scratch);
+      const sourceFeed = JSON.parse(readFileSync(join(scratch, `releases.${channel}.json`), 'utf8'));
+      const candidates = sourceFeed.Assets?.filter(item =>
+        item.FileName === previous.full && item.Version === previous.version && item.Type === 'Full');
+      if (candidates?.length !== 1) throw new Error('Incompatible previous release feed');
+      assertFeedAsset(candidates[0], basePath, previous.version, channel, 'full');
+    } finally {
+      rmSync(scratch, { recursive: true, force: true });
+    }
   }
   mkdirSync(resolve(stateFile, '..'), { recursive: true });
   writeFileSync(stateFile, JSON.stringify({
