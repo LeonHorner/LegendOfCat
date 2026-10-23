@@ -209,7 +209,7 @@ test('Delta corruption, missing delta or tampered feed blocks release', () => {
     const feed = JSON.parse(readFileSync(feedPath, 'utf8'));
     feed.Assets[0].SHA1 = 'bad';
     writeFileSync(feedPath, JSON.stringify(feed));
-    assert.throws(() => finalizeRelease('win', version, directory, stateFile), /checksum mismatch/);
+    assert.throws(() => finalizeRelease('win', version, directory, stateFile), /SHA-1 mismatch/);
   });
 });
 
