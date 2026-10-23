@@ -6,7 +6,7 @@ Unity starter for a 2D game with optional 3D visuals. The previous Java game is 
 Install Unity Hub and Unity **6000.3.27f1**, then add this folder as a project.
 Use **LegendOfCat > Create starter scene** to create/open the initial scene.
 Commit generated Unity settings, Packages/packages-lock.json and any new .meta files after the first import.
-The Unity Editor build has not yet been verified.
+The starter scene test and Windows player build have passed in CI; full platform validation is recorded in the setup PR.
 
 ## Repository language
 Use English for maintained code, comments, documentation, filenames, branches, commits, PRs, UI text and release notes. Preserve third-party legal notices and proper names verbatim.
@@ -56,6 +56,6 @@ Third-party components retain their own licenses. Record origins and human creat
 AI provenance does not guarantee copyright protection.
 
 ## Setup status
-Unity activation secrets are not configured yet. Merge validation cannot pass until activation is set up.
+Unity activation secrets are configured. The setup PR tracks final Windows/Linux validation.
 The first workflow setup PR remains open until its final checks pass; the already-registered Release workflow can be dispatched on that setup branch for bootstrapping.
 Release tooling audit reports transitive braces/micromatch and npm/ip-address advisories even with current direct dependencies. Recheck before the first release.
