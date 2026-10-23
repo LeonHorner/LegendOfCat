@@ -14,6 +14,8 @@ Difficulty is experiential: compare learning load, jump precision, attack densit
 Inspected origin/main ab70aa45faf945828df38d94afd5f8b1f4b79f3e (PR #7). StarterScreen already supplies start menu, settings/update views and update-service integration. UpdatePolicy and VersionedJsonFile supply policy and versioned persistence. Restyle those views through a dedicated issue; preserve their existing behavior and launcher ownership. Do not recreate the update system. New gameplay must integrate with that foundation.
 
 ## Delivery strategy
+
+The [six-level adventure proposal](six-level-adventure.md) describes campaign pacing, checkpoint policy and the user decision gate. Its approval status is recorded in that document; concept themes and boss placement do not become production requirements implicitly.
 Small coherent feature branches and PRs, with dependencies and user-facing acceptance criteria. Several related issues may share a branch. First prove movement and both combat modes, then one complete level, then expand the campaign. Scene concepts do not fix boss placement or campaign themes. Automated checks follow AGENTS.md: manual final merge preparation and explicitly requested releases, not every commit. Nothing in this plan authorizes merging or releasing.
 
 ## Legacy reference
