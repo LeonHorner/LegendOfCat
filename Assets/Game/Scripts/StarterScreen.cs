@@ -142,13 +142,13 @@ public sealed partial class StarterScreen : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Return) &&
                 (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)))
                 SetFullscreen(!fullscreen);
-            if (!display.fullscreen && Screen.width >= 640 && Screen.height >= 360) {
+            if (!fullscreen && Screen.width >= 640 && Screen.height >= 360) {
                 if (lastWidth != Screen.width || lastHeight != Screen.height) {
                     lastWidth = Screen.width; lastHeight = Screen.height;
                     changedAt = Time.unscaledTime;
                 } else if ((windowWidth != lastWidth || windowHeight != lastHeight) &&
                            Time.unscaledTime - changedAt > 1.5f) {
-                    display.width = lastWidth; display.height = lastHeight;
+                    windowWidth = lastWidth; windowHeight = lastHeight;
                     SaveDisplay();
                 }
             }
