@@ -34,6 +34,58 @@ Do not remove the feed files or `.nupkg` packages: `GithubSource` needs them for
 The staging script fails closed on missing, inconsistent or duplicate publish assets.
 The packaging outputs themselves are not renamed or rewritten.
 
+
+## Delta packages and publication gate
+
+The **manually triggered** Release workflow uses the pinned Velopack CLI (v1.2.161)
+and a separate packaging job for each channel (`win`, `linux`).
+
+1. `node tools/delta-release.mjs prepare <channel> <target-version> <output-dir>`
+   asks GitHub for the latest *stable published release*. On a first stable release
+   (no predecessor) it deliberately uses full-only mode. Otherwise, it checks
+   that the predecessor tag is older, both channel feed and correct full archive
+   exist, downloads them by exact name, and verifies the archive size/SHA-1
+   against that release's feed. A missing/incorrect asset, download problem or
+   checksum error aborts the job rather than silently disabling Delta generation.
+2. `dotnet vpk pack --delta BestSpeed` builds a new full archive and a Delta
+   using the predecessor package in the same output directory.
+3. `node tools/delta-release.mjs finalize ...` validates the new feed and
+   its full/Delta SHA-1, optional SHA-256 and size, applies the new Delta to the downloaded
+   previous full archive using `dotnet vpk delta patch`, and checks that the
+   reconstructed new full archive has the same **SHA-256** as the built full
+   archive. Missing or invalid Deltas block release publication.
+4. A Delta is published only when it uses **at most 90%** of the new full
+   package's size (at least 10% bandwidth savings). An oversized *verified*
+   Delta is omitted, leaving a usable full-only release. A broken Delta never
+   silently falls back. Previous version packages are removed from staging.
+5. The public `releases.<channel>.json` is restricted to the exact new-version
+   full and optional Delta. `tools/release-assets.mjs` independently verifies
+   filenames, package ID, version, type, SHA-1, optional SHA-256 and byte size before publication.
+   Output contains exactly the public player downloads and new packages/feeds.
+   Package verification and Unity tests/Windows/Linux builds must all pass
+   before any release becomes visible.
+
+In `Prepare merge`, nonpublishing Windows/Linux integration jobs first exercise
+the **actual pinned Velopack CLI** using official published full-package
+v0.1.0 and v0.2.0 fixtures; they run `vpk delta generate` and
+`vpk delta patch`, verifying the reconstructed full package's SHA-256.
+These are genuine package-level tests (not mocked patches), but they do not
+rebuild the next version, exercise `vpk pack` against its specific release
+payload, or prove a graphical installation. The first authorized release still
+runs the end-to-end packaging and reconstruction gate before publication.
+
+GitHub's `GithubSource` can discover Deltas across tagged releases; each
+GitHub Release includes only its own version's full and optional Delta.
+The updater decides between Delta chains and full-package downloads.
+A first update on Linux normally downloads the full package because an AppImage
+installation does not have an existing local full-package Delta base.
+The workflow reports package sizes and estimated bandwidth savings, not actual
+runtime download savings. Real graphical N→N+1 and skipped-version updates must
+still be tested separately on Windows and Linux as described in
+[RELEASE-TEST.md](../RELEASE-TEST.md). The maintainer's successful
+Windows v0.1.0→v0.2.0 test used the old full-only system and is not Delta evidence.
+
+
 README links target `/releases/latest/download/<fixed-asset-name>`, while each release
 description links to the exact release tag and puts the downloads above the changelog.
 The README direct links will not resolve against v0.2.0, which still uses Velopack's

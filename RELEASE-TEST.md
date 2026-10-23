@@ -1,6 +1,8 @@
 # First installation and update test
 
-Status: **not executed**. This document is a runbook, not evidence of verified update support.
+Status: **partially observed on Windows** (v0.1.0 -> v0.2.0, maintainer report); the full
+platform validation remains incomplete. This document is a runbook with clearly labeled
+observations, not evidence of fully verified cross-platform update support.
 Publishing N and N+1 requires separate explicit release authorization. Do not create an artificial
 release merely to exercise the updater; use the next small, real fix for N+1.
 
@@ -59,6 +61,59 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 7. Confirm a second normal launch of the same installation cannot run a competing game/update.
    Directly launching the internal Unity player intentionally disables update installation.
 
+## Delta update validation (future stable N -> N+1)
+
+Before authorizing the release, confirm that the new Release workflow jobs for
+**both** platforms passed the downloaded-baseline checksum validation, Delta
+reconstruction SHA-256 check, feed validation and asset-staging gate. Record the
+workflow summary's baseline version, complete package size, Delta size, savings
+percentage or documented full-only reason. A first release with no previous
+stable archive is legitimately full-only; a failed download or corrupt patch
+must instead block publication. No artificial public release is required.
+
+On Linux, the **first AppImage update normally requires a full package** because the
+initial installation does not contain a local full-package Delta base. Test a subsequent
+Linux update after that base exists before expecting an actual Delta download.
+
+On a real Windows installation and a Linux desktop/AppImage, check:
+
+1. Keep stable version N installed with identifiable saved preferences.
+   Record the current install package and version. Do not assume the
+   release workflow's patch verification proves the live update path.
+2. After a separately authorized regular N+1 release, start N and monitor the
+   actual update logs/network traffic to determine whether Velopack downloaded
+   a Delta or full package. Where a Delta is available and beneficial, record
+   which path was actually chosen rather than assuming it was used.
+3. Apply the update. Confirm the restarted application reports N+1, retains
+   settings, and presents no corruption or repeated update prompt.
+4. Test an installation that skips one or more stable versions. Velopack may
+   choose a Delta chain or a full archive; verify both download choice and
+   successful result.
+5. Where practical, exercise fallback to the full package and
+   interrupted-download/retry behavior without publishing invalid Delta assets.
+   Log failures and preserve a rollback/reinstall path.
+
+The first N+1 release with verified Delta artifacts is a **package-generation
+milestone**, not yet proof of correct end-to-end Delta updates on both desktops.
+Only mark platform-specific Delta support verified after collecting actual
+installation logs and platform test evidence.
+
+## Observed Windows update: v0.1.0 -> v0.2.0
+
+Recorded on 2026-10-23 from the maintainer's report of a real Windows installation:
+
+- In-app update from stable v0.1.0 to stable v0.2.0 completed successfully.
+- Existing settings were preserved.
+- The game automatically restarted after the update.
+
+This is a user-reported functional smoke test, not a CI result or a recorded
+comprehensive platform validation. The Windows version/build, installation path,
+download progress, log captures, Later/reminder behavior, interruption/retry,
+release history, and detailed update package selection were not reported.
+The update used the release process *before* public installer filenames were
+changed; this observation does not validate Delta packages or new download names.
+Linux installation/update behavior remains unverified.
+
 ## Evidence
 
 | Check | Windows | Linux |
@@ -70,10 +125,15 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 | Offline start and retry | Not run | Not run |
 | N+1 tag / commit / release workflow | Pending | Pending |
 | Later persists across restart | Not run | Not run |
-| Settings update / progress / restart to N+1 | Not run | Not run |
+| Installed N -> N+1 update / automatic restart | PASS (maintainer report, v0.1.0 -> v0.2.0) | Not run |
+| Settings update path and download progress | Not reported | Not run |
+| Delta artifact SHA-256 reconstruction / release feed | Not run | Not run |
+| Actual Delta or full download choice (N → N+1) | Not observed | Not run |
+| Skipped-version Delta chain / full fallback | Not run | Not run |
 | First-pop-up Update now | Not run | Not run |
 | Interrupted download / retry | Not run | Not run |
-| Preferences preserved / old version read-only | Not run | Not run |
+| Preferences preserved across update | PASS (maintainer report) | Not run |
+| Old version release history read-only | Not reported | Not run |
 | Logs / screenshots / remaining defects | Pending | Pending |
 
 Do not mark update support verified until both real platform tests pass. If the game cannot

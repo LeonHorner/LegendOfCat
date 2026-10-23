@@ -43,7 +43,7 @@ function mock(options = {}) {
   const statuses = [];
   const outputs = {};
   const failures = [];
-  const results = { PREFLIGHT: 'success', TEST: 'success', BUILD: 'success', ...options.results };
+  const results = { PREFLIGHT: 'success', TEST: 'success', BUILD: 'success', DELTA_INTEGRATION: 'success', ...options.results };
   return {
     pr,
     statuses,
@@ -130,6 +130,9 @@ test('the gate rejects failures, cancellations, skips and stale PR revisions', a
     { results: { BUILD: 'failure' } },
     { results: { BUILD: 'cancelled' } },
     { results: { BUILD: 'skipped' } },
+    { results: { DELTA_INTEGRATION: 'failure' } },
+    { results: { DELTA_INTEGRATION: 'cancelled' } },
+    { results: { DELTA_INTEGRATION: 'skipped' } },
     { results: { PREFLIGHT: 'failure' } },
     { pr: { head: { sha: 'different-commit', repo: { full_name: 'LeonHorner/LegendOfCat' } } } },
     { pr: { base: { ref: 'main', sha: 'new-main-commit' } } },
@@ -153,7 +156,7 @@ test('automatic CI is limited to ready same-repo PRs; manual fallback remains', 
   assert.match(prYaml, /!github\.event\.pull_request\.draft/);
   assert.match(prYaml, /group: pr-validation-\$\{\{ github\.event\.pull_request\.number \|\| inputs\.pr_number \}\}/);
   assert.match(prYaml, /cancel-in-progress: true/);
-  assert.match(prYaml, /needs: \[preflight, test, build\]/);
+  assert.match(prYaml, /needs: \[preflight, test, build, delta-integration\]/);
   assert.match(prYaml, /build:\n    name: Build \(\$\{\{ matrix\.platform \}\}\)\n    needs: preflight/);
   assert.match(prYaml, /githubToken: ''/);
 });
@@ -169,4 +172,27 @@ test('release is manual and publish depends on all required jobs', () => {
   assert.match(releaseYaml, /needs\.package\.result == 'success'/);
   assert.match(releaseYaml, /test "\$EXPECTED" = "\$ACTUAL"/);
   assert.match(releaseYaml, /githubToken: ''/);
+});
+
+test('both release platforms verify Delta packages before artifacts can publish', () => {
+  const fetch = releaseYaml.indexOf('name: Fetch and verify previous stable full package');
+  const pack = releaseYaml.indexOf('name: Package installer and update feed');
+  const verify = releaseYaml.indexOf('name: Verify Delta reconstruction and release feed');
+  const artifact = releaseYaml.indexOf('name: release-${{ matrix.platform }}');
+  const upload = releaseYaml.indexOf('name: Publish verified commit');
+  assert.ok(fetch !== -1 && fetch < pack && pack < verify && verify < artifact && artifact < upload);
+  assert.match(releaseYaml, /GH_TOKEN: \$\{\{ github\.token \}\}/);
+  assert.match(releaseYaml, /node tools\/delta-release\.mjs prepare/);
+  assert.match(releaseYaml, /node tools\/delta-release\.mjs finalize/);
+  assert.match(releaseYaml, /tools\/release-assets\.mjs artifacts\/releases artifacts\/published \$\{\{ needs\.plan\.outputs\.version \}\}/);
+  assert.match(prYaml, /node --test tools\/release-assets\.test\.mjs tools\/delta-release\.test\.mjs/);
+});
+
+test('real Velopack Delta reconstruction is mandatory on both platforms before merge-ready', () => {
+  assert.match(prYaml, /delta-integration:\n    name: Real Velopack Delta/);
+  assert.match(prYaml, /os: windows-2022\n            platform: win/);
+  assert.match(prYaml, /os: ubuntu-22\.04\n            platform: linux/);
+  assert.match(prYaml, /run: node tools\/integration-delta\.mjs \$\{\{ matrix\.platform \}\}/);
+  assert.match(prYaml, /DELTA_INTEGRATION: \$\{\{ needs\.delta-integration\.result \}\}/);
+  assert.match(prYaml, /'DELTA_INTEGRATION'\]\.every/);
 });
