@@ -40,4 +40,3 @@ Release tooling audit reports transitive braces/micromatch and npm/ip-address ad
 ## Asset provenance
 
 Third-party components retain their own licenses. Record origins and human creative decisions in [ASSETS.md](../ASSETS.md). AI provenance does not guarantee copyright protection.
-
