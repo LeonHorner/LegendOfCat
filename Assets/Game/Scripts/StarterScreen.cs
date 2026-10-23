@@ -212,7 +212,13 @@ public sealed class StarterScreen : MonoBehaviour
         GUILayout.EndArea();
         if (popup) {
             var popupWidth = Mathf.Min(460, Screen.width - 24);
-            GUILayout.BeginArea(new Rect((Screen.width - popupWidth) / 2, (Screen.height - 230) / 2, popupWidth, 230), GUI.skin.window);
+            var popupRect = new Rect((Screen.width - popupWidth) / 2, (Screen.height - 230) / 2, popupWidth, 230);
+            GUI.color = new Color(0, 0, 0, 0.7f);
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+            GUI.color = new Color(0.07f, 0.09f, 0.13f);
+            GUI.DrawTexture(popupRect, Texture2D.whiteTexture);
+            GUI.color = previous;
+            GUILayout.BeginArea(popupRect, GUI.skin.box);
             GUILayout.Label("Update available", titleStyle);
             GUILayout.Label("Version " + available + " is available. Restart to install after the download completes.", textStyle);
             if (Button("Update now")) Send("download");
