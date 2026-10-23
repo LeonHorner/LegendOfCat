@@ -22,6 +22,7 @@ notes are explicitly simulated; no update was installed or release published.
 | [Small window with cutout](cutout.png) | 640 x 480, simulated 50-pixel side and 25-pixel vertical insets; scrollable content |
 | [Portrait dialog](popup-narrow.png) | Consent and Later remain accessible at 390 x 844 |
 | [Keyboard focus](keyboard-focus.png) | Native interactive capture: arrow-key focus and automatic scroll reveal |
+| [Resizable window](resizable-window.png) | Native maximize/restore inspection after enabling desktop window resizing |
 | [Initial menu](menu-wide.png) | Native interactive capture before a simulated update was offered |
 
 Interactive inspection also verified keyboard activation with Enter and ordinary

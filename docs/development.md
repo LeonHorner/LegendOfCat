@@ -69,6 +69,9 @@ player/editor launches use `UnavailableMenuPlatformService`: the menu/settings
 remain usable, update actions are disabled, and no executable is assumed to exist.
 The launcher still owns installation and automatic restart after a consented download.
 
+Desktop player and preview windows can be resized by dragging their borders or corners.
+Both build entry points enable Unity's resizable-window setting.
+
 The content region follows `Screen.safeArea`, with a 420-pixel logical width reference,
 bounded scaling and scrollable content. Buttons are at least 48 physical pixels high.
 Tab/Shift+Tab or arrow keys move focus; Enter/Space activates buttons. A gold border
