@@ -59,3 +59,11 @@ AI provenance does not guarantee copyright protection.
 Unity activation secrets are configured. The setup PR tracks final Windows/Linux validation.
 The first workflow setup PR remains open until its final checks pass; the already-registered Release workflow can be dispatched on that setup branch for bootstrapping.
 Release tooling audit reports transitive braces/micromatch and npm/ip-address advisories even with current direct dependencies. Recheck before the first release.
+
+## Official Unity agent connection
+The official com.unity.pipeline package is pinned to 0.9.0-exp.1. Open this project in Unity before using the connection.
+The verified local CLI version is 1.0.0-beta.13. Run unity status to check readiness, then unity command get_hierarchy for a read-only check.
+For Codex, configure a local MCP server running unity mcp --project-path <absolute-project-path>. Keep machine-specific executable and project paths out of Git.
+The setup machine has a local .codex/config.toml excluded through .git/info/exclude. Reopen the project in Codex to load the connection.
+CLI and MCP use the same Pipeline backend: CLI is convenient for scripts; MCP exposes discoverable structured tools directly to agents.
+No tests are run by connecting MCP. Follow the manual final-validation policy in AGENTS.md.
