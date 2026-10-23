@@ -123,16 +123,17 @@ static async Task WindowsHandoff()
 {
     var gameExit = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
     var launcherExit = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+    var waitingForLauncher = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
     var events = new List<string>();
     var handoff = UpdateWorkflow.ApplyAsync(
         false,
         async () => { events.Add("wait game"); await gameExit.Task; events.Add("game exited"); },
-        async () => { events.Add("wait launcher"); await launcherExit.Task; events.Add("launcher exited"); },
+        async () => { events.Add("wait launcher"); waitingForLauncher.SetResult(true); await launcherExit.Task; events.Add("launcher exited"); },
         () => events.Add("apply"));
     Equal("wait game", string.Join(",", events));
     gameExit.SetResult(true);
     // RunContinuationsAsynchronously means the waiting callback resumes on the pool.
-    await Until(() => events.Contains("wait launcher"));
+    await waitingForLauncher.Task.WaitAsync(TimeSpan.FromSeconds(5));
     Check(!handoff.IsCompleted, "Windows must await launcher exit");
     launcherExit.SetResult(true);
     await handoff;
@@ -174,15 +175,6 @@ static void Check(bool condition, string message)
 static void Equal(string expected, string actual)
 {
     if (expected != actual) throw new Exception($"Expected [{expected}], got [{actual}]");
-}
-
-static async Task Until(Func<bool> ready)
-{
-    using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-    while (!ready()) {
-        timeout.Token.ThrowIfCancellationRequested();
-        await Task.Delay(10, timeout.Token);
-    }
 }
 
 sealed class StubHistoryHandler(HttpStatusCode status) : HttpMessageHandler
