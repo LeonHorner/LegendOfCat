@@ -33,7 +33,7 @@ public sealed class DisplayState
         samples++;
         if (Pending) {
             // Allow the request to settle for multiple frames, including compositor resize events.
-            if (samples < 3 || now - changedAt < 0.5f ||
+            if (samples < 3 || now - changedAt < 1.5f ||
                 (fullscreen != RequestedFullscreen && now - requestedAt < 5)) return false;
             Pending = false;
         }

@@ -33,6 +33,8 @@ public class DesktopBehaviorTests
         Assert.That(Call(state, "Observe", 1280, 720, false, 0.1f, false), Is.False);
         Assert.That(Call(state, "Observe", 1920, 1080, true, 0.2f, false), Is.False);
         Call(state, "Observe", 1920, 1080, true, 0.3f, false);
+        Call(state, "Observe", 1920, 1080, true, 1f, false);
+        Assert.That(Property(state, "Pending"), Is.True, "Controls remain pending until the observed mode is committed.");
         Assert.That(Call(state, "Observe", 1920, 1080, true, 2f, false), Is.True);
         Assert.That(Property(state, "Fullscreen"), Is.True);
         Assert.That(Property(state, "Width"), Is.EqualTo(1280));
