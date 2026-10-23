@@ -13,7 +13,7 @@ $start.CreateNoWindow = $true
 $start.WorkingDirectory = [IO.Path]::GetDirectoryName($executablePath)
 if ($VirtualDisplay) {
     if ($IsWindows) { throw 'A virtual X display is only supported on Linux.' }
-    $start.FileName = (Get-Command xvfb-run -CommandType Application).Source
+    $start.FileName = (Get-Command xvfb-run -CommandType Application | Select-Object -First 1).Source
     $start.ArgumentList.Add('--auto-servernum')
     $start.ArgumentList.Add($executablePath)
 } else {
