@@ -8,7 +8,7 @@ level files yet; do not invent their data models before those features exist.
 ## Independent schemas
 
 - Each file format has its own integer `schemaVersion`, independent of the application version.
-  Menu settings currently use version **0**, with no published predecessor and no migration steps.
+  Menu and display settings each use independent version **0** schemas, with no published predecessor and no migration steps.
   Future saves and editable levels also start at **0** and maintain their own
   version histories. Shipped Unity scenes/assets are build inputs, not migrated user files.
 - `schemaVersion` is mandatory and must be a non-negative integer. Missing/invalid versions
@@ -58,6 +58,10 @@ There is no 0-to-1 migration yet. A missing reminder uses an empty string. An ex
 non-string reminder is invalid and must not be overwritten. Reminder writes preserve unknown
 fields and go through the same validated atomic-save path. The chained migration tests use
 synthetic examples to verify the mechanism; they do not establish released gameplay schemas.
+
+## Desktop display settings
+
+`display-settings.json` is independent from `menu-settings.json` and starts at schemaVersion 0. It stores `width` (640–16384), `height` (360–16384) and `fullscreen` (boolean). It uses `VersionedJsonFile` to preserve unknown fields and block writes to invalid, unreadable or newer files. A missing file defaults to a windowed 1280 × 720 player. Display settings never reset menu settings or game saves.
 
 ## Checklist for each future issue or PR
 
