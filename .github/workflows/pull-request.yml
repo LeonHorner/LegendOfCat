@@ -72,7 +72,13 @@ jobs:
       - name: Run CI workflow contract tests
         run: node --test tools/ci-workflow.test.mjs
       - name: Check release download and Delta contracts
-        run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs tools/linux-update-contract.test.mjs
+        run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
+      - name: Set up .NET for updater workflow tests
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Run updater workflow regression tests
+        run: dotnet run --project Launcher.WorkflowTests/Launcher.WorkflowTests.csproj --configuration Release
       - name: Check Unity activation
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
