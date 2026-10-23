@@ -50,24 +50,35 @@ and a separate packaging job for each channel (`win`, `linux`).
 2. `dotnet vpk pack --delta BestSpeed` builds a new full archive and a Delta
    using the predecessor package in the same output directory.
 3. `node tools/delta-release.mjs finalize ...` validates the new feed and
-   its full/Delta SHA-1 and size, applies the new Delta to the downloaded
+   its full/Delta SHA-1, optional SHA-256 and size, applies the new Delta to the downloaded
    previous full archive using `dotnet vpk delta patch`, and checks that the
    reconstructed new full archive has the same **SHA-256** as the built full
    archive. Missing or invalid Deltas block release publication.
-4. A Delta is published only when it uses **less than 90%** of the new full
+4. A Delta is published only when it uses **at most 90%** of the new full
    package's size (at least 10% bandwidth savings). An oversized *verified*
    Delta is omitted, leaving a usable full-only release. A broken Delta never
    silently falls back. Previous version packages are removed from staging.
 5. The public `releases.<channel>.json` is restricted to the exact new-version
    full and optional Delta. `tools/release-assets.mjs` independently verifies
-   filenames, package ID, version, type, SHA-1 and byte size before publication.
+   filenames, package ID, version, type, SHA-1, optional SHA-256 and byte size before publication.
    Output contains exactly the public player downloads and new packages/feeds.
    Package verification and Unity tests/Windows/Linux builds must all pass
    before any release becomes visible.
 
+In `Prepare merge`, nonpublishing Windows/Linux integration jobs first exercise
+the **actual pinned Velopack CLI** using official published full-package
+v0.1.0 and v0.2.0 fixtures; they run `vpk delta generate` and
+`vpk delta patch`, verifying the reconstructed full package's SHA-256.
+These are genuine package-level tests (not mocked patches), but they do not
+rebuild the next version, exercise `vpk pack` against its specific release
+payload, or prove a graphical installation. The first authorized release still
+runs the end-to-end packaging and reconstruction gate before publication.
+
 GitHub's `GithubSource` can discover Deltas across tagged releases; each
 GitHub Release includes only its own version's full and optional Delta.
 The updater decides between Delta chains and full-package downloads.
+A first update on Linux normally downloads the full package because an AppImage
+installation does not have an existing local full-package Delta base.
 The workflow reports package sizes and estimated bandwidth savings, not actual
 runtime download savings. Real graphical N→N+1 and skipped-version updates must
 still be tested separately on Windows and Linux as described in
