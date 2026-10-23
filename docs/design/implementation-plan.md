@@ -2,7 +2,7 @@
 
 See game-direction.md and art-direction.md before implementation. The following issues are deliberately small. GitHub native blocked-by relationships are the source of truth for dependencies; do not duplicate dependency lists in issue bodies. Product choices remain review gates; this is not a literal Java port.
 
-1. **Define the six-level adventure and challenge curve** — Propose a six-level journey, teaching beats, checkpoints and optional challenges. Retain one stomp boss and flying owl/dragon ranged bosses; level numbers and themes are proposals, not fixed Java mappings.
+1. **Define the six-level adventure and challenge curve** — Review the [six-level adventure proposal and decision record](six-level-adventure.md) for the journey, teaching beats, checkpoints, optional challenges and Java difficulty comparison. Retain one stomp boss and flying owl/dragon ranged bosses; dependent content requires the recorded user decisions.
 
 2. **Prototype responsive cat movement and camera** — Build a small playable test course with run, jump, fall, landing and camera follow; Java CatAdventure is a reference for existing coyote time and input buffering, not a mandatory numeric spec.
 

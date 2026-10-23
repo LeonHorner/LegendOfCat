@@ -1,6 +1,7 @@
 # Movement prototype
 
-Issue #9 supplies a temporary movement lab through **Play** on the existing menu.
+Issue #9 supplies a temporary movement lab through **Movement lab (prototype) > Enter movement lab**
+on the painted menu integrated from PR #31. Return with **Back to menu**, Escape or controller Start.
 This is a tuning baseline, not approval of final character art, campaign geometry or difficulty.
 No traversal ability beyond running and jumping is introduced.
 
@@ -58,6 +59,10 @@ The orange/cream geometric quadruped is a placeholder; moving legs and jump/fall
 feedback never change collision dimensions or delay movement.
 
 ## Verification
+
+The [painted-menu integration review](menu-movement-integration/README.md) records the
+combined entry/return flow after merging PR #31. The earlier captures below predate
+that menu integration; movement tuning and controls are unchanged.
 
 Behavioral EditMode tests cover short taps, grace expiry, buffered landing, no held auto-jump,
 reset, timestep-based horizontal motion, terminal velocity and the full-hold envelope.

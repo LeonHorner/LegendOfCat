@@ -18,11 +18,17 @@ Draft PRs track unfinished features. List every related issue, acceptance criter
 Use an English Conventional Commit PR title describing the complete user-visible result. Squash merge turns it into one commit and one release-note entry.
 External code contributions are not accepted; public bug reports and feature requests are welcome.
 
+For concurrent work, inspect open PRs, active branches and native issue dependencies before editing.
+Record relevant shared components, ownership and integration checks in the PR's Coordination section.
+Use a separate worktree and Unity project directory per concurrent agent, with its own Library.
+Agree on a small interface, an integration owner or dependency sequencing when components overlap;
+do not independently edit another feature's entry point or metadata. See AGENTS.md for the full rules.
+
 ## Prepare a merge
 Pushes, PR creation and individual commits do not run tests or builds.
 Once the entire feature is complete:
 
-1. Merge current main into the feature branch without rewriting published history.
+1. Review newly merged PRs, merge current main normally into the feature branch, and preserve both features when resolving conflicts. Inspect the relevant end-to-end behavior and update PR integration/risk notes without rewriting published history.
 2. Mark the PR ready and finish its documentation and self-review.
 3. Run **Actions > Prepare merge** and enter the PR number.
    CLI equivalent: `gh workflow run pull-request.yml -f pr_number=123`.
@@ -42,7 +48,7 @@ Run Unity in batch mode with `-executeMethod BuildGame.BuildPreview` and
 Keep the entire output folder with the executable; Unity players are not single-file applications.
 Preview-only buttons show the update pop-up and simulate downloads/errors without networking,
 installing updates or quitting to an updater. Preview settings use a separate persistent data
-directory (`LeonHorner/LegendOfCat Preview`). The normal start menu, Settings and Play test view
+directory (`LeonHorner/LegendOfCat Preview`). The painted menu, Settings and movement-lab entry
 are the same UI as the release build; simulation tools are compiled out of release builds.
 
 ## Official Unity agent connection
@@ -55,9 +61,64 @@ No tests are run by connecting MCP. Follow the manual final-validation policy in
 
 ## Design references
 
-**Play** opens the reusable movement lab. See [Movement prototype](design/movement-prototype.md)
+**Movement lab (prototype) > Enter movement lab** opens the reusable movement lab. See [Movement prototype](design/movement-prototype.md)
 for controls, course geometry, jump reach and the prefab regeneration command.
 
 Read the [game direction](design/game-direction.md), [art direction](design/art-direction.md) and [implementation plan](design/implementation-plan.md) before gameplay or visual work. The Unity adventure reimagines the earlier Java game rather than copying its gameplay specification.
 
 For release operations and updater behavior, see [Releasing](releasing.md).
+
+## Painted menu inspection
+
+The menu retains IMGUI and the existing settings schema (`schemaVersion: 0`).
+`StarterScreen.Presentation.cs` owns styling and layout; `IMenuPlatformService`
+is the small update boundary. Desktop launch detection and the unchanged line-based
+service protocol live in `DesktopMenuPlatformService`. Other platforms and direct
+player/editor launches use `UnavailableMenuPlatformService`: the menu/settings
+remain usable, update actions are disabled, and no executable is assumed to exist.
+The launcher still owns installation and automatic restart after a consented download.
+
+Desktop player and preview windows can be resized by dragging their borders or corners.
+Both build entry points enable Unity's resizable-window setting.
+
+The content region follows `Screen.safeArea`, with a 420-pixel logical width reference,
+bounded scaling and scrollable content. Buttons are at least 48 physical pixels high.
+Tab/Shift+Tab or arrow keys move focus; Enter/Space activates buttons. A gold border
+marks focus independently of text color. A short page opacity transition leaves input
+immediate; scenery does not move. Update dialogs trap menu interaction and offer
+Later as their initial focus. **Movement lab (prototype)** opens an introduction explaining
+the temporary course and unfinished campaign; **Enter movement lab** starts it. The menu's
+single OnGUI implementation skips all painting while the lab is active. The menu component
+continues receiving update-service messages, preserving settings and once-per-version reminders.
+Return with **Back to menu**, Escape or controller Start; the lab stops immediately, its input
+actions are disabled and the painted menu resumes with fresh keyboard navigation state.
+
+Open `Assets/Game/Scenes/Main.unity` in the pinned Editor and enter Play Mode to inspect the
+combined flow. Verify menu keyboard focus, entry, run/jump/retry, return, then Settings and
+Versions & updates. Repeat entry/return and resize the window; the complete campaign is not
+playable. Input handling remains Both so the IMGUI menu and shared Input System movement
+actions work together. Desktop launcher behavior and settings schema are unchanged.
+See the [integration review and captures](design/menu-movement-integration/README.md)
+for conflict resolutions and the menu/course regression test included in final validation.
+
+Preview builds include state inspection controls (checking, available/pop-up,
+download progress, ready, current, error, warning and unsupported platform).
+Example releases are labeled as simulations and appear only in preview builds.
+Optional player arguments produce actual rendered captures and exit:
+
+```text
+LegendOfCatPreview.exe -screen-fullscreen 0 -screen-width 1280 -screen-height 720 --preview-view menu --preview-capture <absolute-path>.png
+```
+
+`--preview-view` also accepts `settings`, `play`, `popup`, `available`, `checking`,
+`downloading`, `ready`, `current`, `error`, `warning`, and `development` (unsupported).
+`--preview-suite <absolute-directory>` captures the full state/size matrix and exits.
+Keep the preview window visible during capture; a hidden window can produce black
+images even while the simulation runs. The Preview tools / Capture view matrix
+button writes the matrix to `Application.persistentDataPath/menu-preview-captures`
+and exits. Direct3D 11 can be selected with `-force-d3d11` on Windows.
+Allow the capture sequence to finish before closing it.
+Add `--preview-cutout` to simulate 50-pixel side insets and 25-pixel top/bottom
+insets. This is local visual inspection, not mobile store or touch-gameplay support.
+Preview builds use a separate settings directory and never contact the update feed.
+See [menu preview captures](design/menu-preview/README.md) for inspection evidence.

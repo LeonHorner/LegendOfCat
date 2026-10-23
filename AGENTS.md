@@ -23,17 +23,24 @@
 
 
 ## Issue-to-PR workflow
-1. Read the requested issue, linked issues, acceptance criteria, and existing PRs/branches before editing.
+1. Read the requested issue, linked issues, acceptance criteria, native GitHub blocked-by relationships, open PRs and active feature branches before editing. Identify overlapping files, shared Unity assets, project settings and integration points; follow the parallel-work rules below.
 2. The unit of work is a coherent feature, not an issue. Several related issues may share one feature branch and one PR. Reuse an existing feature branch/PR instead of opening competing work.
 3. Use a descriptive branch such as feat/player-movement, fix/camera-jitter, or chore/unity-upgrade. Never work directly on main.
 4. Implement the agreed feature, update relevant documentation and asset provenance, and add meaningful tests for the behavior. Do not expand into unrelated issues.
 5. Open a draft PR early for multi-issue features; list all related issues and remaining acceptance criteria. Use "Closes #123" only for issues fully completed by the PR. Keep incomplete issues explicitly listed as remaining work.
 6. Keep the PR title, summary and checklist current as the feature evolves. The final title describes the complete player-visible result and becomes the single squash commit/changelog entry.
 7. Perform static checks and self-review while developing. Do not run CI/tests after every commit, on every push, or merely because a draft PR exists.
-8. Once the whole feature is ready, update the branch from main with a normal merge (never a force-push/rebase of shared history), mark the PR ready, and run the manual Prepare merge workflow (pull-request.yml) with pr_number=<number>. Inspect results and fix failures; rerun only after fixes or an invalidated revision.
-9. Every test and both Windows/Linux player and launcher builds must pass for the exact PR revision. Any new commit requires final validation again. Do not bypass the merge-ready status.
+8. Once implementation, documentation and self-review are complete, review other merged PRs and merge current main normally into the feature branch (never force-push/rebase shared history). Resolve conflicts preserving both features' intended behavior, inspect relevant end-to-end integration, and update the PR's integration notes and remaining risks. Mark the PR ready and run the manual Prepare merge workflow (pull-request.yml) with pr_number=<number>. Inspect results and fix failures; rerun only after fixes or invalidated results.
+9. Every test and both Windows/Linux player and launcher builds must pass for the exact PR revision. A new commit or invalidated base requires fresh final validation; merge a newer main first. Do not bypass the merge-ready status.
 10. Report the PR URL, implemented issues, documentation changes, validation results and remaining blockers. "Implement issue #123" authorizes the work through a ready PR and final checks when the feature is complete; it does not authorize merging or publishing a release.
 11. Merge only when explicitly requested, using squash and the validated head SHA. If the feature contains unfinished issues, leave the PR as a draft and report progress without triggering final validation.
+
+## Parallel work and ownership
+- Before editing, establish component boundaries and any overlap in the PR's coordination notes; independent changes may simply say none. Keep components independently implementable where practical and respect documented ownership and scope.
+- Concurrent agents use separate Git worktrees and isolated Unity project directories. Each working copy owns its Library; never share a mutable Unity Library directory between copies or run Editors against the same project concurrently.
+- Prefer small, stable interfaces to modifying another agent's component independently. Avoid simultaneous ownership of shared entry points, scenes, prefabs, .meta files, package configuration and project settings. Never create competing metadata for the same Unity asset or silently replace another feature's changes.
+- If tasks must change the same component, name an integration owner in the existing PR coordination notes or sequence the tasks with native GitHub blocked-by relationships. These relationships remain authoritative; do not duplicate dependency graphs in issue bodies.
+- Create a separate integration issue only for meaningful independent work, not routine coordination. Do not introduce a central coordinator agent or complex locking infrastructure. These rules do not require spawning additional agents.
 
 ## Git safety
 - Never force-push any branch, rewrite published history, delete main, or bypass repository rules.

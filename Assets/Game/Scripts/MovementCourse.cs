@@ -113,7 +113,7 @@ public sealed class MovementCourse : MonoBehaviour
     {
         float width = Mathf.Min(680, Screen.width - 24);
         GUILayout.BeginArea(new Rect(12, 12, width, 160), GUI.skin.box);
-        GUILayout.Label("MIKA / MOVEMENT LAB — temporary art");
+        GUILayout.Label("MIKA / MOVEMENT LAB PROTOTYPE — temporary art");
         GUILayout.Label("A/D or arrows: run | Space/W/Up: jump (hold for height) | R: retry | Esc: menu");
         GUILayout.Label("Controller: stick/D-pad, South: jump, Select: retry, Start: menu");
         GUILayout.Label((landing > 0 ? "Landing" : Cat.Pose) + " | Clear the gaps; falls return to the start.");

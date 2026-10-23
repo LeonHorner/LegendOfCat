@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 
-public sealed class StarterScreen : MonoBehaviour
+public sealed partial class StarterScreen : MonoBehaviour
 {
     [Serializable] public class Release { public string version, notes, url; }
     [Serializable] public class Message {
@@ -20,7 +19,7 @@ public sealed class StarterScreen : MonoBehaviour
     static readonly bool Preview = false;
 #endif
     readonly ConcurrentQueue<string> messages = new ConcurrentQueue<string>();
-    Process helper;
+    IMenuPlatformService platform;
     Preferences preferences = new Preferences();
     VersionedJsonFile settingsFile;
     Release[] releases = new Release[0];
@@ -29,13 +28,25 @@ public sealed class StarterScreen : MonoBehaviour
     bool popup, applying;
     int progress;
     Vector2 scroll;
-    GUIStyle titleStyle, textStyle;
     MovementCourse course;
 
     void OpenCourse()
     {
+        if (course != null || popup || applying) return;
         course = Instantiate(Resources.Load<MovementCourse>("MovementCourse"));
-        course.BackToMenu = () => { Destroy(course.gameObject); course = null; page = "menu"; };
+        course.BackToMenu = CloseCourse;
+    }
+
+    void CloseCourse()
+    {
+        if (course == null) return;
+        // Stop input and rendering immediately, before deferred destruction at the end of the frame.
+        course.gameObject.SetActive(false);
+        Destroy(course.gameObject);
+        course = null;
+        page = "menu";
+        lastPage = null;
+        previousFocus.Clear();
     }
 
     public static bool ShouldOffer(string availableVersion, string lastOfferedVersion)
@@ -49,31 +60,11 @@ public sealed class StarterScreen : MonoBehaviour
 #if LEGEND_OF_CAT_PREVIEW
         messages.Enqueue("{\"state\":\"history\",\"releases\":[{\"version\":\"0.1.0 (preview example)\",\"notes\":\"Sample release notes for UI inspection. No release has been published.\",\"url\":\"https://github.com/LeonHorner/LegendOfCat/releases/\"}]}");
 #endif
-        if (Application.isEditor || Preview) return;
-        var executable = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..",
-            Application.platform == RuntimePlatform.WindowsPlayer ? "LegendOfCat.exe" : "LegendOfCat"));
-        if (!File.Exists(executable)) return;
-        var args = Environment.GetCommandLineArgs();
-        var index = Array.IndexOf(args, "--launcher-pid");
-        int launcherPid = 0;
-        if (index >= 0 && index + 1 < args.Length) int.TryParse(args[index + 1], out launcherPid);
-        // Opening the internal player bypasses the entry process's installation lock.
-        if (launcherPid == 0) return;
-        try {
-            var start = new ProcessStartInfo(executable) {
-                UseShellExecute = false, CreateNoWindow = true,
-                RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true,
-                Arguments = "--update-service " + Process.GetCurrentProcess().Id + " " + launcherPid + " " +
-                    Quote(Application.persistentDataPath) + " " + Quote(Application.version)
-            };
-            helper = new Process { StartInfo = start };
-            helper.OutputDataReceived += (_, eventArgs) => { if (eventArgs.Data != null) messages.Enqueue(eventArgs.Data); };
-            helper.ErrorDataReceived += (_, eventArgs) => { };
-            helper.Start();
-            helper.BeginOutputReadLine();
-            helper.BeginErrorReadLine();
-            Send("check");
-        } catch (Exception) { state = "error"; error = "Update service could not start. You can keep playing."; }
+        platform = Preview ? new UnavailableMenuPlatformService() : DesktopMenuPlatformService.Create();
+        if (platform.SupportsUpdates) state = "checking";
+#if LEGEND_OF_CAT_PREVIEW
+        StartCoroutine(CapturePreview());
+#endif
     }
     void LoadPreferences()
     {
@@ -81,26 +72,28 @@ public sealed class StarterScreen : MonoBehaviour
         preferences.lastOfferedVersion = (string)settingsFile.Data["lastOfferedVersion"];
         warning = settingsFile.Warning;
     }
-    static string Quote(string value) => "\"" + value.Replace("\"", "\\\"") + "\"";
     void Send(string command)
     {
 #if LEGEND_OF_CAT_PREVIEW
         if (Preview) {
-            if (command == "check") messages.Enqueue("{\"state\":\"available\",\"version\":\"0.1.0\"}");
+            previewUnsupported = false;
+            if (command == "check") messages.Enqueue("{\"state\":\"available\",\"version\":\"0.1.0 (preview example)\"}");
             if (command == "download") { popup = false; page = "updates"; StartCoroutine(PreviewDownload()); }
             if (command == "apply") state = "previewComplete";
             return;
         }
 #endif
-        try {
-            helper.StandardInput.WriteLine(command);
-            helper.StandardInput.Flush();
-            if (command == "check") { state = "checking"; error = ""; }
-            if (command == "download") { state = "downloading"; error = ""; popup = false; page = "updates"; }
-        } catch (Exception) { state = "error"; error = "Update service is unavailable. Restart the game to retry."; }
+        if (platform == null || !platform.SupportsUpdates) {
+            if (command == "apply") { state = "error"; error = "Update service is unavailable. Restart the game to retry."; }
+            return;
+        }
+        platform.Send(command);
+        if (command == "check") { state = "checking"; error = ""; }
+        if (command == "download") { state = "downloading"; error = ""; popup = false; page = "updates"; }
     }
     void Update()
     {
+        while (platform != null && platform.TryReceive(out var incoming)) messages.Enqueue(incoming);
         while (messages.TryDequeue(out var line)) {
             Message message;
             try { message = JsonUtility.FromJson<Message>(line); } catch (Exception) { continue; }
@@ -127,14 +120,70 @@ public sealed class StarterScreen : MonoBehaviour
             }
             if (state == "current") available = "";
             if (state == "ready") Send("apply");
-            if (state == "applying") { applying = true; Application.Quit(0); }
-        }
-        if (helper != null && !applying && state != "error") {
-            try { if (helper.HasExited) { state = "error"; error = "Update service stopped. Restart the game to retry."; } }
-            catch (InvalidOperationException) { }
+            if (state == "applying" && platform != null && platform.SupportsUpdates) { applying = true; platform.CompleteApply(); Application.Quit(0); }
         }
     }
 #if LEGEND_OF_CAT_PREVIEW
+    // Optional local visual inspection, compiled out of production players.
+    System.Collections.IEnumerator CapturePreview(string suiteOverride = null)
+    {
+        var args = Environment.GetCommandLineArgs();
+        string Argument(string key) {
+            int index = Array.IndexOf(args, key);
+            return index >= 0 && index + 1 < args.Length ? args[index + 1] : "";
+        }
+        string suite = suiteOverride ?? Argument("--preview-suite");
+        if (!string.IsNullOrEmpty(suite) || !string.IsNullOrEmpty(Argument("--preview-capture")))
+            Application.runInBackground = true;
+        if (!string.IsNullOrEmpty(suite)) {
+            yield return new WaitForSecondsRealtime(12);
+            Directory.CreateDirectory(suite);
+            previewTools = false;
+            foreach (string viewName in new[] { "menu", "settings", "play", "popup", "checking", "available", "downloading", "ready", "current", "error", "warning", "development", "narrow", "cutout", "popup-narrow" }) {
+                popup = false; warning = ""; error = ""; previewUnsupported = false;
+                available = "0.1.0 (preview example)"; progress = 47;
+                state = viewName; page = "updates"; scroll = Vector2.zero;
+                simulateCutout = viewName == "cutout";
+                bool narrow = viewName == "narrow" || viewName == "popup-narrow";
+                Screen.SetResolution(narrow ? 390 : viewName == "cutout" ? 640 : 1280, narrow ? 844 : viewName == "cutout" ? 480 : 720, FullScreenMode.Windowed);
+                if (viewName == "menu" || viewName == "settings" || viewName == "play") page = viewName;
+                if (viewName == "narrow" || viewName == "cutout") page = "settings";
+                if (viewName == "popup" || viewName == "popup-narrow") { state = "available"; popup = true; }
+                if (viewName == "error") error = "Simulated download failure. Retry or choose Later.";
+                if (viewName == "warning") { state = "current"; available = ""; warning = "Preview warning: settings could not be saved. Existing settings are preserved."; }
+                if (viewName == "development") { previewUnsupported = true; available = ""; }
+                if (viewName == "current") available = "";
+                yield return new WaitForSecondsRealtime(0.7f);
+                yield return new WaitForEndOfFrame();
+                ScreenCapture.CaptureScreenshot(Path.Combine(suite, viewName + ".png"));
+                yield return new WaitForSecondsRealtime(0.5f);
+            }
+            Application.Quit();
+            yield break;
+        }
+        string view = Argument("--preview-view");
+        yield return null;
+        if (view == "menu" || view == "settings" || view == "play") page = view;
+        else if (!string.IsNullOrEmpty(view)) {
+            page = "updates";
+            state = view;
+            available = "0.1.0 (preview example)";
+            if (view == "popup") { state = "available"; popup = true; }
+            if (view == "downloading") progress = 47;
+            if (view == "error") error = "Simulated download failure. Retry or choose Later.";
+            if (view == "warning") { state = "current"; available = ""; warning = "Preview warning: settings could not be saved. Existing settings are preserved."; }
+            if (view == "current" || view == "development") available = "";
+            if (view == "development") previewUnsupported = true;
+        }
+        simulateCutout = args.Contains("--preview-cutout");
+        string capture = Argument("--preview-capture");
+        if (string.IsNullOrEmpty(capture)) yield break;
+        yield return new WaitForSecondsRealtime(12);
+        yield return new WaitForEndOfFrame();
+        ScreenCapture.CaptureScreenshot(capture);
+        yield return new WaitForSecondsRealtime(1);
+        Application.Quit();
+    }
     System.Collections.IEnumerator PreviewDownload()
     {
         for (int value = 0; value <= 100; value += 5) {
@@ -144,105 +193,19 @@ public sealed class StarterScreen : MonoBehaviour
         messages.Enqueue("{\"state\":\"ready\"}");
     }
 #endif
-    void OnApplicationQuit()
-    {
-        if (helper == null || applying) return;
-        try { if (!helper.HasExited) helper.Kill(); } catch (Exception) { }
-        helper.Dispose();
-    }
-    void OnGUI()
-    {
-        if (course != null) return;
-        if (titleStyle == null) {
-            titleStyle = new GUIStyle(GUI.skin.label) { fontSize = 30, alignment = TextAnchor.MiddleCenter };
-            textStyle = new GUIStyle(GUI.skin.label) { wordWrap = true, fontSize = 16 };
-        }
-        var previous = GUI.color;
-        GUI.color = new Color(0.055f, 0.07f, 0.11f);
-        GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
-        GUI.color = previous;
-        float width = Mathf.Min(720, Screen.width - 32), height = Mathf.Min(680, Screen.height - 32);
-        GUILayout.BeginArea(new Rect((Screen.width - width) / 2, (Screen.height - height) / 2, width, height), GUI.skin.box);
-        GUILayout.Label("LegendOfCat", titleStyle);
-        GUILayout.Label("Version " + Application.version, textStyle);
-        if (Preview) GUILayout.Label("Local UI preview — updates are simulated; nothing is installed.", textStyle);
-        if (!string.IsNullOrEmpty(warning)) GUILayout.Label(warning, textStyle);
-        GUI.enabled = !popup && state != "applying";
-        scroll = GUILayout.BeginScrollView(scroll);
-        if (page == "menu") {
-            GUILayout.Space(30);
-            if (Button("Play")) OpenCourse();
-            if (Button(string.IsNullOrEmpty(available) ? "Settings" : "Settings • Update available")) page = "settings";
-            if (Button("Quit")) Application.Quit();
-        } else if (page == "settings") {
-            GUILayout.Label("Settings", titleStyle);
-            GUI.enabled = false;
-            Button("Language — Coming later");
-            GUI.enabled = !popup;
-            if (Button(string.IsNullOrEmpty(available) ? "Versions & Updates" : "Versions & Updates • Update available")) page = "updates";
-            if (Button("Back")) page = "menu";
-        } else {
-            GUILayout.Label("Versions & Updates", titleStyle);
-            GUILayout.Label(StatusText(), textStyle);
-            if (!string.IsNullOrEmpty(warning)) GUILayout.Label(warning, textStyle);
-            if (!string.IsNullOrEmpty(error)) GUILayout.Label(error, textStyle);
-            bool busy = state == "checking" || state == "downloading" || state == "ready" || state == "applying";
-            GUI.enabled = !popup && !busy && (helper != null || Preview);
-            if (Button(state == "error" ? "Retry" : "Check for updates")) Send("check");
-            if (!string.IsNullOrEmpty(available) && Button("Update now — " + available)) Send("download");
-            GUI.enabled = !popup;
-            foreach (var release in releases) {
-                GUILayout.Space(12);
-                GUILayout.Label(release.version, textStyle);
-                GUILayout.Label(release.notes, textStyle);
-                if (Button("Release notes") && IsReleaseUrl(release.url)) Application.OpenURL(release.url);
-            }
-            GUILayout.Label("Older releases are listed for reference. Downgrades are not supported.", textStyle);
-            if (Button(state == "error" ? "Later" : "Back")) page = "settings";
-        }
-        GUILayout.EndScrollView();
-#if LEGEND_OF_CAT_PREVIEW
-        if (Preview) {
-            GUI.enabled = !popup && state != "downloading";
-            GUILayout.Label("Preview tools", textStyle);
-            if (Button("Show update pop-up")) { popup = true; available = "0.1.0"; }
-            if (Button("Simulate download error")) {
-                popup = false; page = "updates"; available = "0.1.0";
-                messages.Enqueue("{\"state\":\"error\",\"message\":\"Simulated download failure. Retry or choose Later.\"}");
-            }
-        }
-#endif
-        GUI.enabled = true;
-        GUILayout.EndArea();
-        if (popup) {
-            var popupWidth = Mathf.Min(460, Screen.width - 24);
-            var popupRect = new Rect((Screen.width - popupWidth) / 2, (Screen.height - 230) / 2, popupWidth, 230);
-            GUI.color = new Color(0, 0, 0, 0.7f);
-            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
-            GUI.color = new Color(0.07f, 0.09f, 0.13f);
-            GUI.DrawTexture(popupRect, Texture2D.whiteTexture);
-            GUI.color = previous;
-            GUILayout.BeginArea(popupRect, GUI.skin.box);
-            GUILayout.Label("Update available", titleStyle);
-            GUILayout.Label("Version " + available + " is available. Restart to install after the download completes.", textStyle);
-            if (Button("Update now")) Send("download");
-            if (Button("Later")) popup = false;
-            GUILayout.EndArea();
-        }
-    }
+    void OnApplicationQuit() { platform?.Dispose(); }
     public static bool IsReleaseUrl(string url) => UpdatePolicy.IsReleaseUrl(url);
-    static bool Button(string label) => GUILayout.Button(label, GUILayout.MinHeight(38));
     string StatusText()
     {
         switch (state) {
-            case "checking": return "Checking for updates…";
+            case "checking": return "Checking for updates...";
             case "available": return "Update available: " + available;
             case "downloading": return "Downloading update: " + progress + "%";
-            case "ready": case "applying": return "Restarting to install the update…";
+            case "ready": case "applying": return "Restarting to install the update...";
             case "current": return "You are up to date.";
             case "previewComplete": return "Preview download complete. No update was installed.";
             case "error": return "Update unavailable. Your installed version is still playable.";
-            default: return "Development build: update installation is unavailable.";
+            default: return "Updates are unavailable on this platform or when opened without the desktop launcher.";
         }
     }
 }
