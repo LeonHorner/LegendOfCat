@@ -142,6 +142,13 @@ public sealed partial class StarterScreen
             GUI.enabled = false;
             Button("Language - Coming later");
             GUI.enabled = !popup;
+            if (!Preview) {
+                GUILayout.Space(12);
+                Label("Display", headingStyle);
+                if (Button(display.fullscreen ? "Fullscreen: On" : "Fullscreen: Off"))
+                    SetFullscreen(!display.fullscreen);
+                Label("Resize the window by dragging its borders. Alt+Enter toggles fullscreen.", smallStyle);
+            }
             if (Button(string.IsNullOrEmpty(available) ? "Versions & updates" : "Versions & updates - Available")) page = "updates";
             if (Button("Back to menu")) page = "menu";
         } else {
