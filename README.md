@@ -34,4 +34,7 @@ First-release installation and N -> N+1 updating on Windows/Linux must be verifi
 Original code: PolyForm Noncommercial 1.0.0 (LICENSE).
 Original artwork/audio/models, where copyright exists: CC BY-NC 4.0 (ASSET-LICENSE.md).
 Third-party components retain their own licenses. AI provenance does not guarantee copyright protection.
-`nRelease tooling dependency audit currently flags transitive braces/micromatch and npm/ip-address advisories even on latest direct packages. The affected pattern inputs are repository-controlled; no issue content is executed. Recheck before the first release.
+
+Release tooling dependency audit currently flags transitive braces/micromatch and npm/ip-address advisories even on latest direct packages. The affected pattern inputs are repository-controlled; no issue content is executed. Recheck before the first release.
+
+Branch protection requires squash PRs, blocks deletion/force-push, and requires resolved conversations; no reviewer approval or CI checks are required. Conventional Commit subjects are validated by the manual release preflight (GitHub rejected its commit-pattern ruleset for this repository).
