@@ -145,8 +145,8 @@ public sealed partial class StarterScreen
             if (!Preview) {
                 GUILayout.Space(12);
                 Label("Display", headingStyle);
-                if (Button(display.fullscreen ? "Fullscreen: On" : "Fullscreen: Off"))
-                    SetFullscreen(!display.fullscreen);
+                if (Button(fullscreen ? "Fullscreen: On" : "Fullscreen: Off"))
+                    SetFullscreen(!fullscreen);
                 Label("Resize the window by dragging its borders. Alt+Enter toggles fullscreen.", smallStyle);
             }
             if (Button(string.IsNullOrEmpty(available) ? "Versions & updates" : "Versions & updates - Available")) page = "updates";
