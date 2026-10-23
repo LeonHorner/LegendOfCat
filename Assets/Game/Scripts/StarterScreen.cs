@@ -30,6 +30,13 @@ public sealed class StarterScreen : MonoBehaviour
     int progress;
     Vector2 scroll;
     GUIStyle titleStyle, textStyle;
+    MovementCourse course;
+
+    void OpenCourse()
+    {
+        course = Instantiate(Resources.Load<MovementCourse>("MovementCourse"));
+        course.BackToMenu = () => { Destroy(course.gameObject); course = null; page = "menu"; };
+    }
 
     public static bool ShouldOffer(string availableVersion, string lastOfferedVersion)
         => UpdatePolicy.ShouldOffer(availableVersion, lastOfferedVersion);
@@ -145,6 +152,7 @@ public sealed class StarterScreen : MonoBehaviour
     }
     void OnGUI()
     {
+        if (course != null) return;
         if (titleStyle == null) {
             titleStyle = new GUIStyle(GUI.skin.label) { fontSize = 30, alignment = TextAnchor.MiddleCenter };
             textStyle = new GUIStyle(GUI.skin.label) { wordWrap = true, fontSize = 16 };
@@ -163,13 +171,9 @@ public sealed class StarterScreen : MonoBehaviour
         scroll = GUILayout.BeginScrollView(scroll);
         if (page == "menu") {
             GUILayout.Space(30);
-            if (Button("Play")) page = "play";
+            if (Button("Play")) OpenCourse();
             if (Button(string.IsNullOrEmpty(available) ? "Settings" : "Settings • Update available")) page = "settings";
             if (Button("Quit")) Application.Quit();
-        } else if (page == "play") {
-            GUILayout.Label("Test scene", titleStyle);
-            GUILayout.Label("The menu and update flow are ready to test. Gameplay is not available yet.", textStyle);
-            if (Button("Back to menu")) page = "menu";
         } else if (page == "settings") {
             GUILayout.Label("Settings", titleStyle);
             GUI.enabled = false;

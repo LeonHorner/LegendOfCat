@@ -55,6 +55,9 @@ No tests are run by connecting MCP. Follow the manual final-validation policy in
 
 ## Design references
 
+**Play** opens the reusable movement lab. See [Movement prototype](design/movement-prototype.md)
+for controls, course geometry, jump reach and the prefab regeneration command.
+
 Read the [game direction](design/game-direction.md), [art direction](design/art-direction.md) and [implementation plan](design/implementation-plan.md) before gameplay or visual work. The Unity adventure reimagines the earlier Java game rather than copying its gameplay specification.
 
 For release operations and updater behavior, see [Releasing](releasing.md).
