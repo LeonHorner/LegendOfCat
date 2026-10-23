@@ -84,6 +84,47 @@ test('baseline downloads require a nonempty matching package; no baseline suppor
   });
 });
 
+test('previous full package must match the signed-off feed checksum', () => {
+  temporary(root => {
+    const folder = join(root, 'fresh');
+    const state = join(root, 'state.json');
+    const previousVersion = '0.2.0';
+    const previousFile = packageName(previousVersion, 'win');
+    const priorRelease = { tag_name: 'v0.2.0', draft: false, prerelease: false,
+      assets: [{ name: previousFile }, { name: 'releases.win.json' }] };
+    const downloaded = {
+      getLatest: () => priorRelease,
+      download: () => writeFileSync(join(folder, previousFile), 'valid base'),
+      downloadFeed: (_previous, scratch) => {
+        const full = join(folder, previousFile);
+        writeFileSync(join(scratch, 'releases.win.json'), JSON.stringify({
+          Assets: [entry(previousFile, full, 'Full', previousVersion)]
+        }));
+      }
+    };
+    const selected = prepareRelease('win', version, folder, state, downloaded);
+    assert.equal(selected.version, previousVersion);
+    assert.equal(JSON.parse(readFileSync(state, 'utf8')).previous.full, previousFile);
+  });
+  temporary(root => {
+    const folder = join(root, 'fresh');
+    const state = join(root, 'state.json');
+    const previousFile = packageName('0.2.0', 'win');
+    const release = { tag_name: 'v0.2.0', draft: false, prerelease: false,
+      assets: [{ name: previousFile }, { name: 'releases.win.json' }] };
+    assert.throws(() => prepareRelease('win', version, folder, state, {
+      getLatest: () => release,
+      download: () => writeFileSync(join(folder, previousFile), 'corrupt base'),
+      downloadFeed: (_previous, scratch) => writeFileSync(
+        join(scratch, 'releases.win.json'), JSON.stringify({
+          Assets: [{ PackageId: repository, FileName: previousFile,
+            Version: '0.2.0', Type: 'Full', SHA1: 'wrong', Size: 12 }]
+        })
+      )
+    }), /checksum mismatch/);
+  });
+});
+
 test('verified Delta is published when smaller and previous assets are stripped', () => {
   for (const platform of ['win', 'linux']) temporary(root => {
     const { directory, stateFile, full, delta, previous, feedName } = fixture(root, platform);
@@ -120,7 +161,7 @@ test('Delta corruption, missing delta or tampered feed blocks release', () => {
       patch: (_b, _d, output) => writeFileSync(output, Buffer.from('wrong content'))
     }), /reconstruction differs/);
     rmSync(deltaPath);
-    assert.throws(() => finalizeRelease('win', version, directory, stateFile), /missing or empty|did not generate/);
+    assert.throws(() => finalizeRelease('win', version, directory, stateFile), /missing or empty|did not generate|Unrecognized or missing new-version/);
   });
   temporary(root => {
     const { directory, stateFile, feedName } = fixture(root);
