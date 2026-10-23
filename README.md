@@ -1,6 +1,6 @@
 # LegendOfCat
 
-Unity starter for a 2D game with optional 3D visuals. The previous Java game is not migrated.
+Unity foundation for a charming 2D cat adventure. The Java gameplay is being reimagined; see [game direction](docs/design/game-direction.md), [art direction and initial references](docs/design/art-direction.md), and [implementation plan](docs/design/implementation-plan.md).
 
 ## Open
 Install Unity Hub and Unity **6000.3.27f1**, then add this folder as a project.
