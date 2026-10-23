@@ -3,11 +3,10 @@
 // GitHub Release publication is required.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolve } from 'node:path';
 import { assertFeedAsset, packageName } from './delta-release.mjs';
 
 const repo = 'LeonHorner/LegendOfCat';
@@ -32,6 +31,8 @@ export function testRealDelta(channel) {
     const feedName = `releases.${channel}.json`;
     const baseDir = join(root, 'base');
     const newDir = join(root, 'new');
+    mkdirSync(baseDir);
+    mkdirSync(newDir);
     // Download verified published packages from their own stable tags.
     for (const [tag, filename, directory] of [
       ['v' + previous, base, baseDir],
