@@ -1,23 +1,53 @@
 name: Pull request validation
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened, ready_for_review, edited]
+  workflow_call:
+    inputs:
+      pr_number:
+        required: true
+        type: string
 permissions:
   contents: read
+  statuses: write
 concurrency:
-  group: pr-validation-${{ github.event.pull_request.number }}
+  group: pr-validation-${{ inputs.pr_number }}
   cancel-in-progress: true
 jobs:
   preflight:
     name: PR preflight
     runs-on: ubuntu-22.04
+    outputs:
+      sha: ${{ steps.pr.outputs.sha }}
+      base: ${{ steps.pr.outputs.base }}
+      title: ${{ steps.pr.outputs.title }}
     steps:
-      - name: Validate Conventional Commit title
+      - name: Resolve exact PR revision
+        id: pr
+        uses: actions/github-script@v7
         env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          node -e 'if (!/^(feat|fix|perf|docs|style|refactor|test|build|ci|chore|revert)(\([^)]+\))?!?: .+/.test(process.env.PR_TITLE)) process.exit(1)'
+          PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          script: |
+            if (!/^[1-9][0-9]*$/.test(process.env.PR_NUMBER)) throw new Error('A valid PR number is required.');
+            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
+            if (pr.state !== 'open' || pr.draft || pr.base.ref !== 'main' ||
+                pr.head.repo.full_name !== context.payload.repository.full_name) {
+              throw new Error('Use an open, ready PR from this repository targeting main.');
+            }
+            core.setOutput('sha', pr.head.sha);
+            core.setOutput('base', pr.base.sha);
+            core.setOutput('title', pr.title);
+            await github.rest.repos.createCommitStatus({
+              ...context.repo, sha: pr.head.sha, state: 'pending', context: 'merge-ready',
+              description: 'Final tests and builds are running.',
+              target_url: context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId
+            });
+            if (!/^(feat|fix|perf|docs|style|refactor|test|build|ci|chore|revert)(\([^)]+\))?!?: .+/.test(pr.title)) {
+              throw new Error('The PR title must be an English Conventional Commit.');
+            }
+            const {data: comparison} = await github.rest.repos.compareCommitsWithBasehead({
+              ...context.repo, basehead: pr.base.sha + '...' + pr.head.sha
+            });
+            if (comparison.behind_by !== 0) throw new Error('Merge main into the feature branch before validation. Do not rebase published branches.');
       - name: Check Unity activation
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -34,10 +64,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.sha }}
       - uses: actions/cache@v4
         with:
           path: Library
-          key: unity-pr-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ github.sha }}
+          key: unity-pr-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ needs.preflight.outputs.sha }}
           restore-keys: |
             unity-pr-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
       - uses: game-ci/unity-test-runner@v4
@@ -56,7 +88,7 @@ jobs:
           retention-days: 3
   build:
     name: Build (${{ matrix.platform }})
-    needs: test
+    needs: [preflight, test]
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
@@ -72,10 +104,12 @@ jobs:
             rid: linux-x64
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.sha }}
       - uses: actions/cache@v4
         with:
           path: Library
-          key: unity-pr-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ github.sha }}
+          key: unity-pr-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ needs.preflight.outputs.sha }}
           restore-keys: |
             unity-pr-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
       - uses: game-ci/unity-builder@v4
@@ -93,17 +127,34 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Build self-contained launcher
-        run: dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true --locked-mode -o build/${{ matrix.platform }}/Launcher
+        run: dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:RestoreLockedMode=true -o build/${{ matrix.platform }}/Launcher
   gate:
-    name: PR validation
-    if: always()
+    name: Record merge readiness
+    if: always() && needs.preflight.outputs.sha != ''
     needs: [preflight, test, build]
     runs-on: ubuntu-22.04
     steps:
-      - name: Require every validation job to succeed
+      - uses: actions/github-script@v7
         env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          CHECKED_SHA: ${{ needs.preflight.outputs.sha }}
+          CHECKED_BASE: ${{ needs.preflight.outputs.base }}
+          CHECKED_TITLE: ${{ needs.preflight.outputs.title }}
           PREFLIGHT: ${{ needs.preflight.result }}
           TEST: ${{ needs.test.result }}
           BUILD: ${{ needs.build.result }}
-        run: test "$PREFLIGHT" = success && test "$TEST" = success && test "$BUILD" = success
+        with:
+          script: |
+            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
+            const unchanged = pr.state === 'open' && !pr.draft &&
+              pr.head.sha === process.env.CHECKED_SHA && pr.base.sha === process.env.CHECKED_BASE &&
+              pr.title === process.env.CHECKED_TITLE;
+            const passed = unchanged && ['PREFLIGHT', 'TEST', 'BUILD'].every(name => process.env[name] === 'success');
+            await github.rest.repos.createCommitStatus({
+              ...context.repo, sha: process.env.CHECKED_SHA,
+              state: passed ? 'success' : 'failure', context: 'merge-ready',
+              description: passed ? 'Exact PR revision passed tests and both platform builds.' : 'Validation failed or the PR changed; prepare merge again.',
+              target_url: context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId
+            });
+            if (!passed) core.setFailed('Merge readiness was not granted.');
 
