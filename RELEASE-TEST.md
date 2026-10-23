@@ -71,6 +71,10 @@ percentage or documented full-only reason. A first release with no previous
 stable archive is legitimately full-only; a failed download or corrupt patch
 must instead block publication. No artificial public release is required.
 
+On Linux, the **first AppImage update normally requires a full package** because the
+initial installation does not contain a local full-package Delta base. Test a subsequent
+Linux update after that base exists before expecting an actual Delta download.
+
 On a real Windows installation and a Linux desktop/AppImage, check:
 
 1. Keep stable version N installed with identifiable saved preferences.
