@@ -66,7 +66,10 @@ export function assertFeedAsset(entry, path, expectedVersion, channel, type) {
     throw new Error('Missing or empty release package: ' + path);
   if (!Number.isSafeInteger(entry.Size) || entry.Size !== statSync(path).size ||
       typeof entry.SHA1 !== 'string' || entry.SHA1.toLowerCase() !== checksum(path))
-    throw new Error('Release feed size/checksum mismatch for ' + entry.FileName);
+    throw new Error('Release feed size/SHA-1 mismatch for ' + entry.FileName);
+  if (entry.SHA256 != null &&
+      (typeof entry.SHA256 !== 'string' || entry.SHA256.toLowerCase() !== checksum(path, 'sha256')))
+    throw new Error('Release feed SHA-256 mismatch for ' + entry.FileName);
 }
 
 function github(args, opts = {}) {
@@ -186,7 +189,7 @@ export function finalizeRelease(channel, targetVersion, outputDir, stateFile, de
       rmSync(temporary, { recursive: true, force: true });
     }
     deltaSize = statSync(deltaPath).size;
-    publishDelta = deltaSize < statSync(fullPath).size * MAX_DELTA_RATIO;
+    publishDelta = deltaSize <= statSync(fullPath).size * MAX_DELTA_RATIO;
   }
 
   // GitHubSource reads one release at a time. The public feed must not reference
