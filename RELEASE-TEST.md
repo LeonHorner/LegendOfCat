@@ -6,8 +6,8 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 
 ## Preparation
 
-- Finish the feature PR, merge current main normally, and run the manual `Release` workflow in
-  `prepare_merge` mode for the ready PR. Every test and both player/helper builds must pass on
+- Finish the feature PR, merge current main normally, and run the manual `Prepare merge`
+  workflow (`pull-request.yml`, `pr_number=<number>`) for the ready PR. Every test and both player/helper builds must pass on
   the exact head SHA before an explicitly authorized squash merge.
 - Record the workflow URL, commit, tag, package names, OS version and installation location.
 - Reserve a Windows desktop and a Linux desktop or graphical VM. Docker payload smoke tests
@@ -18,7 +18,7 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 
 ## Version N: fresh installation
 
-1. After explicit authorization, run `Release` with `mode=release` on main. Let the workflow
+1. After explicit authorization, run `Release` on main (no mode input). Let the workflow
    select the version; record it as N. Verify both platform packages and feeds were published.
 2. On Windows, install using Setup.exe. On Linux, make the AppImage executable, place it in a
    writable location and launch it from a graphical session with required AppImage support.
