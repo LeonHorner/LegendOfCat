@@ -170,3 +170,17 @@ test('release is manual and publish depends on all required jobs', () => {
   assert.match(releaseYaml, /test "\$EXPECTED" = "\$ACTUAL"/);
   assert.match(releaseYaml, /githubToken: ''/);
 });
+
+test('both release platforms verify Delta packages before artifacts can publish', () => {
+  const fetch = releaseYaml.indexOf('name: Fetch and verify previous stable full package');
+  const pack = releaseYaml.indexOf('name: Package installer and update feed');
+  const verify = releaseYaml.indexOf('name: Verify Delta reconstruction and release feed');
+  const artifact = releaseYaml.indexOf('name: release-${{ matrix.platform }}');
+  const upload = releaseYaml.indexOf('name: Publish verified commit');
+  assert.ok(fetch !== -1 && fetch < pack && pack < verify && verify < artifact && artifact < upload);
+  assert.match(releaseYaml, /GH_TOKEN: \$\{\{ github\.token \}\}/);
+  assert.match(releaseYaml, /node tools\/delta-release\.mjs prepare/);
+  assert.match(releaseYaml, /node tools\/delta-release\.mjs finalize/);
+  assert.match(releaseYaml, /tools\/release-assets\.mjs artifacts\/releases artifacts\/published \$\{\{ needs\.plan\.outputs\.version \}\}/);
+  assert.match(prYaml, /node --test tools\/release-assets\.test\.mjs tools\/delta-release\.test\.mjs/);
+});
