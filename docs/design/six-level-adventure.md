@@ -2,13 +2,13 @@
 
 ## Status and scope
 
-Proposal for issue #8, awaiting the user's decisions below. This document plans the campaign; it does not authorize dependent production content. Read [game direction](game-direction.md), [art direction](art-direction.md), the [implementation plan](implementation-plan.md) and [legacy reference](legacy-gameplay-reference.md) alongside it.
+Approved campaign plan for issue #8; see the user decision record below. This document establishes design scope; dependent implementation still requires its own issue and prototype gates. Read [game direction](game-direction.md), [art direction](art-direction.md), the [implementation plan](implementation-plan.md) and [legacy reference](legacy-gameplay-reference.md) alongside it.
 
-The journey takes Mika from a sheltered riverside through inhabited ruins and wind-powered heights into a dragon's mountain home. Working titles and environmental connections are proposals, not new lore requirements. All play remains fully 2D. No mandatory dash, double jump, power-up, currency quota or specific weapon is assumed.
+The journey takes Mika from a sheltered riverside through inhabited ruins and wind-powered heights into a dragon's mountain home. Themes and their order are approved; working titles and environmental connections do not establish additional lore requirements. All play remains fully 2D. No mandatory dash, double jump, power-up, currency quota or specific weapon is assumed.
 
 Lengths below are target minutes for a first successful main-route traversal, including learning pauses but excluding failed attempts and optional detours. They are planning estimates, not measured playtimes. Boss ranges include learning the encounter on a successful attempt. Movement and combat prototypes must establish achievable geometry and timing before production layouts are committed.
 
-## Proposed journey
+## Approved journey
 
 | Level / working theme | Purpose and teaching beats | Main challenge and optional challenge | Target length | Checkpoints and boss placement |
 | --- | --- | --- | --- | --- |
@@ -19,9 +19,11 @@ Lengths below are target minutes for a first successful main-route traversal, in
 | 5. High Ridge Passage | Consolidate traversal and ranged decisions in short alternating sections. Introduce the dragon's low/high warning distinction in a safe rehearsal, without prescribing the final attack implementation. | Main: switch attention between landing, hazard recognition and an attack opportunity. Optional: a precision loop with safe re-entry after a miss. | 6–8 min | Two recovery points before the longest combined sections; no boss. The final stretch releases pressure before level 6. |
 | 6. Dragon's Summit | Briefly recall known skills, then resolve the journey with the flying dragon. Introduce any encounter-specific rule in isolation before combining familiar threats. | Main: distinguish low/high threats and attack during readable openings, with less recovery margin than the owl. Optional: a pre-arena route remix; no extra boss phase required for completion. | 8–10 min | Recovery point after the approach and dedicated checkpoint immediately outside the arena. Flying ranged dragon is the final boss; safe resolution after defeat. |
 
-Total target: 36–48 minutes on successful main-route traversals. This is a scope budget, not a promise about full first-play session length. Optional loops add challenge rather than required progression; their reward, if any, remains undecided.
+Total target: 36–48 minutes on successful main-route traversals. This is a scope budget, not a promise about full first-play session length. Optional loops add challenge and exploration rather than required progression; collectible rewards remain undecided.
 
-## Checkpoint and retry policy proposal
+Levels 1, 3 and 5 are complete traversal levels. Each culminates in a sequence combining its taught skills, then a safe exit; none requires a replacement boss encounter. Optional routes offer a distinctive passage and an environmental discovery, such as a secluded viewpoint or small scene detail teased from the main route. This gives players a visible reason to explore and master the harder route without making it necessary for completion. Exact discoveries are level-design work, not new collectible or progression requirements.
+
+## Checkpoint and retry policy
 
 Place checkpoints on broad safe ground after a demonstrated skill has been learned, before the next substantial combination. Target roughly 1–2 minutes of already learned traversal between checkpoints, shortened when repeated failure would become tedious. Use skill boundaries rather than evenly spaced world coordinates. A checkpoint must not resume inside an active attack or moving-support trap.
 
@@ -47,12 +49,12 @@ Review the real game in motion at a small window size and in grayscale. Standabl
 
 ## User decision record
 
-Approval is required before dependent content implementation. Pending decisions:
+Approved by the user in this chat on 2026-10-23, after the six levels and the purpose of boss-free levels were explained. The user accepted the plan except for asking why harder routes were worthwhile, then explicitly approved the exploration incentive while leaving collectible rewards open. Accepted scope:
 
-1. Accept the proposed river → ruins → mills → observatory → ridge → summit journey and boss order (stomp in 2, owl in 4, dragon in 6), or revise it.
-2. Accept the 36–48 minute successful-route budget, frequent recovery points and dedicated boss checkpoints, or choose a different length/retry emphasis.
-3. Accept optional, ability-independent detours with no required rewards, leaving their reward system to its own decision.
+1. River → ruins → mills → observatory → ridge → summit journey and boss order: stomp in 2, owl in 4, dragon in 6. Levels 1, 3 and 5 culminate in traversal challenges.
+2. A 36–48 minute successful-route budget, safe checkpoints roughly every 1–2 minutes and dedicated checkpoints directly before each boss.
+3. Optional, ability-independent detours with a distinctive challenge and environmental discovery, visible incentives from the main route and a clear return. No required reward; concrete collectible rewards remain a separate decision.
 
 Weapon identity, acquisition, aiming, resources and controls; currency/collectible counts; power-ups and additional movement abilities; boss identities beyond the retained concepts, health and exact phases; campaign unlock rules; timer/pause rules; records and legacy save import remain open. Approval of this plan must not be treated as approval of those systems.
 
-After approval, record the user's date and exact accepted scope here. Revisit pacing and checkpoint placement after the first slice; material theme, boss-order or scope changes require a further user decision. The [implementation plan](implementation-plan.md) continues to define the bounded delivery steps, with dependencies tracked through native GitHub relationships.
+Revisit pacing and checkpoint placement after the first slice; material theme, boss-order or scope changes require a further user decision. The [implementation plan](implementation-plan.md) continues to define the bounded delivery steps, with dependencies tracked through native GitHub relationships.
