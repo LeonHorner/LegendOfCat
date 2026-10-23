@@ -57,3 +57,6 @@ This is a source-derived behavioral snapshot, not an archived executable or a co
 ## Source traceability
 
 Inspected Java files: KATZENPFAD.md; jade/LevelInfo.java and CampaignProgress.java; components/CatAdventure.java, CatPowers.java, YarnWeapon.java, BossBattle.java, YarnBossBattle.java and CatAnimationController.java; scenes/PlaySceneInitializer.java; tests/scenes/CampaignLevelTests.java. Java package paths are traceability labels, not links or build dependencies. Earlier art references are archived separately under docs/design/references.
+
+## Historical boss artwork
+See the [legacy boss design archive](references/legacy-bosses/README.md) for original sprite sheets, animation metadata and generation records. These references are optional inspiration, not fixed Unity designs.
