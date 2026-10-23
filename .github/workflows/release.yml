@@ -1,0 +1,197 @@
+name: Release
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stable-release
+  cancel-in-progress: false
+jobs:
+  plan:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - id: plan
+        run: npm run release:plan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check Unity activation secrets
+        if: steps.plan.outputs.version != ''
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        run: |
+          test -n "$UNITY_LICENSE" && test -n "$UNITY_EMAIL" && test -n "$UNITY_PASSWORD" || {
+            echo "::error::Configure GameCI Unity activation secrets before releasing."
+            exit 1
+          }
+  test:
+    needs: plan
+    if: needs.plan.outputs.version != ''
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: unity-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ github.sha }}
+          restore-keys: |
+            unity-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
+      - uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          testMode: editmode
+          artifactsPath: artifacts/tests
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: artifacts/tests
+          retention-days: 7
+  build:
+    needs: [plan, test]
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - target: StandaloneWindows64
+            platform: win
+            player: LegendOfCat.exe
+          - target: StandaloneLinux64
+            platform: linux
+            player: LegendOfCat
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: unity-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ github.sha }}
+          restore-keys: |
+            unity-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ matrix.target }}
+          buildMethod: BuildGame.Build
+          versioning: Custom
+          version: ${{ needs.plan.outputs.version }}
+          customParameters: -releaseVersion ${{ needs.plan.outputs.version }} -releaseOutput build/${{ matrix.platform }}/Game/${{ matrix.player }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: player-${{ matrix.platform }}
+          path: build/${{ matrix.platform }}/Game
+          retention-days: 1
+  package:
+    needs: [plan, build]
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: windows-2022
+            platform: win
+            rid: win-x64
+            executable: LegendOfCat.exe
+          - os: ubuntu-22.04
+            platform: linux
+            rid: linux-x64
+            executable: LegendOfCat
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet tool restore
+      - uses: actions/download-artifact@v4
+        with:
+          name: player-${{ matrix.platform }}
+          path: publish/Game
+      - name: Publish launcher
+        run: |
+          dotnet publish Launcher/Launcher.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:Version=${{ needs.plan.outputs.version }} -o publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Make Linux player executable
+        if: matrix.platform == 'linux'
+        run: chmod +x publish/Game/LegendOfCat publish/LegendOfCat
+      - name: Smoke test complete payload
+        run: |
+          $player = Join-Path (Get-Location) 'publish/${{ matrix.executable }}'
+          $startOptions = @{
+            FilePath = $player
+            ArgumentList = @('--smoke-test','-batchmode','-nographics','-logFile','smoke.log')
+            PassThru = $true
+          }
+          if ($IsWindows) { $startOptions.WindowStyle = 'Hidden' }
+          $process = Start-Process @startOptions
+          if (-not $process.WaitForExit(90000)) { $process.Kill($true); throw 'Game startup timed out' }
+          if ($process.ExitCode -ne 0) { throw "Game exited with $($process.ExitCode)" }
+      - name: Package installer and update feed
+        run: |
+          $icon = if ($IsWindows) { 'tools/icon.ico' } else { 'tools/icon.png' }
+          dotnet vpk pack --packId LeonHorner.LegendOfCat --packVersion ${{ needs.plan.outputs.version }} --packDir publish --mainExe ${{ matrix.executable }} --runtime ${{ matrix.rid }} --channel ${{ matrix.platform }} --packTitle LegendOfCat --icon $icon --outputDir artifacts/releases/${{ matrix.platform }}
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $folder = 'artifacts/releases/${{ matrix.platform }}'
+          if (-not (Get-ChildItem $folder -Filter '*.nupkg')) { throw 'Missing update package' }
+          if (-not (Test-Path "$folder/releases.${{ matrix.platform }}.json")) { throw 'Missing update feed' }
+          $extension = if ('${{ matrix.platform }}' -eq 'win') { '*Setup.exe' } else { '*.AppImage' }
+          if (-not (Get-ChildItem $folder -Filter $extension)) { throw 'Missing installer/AppImage' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}
+          path: artifacts/releases
+          retention-days: 1
+  publish:
+    needs: [plan, package]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: artifacts/releases
+      - name: Confirm release version has not changed
+        id: final-plan
+        run: npm run release:plan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish verified commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPECTED: ${{ needs.plan.outputs.version }}
+          ACTUAL: ${{ steps.final-plan.outputs.version }}
+        run: |
+          test "$EXPECTED" = "$ACTUAL"
+          npm run release

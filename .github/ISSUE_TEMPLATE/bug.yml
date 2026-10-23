@@ -1,0 +1,17 @@
+name: Bug report
+description: Report a problem with the game
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Game version and operating system
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include reproduction steps, expected behavior, and logs or screenshots if available.
+    validations:
+      required: true

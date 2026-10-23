@@ -1,0 +1,16 @@
+{
+  "name": "legend-of-cat-release",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "release:plan": "node tools/release-plan.mjs",
+    "release": "semantic-release"
+  },
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "13.0.1",
+    "@semantic-release/github": "12.0.10",
+    "@semantic-release/release-notes-generator": "14.1.1",
+    "conventional-changelog-conventionalcommits": "10.4.1",
+    "semantic-release": "25.0.9"
+  }
+}

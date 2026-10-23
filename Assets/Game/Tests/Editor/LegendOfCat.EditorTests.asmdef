@@ -1,0 +1,9 @@
+{
+  "name": "LegendOfCat.EditorTests",
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

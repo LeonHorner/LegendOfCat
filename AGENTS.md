@@ -1,0 +1,19 @@
+# Agent rules
+- Keep the project small; no framework layers without a concrete need.
+- Unity version is pinned in ProjectSettings/ProjectVersion.txt. Commit Packages/packages-lock.json after Editor import.
+- One task per short branch: feat/*, fix/*, chore/*. Never force-push main.
+- Squash PR titles must be Conventional Commits. Do not require external review approval for this solo workflow.
+- Automated tests run ONLY during the manually triggered Release workflow. Do not run tests during normal tasks.
+- Compilation and static inspection are allowed during development. Do not claim unrun checks passed.
+- Do not trigger or publish a release unless the user explicitly requests it.
+- Preserve all Unity .meta files; never hand-edit serialized scenes when Editor tooling is available.
+- Keep Unity MCP local, editor-only, and pinned to a reviewed revision before adding it.
+- Generated scenes and asset metadata must be committed after the first Editor import.
+- Store saves/settings under Application.persistentDataPath, never inside the install folder.
+- Use only original/generated assets or assets whose license allows public source redistribution.
+- Record asset source, generator/model, date, license and human creative decisions in ASSETS.md.
+- No unlicensed characters, brands, fonts, music or copied code. Preserve dependency notices.
+- No secrets, build output, Library, Temp or Logs in Git.
+- The launcher owns updates; Unity must not overwrite its running installation.
+- Stable downloads/updates come only from LeonHorner/LegendOfCat GitHub Releases.
+- Smoke-test actual Windows/Linux installs and N -> N+1 updates in the release process before claiming update support verified.
