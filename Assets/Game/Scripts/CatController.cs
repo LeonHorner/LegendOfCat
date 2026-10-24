@@ -67,8 +67,7 @@ public sealed class CatController : MonoBehaviour
         if (Paused == value) return;
         Paused = value;
         Motion.Reset();
-        body.linearVelocity = Vector2.zero;
-        body.angularVelocity = 0;
+        // Preserve in-flight momentum across pause; only a retry clears velocity.
         body.simulated = !value;
     }
     void OnDisable()
