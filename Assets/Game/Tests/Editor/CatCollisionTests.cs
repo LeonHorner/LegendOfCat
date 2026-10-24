@@ -70,9 +70,11 @@ public class CatCollisionTests
     [Test] public void PausingStopsPhysicsAndRespawnClearsThePause()
     {
         Input("SetMove", 1f); Tick();
+        var priorVelocity = body.linearVelocity;
         controller.GetType().GetMethod("SetPaused").Invoke(controller, new object[] { true });
         Assert.That(body.simulated, Is.False);
-        Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero));
+        Assert.That(body.linearVelocity, Is.EqualTo(priorVelocity),
+            "Pausing should preserve in-flight momentum instead of changing the jump trajectory.");
         Input("PressJump");
         controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(3, 1) });
         Assert.That(body.simulated, Is.True);
