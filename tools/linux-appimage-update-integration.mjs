@@ -6,10 +6,10 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
   chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync,
-  readFileSync, readdirSync, rmSync, statSync
+  readFileSync, rmSync
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { basename, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 
 const [baseAppImage, futurePackage] = process.argv.slice(2).map(x => x && resolve(x));
 if (!baseAppImage || !futurePackage) throw new Error('Expected: <old AppImage> <next full nupkg>');
@@ -66,7 +66,6 @@ const original = join(root, 'Renamed Original Legend Of Cat.AppImage');
 const stage = join(root, 'private staging');
 const ready = join(stage, 'ready');
 const log = join(root, 'native-updater.log');
-const args = [];
 let mounted;
 let remounted;
 let game;
@@ -88,9 +87,7 @@ try {
   chmodSync(join(bin, 'UpdateNix'), 0o700);
   const runner = join(stage, 'linux-update-runner.sh');
   copyFileSync(runnerSource, runner);
-  const packageDir = resolve(futurePackage, '..');
-  // dirname, rather than resolve(file, '..'), is required for an actual file.
-  const actualPackageDir = resolve(futurePackage, '..');
+  const actualPackageDir = dirname(futurePackage);
   game = spawn('sleep', ['60'], { stdio: 'ignore' });
   assert.ok(game.pid && mounted.child.pid);
   supervisor = spawn('/bin/sh', [
