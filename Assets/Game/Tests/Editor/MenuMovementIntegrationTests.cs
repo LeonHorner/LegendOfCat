@@ -56,6 +56,29 @@ public class MenuMovementIntegrationTests
         Assert.That(actions.GetType().GetProperty("enabled").GetValue(actions), Is.True);
         // Movement is verified separately with scripted physics in CatCollisionTests.
         Assert.That(course.GetComponentInChildren<Camera>(), Is.Not.Null);
+        var run = course.GetType().GetProperty("Run").GetValue(course);
+        var checkpoint = run.GetType().GetMethod("TryActivateCheckpoint");
+        Assert.That((bool)checkpoint.Invoke(run, new object[] { 1, new Vector2(9, 0.52f), true }), Is.True);
+        course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
+        var catBody = cat.GetComponent<Rigidbody2D>();
+        Assert.That(catBody.position.x, Is.EqualTo(9).Within(0.001f));
+        Assert.That((int)run.GetType().GetProperty("Retries").GetValue(run), Is.EqualTo(1));
+
+        // An actual fall in FixedUpdate uses the same checkpoint path as manual retry.
+        catBody.position = new Vector2(9, -8);
+        cat.GetType().GetMethod("FixedUpdate", BindingFlags.Instance | BindingFlags.NonPublic)
+            .Invoke(cat, null);
+        Assert.That(catBody.position.x, Is.EqualTo(9).Within(0.001f));
+        Assert.That(catBody.position.y, Is.EqualTo(0.52f).Within(0.001f));
+        Assert.That((int)run.GetType().GetProperty("Retries").GetValue(run), Is.EqualTo(2));
+
+        course.GetType().GetMethod("TogglePause").Invoke(course, null);
+        Assert.That(catBody.simulated, Is.False);
+        course.GetType().GetMethod("RestartRun").Invoke(course, null);
+        Assert.That(catBody.simulated, Is.True);
+        Assert.That(catBody.position.x, Is.EqualTo(spawnX).Within(0.001f));
+        Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.Zero);
+        Assert.That((int)run.GetType().GetProperty("Retries").GetValue(run), Is.Zero);
 
         ((ConcurrentQueue<string>)Field(screen, "messages")).Enqueue("{\"state\":\"warning\",\"message\":\"Preserve this notice\"}");
         yield return null;

@@ -10,6 +10,8 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector3(42, -0.75f, 10)
     };
     public CatController Cat { get; private set; }
+    public RunLifecycle Run { get; private set; }
+    static readonly Vector2[] CheckpointSpawns = { new Vector2(9, 0.52f), new Vector2(34, 1.52f) };
     public System.Action BackToMenu;
     Sprite square;
     Texture2D texture;
@@ -42,9 +44,14 @@ public sealed class MovementCourse : MonoBehaviour
         player.AddComponent<Rigidbody2D>();
         player.AddComponent<BoxCollider2D>().size = new Vector2(0.9f, 0.9f);
         Cat = player.AddComponent<CatController>();
+        Run = new RunLifecycle(player.transform.position);
+        Cat.FellOutOfBounds += RetryCheckpoint;
         var input = player.AddComponent<CatInput>();
         input.controller = Cat;
         input.BackToMenu = () => BackToMenu?.Invoke();
+        input.RetryCheckpoint = RetryCheckpoint;
+        input.RestartRun = RestartRun;
+        input.TogglePause = TogglePause;
         visual = new GameObject("Temporary quadruped silhouette").transform;
         visual.SetParent(player.transform, false);
         var original = Resources.Load<GameObject>("MikaOriginal");
@@ -81,6 +88,12 @@ public sealed class MovementCourse : MonoBehaviour
         var follow = courseCamera.gameObject.AddComponent<CatCamera>();
         follow.target = player.transform;
         Cat.ReturnedToStart += follow.Snap;
+        for (int i = 0; i < CheckpointSpawns.Length; i++) {
+            var point = CheckpointSpawns[i];
+            Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
+                new Vector2(0.14f, 0.9f), new Color(0.95f, 0.75f, 0.36f));
+            Label("CHECKPOINT " + (i + 1), new Vector2(point.x, point.y + 1.2f));
+        }
         Label("EASY / 2 m gap", new Vector2(4, -2));
         Label("RISE / 2 m + 1 m up", new Vector2(11, -2));
         Label("PRECISION / 4 m gap", new Vector2(19, -2));
@@ -111,6 +124,25 @@ public sealed class MovementCourse : MonoBehaviour
         label.text = text; label.characterSize = 0.13f; label.fontSize = 32;
         label.anchor = TextAnchor.MiddleCenter; label.color = new Color(0.85f, 0.87f, 0.85f);
     }
+    void Update()
+    {
+        if (Run == null) return;
+        Run.Advance(Time.deltaTime);
+        if (Run.Paused || !Cat.Grounded) return;
+        var position = Cat.GetComponent<Rigidbody2D>().position;
+        for (int i = 0; i < CheckpointSpawns.Length; i++) {
+            Vector2 point = transform.TransformPoint(CheckpointSpawns[i]);
+            // Marker/spawn follow the course transform when reused in another scene.
+            // Only grounded main-route positions may activate a checkpoint.
+            if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f)
+                Run.TryActivateCheckpoint(i + 1, point, true);
+        }
+    }
+
+    public void RetryCheckpoint() => Cat.RespawnAt(Run.Retry());
+    public void RestartRun() => Cat.RespawnAt(Run.Restart());
+    public void TogglePause() => Cat.SetPaused(Run.TogglePause());
+
     void LateUpdate()
     {
         if (courseCamera != null) {
@@ -134,13 +166,18 @@ public sealed class MovementCourse : MonoBehaviour
     void OnGUI()
     {
         float width = Mathf.Min(680, Screen.width - 24);
-        GUILayout.BeginArea(new Rect(12, 12, width, 160), GUI.skin.box);
-        GUILayout.Label("MIKA / MOVEMENT LAB PROTOTYPE — temporary art");
-        GUILayout.Label("A/D or arrows: run | Space/W/Up: jump (hold for height) | R: retry | Esc: menu");
-        GUILayout.Label("Controller: stick/D-pad, South: jump, Select: retry, Start: menu");
-        GUILayout.Label((landing > 0 ? "Landing" : Cat.Pose) + " | Clear the gaps; falls return to the start.");
+        GUILayout.BeginArea(new Rect(12, 12, width, 245), GUI.skin.box);
+        GUILayout.Label("MIKA / CHECKPOINT LAB PROTOTYPE");
+        GUILayout.Label("A/D or arrows: move | Space/W/Up: jump | R: retry | Backspace: full restart");
+        GUILayout.Label("P: pause | Esc: menu | Controller: South jump, Select retry, LB restart, RB pause, Start menu");
+        GUILayout.Label((Run.Paused ? "Paused" : landing > 0 ? "Landing" : Cat.Pose) +
+            " | Checkpoint " + Run.Checkpoint + " / " + CheckpointSpawns.Length +
+            " | Retries " + Run.Retries + " | Elapsed " + Run.ElapsedSeconds.ToString("F1") + "s");
+        GUILayout.Label("Cross the gold markers on safe ground. Falls retry the latest checkpoint.");
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Retry course", GUILayout.Height(28))) Cat.ReturnToStart();
+        if (GUILayout.Button("Retry checkpoint", GUILayout.Height(28))) RetryCheckpoint();
+        if (GUILayout.Button("Restart entire run", GUILayout.Height(28))) RestartRun();
+        if (GUILayout.Button(Run.Paused ? "Resume" : "Pause", GUILayout.Height(28))) TogglePause();
         if (GUILayout.Button("Back to menu", GUILayout.Height(28))) BackToMenu?.Invoke();
         GUILayout.EndHorizontal(); GUILayout.EndArea();
     }

@@ -7,11 +7,13 @@ No traversal ability beyond running and jumping is introduced.
 
 ## Controls and reuse
 
-The `Gameplay` Input System map defines Move (axis), Jump, Restart and Menu.
+The `Gameplay` Input System map defines Move (axis), Jump, Retry, FullRestart, Pause and Menu.
 `CatInput` owns keyboard/controller bindings and forwards values and press/release callbacks
 to `CatMotion`. The motor and collision controller contain no device polling.
-Keyboard: A/D or arrows, Space/W/Up to jump, R to retry, Escape to return.
-Controller: stick/D-pad, South button to jump, Select to retry, Start to return.
+Keyboard: A/D or arrows, Space/W/Up to jump, R to retry at the active checkpoint,
+Backspace to restart the run, P to pause/resume, Escape to return.
+Controller: stick/D-pad, South button to jump, Select to retry, left shoulder to
+restart, right shoulder to pause/resume, Start to return.
 Future touch bindings can drive the same actions; touch UI and mobile builds are outside this prototype.
 Press/release between physics steps retains a short jump; a brief axis tap survives for one step.
 Focus loss clears input and jump grace. Holding jump does not repeat jumps on landing.
@@ -58,7 +60,43 @@ Background columns have lower contrast and render behind the playable plane.
 The orange/cream geometric quadruped is a placeholder; moving legs and jump/fall/landing
 feedback never change collision dimensions or delay movement.
 
+## Checkpoint and run lifecycle (issue #14)
+
+The movement course is a reusable checkpoint greybox. Two visible checkpoint markers
+sit on safe main-route platforms (X=9 and X=34). They activate only when the cat
+is grounded beside the marker; progress is forward-only, so going backwards does
+not replace a safer recovery point. Spawn positions are fixed safe standing centers,
+never arbitrary mid-jump coordinates. A fall below the course automatically retries
+at the latest checkpoint, or the starting point if none is active. Manual retry uses
+the same path. The controller clears velocity, input buffers and jump grace, and
+snaps the camera at every respawn.
+
+On retry and full restart, `RunLifecycle.ResetTransientState` is raised before
+teleporting the player. Future combat systems must subscribe to remove active
+projectiles and reset each encounter to its pre-attempt state. The current
+movement lab has neither projectiles nor an encounter; this event contract is
+tested with synthetic projectile/encounter owners instead of pretending that
+combat mechanics already exist.
+
+The session-only run state does not modify gameplay saves or records, menu
+preferences, or display settings. A full restart clears checkpoint progress,
+retry count and the active run clock. No additional powers or pickups are
+implemented, so no unapproved ability persistence policy has been chosen.
+Future approved abilities must explicitly decide retry retention; do not infer
+the rule from the original Java game.
+
+The elapsed clock counts gameplay `Time.deltaTime` across retries and excludes
+time spent paused. Pause disables the player's physics and clears held/buffered
+inputs; retry exits pause and a full restart returns to an unpaused fresh run.
+Returning to the menu destroys the course; re-entering starts a new session.
+These are prototype timer and pause rules, not approved campaign scoring or
+save-format decisions.
+
 ## Verification
+
+Pause freezes physics and motor timers while preserving held movement and jump
+input. Releasing jump while paused shortens the ascent on resume, just as releasing
+it during play does. Retry, restart and focus loss still clear motor input.
 
 The [painted-menu integration review](menu-movement-integration/README.md) records the
 combined entry/return flow after merging PR #31. The earlier captures below predate
@@ -72,7 +110,7 @@ fixed level bounds and immediate snapping on retry. Rigidbody interpolation and 
 collision detection are enabled; zero-friction contact avoids wall sticking.
 
 Visual review must include motion, small windows and grayscale; still images alone cannot prove
-absence of jitter. Final artwork, a checkpoint lifecycle, pause/settings during play and player
+absence of jitter. Final artwork, campaign checkpoint placement, in-game settings and player
 playtesting of the proposed difficulty remain separate work.
 
 ### Recorded local review (2026-10-23)

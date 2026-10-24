@@ -6,9 +6,12 @@ public sealed class CatInput : MonoBehaviour
 {
     public CatController controller;
     InputActionMap actions;
-    InputAction move, jump, restart, menu;
+    InputAction move, jump, restart, fullRestart, pause, menu;
     public InputActionMap Actions => actions;
     public System.Action BackToMenu;
+    public System.Action RetryCheckpoint;
+    public System.Action RestartRun;
+    public System.Action TogglePause;
 
     void Awake()
     {
@@ -23,13 +26,19 @@ public sealed class CatInput : MonoBehaviour
         jump.AddBinding("<Gamepad>/buttonSouth");
         restart = actions.AddAction("Restart", InputActionType.Button, "<Keyboard>/r");
         restart.AddBinding("<Gamepad>/select");
+        fullRestart = actions.AddAction("FullRestart", InputActionType.Button, "<Keyboard>/backspace");
+        fullRestart.AddBinding("<Gamepad>/leftShoulder");
+        pause = actions.AddAction("Pause", InputActionType.Button, "<Keyboard>/p");
+        pause.AddBinding("<Gamepad>/rightShoulder");
         menu = actions.AddAction("Menu", InputActionType.Button, "<Keyboard>/escape");
         menu.AddBinding("<Gamepad>/start");
         move.performed += c => controller.Motion.SetMove(c.ReadValue<float>());
         move.canceled += c => controller.Motion.SetMove(0);
         jump.performed += c => controller.Motion.PressJump();
         jump.canceled += c => controller.Motion.ReleaseJump();
-        restart.performed += c => controller.ReturnToStart();
+        restart.performed += c => { if (RetryCheckpoint != null) RetryCheckpoint(); else controller.ReturnToStart(); };
+        fullRestart.performed += c => RestartRun?.Invoke();
+        pause.performed += c => TogglePause?.Invoke();
         menu.performed += c => BackToMenu?.Invoke();
     }
     void OnEnable() => actions.Enable();
