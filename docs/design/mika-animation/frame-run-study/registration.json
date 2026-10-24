@@ -1,0 +1,146 @@
+[
+  {
+    "frame": 0,
+    "translation": [
+      20,
+      12
+    ],
+    "source_support_y": 242,
+    "source_nose_x": 362
+  },
+  {
+    "frame": 1,
+    "translation": [
+      19,
+      12
+    ],
+    "source_support_y": 242,
+    "source_nose_x": 363
+  },
+  {
+    "frame": 2,
+    "translation": [
+      19,
+      13
+    ],
+    "source_support_y": 241,
+    "source_nose_x": 363
+  },
+  {
+    "frame": 3,
+    "translation": [
+      19,
+      11
+    ],
+    "source_support_y": 243,
+    "source_nose_x": 363
+  },
+  {
+    "frame": 4,
+    "translation": [
+      18,
+      17
+    ],
+    "source_support_y": 237,
+    "source_nose_x": 364
+  },
+  {
+    "frame": 5,
+    "translation": [
+      19,
+      14
+    ],
+    "source_support_y": 240,
+    "source_nose_x": 363
+  },
+  {
+    "frame": 6,
+    "translation": [
+      19,
+      14
+    ],
+    "source_support_y": 240,
+    "source_nose_x": 363
+  },
+  {
+    "frame": 7,
+    "translation": [
+      19,
+      14
+    ],
+    "source_support_y": 240,
+    "source_nose_x": 363
+  },
+  {
+    "frame": 8,
+    "translation": [
+      17,
+      16
+    ],
+    "source_support_y": 238,
+    "source_nose_x": 365
+  },
+  {
+    "frame": 9,
+    "translation": [
+      18,
+      19
+    ],
+    "source_support_y": 235,
+    "source_nose_x": 364
+  },
+  {
+    "frame": 10,
+    "translation": [
+      19,
+      13
+    ],
+    "source_support_y": 241,
+    "source_nose_x": 363
+  },
+  {
+    "frame": 11,
+    "translation": [
+      18,
+      15
+    ],
+    "source_support_y": 239,
+    "source_nose_x": 364
+  },
+  {
+    "frame": 12,
+    "translation": [
+      20,
+      16
+    ],
+    "source_support_y": 238,
+    "source_nose_x": 362
+  },
+  {
+    "frame": 13,
+    "translation": [
+      19,
+      24
+    ],
+    "source_support_y": 230,
+    "source_nose_x": 363
+  },
+  {
+    "frame": 14,
+    "translation": [
+      19,
+      17
+    ],
+    "source_support_y": 237,
+    "source_nose_x": 363
+  },
+  {
+    "frame": 15,
+    "translation": [
+      18,
+      16
+    ],
+    "source_support_y": 238,
+    "source_nose_x": 364
+  }
+]

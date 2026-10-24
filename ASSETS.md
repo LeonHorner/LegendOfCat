@@ -1,5 +1,45 @@
 # Asset provenance
 
+## Mika character authoring and articulated preview
+
+`Assets/Game/Art/Mika/` contains original generated character studies, retained
+pose-sheet experiments, and the rejected articulated experiment. The built-in OpenAI
+image generation tool produced the pose sources on 2026-10-23 and the cutout source
+and seam-cleanup edit on 2026-10-24. Exact model IDs were not exposed. References
+were the project's earlier original Mika images; no third-party character, font,
+music or asset was imported. Terms: `ASSET-LICENSE.md` where rights exist; generation
+does not establish exclusivity or copyright.
+
+Human direction selected the natural orange-and-cream quadruped, modest head/eyes,
+striped tail, smooth motion and grounded paws. The user explicitly authorized local
+image cleanup/registration. `tools/prepare-mika-sprites.py` registers pose frames;
+`tools/interpolate-mika-sprites.py` produced experimental optical-flow inbetweens
+that were rejected for running. These pose experiments are retained for provenance
+and are not the default character preview. `tools/prepare-mika-rig.py` extracts
+eight cutout parts from `mika-rig-clean-source.png`, removes stray alpha pixels and
+registers joint axes. Original sources are preserved. Pillow/numpy/OpenCV are
+authoring-only tools, not Unity runtime dependencies. Unity generated the sprite
+metadata and candidate prefabs. No serialized scene was hand-edited.
+
+Implementation decisions: a fixed torso/head silhouette, constant limb lengths,
+alternating diagonal support feet, world-locked stance contacts, and leg flexion
+for landing. No whole-body scaling or gameplay timing change is used. Full prompts,
+review limitations and revision history are in `docs/design/mika-animation/`.
+The user rejected the articulated experiment on 2026-10-24: feet/legs are too thin,
+the assembled anatomy is unsuitable and the jump animation does not fit. The
+optical-flow run experiment was also rejected. These assets/captures remain only
+as provenance and negative examples, not accepted production content. The agreed
+replacement is a consistently drawn complete-character run loop reviewed before
+gameplay integration, followed by authored jump/landing sequences. See the decision
+in `docs/design/art-direction.md` and `docs/design/mika-animation/README.md`.
+
+`docs/design/mika-animation/rig-*.png` and the movement review video are actual local
+Unity Camera.Render captures of the controller in an isolated local Physics2D
+scene at 60 Hz on 2026-10-24, encoded with FFmpeg; no image generator was used for
+the captures. Terms: project captures under `ASSET-LICENSE.md` where rights exist,
+with underlying character provenance above. The recording reviews running, turns,
+held/short jumps, landing and stopping; it does not verify installed builds or updates.
+
 | Asset | Source / generator and model | Date | License / terms | Human creative decisions |
 |---|---|---|---|---|
 | docs/design/desktop-window-history/*.png | Actual local Unity 6000.3.27f1 Windows preview-player ScreenCapture; no generator/model | 2026-10-23 | Project captures under ASSET-LICENSE.md where rights exist; backdrop provenance below | Inspect fixed navigation with 60 release cards at standard, minimum, narrow and ultrawide sizes; preserve readable painted-menu layout and inspect remaining/total MB using simulated download data. |
@@ -11,6 +51,31 @@
 | Start menu and update UI | Original procedural layout; OpenAI Codex, model identifier not exposed | 2026-10-23 | Repository code license (PolyForm Noncommercial 1.0.0); no new image/font/audio assets | Original plain dark menu, superseded by the painted presentation below. Updates remain inside Settings with one reminder per new stable version. Existing Unity GUI resources are used. |
 
 No third-party game assets have been imported.
+
+## Complete-character Mika run study
+
+On 2026-10-24 the user selected the earlier four-frame run for prototype
+integration after comparing animated loops. `Assets/Game/Art/Mika/Original/`
+contains Editor-created sprite metadata referencing the unchanged original
+`mika-movement-candidate.png`; `Assets/Game/Resources/MikaOriginal.prefab` is
+the corresponding cosmetic presentation. No new generated artwork is involved.
+Human decisions: preserve original run poses 4–7 and substantial paws, remove
+inbetweens, register visible sole pivots and retain physics/input timing.
+Other original poses remain temporary; this does not accept the full movement set.
+The apex transition reuses original tucked pose 6 as sprite slot 16 with the
+airborne pivot shared by takeoff/fall. No image generation or repainting was used;
+the human request was an additional pose at the ascent/descent transition.
+
+`docs/design/mika-animation/frame-run-study/` contains an original generated
+complete-cat run sheet and derived review artwork, produced with built-in OpenAI
+image generation on 2026-10-24; exact model ID was not exposed. Terms:
+ASSET-LICENSE.md where rights exist. The identity crop comes from the earlier
+generated Mika movement source. Human direction selected fuller paws and
+complete-character frames after rejecting the cutout rig. Local processing only
+cleans alpha and translates frames; no optical flow or anatomical deformation.
+See the study README for generation direction, processing and known defects.
+This is review artwork with unresolved proportions and stride continuity, not
+accepted production animation. No runtime assets or gameplay were replaced.
 
 ## Application icon
 

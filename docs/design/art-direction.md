@@ -23,6 +23,51 @@ The same owl appears for comparison, not because three owl encounters are planne
 ## Animation
 Smooth idle/run/turn/jump/fall/landing transitions with grounded feet and consistent proportions. Do not substitute whole-body stretching for authored motion. Combat separates anticipation, active attack and recovery. Inputs remain immediate; cosmetic animation cannot silently change hit timing. Attack effects remain restrained enough for simultaneous threats to be read.
 
+### Mika animation decision — 2026-10-24
+
+The user rejected the current cutout/IK rig as substantially worse than the earlier
+complete-cat artwork: feet/legs are much too thin, assembled anatomy looks unnatural,
+and calculated jump poses do not fit a cat. Optical-flow run inbetweens were also
+rejected because they distorted the paws and degraded motion. These are discarded
+experiments, not production candidates awaiting routine approval. Do not resume
+either approach under the current direction without a new user decision.
+
+A 2D skeletal rig is not inherently unsuitable, but requires purpose-designed,
+well-overlapping artwork and an appropriate joint structure. These generated pieces
+and automatic pose calculations did not meet that standard. Contact/segment-length
+tests check mechanical properties; they do not establish visual quality or acceptance.
+
+The agreed next approach is complete-character frame animation:
+
+1. Return to the earlier complete-cat visual reference, preserving natural orange/
+   cream quadruped proportions and adequately sized legs/paws. Earlier sprite
+   experiments are references, not implicitly approved production animations.
+2. Finish one consistently drawn run cycle first, with matching anatomy, volume,
+   markings and registration across contact, passing and recovery poses. Do not
+   smooth inconsistent drawings with optical flow or whole-body deformation.
+3. Present a short looping animation, also slowed down, for user evaluation
+   **before gameplay integration**. Frame count, screenshots and passing tests
+   cannot substitute for reviewing the loop in motion.
+4. After that review, author coherent takeoff, flight/apex, descent and landing
+   sequences. Preserve immediate input and collision timing; do not use the
+   rejected rig's calculated jump poses as the target.
+
+At rest all four paws should meet the ground. During running, supporting paws stay
+planted while swing paws deliberately lift and return; not every paw must touch
+the ground in every running or airborne frame. Check sliding, hovering, halos,
+changing proportions and artificial stretching.
+
+See [Mika character authoring](mika-animation/README.md) for retained negative
+examples and implementation status. No final Mika movement set has been accepted;
+issue #10 remains incomplete.
+
+Subsequent loop review on 2026-10-24: the user preferred the original four-frame
+run over both added inbetweens and the new sixteen-pose study, and explicitly
+authorized putting that four-frame run into the movement prototype. Use original
+candidate poses 4–7 without interpolation. This selects the prototype run only;
+the remaining movement set still requires review. See the authoring README for
+the current course integration and reproduction steps.
+
 ## Provenance
 See ASSETS.md. Images were produced with the built-in OpenAI image generation tool on 2026-10-23, using earlier generated scene references. Exact model ID was not exposed. Human direction selected cat and owl influences, rejected 2.5D, and required clearer gameplay/background separation. Full archived generation prompts are in [reference-prompts.md](reference-prompts.md).
 
