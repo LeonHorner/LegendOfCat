@@ -82,3 +82,23 @@ See ASSETS.md. Images were produced with the built-in OpenAI image generation to
 
 ## Historical boss artwork
 See the [legacy boss design archive](references/legacy-bosses/README.md) for original sprite sheets, animation metadata and generation records. These references are optional inspiration, not fixed Unity designs.
+
+## Blender character study — 2026-10-24
+
+The user requested an editable 3D cat for Blender/Unity animation authoring, then
+rejected two procedural Blender models for their anatomy, colors, eyes and ears.
+The new instruction prioritizes natural appearance against the supplied concept
+art before adding bones. Those rejected local experiments are not included in
+the published candidate. The earlier cutout/optical-flow rejection still applies.
+
+The user accepted the appearance of the CC0-based natural cat study in
+[art/blender/mika-v3](../../art/blender/mika-v3/README.md) and requested publishing
+it as work in progress for [issue #49](https://github.com/LeonHorner/LegendOfCat/issues/49).
+Source, licensing, AI provenance and local adaptations are recorded in ASSETS.md.
+
+Acceptance covers the visible model only. It is a dense static sculpt requiring
+neutral-pose preparation, animation topology, a skeleton, skinning, authored
+motion and Unity validation. Keep the existing playable 2D baseline until the
+new animation output passes normal/slowed motion and actual-game review. The
+Blender authoring route does not approve replacing the game's 2D presentation
+with a 3D presentation. Issue #49 remains incomplete.
