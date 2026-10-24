@@ -14,6 +14,8 @@ public sealed class CatController : MonoBehaviour
     Vector2 spawn;
     PhysicsMaterial2D material;
     public event System.Action ReturnedToStart;
+    public event System.Action FellOutOfBounds;
+    public bool Paused { get; private set; }
 
     void Awake()
     {
@@ -29,6 +31,7 @@ public sealed class CatController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        if (Paused) return;
         Grounded = false;
         var filter = new ContactFilter2D { useTriggers = false };
         var count = shape.Cast(Vector2.down, filter, hits, 0.04f);
@@ -38,17 +41,41 @@ public sealed class CatController : MonoBehaviour
         if (leaveGroundSteps > 0) leaveGroundSteps--;
         body.linearVelocity = Motion.Step(Time.fixedDeltaTime, Grounded, body.linearVelocity);
         if (Motion.Jumped) { Grounded = false; leaveGroundSteps = 2; }
-        if (body.position.y < -7) ReturnToStart();
+        if (body.position.y < -7) {
+            if (FellOutOfBounds != null) FellOutOfBounds();
+            else ReturnToStart();
+        }
     }
-    public void ReturnToStart()
+    public void ReturnToStart() => RespawnAt(spawn);
+
+    // The course chooses the spawn; the controller always resets motor and physics.
+    public void RespawnAt(Vector2 position)
     {
+        SetPaused(false);
         Motion.Reset();
         body.linearVelocity = Vector2.zero;
-        body.position = spawn;
-        transform.position = spawn;
+        body.angularVelocity = 0;
+        body.position = position;
+        transform.position = position;
+        Grounded = false;
         leaveGroundSteps = 0;
         ReturnedToStart?.Invoke();
     }
-    void OnDisable() { Motion.Reset(); if (body) body.linearVelocity = Vector2.zero; }
+
+    public void SetPaused(bool value)
+    {
+        if (Paused == value) return;
+        Paused = value;
+        Motion.Reset();
+        body.linearVelocity = Vector2.zero;
+        body.angularVelocity = 0;
+        body.simulated = !value;
+    }
+    void OnDisable()
+    {
+        Motion.Reset();
+        if (body) { body.linearVelocity = Vector2.zero; body.simulated = true; }
+        Paused = false;
+    }
     void OnDestroy() { if (material) Destroy(material); }
 }
