@@ -39,7 +39,9 @@ static class UpdateService
         Directory.CreateDirectory(stateDirectory);
         var marker = Path.Combine(stateDirectory, "update-pending.txt");
         var log = Path.Combine(stateDirectory, "updates.log");
-        var manager = new UpdateManager(new GithubSource(Repository, null, false));
+        var transfer = new ReportingDownloader((progress, downloadedBytes, totalBytes) =>
+            Send(new { state = "downloading", progress, downloadedBytes, totalBytes }));
+        var manager = new UpdateManager(new GithubSource(Repository, null, false, transfer));
         if (File.Exists(marker)) {
             var target = await File.ReadAllTextAsync(marker);
             if (target != installedVersion)
@@ -55,43 +57,66 @@ static class UpdateService
             try {
                 if (command == "check") {
                     Send(new { state = "checking" });
-                    var releases = new List<object>();
-                    for (var page = 1; ; page++) {
-                        var batch = await client.GetFromJsonAsync<JsonElement[]>(
-                            $"https://api.github.com/repos/LeonHorner/LegendOfCat/releases?per_page=100&page={page}") ?? [];
-                        foreach (var release in batch) {
-                            if (!UpdatePolicy.IsStableRelease(release.GetProperty("draft").GetBoolean(),
-                                release.GetProperty("prerelease").GetBoolean())) continue;
-                            releases.Add(new { version = release.GetProperty("tag_name").GetString(),
-                                notes = release.GetProperty("body").GetString() ?? "",
-                                url = release.GetProperty("html_url").GetString() });
-                        }
-                        if (batch.Length < 100) break;
-                    }
-                    Send(new { state = "history", releases });
-                    if (!manager.IsInstalled) { Send(new { state = "development" }); continue; }
-                    update = await manager.CheckForUpdatesAsync().WaitAsync(TimeSpan.FromSeconds(20));
-                    if (update != null && !UpdatePolicy.IsNewerStableVersion(
-                        update.TargetFullRelease.Version.ToString(), manager.CurrentVersion?.ToString() ?? installedVersion))
-                        update = null;
-                    downloaded = false;
-                    Send(new { state = update == null ? "current" : "available",
-                        version = update?.TargetFullRelease.Version.ToString() ?? "" });
+                    await UpdateWorkflow.CheckAsync(
+                        async () => {
+                            var releases = new List<object>();
+                            for (var page = 1; ; page++) {
+                                var batch = await client.GetFromJsonAsync<JsonElement[]>(
+                                    $"https://api.github.com/repos/LeonHorner/LegendOfCat/releases?per_page=100&page={page}") ?? [];
+                                foreach (var release in batch) {
+                                    if (!UpdatePolicy.IsStableRelease(release.GetProperty("draft").GetBoolean(),
+                                        release.GetProperty("prerelease").GetBoolean())) continue;
+                                    releases.Add(new { version = release.GetProperty("tag_name").GetString(),
+                                        notes = release.GetProperty("body").GetString() ?? "",
+                                        url = release.GetProperty("html_url").GetString() });
+                                }
+                                if (batch.Length < 100) break;
+                            }
+                            Send(new { state = "history", releases });
+                        },
+                        async () => {
+                            if (!manager.IsInstalled) { Send(new { state = "development" }); return; }
+                            update = await manager.CheckForUpdatesAsync().WaitAsync(TimeSpan.FromSeconds(20));
+                            if (update != null && !UpdatePolicy.IsNewerStableVersion(
+                                update.TargetFullRelease.Version.ToString(), manager.CurrentVersion?.ToString() ?? installedVersion))
+                                update = null;
+                            downloaded = false;
+                            Send(new { state = update == null ? "current" : "available",
+                                version = update?.TargetFullRelease.Version.ToString() ?? "" });
+                        },
+                        async historyError => {
+                            try {
+                                await File.AppendAllTextAsync(log,
+                                    $"{DateTimeOffset.UtcNow:O} Optional release history unavailable: {historyError.GetType().Name} (HTTP {(historyError as HttpRequestException)?.StatusCode})\\n");
+                            } catch (Exception) { /* Diagnostics are best effort. */ }
+                            Send(new { state = "warning", message = "Release history is temporarily unavailable. Update checking continues." });
+                        });
                 } else if (command == "download" && update != null) {
-                    Send(new { state = "downloading", progress = 0 });
+                    transfer.Configure(update);
+                    transfer.ReportOverall(0);
                     using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(30));
                     await manager.DownloadUpdatesAsync(update,
-                        progress => Send(new { state = "downloading", progress }), timeout.Token);
+                        transfer.ReportOverall, timeout.Token);
                     downloaded = true;
                     Send(new { state = "ready" });
                 } else if (command == "apply" && update != null && downloaded) {
                     await File.WriteAllTextAsync(marker, update.TargetFullRelease.Version.ToString());
                     await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Applying {update.TargetFullRelease.Version}\n");
                     Send(new { state = "applying" });
-                    // Both Unity and the entry process must release their files before installation.
-                    await WaitForExit(gamePid);
-                    if (launcherPid > 0) await WaitForExit(launcherPid);
-                    manager.ApplyUpdatesAndRestart(update);
+                    await UpdateWorkflow.ApplyAsync(
+                        OperatingSystem.IsLinux(),
+                        async () => {
+                            await WaitForExit(gamePid);
+                            await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Game exited\\n");
+                        },
+                        async () => {
+                            if (launcherPid > 0) await WaitForExit(launcherPid);
+                            await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Launcher exited\\n");
+                        },
+                        () => {
+                            File.AppendAllText(log, $"{DateTimeOffset.UtcNow:O} Starting Velopack handoff\\n");
+                            manager.ApplyUpdatesAndRestart(update);
+                        });
                     return 0;
                 }
             } catch (Exception error) {

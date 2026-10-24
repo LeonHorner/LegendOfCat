@@ -59,18 +59,19 @@ public sealed partial class StarterScreen
         panelStyle = new GUIStyle { normal = { background = panelTexture }, border = new RectOffset(2, 2, 2, 2), padding = new RectOffset(24, 24, 20, 20) };
     }
 
-    bool Button(string label)
+    bool Button(string label, string control = null, bool fixedNavigation = false)
     {
-        GUI.SetNextControlName(label);
-        if (GUI.enabled) focusable.Add(label);
-        bool keyboard = GUI.enabled && GUI.GetNameOfFocusedControl() == label && Event.current.type == EventType.KeyDown &&
+        control = control ?? label;
+        GUI.SetNextControlName(control);
+        if (GUI.enabled) focusable.Add(control);
+        bool keyboard = GUI.enabled && !Event.current.alt && GUI.GetNameOfFocusedControl() == control && Event.current.type == EventType.KeyDown &&
             (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter);
         if (keyboard) Event.current.Use();
         bool clicked = GUILayout.Button(label, buttonStyle, GUILayout.MinHeight(Mathf.Max(48, 48 / guiScale)));
-        if (revealFocus && Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == label) {
+        if (revealFocus && Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == control) {
             var rect = GUILayoutUtility.GetLastRect();
             if (popup) popupScroll.y = Mathf.Max(0, rect.y - 80);
-            else scroll.y = Mathf.Max(0, rect.y - 80);
+            else if (!fixedNavigation) scroll.y = Mathf.Max(0, rect.y - 80);
             revealFocus = false;
         }
         return clicked || keyboard;
@@ -111,6 +112,8 @@ public sealed partial class StarterScreen
         float panelWidth = Mathf.Min(540, width - 24);
         var panel = new Rect(width > 1000 ? 48 : (width - panelWidth) / 2, 12, panelWidth, height - 24);
         if (lastPage != page) { lastPage = page; pageStarted = Time.unscaledTime; scroll = Vector2.zero; GUI.FocusControl(null); }
+        if (Event.current.type == EventType.KeyDown && Event.current.alt &&
+            (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter)) Event.current.Use();
         NavigateFocus();
         focusable.Clear();
         GUILayout.BeginArea(panel, panelStyle);
@@ -120,6 +123,7 @@ public sealed partial class StarterScreen
         GUI.enabled = !popup && !applying && state != "applying";
         // Fade page content only; controls are immediately interactive. No moving scenery.
         GUI.color = new Color(1, 1, 1, Mathf.Lerp(0.75f, 1, Mathf.Clamp01((Time.unscaledTime - pageStarted) / 0.16f)));
+        if (page == "updates" && Button("Back to settings", fixedNavigation: true)) page = "settings";
         scroll = GUILayout.BeginScrollView(scroll);
         if (!string.IsNullOrEmpty(warning)) { GUILayout.Space(16); Label("Notice", headingStyle); Label(warning); }
         if (page == "menu") {
@@ -141,6 +145,15 @@ public sealed partial class StarterScreen
             GUI.enabled = false;
             Button("Language - Coming later");
             GUI.enabled = !popup;
+            if (display != null) {
+                GUILayout.Space(12);
+                Label("Display", headingStyle);
+                GUI.enabled = !popup && !display.Pending;
+                if (Button(fullscreen ? "Fullscreen: On" : "Fullscreen: Off"))
+                    SetFullscreen(!fullscreen);
+                GUI.enabled = !popup;
+                Label("Resize the window by dragging its borders. Alt+Enter toggles fullscreen.", smallStyle);
+            }
             if (Button(string.IsNullOrEmpty(available) ? "Versions & updates" : "Versions & updates - Available")) page = "updates";
             if (Button("Back to menu")) page = "menu";
         } else {
@@ -162,14 +175,23 @@ public sealed partial class StarterScreen
             GUILayout.Space(16);
             Label("Release history", headingStyle);
             if (releases.Length == 0) Label("No release history loaded.", smallStyle);
-            foreach (var release in releases) {
+            for (int index = 0; index < Mathf.Min(releases.Length, ReleaseHistory.MaxReleases); index++) {
+                var release = releases[index];
+                if (release == null) continue;
                 GUILayout.Space(12);
-                Label(release.version, headingStyle);
-                Label(release.notes);
-                if (Button("Release notes - " + release.version) && IsReleaseUrl(release.url)) Application.OpenURL(release.url);
+                GUILayout.BeginVertical(GUI.skin.box);
+                Label(ReleaseHistory.Inline(release.version ?? "Release"), headingStyle);
+                if (release.summary == null) release.summary = ReleaseHistory.Parse(release.notes);
+                foreach (var block in release.summary) {
+                    // Conventional changelogs repeat the version/date above their section headings.
+                    if (block.Heading && ReleaseHistory.IsVersionHeading(block.Text, release.version)) continue;
+                    Label(block.Text, block.Heading ? headingStyle : textStyle);
+                }
+                if (Button("View full notes on GitHub", "release-" + index) && IsReleaseUrl(release.url)) Application.OpenURL(release.url);
+                GUILayout.EndVertical();
             }
+            if (releases.Length > ReleaseHistory.MaxReleases) Label("More releases are available on GitHub.", smallStyle);
             Label("Older releases are for reference. Downgrades are not supported.", smallStyle);
-            if (Button(state == "error" ? "Later" : "Back to settings")) page = "settings";
         }
 #if LEGEND_OF_CAT_PREVIEW
         if (Preview) DrawPreviewTools();
@@ -219,7 +241,7 @@ public sealed partial class StarterScreen
         if (Button("Show checking")) PreviewState("checking");
         if (Button("Show no update")) PreviewState("current");
         if (Button("Show ready to apply")) PreviewState("ready");
-        if (Button("Show download progress")) { PreviewState("downloading"); progress = 47; }
+        if (Button("Show download progress")) { PreviewState("downloading"); progress = 47; downloadedBytes = 47000000; totalBytes = 100000000; }
         if (Button("Show warning")) { warning = "Preview warning: settings could not be saved. Existing settings are preserved."; page = "updates"; }
         if (Button("Show unsupported platform")) { state = "development"; available = ""; page = "updates"; previewUnsupported = true; }
         if (Button("Toggle display cutout")) simulateCutout = !simulateCutout;

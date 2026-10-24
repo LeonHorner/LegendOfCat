@@ -167,7 +167,7 @@ jobs:
         run: node tools/delta-release.mjs prepare ${{ matrix.platform }} ${{ needs.plan.outputs.version }} artifacts/releases/${{ matrix.platform }}
       - name: Package installer and update feed
         run: |
-          $icon = if ($IsWindows) { 'tools/icon.ico' } else { 'tools/icon.png' }
+          $icon = if ($IsWindows) { 'tools/icon.ico' } else { 'Assets/Game/Branding/icon.png' }
           dotnet vpk pack --packId LeonHorner.LegendOfCat --packVersion ${{ needs.plan.outputs.version }} --packDir publish --mainExe ${{ matrix.executable }} --runtime ${{ matrix.rid }} --channel ${{ matrix.platform }} --packTitle LegendOfCat --icon $icon --delta BestSpeed --outputDir artifacts/releases/${{ matrix.platform }}
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $folder = 'artifacts/releases/${{ matrix.platform }}'
@@ -175,6 +175,8 @@ jobs:
           if (-not (Test-Path "$folder/releases.${{ matrix.platform }}.json")) { throw 'Missing update feed' }
           $extension = if ('${{ matrix.platform }}' -eq 'win') { '*Setup.exe' } else { '*.AppImage' }
           if (-not (Get-ChildItem $folder -Filter $extension)) { throw 'Missing installer/AppImage' }
+      - name: Inspect embedded application and package icons
+        run: ./tools/check-package-icons.ps1 -PackageDirectory 'artifacts/releases/${{ matrix.platform }}'
       - name: Verify Delta reconstruction and release feed
         run: node tools/delta-release.mjs finalize ${{ matrix.platform }} ${{ needs.plan.outputs.version }} artifacts/releases/${{ matrix.platform }}
       - uses: actions/upload-artifact@v4

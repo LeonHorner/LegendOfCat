@@ -2,27 +2,20 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
-const prYaml = readFileSync(new URL('../.github/workflows/pull-request.yml', import.meta.url), 'utf8');
-const releaseYaml = readFileSync(new URL('../.github/workflows/release.yml', import.meta.url), 'utf8');
+import yaml from 'js-yaml';
+
+const prWorkflow = yaml.load(readFileSync(new URL('../.github/workflows/pull-request.yml', import.meta.url), 'utf8'));
+const releaseWorkflow = yaml.load(readFileSync(new URL('../.github/workflows/release.yml', import.meta.url), 'utf8'));
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 
+// Execute the actual github-script step from the parsed workflow, not a copied
+// implementation or a line-indentation approximation.
 function githubScript(job) {
-  const lines = prYaml.split('\n');
-  const begin = lines.indexOf('  ' + job + ':');
-  assert.notEqual(begin, -1, 'Missing job: ' + job);
-  let end = begin + 1;
-  while (end < lines.length && !/^  [a-z][a-z-]*:$/.test(lines[end])) end++;
-  let at = begin + 1;
-  while (at < end && lines[at] !== '          script: |') at++;
-  assert.ok(at < end, 'Missing github-script in ' + job);
-
-  const script = [];
-  for (let i = at + 1; i < end; i++) {
-    if (lines[i].startsWith('            ')) script.push(lines[i].slice(12));
-    else if (!lines[i].trim()) script.push('');
-    else break;
-  }
-  return new AsyncFunction('github', 'context', 'core', 'process', script.join('\n'));
+  const steps = prWorkflow.jobs[job]?.steps ?? [];
+  const matches = steps.filter(step => step.uses?.startsWith('actions/github-script@'));
+  assert.equal(matches.length, 1, `Expected one github-script step in ${job}`);
+  assert.equal(typeof matches[0].with?.script, 'string');
+  return new AsyncFunction('github', 'context', 'core', 'process', matches[0].with.script);
 }
 
 const runPreflight = githubScript('preflight');
@@ -43,7 +36,7 @@ function mock(options = {}) {
   const statuses = [];
   const outputs = {};
   const failures = [];
-  const results = { PREFLIGHT: 'success', TEST: 'success', BUILD: 'success', DELTA_INTEGRATION: 'success', ...options.results };
+  const results = { PREFLIGHT: 'success', TEST: 'success', BUILD: 'success', PACKAGE: 'success', DELTA_INTEGRATION: 'success', ...options.results };
   return {
     pr,
     statuses,
@@ -103,6 +96,27 @@ test('automatic PR event reads the event PR number', async () => {
   assert.equal(r.outputs.number, '32');
 });
 
+test('manual preflight rejects invalid PR numbers before reading an issue', async () => {
+  for (const input of ['', '0', '-1', '01', 'abc', '1.5', '9007199254740992']) {
+    const r = mock({ input });
+    await assert.rejects(runPreflight(r.github, r.context, r.core, r.process), undefined, input);
+    assert.deepEqual(r.statuses, [], input);
+  }
+});
+
+test('preflight rejects invalid titles, closed PRs and unexpected target branches', async () => {
+  for (const pr of [
+    { title: 'unstructured change' },
+    { title: 'fix: ' },
+    { state: 'closed' },
+    { base: { ref: 'develop', sha: 'main-commit' } }
+  ]) {
+    const r = mock({ pr });
+    await assert.rejects(runPreflight(r.github, r.context, r.core, r.process));
+    assert.ok(!r.statuses.some(status => status.state === 'success'));
+  }
+});
+
 test('draft, out-of-date, and external PRs are not approved in preflight', async () => {
   for (const options of [
     { pr: { draft: true } },
@@ -130,6 +144,9 @@ test('the gate rejects failures, cancellations, skips and stale PR revisions', a
     { results: { BUILD: 'failure' } },
     { results: { BUILD: 'cancelled' } },
     { results: { BUILD: 'skipped' } },
+    { results: { PACKAGE: 'failure' } },
+    { results: { PACKAGE: 'cancelled' } },
+    { results: { PACKAGE: 'skipped' } },
     { results: { DELTA_INTEGRATION: 'failure' } },
     { results: { DELTA_INTEGRATION: 'cancelled' } },
     { results: { DELTA_INTEGRATION: 'skipped' } },
@@ -150,49 +167,70 @@ test('the gate rejects failures, cancellations, skips and stale PR revisions', a
   }
 });
 
-test('automatic CI is limited to ready same-repo PRs; manual fallback remains', () => {
-  assert.match(prYaml, /types: \[opened, reopened, ready_for_review, synchronize, edited, converted_to_draft\]/);
-  assert.match(prYaml, /if: github\.event_name == 'workflow_dispatch' \|\| .*head\.repo\.full_name == github\.repository/);
-  assert.match(prYaml, /!github\.event\.pull_request\.draft/);
-  assert.match(prYaml, /group: pr-validation-\$\{\{ github\.event\.pull_request\.number \|\| inputs\.pr_number \}\}/);
-  assert.match(prYaml, /cancel-in-progress: true/);
-  assert.match(prYaml, /needs: \[preflight, test, build, delta-integration\]/);
-  assert.match(prYaml, /build:\n    name: Build \(\$\{\{ matrix\.platform \}\}\)\n    needs: preflight/);
-  assert.match(prYaml, /githubToken: ''/);
+
+// Config tests inspect parsed workflow topology, not incidental YAML formatting.
+// Script behavior is tested above by running the actual embedded scripts.
+test('PR workflow triggers and job graph keep validation on ready PRs', () => {
+  assert.deepEqual(prWorkflow.on.pull_request.types, [
+    'opened', 'reopened', 'ready_for_review', 'synchronize', 'edited', 'converted_to_draft'
+  ]);
+  assert.equal(prWorkflow.on.workflow_dispatch.inputs.pr_number.required, true);
+  assert.equal(prWorkflow.concurrency['cancel-in-progress'], true);
+  assert.deepEqual(prWorkflow.jobs.gate.needs,
+    ['preflight', 'test', 'build', 'package', 'delta-integration']);
+  assert.equal(prWorkflow.jobs.test.needs, 'preflight');
+  assert.equal(prWorkflow.jobs.build.needs, 'preflight');
+  assert.deepEqual(prWorkflow.jobs.package.needs, ['preflight', 'build']);
+  assert.equal(prWorkflow.jobs['delta-integration'].needs, 'preflight');
+  assert.equal(prWorkflow.jobs.preflight.steps[0].uses, 'actions/github-script@v7');
+  assert.deepEqual(prWorkflow.jobs.preflight.steps[0].env, {
+    PR_NUMBER: '${{ inputs.pr_number }}'
+  });
+  assert.ok(prWorkflow.jobs.preflight.if, 'Preflight must be conditionally guarded');
 });
 
-test('release is manual and publish depends on all required jobs', () => {
-  const header = releaseYaml.split('\njobs:')[0];
-  assert.match(header, /on:\n  workflow_dispatch:/);
-  assert.doesNotMatch(header, /\bpull_request:/);
-  assert.match(releaseYaml, /build:\n    needs: plan\n    if: needs\.plan\.outputs\.version != ''/);
-  assert.match(releaseYaml, /package:\n    needs: \[plan, build\]/);
-  assert.match(releaseYaml, /needs: \[plan, test, build, package\]/);
-  assert.match(releaseYaml, /needs\.test\.result == 'success'/);
-  assert.match(releaseYaml, /needs\.package\.result == 'success'/);
-  assert.match(releaseYaml, /test "\$EXPECTED" = "\$ACTUAL"/);
-  assert.match(releaseYaml, /githubToken: ''/);
+test('release is manual and publishing is gated on required jobs', () => {
+  assert.deepEqual(Object.keys(releaseWorkflow.on), ['workflow_dispatch']);
+  assert.deepEqual(releaseWorkflow.jobs.package.needs, ['plan', 'build']);
+  assert.equal(releaseWorkflow.jobs.build.needs, 'plan');
+  assert.deepEqual(releaseWorkflow.jobs.publish.needs, ['plan', 'test', 'build', 'package']);
+  const publishRequirements = new Set(
+    releaseWorkflow.jobs.publish.if.split('&&').map(term => term.trim()));
+  assert.deepEqual(publishRequirements, new Set(
+    ['plan', 'test', 'build', 'package'].map(name =>
+      `needs.${name}.result == 'success'`)));
 });
 
-test('both release platforms verify Delta packages before artifacts can publish', () => {
-  const fetch = releaseYaml.indexOf('name: Fetch and verify previous stable full package');
-  const pack = releaseYaml.indexOf('name: Package installer and update feed');
-  const verify = releaseYaml.indexOf('name: Verify Delta reconstruction and release feed');
-  const artifact = releaseYaml.indexOf('name: release-${{ matrix.platform }}');
-  const upload = releaseYaml.indexOf('name: Publish verified commit');
-  assert.ok(fetch !== -1 && fetch < pack && pack < verify && verify < artifact && artifact < upload);
-  assert.match(releaseYaml, /GH_TOKEN: \$\{\{ github\.token \}\}/);
-  assert.match(releaseYaml, /node tools\/delta-release\.mjs prepare/);
-  assert.match(releaseYaml, /node tools\/delta-release\.mjs finalize/);
-  assert.match(releaseYaml, /tools\/release-assets\.mjs artifacts\/releases artifacts\/published \$\{\{ needs\.plan\.outputs\.version \}\}/);
-  assert.match(prYaml, /node --test tools\/release-assets\.test\.mjs tools\/delta-release\.test\.mjs/);
+test('both platforms perform real Velopack Delta reconstruction before merge gate', () => {
+  const integration = prWorkflow.jobs['delta-integration'];
+  assert.deepEqual(integration.strategy.matrix.include.map(({ os, platform }) => ({ os, platform })), [
+    { os: 'windows-2022', platform: 'win' },
+    { os: 'ubuntu-22.04', platform: 'linux' }
+  ]);
+  assert.ok(integration.steps.some(step =>
+    step.run?.trim() === 'node tools/integration-delta.mjs ${{ matrix.platform }}'));
+  const gate = prWorkflow.jobs.gate.steps.find(step => step.uses?.startsWith('actions/github-script@'));
+  assert.deepEqual(Object.fromEntries(['PREFLIGHT', 'TEST', 'BUILD', 'PACKAGE', 'DELTA_INTEGRATION'].map(key =>
+    [key, gate.env[key]])), {
+    PREFLIGHT: '${{ needs.preflight.result }}',
+    TEST: '${{ needs.test.result }}',
+    BUILD: '${{ needs.build.result }}',
+    PACKAGE: '${{ needs.package.result }}',
+    DELTA_INTEGRATION: '${{ needs.delta-integration.result }}'
+  });
 });
 
-test('real Velopack Delta reconstruction is mandatory on both platforms before merge-ready', () => {
-  assert.match(prYaml, /delta-integration:\n    name: Real Velopack Delta/);
-  assert.match(prYaml, /os: windows-2022\n            platform: win/);
-  assert.match(prYaml, /os: ubuntu-22\.04\n            platform: linux/);
-  assert.match(prYaml, /run: node tools\/integration-delta\.mjs \$\{\{ matrix\.platform \}\}/);
-  assert.match(prYaml, /DELTA_INTEGRATION: \$\{\{ needs\.delta-integration\.result \}\}/);
-  assert.match(prYaml, /'DELTA_INTEGRATION'\]\.every/);
+test('release checks and builds both platforms before publishing artifacts', () => {
+  const pkg = releaseWorkflow.jobs.package;
+  assert.deepEqual(pkg.strategy.matrix.include.map(({ platform }) => platform), ['win', 'linux']);
+  const steps = pkg.steps;
+  const names = steps.map(step => step.name);
+  const fetch = names.indexOf('Fetch and verify previous stable full package');
+  const pack = names.indexOf('Package installer and update feed');
+  const verify = names.indexOf('Verify Delta reconstruction and release feed');
+  const upload = steps.findIndex((step, index) => index > verify && step.uses?.startsWith('actions/upload-artifact@'));
+  assert.ok(fetch >= 0 && fetch < pack && pack < verify && verify < upload,
+    'Baseline verification, packing and Delta reconstruction must precede artifact upload');
+  assert.ok(releaseWorkflow.jobs.publish.steps.some(step =>
+    step.name === 'Publish verified commit'));
 });

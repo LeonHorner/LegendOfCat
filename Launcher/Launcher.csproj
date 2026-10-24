@@ -6,11 +6,13 @@
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>../tools/icon.ico</ApplicationIcon>
     <AssemblyName>LegendOfCat</AssemblyName>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../Assets/Game/Scripts/UpdatePolicy.cs" Link="UpdatePolicy.cs" />
+    <Compile Include="../Assets/Game/Scripts/DownloadProgress.cs" Link="DownloadProgress.cs" />
     <PackageReference Include="Velopack" Version="1.2.161" />
   </ItemGroup>
 </Project>

@@ -8,7 +8,7 @@ level files yet; do not invent their data models before those features exist.
 ## Independent schemas
 
 - Each file format has its own integer `schemaVersion`, independent of the application version.
-  Menu settings currently use version **0**, with no published predecessor and no migration steps.
+  Menu and display settings each use independent version **0** schemas, with no display predecessor and no display migration steps. Menu schema 0 shipped in v0.2.0.
   Future saves and editable levels also start at **0** and maintain their own
   version histories. Shipped Unity scenes/assets are build inputs, not migrated user files.
 - `schemaVersion` is mandatory and must be a non-negative integer. Missing/invalid versions
@@ -54,10 +54,14 @@ recovery; automatic recovery from an arbitrary backup and down-migrations are no
 
 Version 0: `{ "schemaVersion": 0, "lastOfferedVersion": "0.2.0" }`
 
-There is no 0-to-1 migration yet. A missing reminder uses an empty string. An explicitly
+Menu schema 0 shipped in v0.2.0. There is no 0-to-1 migration yet. A missing reminder uses an empty string. An explicitly
 non-string reminder is invalid and must not be overwritten. Reminder writes preserve unknown
 fields and go through the same validated atomic-save path. The chained migration tests use
 synthetic examples to verify the mechanism; they do not establish released gameplay schemas.
+
+## Desktop display settings
+
+`display-settings.json` is independent from `menu-settings.json` and starts at schemaVersion 0. It stores `width` (640–16384), `height` (360–16384) and `fullscreen` (boolean). It uses `VersionedJsonFile` to preserve unknown fields and block writes to invalid, unreadable or newer files. A missing file defaults to a windowed 1280 × 720 player. Display settings never reset menu settings or game saves.
 
 ## Checklist for each future issue or PR
 
@@ -84,7 +88,7 @@ published formats to fit new code. Unreleased format examples may evolve with th
 
 | Stable release | Settings | Gameplay saves | Editable levels |
 | --- | --- | --- | --- |
-| None published | Not yet published (planned: 0) | Not implemented | Not implemented |
+| v0.2.0 | Menu settings: 0; display settings: not shipped | Not implemented | Not implemented |
 
 Only add actual published tags. Before releasing a new format version, validate migrations
 against fixtures from every previously published supported schema. Preview data is disposable
