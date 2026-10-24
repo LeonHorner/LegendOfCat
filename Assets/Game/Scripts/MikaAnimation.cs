@@ -7,7 +7,9 @@ public sealed class MikaAnimation
     public Pose Current { get; private set; }
     public int Facing { get; private set; } = 1;
     public int Frame { get; private set; }
-    public const float StrideLength = 2.4f;
+    public const int FrameCount = 78;
+    public const float StrideLength = 3.6f;
+    public const float LandingDuration = 0.24f;
     float elapsed, distance;
     bool initialized, wasGrounded;
 
@@ -37,7 +39,7 @@ public sealed class MikaAnimation
         if (!grounded) next = velocity.y > 0 ? Pose.Jump : Pose.Fall;
         else if (landed) next = Pose.Landing;
         else if (turned || Current == Pose.Turn && elapsed < 0.10f) next = Pose.Turn;
-        else if (Current == Pose.Landing && elapsed < 0.12f) next = Pose.Landing;
+        else if (Current == Pose.Landing && elapsed < LandingDuration) next = Pose.Landing;
         else next = moving ? Pose.Run : Pose.Idle;
 
         if (next != Current || turned && grounded || landed) {
@@ -48,12 +50,36 @@ public sealed class MikaAnimation
         // Reset on retry/teleport through the adapter; never animate a stationary run.
         if (grounded && moving) distance = Mathf.Repeat(distance + Mathf.Abs(travelled), StrideLength);
         switch (Current) {
-            case Pose.Run: Frame = 4 + Mathf.Min(3, (int)(distance / StrideLength * 4)); break;
-            case Pose.Turn: Frame = elapsed < 0.05f ? 8 : 9; break;
-            case Pose.Jump: Frame = 10; break;
-            case Pose.Fall: Frame = 11; break;
-            case Pose.Landing: Frame = elapsed < 0.06f ? 12 : 13; break;
-            default: Frame = (int)(elapsed * 3) % 4; break;
+            case Pose.Run:
+                int phase = Mathf.Min(31, (int)(distance / StrideLength * 32));
+                Frame = phase % 4 == 0 ? 6 + phase / 4 : 24 + phase / 4 * 3 + phase % 4 - 1;
+                break;
+            case Pose.Turn: Frame = elapsed < 0.05f ? 4 : 5; break;
+            case Pose.Jump:
+                Frame = elapsed < 0.06f ? Between(14, 15, elapsed / 0.06f)
+                    : Between(15, 16, Mathf.Clamp01((11 - velocity.y) / 11));
+                break;
+            case Pose.Fall:
+                float descent = Mathf.Clamp(-velocity.y / 6, 0, 3);
+                int stage = Mathf.Min(2, (int)descent);
+                Frame = Between(16 + stage, 17 + stage, descent - stage);
+                break;
+            case Pose.Landing:
+                float recovery = Mathf.Clamp(elapsed / LandingDuration * 4, 0, 3.99f);
+                int landingStage = (int)recovery;
+                Frame = Between(20 + landingStage, landingStage == 3 ? 0 : 21 + landingStage,
+                    recovery - landingStage);
+                break;
+            default: Frame = 0; break;
         }
+    }
+
+    static int Between(int first, int second, float fraction)
+    {
+        int step = Mathf.Clamp((int)(fraction * 4), 0, 4);
+        if (step == 0) return first;
+        if (step == 4) return second;
+        int pair = first >= 20 ? 14 + first - 20 : 8 + first - 14;
+        return 24 + pair * 3 + step - 1;
     }
 }

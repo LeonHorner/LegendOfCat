@@ -26,7 +26,7 @@ public class MikaAnimationTests
         Assert.That(Read("Current").ToString(), Is.EqualTo("Landing"));
         Step(0.02f, false, 0, 11);
         Assert.That(Read("Current").ToString(), Is.EqualTo("Jump"));
-        Assert.That(Read("Frame"), Is.EqualTo(10));
+        Assert.That(Read("Frame"), Is.EqualTo(14));
     }
 
     [Test]
@@ -71,5 +71,31 @@ public class MikaAnimationTests
         Assert.That(Read("Current").ToString(), Is.EqualTo("Idle"));
         Assert.That(Read("Facing"), Is.EqualTo(1));
         Assert.That(Read("Frame"), Is.EqualTo(0));
+    }
+
+    [Test]
+    public void ApexDoesNotSnapDirectlyFromTuckedToExtendedPaws()
+    {
+        Step(0.02f, false, 2, 11);
+        Step(0.08f, false, 2, 4);
+        Assert.That((int)Read("Frame"), Is.InRange(51, 53));
+        Step(0.02f, false, 2, -0.1f);
+        Assert.That(Read("Frame"), Is.EqualTo(16));
+        Step(0.10f, false, 2, -6);
+        Assert.That(Read("Frame"), Is.EqualTo(17));
+        Step(0.10f, false, 2, -12);
+        Assert.That(Read("Frame"), Is.EqualTo(18));
+    }
+
+    [Test]
+    public void LandingPlaysContactAbsorptionAndRecoveryBeforeIdle()
+    {
+        Step(0.02f, false, 0, -10);
+        Step(0.02f, true, 0, 0);
+        for (int i = 0; i < 4; i++) {
+            Assert.That(Read("Frame"), Is.EqualTo(20 + i));
+            Step(0.0601f, true, 0, 0);
+        }
+        Assert.That(Read("Current").ToString(), Is.EqualTo("Idle"));
     }
 }

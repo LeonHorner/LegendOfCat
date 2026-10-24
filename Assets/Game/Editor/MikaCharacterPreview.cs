@@ -5,7 +5,7 @@ using UnityEngine;
 // Dedicated authoring scene: deliberately independent of MovementCourse and shared prefabs.
 public static class MikaCharacterPreview
 {
-    public const string AtlasPath = "Assets/Game/Art/Mika/mika-movement-candidate.png";
+    public const string AtlasPath = "Assets/Game/Art/Mika/mika-movement-smooth.png";
     const string PrefabPath = "Assets/Game/Art/Mika/MikaCandidate.prefab";
 
     [MenuItem("LegendOfCat/Mika/Capture candidate contact sheet")]
@@ -23,10 +23,11 @@ public static class MikaCharacterPreview
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = new Color(0.10f, 0.16f, 0.20f);
         camera.scene = scene;
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < MikaAnimation.FrameCount; i++) {
             var item = new GameObject($"Frame {i:00}").AddComponent<SpriteRenderer>();
             item.transform.SetParent(root.transform, false);
-            item.transform.localPosition = new Vector3((i % 4 - 1.5f) * 2.2f, (1.5f - i / 4) * 1.55f - 0.6f);
+            item.transform.localPosition = new Vector3((i % 6 - 2.5f) * 1.55f, (1.5f - i / 6) * 1.55f - 0.6f);
+            item.transform.localScale = Vector3.one * 0.8f;
             item.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Game/Art/Mika/candidate-frame-{i:00}.asset");
         }
         var target = new RenderTexture(1440, 1000, 24);
@@ -59,17 +60,22 @@ public static class MikaCharacterPreview
         importer.alphaIsTransparency = true;
         importer.mipmapEnabled = false;
         importer.textureCompression = TextureImporterCompression.Uncompressed;
-        importer.maxTextureSize = 2048;
+        importer.maxTextureSize = 4096;
+        importer.isReadable = true;
         importer.SaveAndReimport();
         var atlas = AssetDatabase.LoadAssetAtPath<Texture2D>(AtlasPath);
-        float width = atlas.width / 4f, height = atlas.height / 4f;
-        var frames = new Sprite[16];
+        float width = atlas.width / 8f;
+        float height = atlas.height / 10f;
+        var frames = new Sprite[MikaAnimation.FrameCount];
         for (int i = 0; i < frames.Length; i++) {
             string path = $"Assets/Game/Art/Mika/candidate-frame-{i:00}.asset";
-            var sprite = Sprite.Create(atlas,
-                new Rect(i % 4 * width, (3 - i / 4) * height, width, height),
-                new Vector2(0.5f, 0.08f), width / 1.8f, 0, SpriteMeshType.FullRect);
-            sprite.name = $"Mika candidate {i:00}";
+            int row = i / 8;
+            var rect = new Rect(i % 8 * width, (9 - row) * height, width, height);
+            var pivot = ContactPivot(atlas, rect);
+            // Airborne pivots retain a stable torso anchor instead of pulling tucked paws down.
+            if (i >= 14 && i <= 19 || i >= 48 && i <= 65) pivot.y = 37.5f / height;
+            var sprite = Sprite.Create(atlas, rect, pivot, 256f / 1.8f, 0, SpriteMeshType.FullRect);
+            sprite.name = $"candidate-frame-{i:00}";
             var existing = AssetDatabase.LoadAssetAtPath<Sprite>(path);
             if (existing) { EditorUtility.CopySerialized(sprite, existing); Object.DestroyImmediate(sprite); }
             else { AssetDatabase.CreateAsset(sprite, path); existing = sprite; }
@@ -109,5 +115,17 @@ public static class MikaCharacterPreview
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = new Color(0.12f, 0.18f, 0.22f);
         Debug.Log("Mika candidate preview: play, use movement controls. Artwork and foot contacts require review before integration.");
+    }
+
+    public static Vector2 ContactPivot(Texture2D atlas, Rect rect)
+    {
+        // Ignore faint transparent RGB/background pixels; require a real horizontal sole span.
+        for (int y = 0; y < (int)rect.height; y++) {
+            int solid = 0;
+            for (int x = 0; x < (int)rect.width; x++)
+                if (atlas.GetPixel((int)rect.x + x, (int)rect.y + y).a > 0.65f) solid++;
+            if (solid >= 5) return new Vector2(0.5f, (y + 0.5f) / rect.height);
+        }
+        throw new System.InvalidOperationException("Mika frame has no visible paw contact pixels.");
     }
 }

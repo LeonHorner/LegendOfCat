@@ -2,6 +2,36 @@
 
 Issue #10 is in progress. This is isolated authoring work, **not accepted production artwork**.
 
+## Revised movement preview (2026-10-24)
+
+The active preview now uses `mika-movement-smooth.png`: 24 original generated key
+poses plus 54 optical-flow intermediate images. Running has 32 distance-driven
+phases. Jump/fall use progressive velocity-dependent poses with a shared apex;
+landing uses contact, absorption and recovery over 0.24 seconds. Idle holds one
+registered pose to avoid the old size/foot-position flicker. These changes supersede
+the initial 16-frame candidate described below.
+
+The visual child aligns its opaque sole pivot to the surface detected by the
+existing collider cast, compensating for the physics contact gap without moving
+the Rigidbody or collider. Grounded pivots are measured independently per frame.
+Airborne torso anchors stay fixed to avoid pulling tucked feet toward the ground.
+
+Updated provenance: built-in OpenAI image generation, exact model ID not exposed,
+generated 2026-10-23, refined/imported 2026-10-24. The user requested planted paws
+and smoother jump/landing movement and explicitly authorized local image cleanup.
+`mika-movement-refined-source.png` preserves the generated 6-by-4 source.
+`tools/prepare-mika-sprites.py` removes isolated alpha specks and registers unscaled
+poses; `tools/interpolate-mika-sprites.py` uses Pillow, numpy and OpenCV DIS optical
+flow to produce the review atlas. These are authoring tools only, not new Unity
+runtime dependencies. Asset terms remain `ASSET-LICENSE.md` where rights exist.
+Optical-flow images need motion review for local distortions and ghosting before
+production acceptance; they are not hand-authored final animation.
+
+Unity compiled/imported the revised preview and regenerated the sprite assets and
+prefab. The preview runs locally; standing paw contact was inspected. Automated
+tests, full movement recording and both platform builds remain pending. The old
+contact sheet below records the earlier candidate, not the revised atlas.
+
 ## Ownership and integration
 
 `feat/mika-animation` owns `MikaAnimation.cs`, `MikaSpritePresentation.cs`,
