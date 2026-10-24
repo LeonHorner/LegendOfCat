@@ -52,6 +52,19 @@ held/short jumps, landing and stopping; it does not verify installed builds or u
 
 No third-party game assets have been imported.
 
+## Integrated Mika review evidence
+
+`docs/design/mika-animation/integrated-movement-review.mp4`, the two
+`integrated-review-*.png` strips and `integrated-review.json` were captured from
+the original course/prefab in Unity 6000.3.27f1 on 2026-10-24 using
+MikaMovementReview.Record. No image generator/model or third-party artwork was
+used. FFmpeg encoded the video; Pillow cropped/labeled the strips and derived
+grayscale. Terms follow the original project artwork under ASSET-LICENSE.md
+where rights exist. Human direction retained the approved four-pose run and
+requested real-character integration checks. The original source drawing is
+unchanged; the Editor corrected run pose 6's sole pivot by ignoring disconnected
+pixels. Review evidence is not acceptance of the remaining movement artwork.
+
 ## Complete-character Mika run study
 
 On 2026-10-24 the user selected the earlier four-frame run for prototype

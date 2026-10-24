@@ -166,13 +166,36 @@ public static class MikaCharacterPreview
 
     public static Vector2 ContactPivot(Texture2D atlas, Rect rect)
     {
-        // Ignore faint transparent RGB/background pixels; require a real horizontal sole span.
-        for (int y = 0; y < (int)rect.height; y++) {
-            int solid = 0;
-            for (int x = 0; x < (int)rect.width; x++)
-                if (atlas.GetPixel((int)rect.x + x, (int)rect.y + y).a > 0.65f) solid++;
-            if (solid >= 5) return new Vector2(0.5f, (y + 0.5f) / rect.height);
+        // Stray opaque pixels below the cat must not become the sole anchor.
+        // Use the largest connected silhouette; do not change the drawing itself.
+        int width = (int)rect.width, height = (int)rect.height;
+        var solid = new bool[width * height];
+        for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
+                solid[y * width + x] = atlas.GetPixel((int)rect.x + x, (int)rect.y + y).a > 0.65f;
+        var queue = new System.Collections.Generic.Queue<int>();
+        int largest = 0, sole = 0;
+        for (int start = 0; start < solid.Length; start++) {
+            if (!solid[start]) continue;
+            solid[start] = false; queue.Enqueue(start);
+            int count = 0, lowest = height;
+            while (queue.Count > 0) {
+                int pixel = queue.Dequeue(), x = pixel % width, y = pixel / width;
+                count++; lowest = Mathf.Min(lowest, y);
+                Visit(x > 0 ? pixel - 1 : -1);
+                Visit(x + 1 < width ? pixel + 1 : -1);
+                Visit(y > 0 ? pixel - width : -1);
+                Visit(y + 1 < height ? pixel + width : -1);
+            }
+            if (count > largest) { largest = count; sole = lowest; }
         }
-        throw new System.InvalidOperationException("Mika frame has no visible paw contact pixels.");
+        if (largest < 20) throw new System.InvalidOperationException("Mika frame has no connected character silhouette.");
+        return new Vector2(0.5f, (sole + 0.5f) / rect.height);
+
+        void Visit(int pixel)
+        {
+            if (pixel < 0 || !solid[pixel]) return;
+            solid[pixel] = false; queue.Enqueue(pixel);
+        }
     }
 }

@@ -2,6 +2,12 @@
 
 Issue #10 is in progress. This is isolated authoring work, **not accepted production artwork**.
 
+After merged PR #41, the [integration review](integration-review.md) tracks the
+next bounded step: real-prefab physics/presentation tests, bounded contact-skin
+correction and current movement evidence. It also fixes the incorrect visible
+sole pivot in original run pose 6 without changing its drawing or the run cycle.
+Rejected experiment cleanup and final animation acceptance remain separate work.
+
 ## Current prototype: original four-frame run (2026-10-24)
 
 After comparing animated loops, the user preferred the first four run drawings

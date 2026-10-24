@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-24",
+  "unity": "6000.3.27f1",
+  "frames": 360,
+  "fps": 60,
+  "durationSeconds": 6,
+  "source": "MikaMovementReview.Record; actual Resources/MovementCourse and Resources/MikaOriginal",
+  "camera": "Course camera; scripted tracking for inspection, HUD not captured by Camera.Render",
+  "runSpriteIndices": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "apexFrameRange": [
+    149,
+    150,
+    151,
+    152,
+    153,
+    154,
+    155,
+    156,
+    157
+  ],
+  "groundedVisualYRange": [
+    -0.0008,
+    0.015
+  ],
+  "limits": [
+    "Scripted local-physics playback, not a human playtest",
+    "No artwork changes; jump/landing acceptance remains open",
+    "No final Windows/Linux build verification"
+  ]
+}
