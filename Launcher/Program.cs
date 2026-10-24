@@ -91,7 +91,7 @@ static class UpdateService
                         async historyError => {
                             try {
                                 await File.AppendAllTextAsync(log,
-                                    $"{DateTimeOffset.UtcNow:O} Optional release history unavailable: {historyError.GetType().Name} (HTTP {(historyError as HttpRequestException)?.StatusCode})\\n");
+                                    $"{DateTimeOffset.UtcNow:O} Optional release history unavailable: {historyError.GetType().Name} (HTTP {(historyError as HttpRequestException)?.StatusCode})\n");
                             } catch (Exception) { /* Diagnostics are best effort. */ }
                             Send(new { state = "warning", message = "Release history is temporarily unavailable. Update checking continues." });
                         });
