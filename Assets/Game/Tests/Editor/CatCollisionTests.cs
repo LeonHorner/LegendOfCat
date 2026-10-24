@@ -67,6 +67,21 @@ public class CatCollisionTests
         Assert.That(displacement.x * direction, Is.GreaterThan(0.05f), state);
         Assert.That(displacement.y, Is.GreaterThan(0.05f), state);
     }
+    [Test] public void PausingStopsPhysicsAndRespawnClearsThePause()
+    {
+        Input("SetMove", 1f); Tick();
+        controller.GetType().GetMethod("SetPaused").Invoke(controller, new object[] { true });
+        Assert.That(body.simulated, Is.False);
+        Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero));
+        Input("PressJump");
+        controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(3, 1) });
+        Assert.That(body.simulated, Is.True);
+        Assert.That(body.position, Is.EqualTo(new Vector2(3, 1)));
+        Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero));
+        Tick();
+        Assert.That(body.linearVelocity.x, Is.Zero);
+        Assert.That((bool)motion.GetType().GetProperty("Jumped").GetValue(motion), Is.False);
+    }
     [Test] public void RetryRestoresPositionAndClearsVelocityAndBufferedInput()
     {
         Input("SetMove", 1f); Input("PressJump"); Tick();
