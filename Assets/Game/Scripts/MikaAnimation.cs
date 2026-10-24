@@ -51,8 +51,9 @@ public sealed class MikaAnimation
         if (grounded && moving) distance = Mathf.Repeat(distance + Mathf.Abs(travelled), StrideLength);
         switch (Current) {
             case Pose.Run:
-                int phase = Mathf.Min(31, (int)(distance / StrideLength * 32));
-                Frame = phase % 4 == 0 ? 6 + phase / 4 : 24 + phase / 4 * 3 + phase % 4 - 1;
+                // Optical-flow leg inbetweens distorted paw shape during contact.
+                // Keep the eight original contact/passing poses until authored inbetweens replace them.
+                Frame = 6 + Mathf.Min(7, (int)(distance / StrideLength * 8));
                 break;
             case Pose.Turn: Frame = elapsed < 0.05f ? 4 : 5; break;
             case Pose.Jump:

@@ -5,8 +5,11 @@ Issue #10 is in progress. This is isolated authoring work, **not accepted produc
 ## Revised movement preview (2026-10-24)
 
 The active preview now uses `mika-movement-smooth.png`: 24 original generated key
-poses plus 54 optical-flow intermediate images. Running has 32 distance-driven
-phases. Jump/fall use progressive velocity-dependent poses with a shared apex;
+poses plus 54 optical-flow intermediate images. Following user review, running
+uses only the eight original contact/passing poses: optical-flow leg inbetweens
+made the run look worse and are no longer selected. Further run smoothing needs
+authored inbetweens with consistent anatomy and foot contacts, not optical flow.
+Jump/fall use progressive velocity-dependent poses with a shared apex;
 landing uses contact, absorption and recovery over 0.24 seconds. Idle holds one
 registered pose to avoid the old size/foot-position flicker. These changes supersede
 the initial 16-frame candidate described below.
