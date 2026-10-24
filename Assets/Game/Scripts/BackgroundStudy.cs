@@ -11,6 +11,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     public bool tour;
     public bool showControls = true;
     public Camera View { get; private set; }
+    public const float CameraFloor = 1f;
     public CatController Cat { get; private set; }
     readonly Transform[] layers = new Transform[3];
     readonly Material[] materials = new Material[3];
@@ -34,24 +35,32 @@ public sealed class BackgroundStudy : MonoBehaviour
         View = new GameObject("Study camera").AddComponent<Camera>();
         View.transform.SetParent(transform, false);
         View.orthographic = true; View.orthographicSize = 5.5f;
-        View.transform.position = new Vector3(6, 3, -10);
+        View.transform.position = new Vector3(6, CameraFloor, -10);
+        View.depth = 1;
         View.clearFlags = CameraClearFlags.SolidColor;
         View.backgroundColor = new Color(0.8f, 0.79f, 0.7f);
+        var bars = new GameObject("Study viewport bars").AddComponent<Camera>();
+        bars.transform.SetParent(transform, false);
+        bars.depth = 0; bars.clearFlags = CameraClearFlags.SolidColor;
+        bars.backgroundColor = Color.black; bars.cullingMask = 0;
         var atlas = Resources.Load<Texture2D>("BackgroundStudy/painted-atlas");
+        var textures = new[] { atlas, Resources.Load<Texture2D>("BackgroundStudy/middle-cutout"),
+            Resources.Load<Texture2D>("BackgroundStudy/near-cutout") };
         for (int i = 0; i < 3; i++) {
             layers[i] = new GameObject("Painted depth " + i).transform;
             layers[i].SetParent(transform, false);
             materials[i] = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
-            materials[i].mainTexture = atlas;
-            materials[i].SetFloat("_Strip", i);
-            materials[i].SetFloat("_Fade", i == 0 ? 0 : 1);
+            materials[i].mainTexture = textures[i];
+            materials[i].SetFloat("_Cutout", i == 0 ? 0 : 1);
+            float width = i == 0 ? 64 : 24;
             for (int tile = -1; tile <= 1; tile++) {
                 var panel = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 DestroyImmediate(panel.GetComponent<Collider>());
                 panel.name = "Mirrored scenery tile " + tile;
                 panel.transform.SetParent(layers[i], false);
-                panel.transform.localPosition = new Vector3(tile * 64, i == 0 ? 0 : i == 1 ? -1 : -2, 20 - i * 2);
-                panel.transform.localScale = new Vector3(64, i == 0 ? 20 : i == 1 ? 16 : 14, 1);
+                panel.transform.localPosition = new Vector3(tile * width, i == 0 ? 0 : i == 1 ? 1 : -2, 20 - i * 2);
+                // Preserve the painting's proportions instead of stretching thin atlas strips.
+                panel.transform.localScale = new Vector3(width, i == 0 ? width / 4.5f : width / 1.5f, 1);
                 panel.GetComponent<MeshRenderer>().sharedMaterial = materials[i];
             }
         }
@@ -72,7 +81,8 @@ public sealed class BackgroundStudy : MonoBehaviour
         var original = Resources.Load<GameObject>("MikaOriginal");
         if (original) Instantiate(original, player.transform).GetComponent<MikaSpritePresentation>().controller = Cat;
         else Debug.LogError("Background study requires the existing MikaOriginal prefab.");
-        ApplyView(6, 3);
+        ApplyViewport(Screen.width, Screen.height);
+        ApplyView(6, CameraFloor);
     }
 
     GameObject Block(string label, Vector2 position, Vector2 size, Color color)
@@ -89,30 +99,38 @@ public sealed class BackgroundStudy : MonoBehaviour
         float[] speeds = concept == Concept.Panorama ? new[] { 0.08f, 0.08f, 0.08f }
             : concept == Concept.Subtle ? new[] { 0.05f, 0.14f, 0.24f } : new[] { farSpeed, middleSpeed, nearSpeed };
         for (int i = 0; i < 3; i++) {
-            float center = TileCenter(x, speeds[i], 64);
+            float width = i == 0 ? 64 : 24;
+            float center = TileCenter(x, speeds[i], width);
             // Only horizontal parallax is under evaluation. Lock vertical registration
             // to the camera so jump follow cannot reveal the outer panorama boundary.
             layers[i].position = new Vector3(Offset(x, speeds[i]) + center, y, 0);
-            int tileIndex = Mathf.RoundToInt(center / 64);
+            int tileIndex = Mathf.RoundToInt(center / width);
             for (int j = 0; j < 3; j++) {
                 var panel = layers[i].GetChild(j);
                 var scale = panel.localScale;
-                scale.x = ((tileIndex + j - 1) & 1) == 0 ? 64 : -64;
+                scale.x = ((tileIndex + j - 1) & 1) == 0 ? width : -width;
                 panel.localScale = scale;
             }
         }
     }
 
+    public void ApplyViewport(int width, int height)
+    {
+        View.rect = MenuLayout.Letterbox16By9(width, height);
+        View.aspect = 16f / 9f;
+    }
+
     void LateUpdate()
     {
         if (!View) return;
+        ApplyViewport(Screen.width, Screen.height);
         if (tour) {
             tourTime += Time.deltaTime;
-            ApplyView(Mathf.PingPong(tourTime * 5, 48) - 2, 3);
+            ApplyView(Mathf.PingPong(tourTime * 5, 48) - 2, CameraFloor);
         } else {
             float half = View.orthographicSize * View.aspect;
             float x = Mathf.Clamp(Cat.transform.position.x + 2, half - 5, 47 - half);
-            var desired = new Vector3(x, Mathf.Clamp(Cat.transform.position.y + 1.2f, 3, 5), -10);
+            var desired = new Vector3(x, Mathf.Clamp(Cat.transform.position.y - 0.8f, CameraFloor, 3), -10);
             var position = Vector3.SmoothDamp(View.transform.position, desired, ref cameraVelocity, 0.16f);
             ApplyView(position.x, position.y);
         }

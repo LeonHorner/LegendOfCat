@@ -12,21 +12,31 @@ public static class BuildBackgroundStudy
     public static void Create()
     {
         if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
-        var importer = (TextureImporter)AssetImporter.GetAtPath("Assets/Game/Resources/BackgroundStudy/painted-atlas.png");
-        importer.textureCompression = TextureImporterCompression.Uncompressed;
-        importer.mipmapEnabled = false; importer.isReadable = false;
-        importer.wrapMode = TextureWrapMode.Clamp; importer.maxTextureSize = 2048;
-        importer.SaveAndReimport();
+        ImportLayers();
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         new GameObject("Golden River background study").AddComponent<BackgroundStudy>();
         EditorSceneManager.SaveScene(scene, ScenePath);
         AssetDatabase.SaveAssets();
     }
 
+    [MenuItem("LegendOfCat/Background study/Import painted layers")]
+    public static void ImportLayers()
+    {
+        foreach (string name in new[] { "painted-atlas", "middle-cutout", "near-cutout" }) {
+            var importer = (TextureImporter)AssetImporter.GetAtPath($"Assets/Game/Resources/BackgroundStudy/{name}.png");
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.mipmapEnabled = false; importer.isReadable = false;
+            importer.alphaIsTransparency = true;
+            importer.wrapMode = TextureWrapMode.Clamp; importer.maxTextureSize = 2048;
+            importer.SaveAndReimport();
+        }
+    }
+
     [MenuItem("LegendOfCat/Background study/Capture comparison")]
     public static void Capture()
     {
         Directory.CreateDirectory(Evidence);
+        ImportLayers();
         var scene = EditorSceneManager.NewPreviewScene();
         var root = new GameObject("Evidence only");
         UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(root, scene);
@@ -40,16 +50,16 @@ public static class BuildBackgroundStudy
                 // sprite's paw baseline to the platform top without changing the prefab.
                 var catSprite = study.Cat.GetComponentInChildren<SpriteRenderer>();
                 catSprite.transform.position += Vector3.up * (1f - catSprite.bounds.min.y);
-                study.ApplyView(17, 3);
+                study.ApplyView(17, BackgroundStudy.CameraFloor);
                 Save(study.View, $"{Evidence}/candidate-{mode}.png", 1280, 720, false);
                 Save(study.View, $"{Evidence}/candidate-{mode}-small-grayscale.png", 640, 360, true);
                 // 5 fps review recording: 5 world units/s, including a complete reversal.
                 for (int frame = 0; frame < 97; frame++) {
-                    study.ApplyView(Mathf.PingPong(frame, 48) - 2, 3);
+                    study.ApplyView(Mathf.PingPong(frame, 48) - 2, BackgroundStudy.CameraFloor);
                     Save(study.View, $"{Evidence}/motion-{mode}-{frame:00}.png", 640, 360, false);
                 }
                 foreach (float x in new[] { -120f, 57f, 59f, 240f }) {
-                    study.ApplyView(x, 3);
+                    study.ApplyView(x, BackgroundStudy.CameraFloor);
                     Save(study.View, $"{Evidence}/wrap-{mode}-{x}.png", 640, 360, false);
                 }
             }
@@ -63,7 +73,7 @@ public static class BuildBackgroundStudy
         var pixels = new Texture2D(width, height, TextureFormat.RGB24, false);
         var previous = RenderTexture.active;
         try {
-            camera.targetTexture = target; camera.aspect = (float)width / height; camera.Render();
+            camera.targetTexture = target; camera.rect = new Rect(0, 0, 1, 1); camera.aspect = 16f / 9f; camera.Render();
             RenderTexture.active = target; pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0); pixels.Apply();
             if (grayscale) {
                 var colors = pixels.GetPixels();

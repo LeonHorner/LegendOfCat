@@ -220,3 +220,18 @@ prototype artwork, with no user approval of final production background directio
 Built-in generation prompt:
 
 > Use case: stylized-concept. Create a single 1536x1024 background layer ATLAS for a warm hand-painted 2D side-scrolling Golden River Path game prototype. Reference image is STYLE AND PALETTE ONLY. No cat, owl, characters, gameplay platforms, foreground, text or borders. Atlas has precisely THREE equal horizontal strips stacked vertically, each its own very wide panoramic landscape, no margin. TOP third: ONLY warm pale golden sunset sky, soft clouds and extremely distant lavender hills, no trees/buildings. MIDDLE third: atmospheric blue sage distant riverside forest, small recessed ruined tower silhouettes, river mist; fill entire strip with pale atmospheric sky above and soft river below. BOTTOM third: closer soft sage and muted ochre riverside trees and vegetation with open gaps, fill strip with pale atmospheric sky above and mist below. All three strips low contrast, painterly brush texture, no dark outlines, no horizontal walkable ledges or bridges. In EACH strip left and right edges have identical low-detail mist colors and landscape heights for horizontal reuse; broad subtle forms rather than obvious repeating landmarks. The result must be beautiful painted scenery, separated into the specified three strip regions for runtime composition, not a screenshot of a game.
+
+## Golden River transparent replacement layers — 2026-10-25
+
+`Assets/Game/Resources/BackgroundStudy/middle-cutout.png` and `near-cutout.png`
+are original RGBA paintings generated with the built-in OpenAI image tool; exact
+model ID was not exposed. Source reference: our archived Golden River Ruins v2,
+used for palette/style. License: ASSET-LICENSE.md where rights exist. No third-party
+asset or font was added. Original generated pixels are preserved. Prompts and
+composition constraints: docs/design/background-study/cutout-prompts.md.
+Human decision: the user identified insufficient lower scenery and blurry layer
+transitions in Unity. Implementation: enforce the existing 16:9 presentation,
+lower camera framing, use independent transparent silhouettes rather than broad
+strip crossfades, retain image proportions, reject low-alpha halos at runtime and
+place smaller near vegetation below the gameplay plane. This feedback does not
+select A/B/C or approve final production backgrounds.

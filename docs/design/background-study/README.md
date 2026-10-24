@@ -19,6 +19,10 @@ Play. Alternatively use **LegendOfCat > Background study > Create isolated scene
 A/D/arrows move, Space jumps, R retries. The original movement course geometry is
 reused as a short comparison route, not an approved Level 1 layout. The camera
 follows the interpolated cat transform with smoothing and viewport-aware bounds.
+Like the existing movement course, the view is fixed to **16:9**, with black bars
+outside that viewport in other window shapes. The camera baseline is y=1 instead
+of y=3, exposing two more world units below the platforms; jump follow is similarly
+lowered. Character scale, collisions and jump physics are unchanged.
 Use the on-screen buttons to switch candidates without moving the camera or cat.
 Camera-only tour travels at 5 units/s and reverses; turn it off to follow Mika.
 
@@ -37,17 +41,21 @@ gameplay gap; crisp lit tops and dark solid platform fronts identify landing edg
 ## Reuse and limitations
 
 The new generated atlas reinterprets the archived reference into three panoramic
-strips; the original full scene is never used as a tiling layer. Runtime UV windows
-and soft vertical alpha fades composite the strips. Their generated skies overlap:
-these are prototype strips, not final clean transparent production source layers.
-Alternating mirrored tiles meet with identical edge pixels; three 64-unit tiles per
-depth cover the view. Absolute camera offsets prevent reversal drift. Mirroring
+strips; the original full scene is never used as a tiling layer. The initial broad
+vertical alpha fades were rejected during user testing on 2026-10-25 for blurry
+transitions. Only the sky strip remains in use. New independent transparent middle
+and near paintings preserve their authored contours, with low-alpha generation
+halos rejected by a narrow alpha threshold. No screen-height crossfade remains.
+All paintings retain their original aspect ratios. Lower, smaller near vegetation
+leaves the river visible and avoids filling the gameplay gaps with giant shrubs.
+Alternating mirrored tiles meet with identical edge pixels; three 64-unit sky tiles
+and three 24-unit tiles per cutout depth cover the view. Absolute offsets prevent reversal drift. Mirroring
 removes color discontinuities but can reveal symmetric tree/tower silhouettes;
 it is a technical reuse demonstration, not acceptable variety for a full 4–6-minute
 level. Production should use deliberately matching painted edges and multiple
 modules, with unique landmarks placed in world space behind the gameplay plane.
 
-Nine unlit quads share one 1536x1024 uncompressed texture (approximately 6 MiB RGBA
+Nine unlit quads use three 1536x1024 uncompressed textures (approximately 18 MiB RGBA
 before platform overhead) and three materials. Transparent overlap adds overdraw;
 no measured player GPU timings or platform performance claim is made.
 
@@ -60,7 +68,8 @@ Then run `pwsh -File tools/export-background-study.ps1` with FFmpeg available to
 encode the MP4s and comparison GIF and remove the numbered intermediate PNGs.
 Motion sequences use the same 5-unit/s camera sweep, reverse and return; they are
 camera/scenery recordings, not recordings of player input. Wrap stress stills
-inspect negative travel, the near-layer wrap boundary and long travel.
+inspect negative travel, several world positions and long travel. Unit tests sweep
+both tile widths across positive and negative wrap boundaries.
 
 ![A, B and C from left to right, same camera sweep](comparison.gif)
 
@@ -82,9 +91,9 @@ so it does not establish readability during a complete player traversal.
 
 Wrap stress captures reveal symmetric tree clusters around mirrored joins. No
 empty horizontal tile gaps appear; recognizable repeated towers and mirrored
-foliage remain an art limitation. Atmospheric strip fades also leave ghosted
-landmark silhouettes. Clean transparent authored layers and variant modules are
-required before production. The initial panorama capture exposed a bare strip at
+foliage remain an art limitation. The old strip fades caused ghosted landmark
+silhouettes and have been replaced with independently generated cutout layers.
+Variant modules are still required before production. The initial panorama capture exposed a bare strip at
 the lower screen edge; enlarged vertical coverage and camera-locked vertical
 registration address that. Horizontal parallax is the only evaluated motion axis.
 
@@ -99,8 +108,9 @@ display refresh rate. Smooth follow uses elapsed time; automated tests establish
 registration and collision separation, not perceived smoothness or art acceptance.
 
 Validation: pinned Editor import/scene generation and graphics captures succeeded;
-seven focused Unity tests passed, including a Play-Mode test for ground contact
-and world-space collision stability through all concept switches. Test logs are
+seven focused Unity tests cover ground contact, world-space collision stability
+through all concept switches, tile coverage and fixed 16:9 at 640x360, 1280x720,
+1024x768 and 2560x1080. Test logs are
 local under ignored Logs/. No Windows/Linux player/launcher build, actual install
 test or measured GPU performance is claimed. Package lock remained unchanged
 after Editor import. Keep the PR draft and issue open until the user chooses and

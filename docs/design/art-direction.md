@@ -84,8 +84,12 @@ compares three-layer parallax, a unified panorama and subtler three-layer motion
 over the same short movement segment. Candidate factors are adjustable prototype
 values. Recommendation: consider subtle parallax with occasional unique landmarks;
 **user selection is pending**. No final background production direction is approved.
-The generated strip atlas and mirrored reuse are evaluation assets, with visible
-symmetry/ghosting limitations documented in the comparison. Keep gameplay surfaces
+The initial broad strip crossfades were rejected in Unity feedback on 2026-10-25
+for blurry transitions and insufficient lower scenery. The revised lab enforces
+the existing 16:9 viewport, lowers camera framing, and uses independent transparent
+middle/near layers with their painted contours instead of height-based fades.
+Mirrored reuse remains an evaluation technique with visible symmetry limitations
+documented in the comparison. Keep gameplay surfaces
 in world space and retain the readability requirements above. Full Level 1 content
 remains scoped to #16.
 
