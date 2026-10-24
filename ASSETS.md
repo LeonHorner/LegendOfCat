@@ -192,3 +192,14 @@ The image is decorative scenery and does not establish campaign themes or routes
 Generation prompt (built-in tool):
 
 > Use case: stylized-concept. Asset type: original 2D game main-menu background, landscape 1536x1024. A charming hand-painted forest river valley at warm golden hour, soft atmospheric blue-green distant hills and old mossy stone ruins, amber foliage framing the far edges, winding glimmering stream toward the distance. Painterly gouache brushwork, entirely 2D, warm adventure mood. Composition: left half tranquil low-detail deep teal woodland shadow to support a separate opaque UI panel, right half luminous misty valley vista; no sharp foreground platforms or apparent gameplay routes. Natural lighting, restrained contrast, soft edges. No characters, animals, text, logos, UI, buttons, buildings with recognizable brands, or watermark. This is decorative menu scenery, not a level layout.
+
+## Mika apex atlas-edge correction — 2026-10-24
+
+`Assets/Game/Art/Mika/Original/original-apex-isolated.png` is a local Unity
+Editor-derived copy of the existing apex atlas cell with a two-pixel transparent
+sampling border. No new image generator/model, drawing or scaling was used.
+Source: the previously documented generated Mika movement atlas; existing
+ASSET-LICENSE.md terms apply where rights exist. Human direction: remove the
+neighboring atlas speck and retain the accepted apex alignment (-2, -14 source
+pixels). The user accepted the in-game result after playtesting. Original visible
+RGBA and alpha are preserved; the atlas and sprite GUID remain intact.

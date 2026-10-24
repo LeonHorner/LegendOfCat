@@ -34,11 +34,18 @@ public static class MikaCharacterPreview
             if (i == 10 || i == 11 || i == 16) {
                 // Match the shoulder anchor across complete airborne drawings.
                 // Registration only: never scale or deform the cat at runtime.
-                float shoulderX = i == 10 ? 220 : i == 11 ? 255 : 245;
-                float shoulderY = i == 10 ? 145 : i == 11 ? 155 : 140;
+                // Keep the apex registration accepted in the movement playtest.
+                float shoulderX = i == 10 ? 220 : i == 11 ? 255 : 247;
+                float shoulderY = i == 10 ? 145 : i == 11 ? 155 : 126;
                 pivot = new Vector2((shoulderX - 56) / width, (height - shoulderY - 110) / height);
             }
-            var sprite = Sprite.Create(atlas, rect, pivot, width / 1.8f, 0, SpriteMeshType.FullRect);
+            var texture = atlas;
+            if (i == 16) {
+                // Bilinear filtering at the atlas cell boundary samples the neighboring tail.
+                texture = IsolateApex(atlas, rect, folder);
+                rect.position = new Vector2(2, 2);
+            }
+            var sprite = Sprite.Create(texture, rect, pivot, width / 1.8f, 0, SpriteMeshType.FullRect);
             sprite.name = $"original-frame-{i:00}";
             string path = $"{folder}/{sprite.name}.asset";
             var existing = AssetDatabase.LoadAssetAtPath<Sprite>(path);
@@ -75,6 +82,31 @@ public static class MikaCharacterPreview
         PrefabUtility.SaveAsPrefabAsset(visual, "Assets/Game/Resources/MikaOriginal.prefab");
         Object.DestroyImmediate(visual);
         AssetDatabase.SaveAssets();
+    }
+
+    static Texture2D IsolateApex(Texture2D atlas, Rect rect, string folder)
+    {
+        int width = Mathf.CeilToInt(rect.width), height = Mathf.CeilToInt(rect.height);
+        var padded = new Texture2D(width + 4, height + 4, TextureFormat.RGBA32, false);
+        padded.SetPixels32(new Color32[(width + 4) * (height + 4)]);
+        padded.SetPixels(2, 2, width, height,
+            atlas.GetPixels((int)rect.x, (int)rect.y, width, height));
+        padded.Apply();
+        string path = $"{folder}/original-apex-isolated.png";
+        System.IO.File.WriteAllBytes(path, padded.EncodeToPNG());
+        Object.DestroyImmediate(padded);
+        AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
+        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+        importer.textureType = TextureImporterType.Default;
+        importer.isReadable = true;
+        importer.mipmapEnabled = false;
+        importer.npotScale = TextureImporterNPOTScale.None;
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+        importer.alphaIsTransparency = true;
+        importer.filterMode = FilterMode.Bilinear;
+        importer.wrapMode = TextureWrapMode.Clamp;
+        importer.SaveAndReimport();
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
     }
 
     public static Vector2 ContactPivot(Texture2D atlas, Rect rect)

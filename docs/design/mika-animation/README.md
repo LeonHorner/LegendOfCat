@@ -2,6 +2,17 @@
 
 ## Latest user review — 2026-10-24
 
+The user accepted the in-game apex alignment and atlas-edge correction after
+playtesting. Slot 16 now uses its adjusted pivot and an isolated, transparently
+padded copy of the same artwork to prevent neighboring atlas pixels from appearing
+under bilinear filtering. The Editor preparation regenerates the texture and
+preserves the existing sprite GUID. Original visible pixels, source alpha and
+transparent borders were checked locally. Preserve the current drawings, four-frame
+run and state timing. Unity import/compilation and user playtesting were completed
+during development; full exact-head tests and Windows/Linux builds have not been
+run for this update. Idle animation remains unfinished; issue #10 is incomplete.
+No merge or release is authorized.
+
 The bounded [apex experiment](movement-completion/apex-pair/README.md) tried one
 pre-apex drawing first, as authorized. It still changes head/trunk proportions,
 so it was not integrated and the second drawing was deferred. Active transition
