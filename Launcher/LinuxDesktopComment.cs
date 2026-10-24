@@ -32,6 +32,8 @@ internal static class LinuxDesktopComment
 
         try {
             foreach (var entry in Directory.EnumerateFiles(applications, "*.desktop")) {
+                if (!Path.GetFileName(entry).Contains("legendofcat", StringComparison.OrdinalIgnoreCase))
+                    continue;
                 try { RewriteGeneratedComment(entry, appImage); }
                 catch (IOException) { /* Desktop integration is optional. */ }
                 catch (UnauthorizedAccessException) { /* User may have protected their entry. */ }
