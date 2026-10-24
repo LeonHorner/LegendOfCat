@@ -3,7 +3,7 @@
 ## Mika character authoring and articulated preview
 
 `Assets/Game/Art/Mika/` contains original generated character studies, retained
-pose-sheet experiments, and the active articulated candidate. The built-in OpenAI
+pose-sheet experiments, and the rejected articulated experiment. The built-in OpenAI
 image generation tool produced the pose sources on 2026-10-23 and the cutout source
 and seam-cleanup edit on 2026-10-24. Exact model IDs were not exposed. References
 were the project's earlier original Mika images; no third-party character, font,
@@ -25,7 +25,13 @@ Implementation decisions: a fixed torso/head silhouette, constant limb lengths,
 alternating diagonal support feet, world-locked stance contacts, and leg flexion
 for landing. No whole-body scaling or gameplay timing change is used. Full prompts,
 review limitations and revision history are in `docs/design/mika-animation/`.
-The character remains a candidate pending visual acceptance and course integration.
+The user rejected the articulated experiment on 2026-10-24: feet/legs are too thin,
+the assembled anatomy is unsuitable and the jump animation does not fit. The
+optical-flow run experiment was also rejected. These assets/captures remain only
+as provenance and negative examples, not accepted production content. The agreed
+replacement is a consistently drawn complete-character run loop reviewed before
+gameplay integration, followed by authored jump/landing sequences. See the decision
+in `docs/design/art-direction.md` and `docs/design/mika-animation/README.md`.
 
 `docs/design/mika-animation/rig-*.png` and the movement review video are actual local
 Unity Camera.Render captures of the controller in an isolated local Physics2D

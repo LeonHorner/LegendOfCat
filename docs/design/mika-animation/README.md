@@ -2,7 +2,39 @@
 
 Issue #10 is in progress. This is isolated authoring work, **not accepted production artwork**.
 
-## Articulated revision (2026-10-24)
+## Current decision: rig rejected; restart with a reviewed run loop (2026-10-24)
+
+The user explicitly rejected the articulated revision as substantially worse:
+feet/legs are much too thin and the jump animation is inappropriate. The earlier
+optical-flow running experiment was also rejected. These attempts are retained
+as negative examples and provenance, not accepted artwork or a production base.
+
+The user agreed to return to complete-character frame animation. First finish a
+consistently drawn run cycle matching the earlier complete-cat visual reference,
+with stable anatomy, adequate paw size, registration and clear support contacts.
+Show it as a short loop, also slowed down, for review **before gameplay integration**.
+Then author coherent takeoff, flight/apex, descent and landing image sequences.
+Do not repeat optical-flow smoothing or tune the rejected procedural rig as the
+default next step. A future rig would require a new user decision and artwork
+actually designed for it, not reuse of these unsuitable generated parts.
+
+Passing five mechanical tests and the recorded reach/contact metrics below did
+not validate visual quality. The user rejection takes precedence over those earlier
+technical results and optimistic progress descriptions. Read the authoritative
+[animation decision](../art-direction.md#mika-animation-decision--2026-10-24).
+
+Documentation-only status update: code/assets are preserved. The current **Create
+isolated character preview** command still opens the rejected rig; it has not been
+replaced or rolled back by this decision record. The MP4, PNGs, prefabs, prompts and
+source sheets below are historical evidence. Do not present them as the approved
+target, integrate them into the course, close #10 or mark PR #41 ready based on them.
+The replacement run loop has not yet been implemented.
+
+At rest all four paws must meet the surface; in a run, support paws stay planted
+while swing paws lift intentionally. Do not force every running paw onto the floor
+or alter physics/input timing to conceal a cosmetic contact problem.
+
+## Rejected articulated revision — historical implementation (2026-10-24)
 
 The default isolated preview now uses a small cutout rig with independent upper
 legs, lower legs, paws, torso/head and tail. The earlier pose/optical-flow experiments
@@ -34,9 +66,8 @@ natural orange/cream quadruped, smooth movement, planted paw contacts. Implement
 decisions: fixed torso/head shape, fixed-length limbs, diagonal support pattern,
 and restrained tail motion. Prompt: [rig-generation-prompt.txt](rig-generation-prompt.txt).
 
-The new rig still requires visual acceptance, including joint seams, turning and
-movement at small size. Full issue completion and ready-PR validation are not
-established by compilation or a standing screenshot.
+The user subsequently rejected this rig. Its technical results below are retained
+for diagnosis only and do not override that decision.
 
 Validation of the articulated revision: Unity compilation/import passed; the five
 focused `MikaGaitTests` passed (5/5, zero failures). Tests cover all four resting
@@ -53,9 +84,9 @@ support comparison. `rig-standing.png` shows all four resting paws on the floor;
 or pose crossfade is used. These captures are actual Unity rendering, not generated
 motion illustrations. The original and circle-cleaned source sheets remain archived.
 
-## Revised movement preview (2026-10-24)
+## Rejected sprite/optical-flow preview — historical implementation (2026-10-24)
 
-The active preview now uses `mika-movement-smooth.png`: 24 original generated key
+The earlier sprite preview used `mika-movement-smooth.png`: 24 original generated key
 poses plus 54 optical-flow intermediate images. Following user review, running
 uses only the eight original contact/passing poses: optical-flow leg inbetweens
 made the run look worse and are no longer selected. Further run smoothing needs
@@ -91,8 +122,9 @@ contact sheet below records the earlier candidate, not the revised atlas.
 PR #36 and PR #37 are now merged. With explicit user authorization, current main
 was merged normally into `feat/mika-animation`; no feature PR was merged into main
 by this task. Their window, icon, update and release changes are preserved. Mika
-provenance is now appended to `ASSETS.md`. The character itself stays in the
-isolated preview pending visual acceptance; `MovementCourse.cs` is not modified.
+provenance is now appended to `ASSETS.md`. The rejected character stays isolated as
+historical evidence; `MovementCourse.cs` is not modified. The replacement requires
+run-loop review before integration.
 
 `feat/mika-animation` owns `MikaAnimation.cs`, `MikaSpritePresentation.cs`,
 `MikaCharacterPreview.cs`, `MikaAnimationTests.cs`, `Assets/Game/Art/Mika/` and this
@@ -105,7 +137,7 @@ After character acceptance, the character branch owner should preserve #36's
 framing/HUD changes when replacing temporary course geometry with a cosmetic child.
 Do not replace shared files wholesale or merge the character PR without authorization.
 
-## Preview and presentation
+## Initial sprite preview and presentation — historical implementation
 
 Use Unity 6000.3.27f1 and **LegendOfCat > Mika > Create isolated character preview**.
 The command imports the candidate uncompressed with alpha, creates sixteen
@@ -128,19 +160,18 @@ final animation. Airborne frames and turn silhouettes also need proportion revie
 
 ## Remaining acceptance work
 
-- Correct clipped run tails, stray pixels between run cells, cell margins and
-  cross-frame registration. These defects are visible in the Unity contact sheet.
-- Author and review enough contact/passing poses for smooth running with planted
-  feet at slow, full and reversing speeds; tune stride to the actual art.
-- Review idle/turn/jump/fall/landing transitions without body stretching or scale drift.
-- Integrate safely with #36 and append staged provenance to `ASSETS.md`.
+- Create a replacement consistently drawn complete-character run cycle; do not
+  treat cleanup of the rejected rig or optical-flow frames as the agreed solution.
+- Review the run as a short loop, also slowed down, before gameplay integration.
+- After review, author coherent jump/flight/landing sequences and their transitions.
+- Integrate accepted artwork while preserving #36's framing/HUD and update provenance.
 - Record actual movement, short/buffered jumps, reversal, fall, landing and retry.
   Inspect normal, small-window and grayscale views against light and dark backdrops.
 - Run exact-head final Prepare merge checks and both platform builds when complete.
 
 No extra idle/fish behavior, new ability, combat timing or campaign decision is introduced.
 
-## Staged asset provenance
+## Initial sprite asset provenance — historical record
 
 Asset: `Assets/Game/Art/Mika/mika-movement-candidate.png` and Editor-derived frames.
 Source: built-in OpenAI image generation, 2026-10-23 (Europe/Vienna); exact model ID
@@ -154,11 +185,10 @@ generated variant was rejected for crowded cells; the retained second variant
 still needs cleanup and is explicitly a candidate. The source generation prompt
 is archived in [generation-prompt.txt](generation-prompt.txt).
 
-`ASSETS.md` is intentionally deferred under the shared-file ownership agreement;
-copy this entry there at integration. Do not describe the issue as closed before
-the remaining criteria and provenance integration are complete.
+The earlier shared-file deferral is superseded: provenance and the rejection status
+are now recorded in `ASSETS.md`. Issue #10 remains incomplete.
 
-## Local validation and capture
+## Initial sprite validation and capture — historical record
 
 Unity 6000.3.27f1 compiled the runtime, Editor and test assemblies and completed
 candidate import/prefab generation successfully. `Packages/packages-lock.json`
