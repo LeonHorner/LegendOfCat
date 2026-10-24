@@ -203,3 +203,20 @@ ASSET-LICENSE.md terms apply where rights exist. Human direction: remove the
 neighboring atlas speck and retain the accepted apex alignment (-2, -14 source
 pixels). The user accepted the in-game result after playtesting. Original visible
 RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
+
+## Golden River background study — 2026-10-24
+
+`Assets/Game/Resources/BackgroundStudy/painted-atlas.png` is original generated
+prototype scenery, made with the built-in OpenAI image generation tool. Exact
+model ID was not exposed. License: ASSET-LICENSE.md where rights exist. Source
+reference: our archived `docs/design/references/golden-river-ruins-v2.png`, used
+only for palette and painterly style. No external assets or fonts were imported.
+Human direction: compare approximately three depth layers with a calm panorama;
+retain warm painted 2D art, softer backgrounds and unambiguous gameplay edges.
+Implementation decisions: three equal panoramic strips, runtime UV composition,
+atmospheric fades and mirrored reuse; no character art changes. This atlas is
+prototype artwork, with no user approval of final production background direction.
+
+Built-in generation prompt:
+
+> Use case: stylized-concept. Create a single 1536x1024 background layer ATLAS for a warm hand-painted 2D side-scrolling Golden River Path game prototype. Reference image is STYLE AND PALETTE ONLY. No cat, owl, characters, gameplay platforms, foreground, text or borders. Atlas has precisely THREE equal horizontal strips stacked vertically, each its own very wide panoramic landscape, no margin. TOP third: ONLY warm pale golden sunset sky, soft clouds and extremely distant lavender hills, no trees/buildings. MIDDLE third: atmospheric blue sage distant riverside forest, small recessed ruined tower silhouettes, river mist; fill entire strip with pale atmospheric sky above and soft river below. BOTTOM third: closer soft sage and muted ochre riverside trees and vegetation with open gaps, fill strip with pale atmospheric sky above and mist below. All three strips low contrast, painterly brush texture, no dark outlines, no horizontal walkable ledges or bridges. In EACH strip left and right edges have identical low-detail mist colors and landscape heights for horizontal reuse; broad subtle forms rather than obvious repeating landmarks. The result must be beautiful painted scenery, separated into the specified three strip regions for runtime composition, not a screenshot of a game.

@@ -1,0 +1,78 @@
+using System.IO;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+public static class BuildBackgroundStudy
+{
+    const string ScenePath = "Assets/Game/Scenes/BackgroundStudy.unity";
+    const string Evidence = "docs/design/background-study";
+
+    [MenuItem("LegendOfCat/Background study/Create isolated scene")]
+    public static void Create()
+    {
+        if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        var importer = (TextureImporter)AssetImporter.GetAtPath("Assets/Game/Resources/BackgroundStudy/painted-atlas.png");
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+        importer.mipmapEnabled = false; importer.isReadable = false;
+        importer.wrapMode = TextureWrapMode.Clamp; importer.maxTextureSize = 2048;
+        importer.SaveAndReimport();
+        var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        new GameObject("Golden River background study").AddComponent<BackgroundStudy>();
+        EditorSceneManager.SaveScene(scene, ScenePath);
+        AssetDatabase.SaveAssets();
+    }
+
+    [MenuItem("LegendOfCat/Background study/Capture comparison")]
+    public static void Capture()
+    {
+        Directory.CreateDirectory(Evidence);
+        var scene = EditorSceneManager.NewPreviewScene();
+        var root = new GameObject("Evidence only");
+        UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(root, scene);
+        var study = root.AddComponent<BackgroundStudy>(); study.Initialize(); study.showControls = false;
+        study.View.scene = scene;
+        try {
+            for (int mode = 0; mode < 3; mode++) {
+                study.concept = (BackgroundStudy.Concept)mode;
+                study.Cat.transform.position = new Vector3(15, 1.48f);
+                study.ApplyView(17, 3);
+                Save(study.View, $"{Evidence}/candidate-{mode}.png", 1280, 720, false);
+                Save(study.View, $"{Evidence}/candidate-{mode}-small-grayscale.png", 640, 360, true);
+                // 5 fps review recording: 5 world units/s, including a complete reversal.
+                for (int frame = 0; frame < 97; frame++) {
+                    study.ApplyView(Mathf.PingPong(frame, 48) - 2, 3);
+                    Save(study.View, $"{Evidence}/motion-{mode}-{frame:00}.png", 640, 360, false);
+                }
+                foreach (float x in new[] { -120f, 57f, 59f, 240f }) {
+                    study.ApplyView(x, 3);
+                    Save(study.View, $"{Evidence}/wrap-{mode}-{x}.png", 640, 360, false);
+                }
+            }
+        } finally { EditorSceneManager.ClosePreviewScene(scene); }
+        AssetDatabase.Refresh();
+    }
+
+    static void Save(Camera camera, string path, int width, int height, bool grayscale)
+    {
+        var target = new RenderTexture(width, height, 24);
+        var pixels = new Texture2D(width, height, TextureFormat.RGB24, false);
+        var previous = RenderTexture.active;
+        try {
+            camera.targetTexture = target; camera.aspect = (float)width / height; camera.Render();
+            RenderTexture.active = target; pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0); pixels.Apply();
+            if (grayscale) {
+                var colors = pixels.GetPixels();
+                for (int i = 0; i < colors.Length; i++) {
+                    float y = colors[i].r * 0.2126f + colors[i].g * 0.7152f + colors[i].b * 0.0722f;
+                    colors[i] = new Color(y, y, y);
+                }
+                pixels.SetPixels(colors); pixels.Apply();
+            }
+            File.WriteAllBytes(path, pixels.EncodeToPNG());
+        } finally {
+            camera.targetTexture = null; RenderTexture.active = previous; target.Release();
+            Object.DestroyImmediate(target); Object.DestroyImmediate(pixels);
+        }
+    }
+}
