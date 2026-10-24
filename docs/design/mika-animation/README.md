@@ -2,6 +2,13 @@
 
 ## Latest user review — 2026-10-24
 
+The latest direction keeps the actual in-game cat and rejects the cute legacy
+sample. The user requests more images specifically between existing transition
+poses. [Existing-game inbetweens](movement-completion/in-game-inbetweens/README.md)
+provides eight additional complete drawings between unchanged game endpoints,
+with before/after loops at identical duration. It is review-only; Unity remains
+unchanged. Preserve the original four-frame run and resolve visual review first.
+
 The user subsequently requested a [small cuter legacy-inspired example](movement-completion/legacy-cute-example/README.md),
 with a curved jumping posture and head/gaze following the arc. This sample uses
 the generated cat atlas from the supplied Java checkout as a style reference.

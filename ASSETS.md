@@ -54,6 +54,17 @@ No third-party game assets have been imported.
 
 ## Mika movement completion and archive
 
+The user rejected the cute legacy sample and retained the current in-game design.
+movement-completion/in-game-inbetweens contains eight new whole-character midpoint
+drawings generated with built-in OpenAI image generation on 2026-10-24 (exact
+model ID not exposed), followed by a targeted recovery-pose edit. Exact prompts,
+actual-game endpoint reference, mappings and registration choices are preserved.
+Terms: ASSET-LICENSE.md where rights exist. Human direction requests more frames
+between existing transitions, preserving character design, proportions and the
+four-frame run. Processing uses one uniform scale, alpha cleanup and translation;
+original endpoint drawings and overall preview duration are unchanged. This is
+documentation-only review artwork, with no Unity integration or acceptance claim.
+
 A small legacy-inspired style example is stored in movement-completion/legacy-cute-example.
 Built-in OpenAI image generation created its eight complete-cat drawings on
 2026-10-24; exact model ID was not exposed. The reference is the generated legacy
