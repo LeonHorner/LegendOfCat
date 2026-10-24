@@ -2,6 +2,7 @@
 
 | Asset | Source / generator and model | Date | License / terms | Human creative decisions |
 |---|---|---|---|---|
+| docs/design/desktop-window-history/*.png | Actual local Unity 6000.3.27f1 Windows preview-player ScreenCapture; no generator/model | 2026-10-23 | Project captures under ASSET-LICENSE.md where rights exist; backdrop provenance below | Inspect fixed navigation with 60 release cards at standard, minimum, narrow and ultrawide sizes; preserve readable painted-menu layout and inspect remaining/total MB using simulated download data. |
 | docs/design/menu-movement-integration/*.png | Actual local Unity Editor ScreenCapture of the integrated painted menu and movement lab; no image generator | 2026-10-23 | Project captures under ASSET-LICENSE.md where rights exist; underlying painted art provenance is recorded below | Preserve the approved painted menu and temporary readable course; explicitly label prototype gameplay and document the round trip. |
 | Assets/Game/VisualEvidence/*.png; docs/design/references/movement-lab-playthrough.mp4 | Captures of the local Unity movement lab; Unity Pipeline capture / ScreenCapture, FFmpeg video encoding; no image generator | 2026-10-23 | Project screenshot/recording under ASSET-LICENSE.md where rights exist; Unity text resources remain Unity dependencies | Review the temporary cat and platform readability in normal and small grayscale views; record the easy and precision jumps without treating the greybox as final art. |
 | Movement lab platforms, geometric cat, background silhouettes and labels | Original procedural Unity geometry; OpenAI Codex (GPT-6 family), no external assets or image generator | 2026-10-23 | Code under repository code license; original visual artwork under ASSET-LICENSE.md where rights exist; built-in Unity text resources remain Unity dependencies | Existing human direction requires an orange/cream quadruped, a clear playable plane and subdued backgrounds; this implementation uses temporary geometry pending character-art work in #10. Numerical course tuning is provisional. |
@@ -9,7 +10,21 @@
 | docs/design/references/*-v2.png (three initial scene concepts) | Built-in OpenAI image generation; exact model ID not exposed; edits of earlier generated concepts in the same design conversation | 2026-10-23 | Project reference artwork under ASSET-LICENSE.md where rights exist; generated provenance does not establish copyright or exclusivity | User selected naturally proportioned cat, cartoon owl influence, painted 2D worlds; rejected 2.5D; required clear platform/background separation. See docs/design/reference-prompts.md. |
 | Start menu and update UI | Original procedural layout; OpenAI Codex, model identifier not exposed | 2026-10-23 | Repository code license (PolyForm Noncommercial 1.0.0); no new image/font/audio assets | Original plain dark menu, superseded by the painted presentation below. Updates remain inside Settings with one reminder per new stable version. Existing Unity GUI resources are used. |
 
-No third-party game assets have been imported. tools/icon.png is a simple programmatically drawn placeholder.
+No third-party game assets have been imported.
+
+## Application icon
+
+`tools/icon.ico` is the single authoritative original icon supplied by Leon Horner
+from the legacy project's `assets/legendofcat.ico`, imported unchanged on 2026-10-23.
+Original creation date and authoring software/model were not supplied; no image
+generator was used for this import. Terms: project original artwork under
+ASSET-LICENSE.md where rights exist. Human direction explicitly selected this
+orange cat on a blue rounded square for all application surfaces, without redesign.
+`Assets/Game/Branding/icon.png` is the exact 256 x 256 PNG entry extracted from the
+ICO with `node tools/application-icon.mjs`; no resampling, recoloring or synthesis.
+Unity generates platform icon sizes at build time. The launcher embeds the ICO;
+Velopack uses the ICO on Windows and the PNG for Linux AppImage/desktop integration.
+The earlier generated placeholder icons have been replaced/removed.
 
 ## Painted menu backdrop
 

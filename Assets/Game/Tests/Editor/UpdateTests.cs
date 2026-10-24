@@ -5,9 +5,70 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Threading;
 
 public class UpdateTests
 {
+    [TestCase(2500000L, 10000000L, "7.5 MB remaining / 10.0 MB total")]
+    [TestCase(1L, 100000L, "0.1 MB remaining / 0.1 MB total")]
+    [TestCase(12000000L, 10000000L, "0.0 MB remaining / 10.0 MB total")]
+    [TestCase(-50L, 1000000L, "1.0 MB remaining / 1.0 MB total")]
+    [TestCase(0L, 0L, "")]
+    public void DownloadSizesAreReadableBoundedAndDoNotRoundRemainingBytesToZero(long downloaded, long total, string expected)
+        => Assert.That(RuntimeType("DownloadProgress").GetMethod("Format").Invoke(null, new object[] { downloaded, total }), Is.EqualTo(expected));
+
+    [Test]
+    public void ConcurrentDeltaCountsAndRetriesResetCleanlyForFullFallback()
+    {
+        var type = RuntimeType("DownloadProgress");
+        var tracker = Activator.CreateInstance(type);
+        void Plan(Dictionary<string, long> files) => type.GetMethod("Reset").Invoke(tracker, new object[] { files });
+        void Report(string file, long count) => type.GetMethod("Report").Invoke(tracker, new object[] { file, count });
+        long Value(string field) => (long)type.GetProperty(field).GetValue(tracker);
+        Plan(new Dictionary<string, long> { ["a.delta"] = 200, ["b.delta"] = 300 });
+        Report("a.delta", 150); Report("b.delta", 100);
+        Assert.That(Value("DownloadedBytes"), Is.EqualTo(250));
+        Assert.That(Value("TotalBytes"), Is.EqualTo(500));
+        Report("a.delta", 0); // This package restarts after a failed HTTP attempt.
+        Assert.That(Value("DownloadedBytes"), Is.EqualTo(100));
+        Plan(new Dictionary<string, long> { ["full"] = 1000 });
+        Report("a.delta", 200); // A stale package must not inflate the new full download.
+        Assert.That(Value("DownloadedBytes"), Is.Zero);
+        Report("full", 1500);
+        Assert.That(Value("DownloadedBytes"), Is.EqualTo(1000));
+        Assert.That(Value("TotalBytes"), Is.EqualTo(1000));
+    }
+
+    [Test]
+    public void ByteObservationCountsSyncAndAsyncWritesAndLeavesVelopacksStreamOpen()
+    {
+        using (var destination = new MemoryStream()) {
+            long received = 0;
+            var observed = (Stream)Activator.CreateInstance(RuntimeType("ProgressWriteStream"), destination, new Action<long>(value => received = value));
+            observed.Write(new byte[80], 0, 80);
+            observed.WriteAsync(new byte[20], 0, 20, CancellationToken.None).GetAwaiter().GetResult();
+            Assert.That(received, Is.EqualTo(100));
+            Assert.That(destination.Length, Is.EqualTo(100));
+            observed.Dispose();
+            Assert.That(destination.CanWrite, Is.True);
+        }
+    }
+
+    [Test]
+    public void DownloadByteMessagesAreOptionalAndResetForOlderHelpersAndErrors()
+    {
+        CreateScreen();
+        Receive("{\"state\":\"downloading\",\"progress\":25,\"downloadedBytes\":2500000,\"totalBytes\":10000000}");
+        string Status() => (string)screenType.GetMethod("StatusText", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(screen, null);
+        Assert.That(Status(), Does.Contain("7.5 MB remaining / 10.0 MB total"));
+        Receive("{\"state\":\"downloading\",\"progress\":70,\"downloadedBytes\":10000000,\"totalBytes\":10000000}");
+        Assert.That(Status(), Does.Contain("Preparing update"));
+        Receive("{\"state\":\"downloading\",\"progress\":40}");
+        Assert.That(Status(), Does.Not.Contain("MB"));
+        Receive("{\"state\":\"error\",\"message\":\"Interrupted\"}");
+        Assert.That(Get("totalBytes"), Is.EqualTo(0L));
+    }
     static Type RuntimeType(string name) => AppDomain.CurrentDomain.GetAssemblies()
         .Select(assembly => assembly.GetType(name)).First(type => type != null);
     static object Policy(string method, params object[] args) => RuntimeType("UpdatePolicy")
