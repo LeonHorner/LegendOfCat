@@ -63,7 +63,7 @@ internal static class DesktopCommentTests
         WithEntry((entry, image) => {
             var initial = "[Desktop Entry]\r\nName=LegendOfCat\r\n" +
                 "Comment=LegendOfCat 0.6.0\r\n" +
-                "Comment[de]=Benutzerdefinierter Text\r\n" +
+                "Comment[de]=Custom localized description\r\n" +
                 "Exec=\"" + image + "\" %U\r\n";
             File.WriteAllText(entry, initial);
             Check(LinuxDesktopComment.RewriteGeneratedComment(entry, image), "Quoted filename should migrate");
@@ -85,6 +85,40 @@ internal static class DesktopCommentTests
                 "Unknown Exec commands must remain unchanged");
             Check(File.ReadAllText(entry) == initial, "Wrapped launcher modified");
         });
+        return Task.CompletedTask;
+    }
+
+    internal static Task RefreshesExistingXdgDesktopEntry()
+    {
+        if (!OperatingSystem.IsLinux()) return Task.CompletedTask;
+        var dataHome = Directory.CreateTempSubdirectory("legendofcat-xdg-test-");
+        var oldDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+        var oldAppImage = Environment.GetEnvironmentVariable("APPIMAGE");
+        try {
+            var applications = Path.Combine(dataHome.FullName, "applications");
+            Directory.CreateDirectory(applications);
+            var image = Path.Combine(dataHome.FullName, "LegendOfCat.AppImage");
+            File.WriteAllText(image, "AppImage placeholder");
+            var entry = Path.Combine(applications, "legendofcat-linux-x86_64.desktop");
+            File.WriteAllText(entry, "[Desktop Entry]\\nName=LegendOfCat\\n" +
+                "Comment=LegendOfCat 0.5.0\\nExec=" + image + "\\n");
+            var unrelated = Path.Combine(applications, "another-game.desktop");
+            File.WriteAllText(unrelated, "[Desktop Entry]\\nName=LegendOfCat\\n" +
+                "Comment=LegendOfCat 0.5.0\\nExec=" + image + "\\n");
+            Environment.SetEnvironmentVariable("XDG_DATA_HOME", dataHome.FullName);
+            Environment.SetEnvironmentVariable("APPIMAGE", image);
+
+            LinuxDesktopComment.RefreshCurrentInstallation();
+
+            Check(File.ReadAllText(entry).Contains("Comment=A little cat, a big adventure"),
+                "Actual XDG startup path did not migrate existing entry");
+            Check(File.ReadAllText(unrelated).Contains("Comment=LegendOfCat 0.5.0"),
+                "Must not modify unrelated desktop filenames");
+        } finally {
+            Environment.SetEnvironmentVariable("XDG_DATA_HOME", oldDataHome);
+            Environment.SetEnvironmentVariable("APPIMAGE", oldAppImage);
+            dataHome.Delete(recursive: true);
+        }
         return Task.CompletedTask;
     }
 
