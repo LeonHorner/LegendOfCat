@@ -141,7 +141,14 @@ public static class MikaRigPreview
         return parts;
     }
 
-    public static void Create()
+    public static void Create() => CreateScene();
+
+    public static void Play()
+    {
+        if (CreateScene()) EditorApplication.EnterPlaymode();
+    }
+
+    static bool CreateScene()
     {
         var parts = ImportParts();
         var cat = new GameObject("Mika rig candidate");
@@ -157,11 +164,12 @@ public static class MikaRigPreview
         PrefabUtility.SaveAsPrefabAsset(cat, PrefabPath);
         Object.DestroyImmediate(cat);
         AssetDatabase.SaveAssets();
-        if (Application.isBatchMode) return;
-        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        if (Application.isBatchMode) return true;
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return false;
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         Populate(SceneManager.GetActiveScene());
         Debug.Log("Mika articulated preview ready. Play: A/D, jump, R retry. Four planted paws at rest.");
+        return true;
     }
 
     public static GameObject Populate(Scene scene)
@@ -186,6 +194,7 @@ public static class MikaRigPreview
         camera.backgroundColor = new Color(0.10f,0.16f,0.20f);
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.scene = scene;
+        camera.gameObject.AddComponent<MikaPreviewCamera>().target = cat.GetComponent<CatController>();
         return cat;
     }
 }

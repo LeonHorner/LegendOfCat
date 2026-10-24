@@ -13,6 +13,8 @@ public sealed class MikaGait
     readonly Vector2[] lift = new Vector2[4];
     readonly bool[] swinging = new bool[4];
     readonly float[] swingPhase = new float[4];
+    readonly float[] swingTargetX = new float[4];
+    readonly bool[] settling = new bool[4];
     float phase, impact, airBlend, runBlend;
     bool initialized, wasGrounded;
     int facing = 1;
@@ -32,6 +34,7 @@ public sealed class MikaGait
         for (int i = 0; i < 4; i++) {
             Feet[i] = planted[i] = lift[i] = origin + new Vector2(RestX[i], 0);
             swinging[i] = false;
+            settling[i] = false;
             Supporting[i] = true;
         }
     }
@@ -92,7 +95,14 @@ public sealed class MikaGait
             bool wantsSwing = moving && p >= StanceFraction;
             bool resetStep = !moving && (i == 0 || i == 3 ? 0 : 1) == settlePair
                 && Mathf.Abs(Feet[i].x-rest) > 0.025f;
-            if (resetStep && !swinging[i]) { lift[i] = Feet[i]; swinging[i] = true; swingPhase[i] = 0; }
+            if (resetStep && !swinging[i]) {
+                lift[i] = Feet[i]; swinging[i] = settling[i] = true;
+                swingPhase[i] = 0; swingTargetX[i] = rest;
+            }
+            if (!moving && swinging[i] && !settling[i]) {
+                lift[i] = Feet[i]; swingPhase[i] = 0;
+                settling[i] = true; swingTargetX[i] = rest;
+            }
             // Finish an existing step when input stops, then leave all four soles planted.
             if (!wantsSwing && moving && swinging[i]) {
                 Feet[i] = new Vector2(rest + (reach - p * CycleDistance) * facing, origin.y);
@@ -100,12 +110,16 @@ public sealed class MikaGait
                 swinging[i] = false;
             }
             if (wantsSwing || !moving && swinging[i]) {
-                if (!swinging[i]) { lift[i] = Feet[i]; swinging[i] = true; }
+                if (!swinging[i]) {
+                    lift[i] = Feet[i]; swinging[i] = true; settling[i] = false;
+                    // Fix the future touchdown point now; zero-velocity easing then meets stance cleanly.
+                    swingTargetX[i] = rest + (reach + (1-p)*CycleDistance)*facing;
+                }
                 float t = moving ? (p - StanceFraction) / (1 - StanceFraction)
                     : Mathf.MoveTowards(swingPhase[i], 1, dt * 10);
                 swingPhase[i] = t;
                 float ease = t * t * (3 - 2 * t);
-                float x = Mathf.Lerp(lift[i].x, moving ? rest + reach * facing : rest, ease);
+                float x = Mathf.Lerp(lift[i].x, swingTargetX[i], ease);
                 Feet[i] = new Vector2(x, origin.y + Mathf.Sin(Mathf.PI * t) * (moving ? 0.075f : 0.04f));
                 planted[i] = new Vector2(x, origin.y);
                 if (t >= 1) { swinging[i] = false; Feet[i] = planted[i]; }

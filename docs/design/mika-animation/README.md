@@ -38,6 +38,21 @@ The new rig still requires visual acceptance, including joint seams, turning and
 movement at small size. Full issue completion and ready-PR validation are not
 established by compilation or a standing screenshot.
 
+Validation of the articulated revision: Unity compilation/import passed; the five
+focused `MikaGaitTests` passed (5/5, zero failures). Tests cover all four resting
+soles, no sliding during stance, alternating support, stopping, fixed bone lengths
+and carrying airborne paws with the root. A final 360-frame controller/local-physics
+review after current-main integration reported maximum ankle reach error 0.00000 m
+and grounded sole offset 0.00500 m (the intentional 5 mm visual overlap to hide the
+physics skin gap). No full suite or Windows/Linux builds were run for this draft.
+
+The [60 Hz movement recording](rig-movement-review.mp4) shows idle, run, reversal,
+held jump, short jump, landing and stopping. [Selected frames](rig-review-strip.png)
+support comparison. `rig-standing.png` shows all four resting paws on the floor;
+`rig-running.png` shows the alternating support/swing pose. No runtime optical-flow
+or pose crossfade is used. These captures are actual Unity rendering, not generated
+motion illustrations. The original and circle-cleaned source sheets remain archived.
+
 ## Revised movement preview (2026-10-24)
 
 The active preview now uses `mika-movement-smooth.png`: 24 original generated key
@@ -73,6 +88,12 @@ contact sheet below records the earlier candidate, not the revised atlas.
 
 ## Ownership and integration
 
+PR #36 and PR #37 are now merged. With explicit user authorization, current main
+was merged normally into `feat/mika-animation`; no feature PR was merged into main
+by this task. Their window, icon, update and release changes are preserved. Mika
+provenance is now appended to `ASSETS.md`. The character itself stays in the
+isolated preview pending visual acceptance; `MovementCourse.cs` is not modified.
+
 `feat/mika-animation` owns `MikaAnimation.cs`, `MikaSpritePresentation.cs`,
 `MikaCharacterPreview.cs`, `MikaAnimationTests.cs`, `Assets/Game/Art/Mika/` and this
 directory. PR #36 retains `MovementCourse.cs`, camera/display integration and its
@@ -80,10 +101,9 @@ directory. PR #36 retains `MovementCourse.cs`, camera/display integration and it
 notes were posted on both PRs before edits. No shared scene, prefab, package,
 project setting, movement rule, controller or input implementation is modified.
 
-After #36 is safely integrated, the character branch owner should merge current
-main normally, preserve its framing/HUD changes, replace the temporary geometry
-with a cosmetic child, and append the staged provenance to `ASSETS.md`. Never
-replace that file wholesale. Do not merge either PR as part of this task.
+After character acceptance, the character branch owner should preserve #36's
+framing/HUD changes when replacing temporary course geometry with a cosmetic child.
+Do not replace shared files wholesale or merge the character PR without authorization.
 
 ## Preview and presentation
 

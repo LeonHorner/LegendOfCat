@@ -1,5 +1,39 @@
 # Asset provenance
 
+## Mika character authoring and articulated preview
+
+`Assets/Game/Art/Mika/` contains original generated character studies, retained
+pose-sheet experiments, and the active articulated candidate. The built-in OpenAI
+image generation tool produced the pose sources on 2026-10-23 and the cutout source
+and seam-cleanup edit on 2026-10-24. Exact model IDs were not exposed. References
+were the project's earlier original Mika images; no third-party character, font,
+music or asset was imported. Terms: `ASSET-LICENSE.md` where rights exist; generation
+does not establish exclusivity or copyright.
+
+Human direction selected the natural orange-and-cream quadruped, modest head/eyes,
+striped tail, smooth motion and grounded paws. The user explicitly authorized local
+image cleanup/registration. `tools/prepare-mika-sprites.py` registers pose frames;
+`tools/interpolate-mika-sprites.py` produced experimental optical-flow inbetweens
+that were rejected for running. These pose experiments are retained for provenance
+and are not the default character preview. `tools/prepare-mika-rig.py` extracts
+eight cutout parts from `mika-rig-clean-source.png`, removes stray alpha pixels and
+registers joint axes. Original sources are preserved. Pillow/numpy/OpenCV are
+authoring-only tools, not Unity runtime dependencies. Unity generated the sprite
+metadata and candidate prefabs. No serialized scene was hand-edited.
+
+Implementation decisions: a fixed torso/head silhouette, constant limb lengths,
+alternating diagonal support feet, world-locked stance contacts, and leg flexion
+for landing. No whole-body scaling or gameplay timing change is used. Full prompts,
+review limitations and revision history are in `docs/design/mika-animation/`.
+The character remains a candidate pending visual acceptance and course integration.
+
+`docs/design/mika-animation/rig-*.png` and the movement review video are actual local
+Unity Camera.Render captures of the controller in an isolated local Physics2D
+scene at 60 Hz on 2026-10-24, encoded with FFmpeg; no image generator was used for
+the captures. Terms: project captures under `ASSET-LICENSE.md` where rights exist,
+with underlying character provenance above. The recording reviews running, turns,
+held/short jumps, landing and stopping; it does not verify installed builds or updates.
+
 | Asset | Source / generator and model | Date | License / terms | Human creative decisions |
 |---|---|---|---|---|
 | docs/design/desktop-window-history/*.png | Actual local Unity 6000.3.27f1 Windows preview-player ScreenCapture; no generator/model | 2026-10-23 | Project captures under ASSET-LICENSE.md where rights exist; backdrop provenance below | Inspect fixed navigation with 60 release cards at standard, minimum, narrow and ultrawide sizes; preserve readable painted-menu layout and inspect remaining/total MB using simulated download data. |
