@@ -223,7 +223,7 @@ test('release checks and builds both platforms before publishing artifacts', () 
   const fetch = names.indexOf('Fetch and verify previous stable full package');
   const pack = names.indexOf('Package installer and update feed');
   const verify = names.indexOf('Verify Delta reconstruction and release feed');
-  const upload = steps.findIndex(step => step.uses?.startsWith('actions/upload-artifact@'));
+  const upload = steps.findIndex((step, index) => index > verify && step.uses?.startsWith('actions/upload-artifact@'));
   assert.ok(fetch >= 0 && fetch < pack && pack < verify && verify < upload,
     'Baseline verification, packing and Delta reconstruction must precede artifact upload');
   assert.ok(releaseWorkflow.jobs.publish.steps.some(step =>
