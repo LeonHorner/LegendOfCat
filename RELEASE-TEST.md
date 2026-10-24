@@ -63,11 +63,49 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 
 ## Linux update recovery regression (#40)
 
-An existing Linux v0.1.0 AppImage was observed to find/download v0.2.0 but close without replacing itself or restarting. The update service's old process ordering can make AppImage runtime resources unavailable before Velopack is launched. After shipping the fix, verify a **new fixed-version AppImage N → later N+1** in a graphical Linux session; do not treat a successful manual installation as an updater test. Older already-shipped AppImages contain their original updater, so users affected by v0.1.0 may need a one-time manual download to reach the fixed version.
+**Observed failure, not a passing validation.** A Linux v0.1.0 AppImage downloaded
+v0.2.0 but failed to apply and restart. After PR #42, a separate real
+v0.3.0 -> v0.4.0 attempt still failed: the `--update-service` helper crashed
+with SIGBUS shortly after the "Starting Velopack handoff" log entry. Crash
+evidence is recorded in sanitized form in issue #40; the exact FUSE mount
+lifetime explanation remains to be confirmed by a controlled trace.
 
-The PR preflight runs the dependency-free .NET updater workflow tests (`Launcher.WorkflowTests`). They simulate HTTP 403/429, timeouts, malformed history, warning-log failures, and both platform process-ordering paths. These tests execute the same orchestration implementation as the launcher but **do not** exercise Velopack's native AppImage replacement or Unity's graphical shutdown; the physical Linux check remains mandatory.
+The new Linux handoff stages the exact Velopack 1.2.161 `UpdateNix` and its
+`sq.version` outside the original mount, launches a standalone POSIX supervisor,
+and only then sends the Unity shutdown message. It waits for BOTH game and
+entry launcher identities to disappear before launching the native updater.
+On timeout it refuses to replace the old AppImage. This deliberately does not
+rely on Velopack 1.2.161's `--waitPid` because that version can continue
+after its 60-second wait fails. The Windows path remains separate.
 
-Record whether the installed AppImage's checksum/mtime actually changes, whether the process restarts to N+1, and whether settings survive. Re-run a version check when the optional GitHub REST release-history request is rate-limited (HTTP 403): the history warning must not prevent Velopack's independent update check. Sanitize logs and installation paths before storing evidence.
+**Verification levels and limitations:**
+
+1. `node --test tools/linux-update-supervisor.test.mjs` executes the real POSIX
+   supervisor with genuine Linux child PIDs; it checks readiness, ordering,
+   timeouts, errors and safe argv handling. It uses a fake native updater.
+2. The Linux native `package` job in `Prepare merge` builds local
+   `0.0.1`/`0.0.2` packages and, if the runner supports FUSE, mounts a real
+   old AppImage, tears down the old mount while the supervisor is running,
+   applies a real full update with the staged Velopack `UpdateNix`, and
+   verifies that the *same renamed file* mounts with different version
+   metadata. This is a nonpublishing native lifecycle test, **not** a game-UI
+   test; no success may be claimed if FUSE is unavailable.
+3. `.github/workflows/linux-appimage-update.yml` offers an additional
+   manually dispatched, isolated replay of the real FUSE test.
+4. A real graphical Unity-driven N -> N+1 update with the Settings UI, automatic
+   restart, correct version, settings/saves retention, next-launch pending
+   reconciliation and no new SIGBUS/core dump is still required before closing
+   #40. A graphical VM or Xvfb can automate core functionality; a normal Linux
+   desktop remains useful for dialogs and end-user presentation.
+
+**For both cached/full and fresh download tests**, verify the original
+AppImage path (including spaces and a user-renamed filename), record actual
+PID/mount transitions, check the exit status/native logs and ensure a stalled
+or failed preparation never authorizes shutdown. Verify Windows behavior after
+this change. Do not publish unredacted machine paths, usernames or crash dumps.
+
+The older published Linux AppImages still contain the old launcher and may
+require a one-time manual replacement before the repaired updater is available.
 
 ## Delta update validation (future stable N -> N+1)
 
@@ -133,7 +171,7 @@ Linux installation/update behavior remains unverified.
 | Offline start and retry | Not run | Not run |
 | N+1 tag / commit / release workflow | Pending | Pending |
 | Later persists across restart | Not run | Not run |
-| Installed N -> N+1 update / automatic restart | PASS (maintainer report, v0.1.0 -> v0.2.0) | Not run |
+| Installed N -> N+1 update / automatic restart | PASS (maintainer report, v0.1.0 -> v0.2.0) | FAIL (v0.1.0 -> v0.2.0 and v0.3.0 -> v0.4.0, see #40) |
 | Settings update path and download progress | Not reported | Not run |
 | Delta artifact SHA-256 reconstruction / release feed | Not run | Not run |
 | Actual Delta or full download choice (N → N+1) | Not observed | Not run |
@@ -142,7 +180,7 @@ Linux installation/update behavior remains unverified.
 | Interrupted download / retry | Not run | Not run |
 | Preferences preserved across update | PASS (maintainer report) | Not run |
 | Old version release history read-only | Not reported | Not run |
-| Logs / screenshots / remaining defects | Pending | Pending |
+| Logs / screenshots / remaining defects | Pending | SIGBUS in update helper; sanitized evidence in #40 |
 
 Do not mark update support verified until both real platform tests pass. If the game cannot
 start at all after a failed installation, retain logs and use the official installer to repair
