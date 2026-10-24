@@ -94,6 +94,10 @@ save-format decisions.
 
 ## Verification
 
+Pause freezes physics and motor timers while preserving held movement and jump
+input. Releasing jump while paused shortens the ascent on resume, just as releasing
+it during play does. Retry, restart and focus loss still clear motor input.
+
 The [painted-menu integration review](menu-movement-integration/README.md) records the
 combined entry/return flow after merging PR #31. The earlier captures below predate
 that menu integration; movement tuning and controls are unchanged.

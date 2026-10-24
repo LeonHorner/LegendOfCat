@@ -66,8 +66,8 @@ public sealed class CatController : MonoBehaviour
     {
         if (Paused == value) return;
         Paused = value;
-        Motion.Reset();
-        // Preserve in-flight momentum across pause; only a retry clears velocity.
+        // Freeze motor timers and preserve held input along with physics momentum.
+        // Respawn and focus loss still clear input explicitly.
         body.simulated = !value;
     }
     void OnDisable()

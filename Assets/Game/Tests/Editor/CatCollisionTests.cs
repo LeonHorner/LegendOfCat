@@ -67,6 +67,27 @@ public class CatCollisionTests
         Assert.That(displacement.x * direction, Is.GreaterThan(0.05f), state);
         Assert.That(displacement.y, Is.GreaterThan(0.05f), state);
     }
+    [TestCase(false)]
+    [TestCase(true)]
+    public void PausedJumpResumesWithHeldOrReleasedInput(bool releaseDuringPause)
+    {
+        Input("SetMove", 1f); Input("PressJump"); Tick();
+        var velocity = body.linearVelocity;
+        var position = body.position;
+        var pause = controller.GetType().GetMethod("SetPaused");
+        pause.Invoke(controller, new object[] { true });
+        for (int i = 0; i < 20; i++) Tick();
+        Assert.That(body.position, Is.EqualTo(position));
+        if (releaseDuringPause) Input("ReleaseJump");
+        pause.Invoke(controller, new object[] { false });
+        Tick();
+        float expectedY = (releaseDuringPause ? Mathf.Min(velocity.y, 5f) : velocity.y)
+            - 30f * Time.fixedDeltaTime;
+        Assert.That(body.linearVelocity.y, Is.EqualTo(expectedY).Within(0.001f),
+            "Only releasing jump should shorten the resumed ascent.");
+        Assert.That(body.linearVelocity.x, Is.GreaterThan(velocity.x),
+            "Held movement must continue without another key press.");
+    }
     [Test] public void PausingStopsPhysicsAndRespawnClearsThePause()
     {
         Input("SetMove", 1f); Tick();
