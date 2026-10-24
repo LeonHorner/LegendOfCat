@@ -24,8 +24,9 @@ internal static class UpdateWorkflow
         await checkForUpdates();
     }
 
-    internal static async Task ApplyAsync(
-        bool isLinux,
+    // Windows-only: Linux uses the mount-independent native supervisor,
+    // which must be started BEFORE authorizing Unity shutdown.
+    internal static async Task ApplyAfterShutdownAsync(
         Func<Task> waitForGameExit,
         Func<Task> waitForLauncherExit,
         Action launchUpdater)
@@ -35,9 +36,7 @@ internal static class UpdateWorkflow
         ArgumentNullException.ThrowIfNull(launchUpdater);
 
         await waitForGameExit();
-        // The Linux updater must launch before waiting for the AppImage
-        // launcher to exit, since that may unmount the updater runtime.
-        if (!isLinux) await waitForLauncherExit();
+        await waitForLauncherExit();
         launchUpdater();
     }
 }

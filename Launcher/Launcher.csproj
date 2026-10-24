@@ -14,5 +14,7 @@
     <Compile Include="../Assets/Game/Scripts/UpdatePolicy.cs" Link="UpdatePolicy.cs" />
     <Compile Include="../Assets/Game/Scripts/DownloadProgress.cs" Link="DownloadProgress.cs" />
     <PackageReference Include="Velopack" Version="1.2.161" />
+    <!-- Also package the mount-independent POSIX handoff supervisor. -->
+    <None Update="linux-update-runner.sh" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" />
   </ItemGroup>
 </Project>

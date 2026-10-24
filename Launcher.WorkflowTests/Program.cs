@@ -10,9 +10,9 @@ var cases = new (string Name, Func<Task> Run)[] {
     ("malformed history still runs update check", InvalidHistory),
     ("history warning logger failure never blocks update check", WarningLogFailure),
     ("update check errors still propagate", UpdateFailurePropagates),
-    ("Linux launches only after game exits and does not await launcher", LinuxHandoff),
     ("Windows awaits both game and launcher exit", WindowsHandoff),
     ("failed game shutdown blocks update handoff", GameExitFailure),
+    ("failed launcher shutdown blocks Windows update", LauncherExitFailure),
     ("installer launch error propagates", InstallerFailure),
 };
 
@@ -103,30 +103,13 @@ static async Task UpdateFailurePropagates()
         _ => Task.CompletedTask));
 }
 
-static async Task LinuxHandoff()
-{
-    var gameExit = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-    var events = new List<string>();
-    var handoff = UpdateWorkflow.ApplyAsync(
-        true,
-        async () => { events.Add("wait game"); await gameExit.Task; events.Add("game exited"); },
-        () => throw new Exception("Linux must not wait for launcher exit before handoff"),
-        () => events.Add("apply"));
-    Equal("wait game", string.Join(",", events));
-    Check(!handoff.IsCompleted, "Cannot start updater before game exit");
-    gameExit.SetResult(true);
-    await handoff;
-    Equal("wait game,game exited,apply", string.Join(",", events));
-}
-
 static async Task WindowsHandoff()
 {
     var gameExit = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
     var launcherExit = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
     var waitingForLauncher = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
     var events = new List<string>();
-    var handoff = UpdateWorkflow.ApplyAsync(
-        false,
+    var handoff = UpdateWorkflow.ApplyAfterShutdownAsync(
         async () => { events.Add("wait game"); await gameExit.Task; events.Add("game exited"); },
         async () => { events.Add("wait launcher"); waitingForLauncher.SetResult(true); await launcherExit.Task; events.Add("launcher exited"); },
         () => events.Add("apply"));
@@ -143,18 +126,26 @@ static async Task WindowsHandoff()
 static async Task GameExitFailure()
 {
     var applied = false;
-    await Throws<IOException>(() => UpdateWorkflow.ApplyAsync(
-        true,
+    await Throws<IOException>(() => UpdateWorkflow.ApplyAfterShutdownAsync(
         () => throw new IOException("Simulated process wait failure"),
         () => Task.CompletedTask,
         () => applied = true));
     Check(!applied, "Failed game exit must not launch installer");
 }
 
+static async Task LauncherExitFailure()
+{
+    var applied = false;
+    await Throws<IOException>(() => UpdateWorkflow.ApplyAfterShutdownAsync(
+        () => Task.CompletedTask,
+        () => throw new IOException("Simulated launcher wait failure"),
+        () => applied = true));
+    Check(!applied, "Failed launcher exit must not launch installer");
+}
+
 static async Task InstallerFailure()
 {
-    await Throws<InvalidOperationException>(() => UpdateWorkflow.ApplyAsync(
-        true,
+    await Throws<InvalidOperationException>(() => UpdateWorkflow.ApplyAfterShutdownAsync(
         () => Task.CompletedTask,
         () => Task.CompletedTask,
         () => throw new InvalidOperationException("Unable to spawn installer")));
