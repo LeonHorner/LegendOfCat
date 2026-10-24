@@ -69,6 +69,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.pr.outputs.sha }}
+      - name: Install workflow test dependencies
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
       - name: Run CI workflow contract tests
         run: node --test tools/ci-workflow.test.mjs
       - name: Check release download and Delta contracts
