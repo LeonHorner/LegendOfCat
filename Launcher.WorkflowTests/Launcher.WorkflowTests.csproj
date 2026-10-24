@@ -8,5 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../Launcher/UpdateWorkflow.cs" Link="UpdateWorkflow.cs" />
+    <Compile Include="../Launcher/LinuxDesktopComment.cs" Link="LinuxDesktopComment.cs" />
   </ItemGroup>
 </Project>
