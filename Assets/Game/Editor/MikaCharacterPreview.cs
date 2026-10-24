@@ -52,7 +52,10 @@ public static class MikaCharacterPreview
     }
 
     [MenuItem("LegendOfCat/Mika/Create isolated character preview")]
-    public static void Create()
+    public static void Create() => MikaRigPreview.Create();
+
+    [MenuItem("LegendOfCat/Mika/Create archived sprite preview")]
+    public static void CreateSpriteArchive()
     {
         var importer = (TextureImporter)AssetImporter.GetAtPath(AtlasPath);
         importer.textureType = TextureImporterType.Sprite;

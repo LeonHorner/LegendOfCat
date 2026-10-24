@@ -2,6 +2,42 @@
 
 Issue #10 is in progress. This is isolated authoring work, **not accepted production artwork**.
 
+## Articulated revision (2026-10-24)
+
+The default isolated preview now uses a small cutout rig with independent upper
+legs, lower legs, paws, torso/head and tail. The earlier pose/optical-flow experiments
+remain archived and are not used by the default preview. **Create archived sprite
+preview** opens the previous experiment explicitly.
+
+`MikaGait` keeps support feet in world coordinates and moves swing feet through a
+smooth low arc. Diagonal pairs alternate; all four soles are grounded at rest.
+The gait follows travelled distance. Stopping finishes the current swing before
+planting the paw. A two-bone solve bends joints while preserving segment lengths.
+Jump targets fold and extend continuously with vertical speed. Landing lowers the
+torso through leg flexion, without scaling the body or affecting input/collision.
+The visual root compensates for the physics contact skin at the detected surface.
+
+**Record articulated movement review** simulates the existing controller in a
+separate local Physics2D scene and records 360 Camera.Render frames at 60 Hz under
+ignored `Logs/mika-rig-recording/`. It does not simulate or replace an open scene.
+The reviewed sequence includes idle, running, reversal, held and short jumps,
+landing and stopping. This is visual authoring playback, not the full test suite.
+
+Provenance: `mika-rig-source.png` was generated with the built-in OpenAI image tool
+on 2026-10-24 using the earlier original Mika sheet as identity reference; exact
+model ID was not exposed. `tools/prepare-mika-rig.py` extracts eight parts, cleans
+alpha specks and registers bone axes under the user's local-edit authorization.
+Pillow/numpy/OpenCV remain authoring-only tools. `rig-part-*.png` and the
+Editor-generated `MikaRigCandidate.prefab` use `ASSET-LICENSE.md` where rights
+exist; no third-party character/font/music asset is imported. Human direction:
+natural orange/cream quadruped, smooth movement, planted paw contacts. Implementation
+decisions: fixed torso/head shape, fixed-length limbs, diagonal support pattern,
+and restrained tail motion. Prompt: [rig-generation-prompt.txt](rig-generation-prompt.txt).
+
+The new rig still requires visual acceptance, including joint seams, turning and
+movement at small size. Full issue completion and ready-PR validation are not
+established by compilation or a standing screenshot.
+
 ## Revised movement preview (2026-10-24)
 
 The active preview now uses `mika-movement-smooth.png`: 24 original generated key
