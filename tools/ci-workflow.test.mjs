@@ -96,6 +96,27 @@ test('automatic PR event reads the event PR number', async () => {
   assert.equal(r.outputs.number, '32');
 });
 
+test('manual preflight rejects invalid PR numbers before reading an issue', async () => {
+  for (const input of ['', '0', '-1', '01', 'abc', '1.5', '9007199254740992']) {
+    const r = mock({ input });
+    await assert.rejects(runPreflight(r.github, r.context, r.core, r.process), undefined, input);
+    assert.deepEqual(r.statuses, [], input);
+  }
+});
+
+test('preflight rejects invalid titles, closed PRs and unexpected target branches', async () => {
+  for (const pr of [
+    { title: 'unstructured change' },
+    { title: 'fix: ' },
+    { state: 'closed' },
+    { base: { ref: 'develop', sha: 'main-commit' } }
+  ]) {
+    const r = mock({ pr });
+    await assert.rejects(runPreflight(r.github, r.context, r.core, r.process));
+    assert.ok(!r.statuses.some(status => status.state === 'success'));
+  }
+});
+
 test('draft, out-of-date, and external PRs are not approved in preflight', async () => {
   for (const options of [
     { pr: { draft: true } },
