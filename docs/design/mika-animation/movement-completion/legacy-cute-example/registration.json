@@ -1,0 +1,96 @@
+{
+  "status": "small style/motion example only; not integrated",
+  "globalScale": 0.5,
+  "resize": "nearest-neighbor, same factor in all poses",
+  "bodyAnchors": [
+    [
+      215,
+      330
+    ],
+    [
+      215,
+      330
+    ],
+    [
+      215,
+      300
+    ],
+    [
+      230,
+      215
+    ],
+    [
+      215,
+      245
+    ],
+    [
+      215,
+      295
+    ],
+    [
+      215,
+      310
+    ],
+    [
+      215,
+      315
+    ]
+  ],
+  "sequence": [
+    [
+      0,
+      "Stand",
+      0,
+      250
+    ],
+    [
+      1,
+      "Load / look up",
+      0,
+      80
+    ],
+    [
+      2,
+      "Rise / head up",
+      65,
+      100
+    ],
+    [
+      3,
+      "Curl / look toward landing",
+      115,
+      120
+    ],
+    [
+      4,
+      "Reach / head down",
+      60,
+      100
+    ],
+    [
+      5,
+      "Contact / absorb",
+      0,
+      90
+    ],
+    [
+      6,
+      "Recover",
+      0,
+      100
+    ],
+    [
+      7,
+      "Settle",
+      0,
+      100
+    ],
+    [
+      0,
+      "Stand",
+      0,
+      350
+    ]
+  ],
+  "motion": "drawn spine/hip/neck articulation; no runtime warping"
+}

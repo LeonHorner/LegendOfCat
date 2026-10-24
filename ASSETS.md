@@ -54,6 +54,18 @@ No third-party game assets have been imported.
 
 ## Mika movement completion and archive
 
+A small legacy-inspired style example is stored in movement-completion/legacy-cute-example.
+Built-in OpenAI image generation created its eight complete-cat drawings on
+2026-10-24; exact model ID was not exposed. The reference is the generated legacy
+cat atlas (assets/images/cat/cat-actions-v1.png), whose PROMPT.md identifies built-in
+image generation; its earlier generation date/model remain unknown. Only the cat
+reference cells were cropped/mirrored, not legacy tile sheets or game code. Human
+direction requested cuter round proportions, blue eyes, sturdy paws, curved body
+postures and head/gaze following the jump. The exact prompt and processing choices
+are preserved with the source. Terms: ASSET-LICENSE.md where rights exist. This
+documentation-only example uses one 0.5 nearest-neighbor scale across all poses;
+it does not alter Unity assets, the legacy checkout, physics or input timing.
+
 Proportion review 3 is in movement-completion/revision-3: a coherent eight-pose
 sheet generated with built-in OpenAI image generation on 2026-10-24 and refined
 by a targeted head-consistency edit (exact model ID not exposed). Its sole identity

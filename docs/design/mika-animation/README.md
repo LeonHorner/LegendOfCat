@@ -2,6 +2,11 @@
 
 ## Latest user review — 2026-10-24
 
+The user subsequently requested a [small cuter legacy-inspired example](movement-completion/legacy-cute-example/README.md),
+with a curved jumping posture and head/gaze following the arc. This sample uses
+the generated cat atlas from the supplied Java checkout as a style reference.
+It is a bounded alternative, not a replacement of the active Unity character.
+
 The user additionally rejected revision 2's changing proportions: Mika becomes
 smaller during the jump. [Proportion review 3](movement-completion/revision-3/README.md)
 uses one complete eight-pose sheet, a single global scale and a fixed-shoulder
