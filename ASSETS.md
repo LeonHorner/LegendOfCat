@@ -62,6 +62,9 @@ the corresponding cosmetic presentation. No new generated artwork is involved.
 Human decisions: preserve original run poses 4–7 and substantial paws, remove
 inbetweens, register visible sole pivots and retain physics/input timing.
 Other original poses remain temporary; this does not accept the full movement set.
+The apex transition reuses original tucked pose 6 as sprite slot 16 with the
+airborne pivot shared by takeoff/fall. No image generation or repainting was used;
+the human request was an additional pose at the ascent/descent transition.
 
 `docs/design/mika-animation/frame-run-study/` contains an original generated
 complete-cat run sheet and derived review artwork, produced with built-in OpenAI

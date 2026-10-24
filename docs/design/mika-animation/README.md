@@ -13,6 +13,12 @@ Idle uses a stable original pose; jump/fall/turn/landing use the original candid
 poses as temporary companions, not newly accepted animation. Visible sole pivots
 and the existing visual-only floor alignment correct the old hovering offset.
 
+The ascent/descent switch now passes through an additional airborne registration
+of original tucked pose 6 (sprite slot 16). It appears on both sides of the apex
+while vertical speed is within ±2.2 m/s after upward motion. Walking off a ledge
+does not trigger this pose. It uses the same airborne pivot as takeoff and fall,
+without crossfading, deformation, new generated artwork or physics changes.
+
 `LegendOfCat/Mika/Create isolated character preview` prepares the original assets
 and opens a temporary movement-course scene. Press Play to test. The preparation
 menu can regenerate the prefab and sprite metadata without changing a scene.

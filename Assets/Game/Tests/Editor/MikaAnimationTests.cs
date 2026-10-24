@@ -38,6 +38,28 @@ public class MikaAnimationTests
     }
 
     [Test]
+    public void OriginalJumpBridgesBothSidesOfApexButNotLedgeFalls()
+    {
+        type.GetProperty("OriginalFrames").SetValue(animation, true);
+        Step(0.02f, false, 2, -0.1f);
+        Assert.That(Read("Frame"), Is.EqualTo(11), "A ledge fall has no takeoff.");
+        Step(0.02f, false, 2, 11);
+        Assert.That(Read("Frame"), Is.EqualTo(10));
+        foreach (float speed in new[] { 2f, 0.1f, 0f, -0.1f, -2f }) {
+            Step(0.02f, false, 2, speed);
+            Assert.That(Read("Frame"), Is.EqualTo(16));
+        }
+        Step(0.02f, false, 2, -4);
+        Assert.That(Read("Frame"), Is.EqualTo(11));
+        Step(0.02f, true, 0, 0);
+        Step(0.02f, false, 0, -0.1f);
+        Assert.That(Read("Frame"), Is.EqualTo(11), "Landing clears apex history.");
+        type.GetMethod("Reset").Invoke(animation, null);
+        Step(0.02f, false, 0, -0.1f);
+        Assert.That(Read("Frame"), Is.EqualTo(11));
+    }
+
+    [Test]
     public void BufferedJumpImmediatelyInterruptsLanding()
     {
         Step(0.02f, false, 0, -5);

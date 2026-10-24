@@ -66,7 +66,7 @@ public sealed class MikaSpritePresentation : MonoBehaviour
 
     void ApplyFrame()
     {
-        if (frames != null && frames.Length == (originalFrames ? 16 : MikaAnimation.FrameCount)) target.sprite = frames[Animation.Frame];
+        if (frames != null && frames.Length == (originalFrames ? 17 : MikaAnimation.FrameCount)) target.sprite = frames[Animation.Frame];
         target.flipX = Animation.Facing < 0;
     }
 

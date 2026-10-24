@@ -73,11 +73,12 @@ public static class MikaCharacterPreview
         importer.SaveAndReimport();
         var atlas = AssetDatabase.LoadAssetAtPath<Texture2D>(source);
         float width = atlas.width / 4f, height = atlas.height / 4f;
-        var frames = new Sprite[16];
-        for (int i = 0; i < 16; i++) {
-            var rect = new Rect(i % 4 * width, (3 - i / 4) * height, width, height);
+        var frames = new Sprite[17];
+        for (int i = 0; i < frames.Length; i++) {
+            int sourceIndex = i == 16 ? 6 : i;
+            var rect = new Rect(sourceIndex % 4 * width, (3 - sourceIndex / 4) * height, width, height);
             var pivot = ContactPivot(atlas, rect);
-            if (i == 10 || i == 11) pivot.y = 0.08f;
+            if (i == 10 || i == 11 || i == 16) pivot.y = 0.08f;
             var sprite = Sprite.Create(atlas, rect, pivot, width / 1.8f, 0, SpriteMeshType.FullRect);
             sprite.name = $"original-frame-{i:00}";
             string path = $"{folder}/{sprite.name}.asset";

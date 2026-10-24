@@ -12,7 +12,7 @@ public sealed class MikaAnimation
     public const float LandingDuration = 0.24f;
     public bool OriginalFrames { get; set; }
     float elapsed, distance;
-    bool initialized, wasGrounded;
+    bool initialized, wasGrounded, jumped;
 
     public void Reset()
     {
@@ -20,13 +20,15 @@ public sealed class MikaAnimation
         Facing = 1;
         Frame = 0;
         elapsed = distance = 0;
-        initialized = wasGrounded = false;
+        initialized = wasGrounded = jumped = false;
     }
 
     public void Step(float deltaTime, bool grounded, Vector2 velocity, float travelled)
     {
         float dt = Mathf.Max(0, deltaTime);
         elapsed += dt;
+        if (grounded) jumped = false;
+        else if (velocity.y > 0) jumped = true;
         bool moving = Mathf.Abs(velocity.x) > 0.1f;
         int direction = moving ? (velocity.x < 0 ? -1 : 1) : Facing;
         bool turned = direction != Facing;
@@ -52,6 +54,12 @@ public sealed class MikaAnimation
         float strideLength = OriginalFrames ? 2.4f : StrideLength;
         if (grounded && moving) distance = Mathf.Repeat(distance + Mathf.Abs(travelled), strideLength);
         if (OriginalFrames) {
+            // A complete-character tucked pose bridges ascent and descent at the apex.
+            // Entering a fall from a ledge must not invent a jump apex.
+            if (!grounded && jumped && Mathf.Abs(velocity.y) <= 2.2f) {
+                Frame = 16;
+                return;
+            }
             switch (Current) {
                 case Pose.Run: Frame = 4 + Mathf.Min(3, (int)(distance / strideLength * 4)); break;
                 case Pose.Turn: Frame = elapsed < 0.05f ? 8 : 9; break;
