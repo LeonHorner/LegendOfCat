@@ -52,6 +52,19 @@ held/short jumps, landing and stopping; it does not verify installed builds or u
 
 No third-party game assets have been imported.
 
+## Complete-character Mika run study
+
+`docs/design/mika-animation/frame-run-study/` contains an original generated
+complete-cat run sheet and derived review artwork, produced with built-in OpenAI
+image generation on 2026-10-24; exact model ID was not exposed. Terms:
+ASSET-LICENSE.md where rights exist. The identity crop comes from the earlier
+generated Mika movement source. Human direction selected fuller paws and
+complete-character frames after rejecting the cutout rig. Local processing only
+cleans alpha and translates frames; no optical flow or anatomical deformation.
+See the study README for generation direction, processing and known defects.
+This is review artwork with unresolved proportions and stride continuity, not
+accepted production animation. No runtime assets or gameplay were replaced.
+
 ## Application icon
 
 `tools/icon.ico` is the single authoritative original icon supplied by Leon Horner

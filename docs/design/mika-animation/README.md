@@ -28,7 +28,9 @@ isolated character preview** command still opens the rejected rig; it has not be
 replaced or rolled back by this decision record. The MP4, PNGs, prefabs, prompts and
 source sheets below are historical evidence. Do not present them as the approved
 target, integrate them into the course, close #10 or mark PR #41 ready based on them.
-The replacement run loop has not yet been implemented.
+A [complete-character run study](frame-run-study/README.md) now includes normal
+and slowed loops. It restores fuller paws but still has inconsistent proportions
+and stride spacing; it is not an accepted replacement or integrated into Unity.
 
 At rest all four paws must meet the surface; in a run, support paws stay planted
 while swing paws lift intentionally. Do not force every running paw onto the floor
