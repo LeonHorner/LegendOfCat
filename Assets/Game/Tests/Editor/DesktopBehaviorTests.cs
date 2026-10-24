@@ -37,7 +37,7 @@ public class DesktopBehaviorTests : InputTestFixture
         Assert.That(Call(state, "Observe", 1920, 1080, true, 0.2f, false), Is.False);
         Call(state, "Observe", 1920, 1080, true, 0.3f, false);
         Call(state, "Observe", 1920, 1080, true, 1f, false);
-        Assert.That(Property(state, "Pending"), Is.True, "Controls remain pending until the observed mode is committed.");
+        Assert.That(Property(state, "Pending"), Is.True, "Persistence remains pending until the observed mode is stable.");
         Assert.That(Call(state, "Observe", 1920, 1080, true, 2f, false), Is.True);
         Assert.That(Property(state, "Fullscreen"), Is.True);
         Assert.That(Property(state, "Width"), Is.EqualTo(1280));
@@ -216,5 +216,52 @@ public class DesktopBehaviorTests : InputTestFixture
             InputSystem.RemoveDevice(pad);
             InputSystem.RemoveDevice(keyboard);
         }
+    }
+    [Test]
+    public void F11TogglesWithoutAltOnlyOnNewPresses()
+    {
+        var keyboard = InputSystem.AddDevice<Keyboard>();
+        InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.F11));
+        InputSystem.Update();
+        Assert.That(Shortcut(keyboard), Is.True);
+        InputSystem.Update();
+        Assert.That(Shortcut(keyboard), Is.False);
+        InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+        InputSystem.Update();
+        Assert.That(Shortcut(keyboard), Is.False);
+        InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.F11));
+        InputSystem.Update();
+        Assert.That(Shortcut(keyboard), Is.True);
+    }
+
+    [Test]
+    public void ConfirmedModeCanReverseBeforePersistenceDebounceWithoutLosingWindowSize()
+    {
+        var state = State();
+        Call(state, "Request", true, 0f);
+        Assert.That(Property(state, "Switching"), Is.True);
+        Call(state, "Observe", 1280, 720, false, 0.01f, false);
+        Assert.That(Property(state, "Switching"), Is.True);
+        Call(state, "Observe", 1920, 1080, true, 0.02f, false);
+        Call(state, "Observe", 1920, 1080, true, 0.03f, false);
+        Assert.That(Property(state, "Switching"), Is.True);
+        Assert.That(Call(state, "Observe", 1920, 1080, true, 0.04f, false), Is.False);
+        Assert.That(Property(state, "Switching"), Is.False, "Controls should unlock after mode confirmation.");
+        Assert.That(Property(state, "Pending"), Is.True, "Saving still debounces.");
+        Call(state, "Request", false, 0.05f);
+        Call(state, "Observe", 1920, 1080, true, 0.06f, true);
+        Assert.That(Property(state, "Switching"), Is.True);
+        // Some compositors report the old desktop dimensions briefly on exit.
+        Call(state, "Observe", 1920, 1080, false, 0.07f, false);
+        Call(state, "Observe", 1280, 720, false, 0.08f, false);
+        Call(state, "Observe", 1280, 720, false, 0.09f, false);
+        Call(state, "Observe", 1280, 720, false, 0.10f, false);
+        Assert.That(Property(state, "Switching"), Is.False);
+        Assert.That(Property(state, "Width"), Is.EqualTo(1280));
+        Call(state, "Observe", 1280, 720, false, 2f, false);
+        Assert.That(Property(state, "Pending"), Is.False);
+        Assert.That(Property(state, "Fullscreen"), Is.False);
+        Assert.That(Property(state, "Width"), Is.EqualTo(1280));
+        Assert.That(Property(state, "Height"), Is.EqualTo(720));
     }
 }

@@ -9,11 +9,13 @@ controller bindings and display-settings schema are unchanged.
 - `CatInput` already uses Input Actions for keyboard/gamepad movement, jump,
   checkpoint retry, run restart, pause and return to menu. Its focus and disable
   handlers cancel actions and reset motion.
-- `StarterScreen` now polls Input System keyboard controls for either Alt key plus
+- `StarterScreen` now polls Input System keyboard controls for F11 or either Alt key plus
   a new press of Return or keypad Enter. Holding the chord does not repeat;
   pressing Alt after an already held Enter does not toggle. A missing keyboard
-  returns false. The existing display request/debounce/resize/persistence path is
-  retained.
+  returns false. Display controls unlock once Unity confirms the requested mode
+  over three consecutive observations; the 1.5-second persistence debounce remains
+  independent. The five-second rejected-request timeout is retained. Rapid reversal
+  preserves the last saved window dimensions, including transient compositor sizes.
 - `StarterScreen.Presentation` uses IMGUI `Event.current` for Tab/arrows/Enter
   navigation and pointer-driven controls. These events and `KeyCode` values do not
   poll the legacy Input Manager. Alt+Enter is consumed before menu activation.
@@ -26,10 +28,11 @@ controller bindings and display-settings schema are unchanged.
 
 ## Validation (2026-10-24)
 
-- Unity 6000.3.27f1 imported this isolated worktree and passed all 130 EditMode
-  tests. Nine new behavioral cases cover the four Alt/Enter combinations, holding,
+- Unity 6000.3.27f1 imported this isolated worktree and passed all 132 EditMode
+  tests. Eleven new behavioral cases cover the four Alt/Enter combinations, holding,
   release/repress, ordinary Enter, Alt after held Enter, no keyboard, and real
   keyboard/gamepad action callbacks through focus loss/regain and jump release.
+  F11 press/release/hold and mode reversal before persistence are also tested.
   InputTestFixture isolates simulated devices from native desktop input.
 - Existing display tests cover asynchronous fullscreen confirmation, preservation
   of window dimensions, resize debounce and rejected-mode timeout. Existing menu
@@ -40,8 +43,9 @@ controller bindings and display-settings schema are unchanged.
   legacy polling exception with the new-only configuration.
 - A production Windows player built successfully and pointer navigation to settings
   works. Automated desktop Alt+Enter injection did not produce a mode change;
-  physical-keyboard verification remains pending. This is not recorded as a passed
-  shortcut check. Exact-head CI remains pending while the PR is draft.
+  the user subsequently confirmed the physical Alt+Enter shortcut works and reported
+  the old switching delay. F11 and the shorter mode lock are a subsequent revision.
+  Its graphical verification and exact-head CI results are recorded in the PR.
 
 Linux graphical keyboard shortcuts have not been exercised on this Windows host.
 A desktop/window-manager shortcut may intercept Alt+Enter before Unity receives

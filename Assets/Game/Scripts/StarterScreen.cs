@@ -73,7 +73,7 @@ public sealed partial class StarterScreen : MonoBehaviour
 
     void SetFullscreen(bool value)
     {
-        if (display == null || display.Pending || fullscreen == value) return;
+        if (display == null || display.Switching || fullscreen == value) return;
         // Capture a recent border resize before leaving windowed mode, even during debounce.
         ObserveDisplay(true);
         fullscreen = value;
@@ -147,8 +147,9 @@ public sealed partial class StarterScreen : MonoBehaviour
     }
     // IMGUI navigation uses Event.current; only the desktop shortcut polls a device.
     internal static bool FullscreenShortcutPressed(Keyboard keyboard)
-        => keyboard != null && (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame)
-            && (keyboard.leftAltKey.isPressed || keyboard.rightAltKey.isPressed);
+        => keyboard != null && (keyboard.f11Key.wasPressedThisFrame ||
+            ((keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame)
+                && (keyboard.leftAltKey.isPressed || keyboard.rightAltKey.isPressed)));
 
     void Update()
     {

@@ -6,6 +6,7 @@ public sealed class DisplayState
     public int Height { get; private set; }
     public bool Fullscreen { get; private set; }
     public bool Pending { get; private set; }
+    public bool Switching { get; private set; }
     public bool RequestedFullscreen { get; private set; }
     int observedWidth, observedHeight;
     bool observedFullscreen, dirty;
@@ -18,7 +19,7 @@ public sealed class DisplayState
     public void Request(bool fullscreen, float now)
     {
         RequestedFullscreen = fullscreen;
-        Pending = true;
+        Pending = Switching = true;
         requestedAt = changedAt = now;
         samples = 0;
     }
@@ -32,10 +33,12 @@ public sealed class DisplayState
         }
         samples++;
         if (Pending) {
-            // Allow the request to settle for multiple frames, including compositor resize events.
+            // Re-enable controls once Unity confirms the mode across several frames.
+            // Persistence still waits for resize/compositor events to settle.
+            Switching = samples < 3 || fullscreen != RequestedFullscreen;
             if (samples < 3 || now - changedAt < 1.5f ||
                 (fullscreen != RequestedFullscreen && now - requestedAt < 5)) return false;
-            Pending = false;
+            Pending = Switching = false;
         }
         if (!flush && now - changedAt < 1.5f) return false;
         // Remember window dimensions independently of fullscreen desktop dimensions.
