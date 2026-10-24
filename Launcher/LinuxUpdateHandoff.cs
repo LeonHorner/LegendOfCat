@@ -44,11 +44,11 @@ internal static class LinuxUpdateHandoff
         var stage = Directory.CreateTempSubdirectory("legendofcat-updater-").FullName;
         Process? process = null;
         try {
-            Directory.SetUnixFileMode(stage, PrivateDirectory);
+            File.SetUnixFileMode(stage, PrivateDirectory);
             var bin = Path.Combine(stage, "usr", "bin");
             Directory.CreateDirectory(bin);
-            Directory.SetUnixFileMode(Path.Combine(stage, "usr"), PrivateDirectory);
-            Directory.SetUnixFileMode(bin, PrivateDirectory);
+            File.SetUnixFileMode(Path.Combine(stage, "usr"), PrivateDirectory);
+            File.SetUnixFileMode(bin, PrivateDirectory);
 
             var stagedUpdater = Path.Combine(bin, "UpdateNix");
             File.Copy(nativeUpdater, stagedUpdater);
