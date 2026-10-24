@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public sealed partial class StarterScreen : MonoBehaviour
 {
@@ -72,7 +73,7 @@ public sealed partial class StarterScreen : MonoBehaviour
 
     void SetFullscreen(bool value)
     {
-        if (display == null || display.Pending || fullscreen == value) return;
+        if (display == null || display.Switching || fullscreen == value) return;
         // Capture a recent border resize before leaving windowed mode, even during debounce.
         ObserveDisplay(true);
         fullscreen = value;
@@ -144,12 +145,17 @@ public sealed partial class StarterScreen : MonoBehaviour
         if (command == "check") { state = "checking"; error = ""; }
         if (command == "download") { downloadedBytes = totalBytes = 0; state = "downloading"; error = ""; popup = false; page = "updates"; }
     }
+    // IMGUI navigation uses Event.current; only the desktop shortcut polls a device.
+    internal static bool FullscreenShortcutPressed(Keyboard keyboard)
+        => keyboard != null && (keyboard.f11Key.wasPressedThisFrame ||
+            ((keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame)
+                && (keyboard.leftAltKey.isPressed || keyboard.rightAltKey.isPressed)));
+
     void Update()
     {
         if (display != null) {
             ObserveDisplay();
-            if ((Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) &&
-                (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)))
+            if (FullscreenShortcutPressed(Keyboard.current))
                 SetFullscreen(!fullscreen);
         }
         while (platform != null && platform.TryReceive(out var incoming)) messages.Enqueue(incoming);
