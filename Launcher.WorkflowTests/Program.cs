@@ -21,6 +21,7 @@ var cases = new (string Name, Func<Task> Run)[] {
     ("KDE quoted paths and localized comments are preserved", DesktopCommentTests.HandlesQuotedPathsAndLocales),
     ("KDE command wrapper is left alone", DesktopCommentTests.RejectsCommandWrappers),
     ("KDE symlinked entry is not modified", DesktopCommentTests.SkipsSymlinkedEntries),
+    ("KDE launcher repairs matching XDG entries on startup", DesktopCommentTests.RefreshesExistingXdgDesktopEntry),
 };
 
 var failed = 0;
