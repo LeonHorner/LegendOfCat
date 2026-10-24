@@ -1,5 +1,9 @@
 # Complete-character run study
 
+Historical rejected study. Its preparation script and referenced refined source
+now live under ../archive/ with their original repository-relative paths. The
+accepted live run remains the original four-frame sequence, not this study.
+
 Generated on 2026-10-24 using built-in OpenAI image generation (exact model ID
 not exposed), referencing `identity-reference.png`, a crop of the earlier
 `Assets/Game/Art/Mika/mika-movement-refined-source.png`. Terms: ASSET-LICENSE.md

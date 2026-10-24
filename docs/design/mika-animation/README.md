@@ -1,6 +1,73 @@
 # Mika character authoring
 
-Issue #10 is in progress. This is isolated authoring work, **not accepted production artwork**.
+## Latest user review — 2026-10-24
+
+The user accepted the in-game apex alignment and atlas-edge correction after
+playtesting. Slot 16 now uses its adjusted pivot and an isolated, transparently
+padded copy of the same artwork to prevent neighboring atlas pixels from appearing
+under bilinear filtering. The Editor preparation regenerates the texture and
+preserves the existing sprite GUID. Original visible pixels, source alpha and
+transparent borders were checked locally. Preserve the current drawings, four-frame
+run and state timing. Unity import/compilation and user playtesting were completed
+during development; full exact-head tests and Windows/Linux builds have not been
+run for this update. Idle animation remains unfinished; issue #10 is incomplete.
+No merge or release is authorized.
+
+The bounded [apex experiment](movement-completion/apex-pair/README.md) tried one
+pre-apex drawing first, as authorized. It still changes head/trunk proportions,
+so it was not integrated and the second drawing was deferred. Active transition
+textures received only disconnected-alpha speck cleanup for the reported edge
+pixel; original poses, timing, pivots and physics are unchanged.
+
+The added inbetween preview was rejected as substantially worse. Do not integrate
+it or continue generating replacement pose sheets by default. The user retained
+the actual game character and requested a small improvement using existing images.
+The next runtime adjustment only stabilizes pose selection: apex hysteresis
+(enter at 2.2 m/s, exit beyond 2.8 m/s) and an 80 ms cosmetic pre-contact grace
+for brief surface-probe misses. Upward motion, grounding and reset clear reach
+history immediately. No drawings, run frames, pivots or physics are changed.
+
+The latest direction keeps the actual in-game cat and rejects the cute legacy
+sample. The user requests more images specifically between existing transition
+poses. [Existing-game inbetweens](movement-completion/in-game-inbetweens/README.md)
+provides eight additional complete drawings between unchanged game endpoints,
+with before/after loops at identical duration. It is review-only; Unity remains
+unchanged. Preserve the original four-frame run and resolve visual review first.
+
+The user subsequently requested a [small cuter legacy-inspired example](movement-completion/legacy-cute-example/README.md),
+with a curved jumping posture and head/gaze following the arc. This sample uses
+the generated cat atlas from the supplied Java checkout as a style reference.
+It is a bounded alternative, not a replacement of the active Unity character.
+
+The user additionally rejected revision 2's changing proportions: Mika becomes
+smaller during the jump. [Proportion review 3](movement-completion/revision-3/README.md)
+uses one complete eight-pose sheet, a single global scale and a fixed-shoulder
+diagnostic loop. It is review-only and has not changed the Unity playtest.
+
+The user reported that jump/landing transitions are still too abrupt after the
+completion preview. PR #45 is back in draft; issue #10 is incomplete. Earlier
+green CI is not visual acceptance. [Revision 2](movement-completion/revision-2/README.md)
+provides a shallower takeoff and additional recovery drawings for comparison only.
+It is not integrated; the current Unity playtest is unchanged. Resolve this
+feedback before claiming completion or repeating final merge validation.
+
+The active complete-character set retains the user-selected four-frame run and
+adds authored flight/landing bridges. See [movement completion](movement-completion/README.md)
+for provenance, registration and state mapping, and the [integration review](integration-review.md)
+for actual-prefab tests and recorded playback. Final exact-head validation is
+tracked on PR #45; no merge or release is performed by the authoring workflow.
+
+Rejected code, assets and tests are now outside Unity in the hash-verified
+[archive](archive/README.md). Historical Assets/tools paths in the older notes
+below resolve relative to that archive. They are not active authoring commands.
+
+## Historical decisions and experiments
+
+After merged PR #41, the [integration review](integration-review.md) tracks the
+next bounded step: real-prefab physics/presentation tests, bounded contact-skin
+correction and current movement evidence. It also fixes the incorrect visible
+sole pivot in original run pose 6 without changing its drawing or the run cycle.
+Rejected experiment cleanup and final animation acceptance remain separate work.
 
 ## Current prototype: original four-frame run (2026-10-24)
 
@@ -9,7 +76,7 @@ and explicitly requested their integration into the movement prototype. The
 course now loads the Editor-generated `Resources/MikaOriginal.prefab`, using
 original candidate poses 4–7, driven by measured travel over the original 2.4 m
 stride. No generated inbetweens, optical flow or cutout rig is used in this path.
-Idle uses a stable original pose; jump/fall/turn/landing use the original candidate
+The initial prototype's idle used a stable original pose; jump/fall/turn/landing used the original candidate
 poses as temporary companions, not newly accepted animation. Visible sole pivots
 and the existing visual-only floor alignment correct the old hovering offset.
 

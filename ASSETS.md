@@ -52,6 +52,92 @@ held/short jumps, landing and stopping; it does not verify installed builds or u
 
 No third-party game assets have been imported.
 
+## Mika movement completion and archive
+
+The bounded apex experiment generated one pre-apex candidate with built-in OpenAI
+image generation on 2026-10-24 (exact model ID not exposed). Source, endpoint
+reference, exact prompt and rejection notes are in movement-completion/apex-pair.
+Terms: ASSET-LICENSE.md where rights exist. The user requested two targeted added
+frames, conditional on the first being visually sound. The first still mismatches
+head/trunk proportions and was not integrated; no second candidate was created.
+An independent alpha-only cleanup removes disconnected specks from the four
+active transition textures, preserving RGB and connected silhouette pixels,
+dimensions and pivots. tools/clean-mika-transition-specks.py records the operation.
+
+The user rejected the cute legacy sample and retained the current in-game design.
+movement-completion/in-game-inbetweens contains eight new whole-character midpoint
+drawings generated with built-in OpenAI image generation on 2026-10-24 (exact
+model ID not exposed), followed by a targeted recovery-pose edit. Exact prompts,
+actual-game endpoint reference, mappings and registration choices are preserved.
+Terms: ASSET-LICENSE.md where rights exist. Human direction requests more frames
+between existing transitions, preserving character design, proportions and the
+four-frame run. Processing uses one uniform scale, alpha cleanup and translation;
+original endpoint drawings and overall preview duration are unchanged. This is
+documentation-only review artwork, with no Unity integration or acceptance claim.
+
+A small legacy-inspired style example is stored in movement-completion/legacy-cute-example.
+Built-in OpenAI image generation created its eight complete-cat drawings on
+2026-10-24; exact model ID was not exposed. The reference is the generated legacy
+cat atlas (assets/images/cat/cat-actions-v1.png), whose PROMPT.md identifies built-in
+image generation; its earlier generation date/model remain unknown. Only the cat
+reference cells were cropped/mirrored, not legacy tile sheets or game code. Human
+direction requested cuter round proportions, blue eyes, sturdy paws, curved body
+postures and head/gaze following the jump. The exact prompt and processing choices
+are preserved with the source. Terms: ASSET-LICENSE.md where rights exist. This
+documentation-only example uses one 0.5 nearest-neighbor scale across all poses;
+it does not alter Unity assets, the legacy checkout, physics or input timing.
+
+Proportion review 3 is in movement-completion/revision-3: a coherent eight-pose
+sheet generated with built-in OpenAI image generation on 2026-10-24 and refined
+by a targeted head-consistency edit (exact model ID not exposed). Its sole identity
+reference is original standing Mika; both prompts and the selected source are
+preserved. Terms: ASSET-LICENSE.md where rights exist. Human direction rejected
+flight-time shrinking and requires head/trunk consistency. Every pose uses one
+global 0.72 scale, with translation-only shoulder registration and alpha cleanup.
+Normal/slowed and stationary size-check loops remain documentation-only review
+artifacts. No Unity integration or user acceptance is claimed.
+
+Following the user's report of abrupt transitions, movement-completion/revision-2
+contains a review-only four-pose sheet from built-in OpenAI image generation,
+2026-10-24, exact model ID not exposed. Terms: ASSET-LICENSE.md where rights exist.
+Its identity reference uses the existing Mika drawings. The exact prompt and
+uniform scale/toe-registration decisions are recorded alongside the source.
+Human direction: shallower takeoff and more gradual recovery. No revision-2 art
+is imported into Unity; it is not accepted production content.
+
+Rejected Mika rig/optical-flow source, assets, code and tests have moved outside
+Unity to docs/design/mika-animation/archive. Historical paths in this document
+resolve through that prefix. Original Unity .meta files and exact source bytes
+are preserved in manifest.json with SHA-256 hashes; archive checkout disables
+line-ending conversion to preserve those hashes on both platforms.
+
+Built-in OpenAI image generation created the four complete-character transition
+drawings on 2026-10-24; exact model ID was not exposed. Source, exact prompt,
+identity reference, normal/slowed review loops and manual registration decisions
+are in docs/design/mika-animation/movement-completion. Active derived PNGs are
+Assets/Game/Art/Mika/Transitions. Terms: ASSET-LICENSE.md where rights exist;
+generation does not establish exclusivity or copyright. Human direction retained
+the original four-frame run and sturdy paws, selected full-character drawing
+instead of rejected rig/optical flow, and requested smoother flight/landing
+transitions. Local processing only cleans alpha, applies one uniform scale and
+translates drawings. The original active sheet has alpha-only speck cleanup;
+all RGB values, dimensions, poses and retained alpha are unchanged. Its exact
+original PNG and metadata remain archived. No new abilities or idle/fish behavior
+were added. The integrated recording/strips are regenerated from Unity playback.
+
+## Integrated Mika review evidence
+
+`docs/design/mika-animation/integrated-movement-review.mp4`, the two
+`integrated-review-*.png` strips and `integrated-review.json` were captured from
+the original course/prefab in Unity 6000.3.27f1 on 2026-10-24 using
+MikaMovementReview.Record. No image generator/model or third-party artwork was
+used. FFmpeg encoded the video; Pillow cropped/labeled the strips and derived
+grayscale. Terms follow the original project artwork under ASSET-LICENSE.md
+where rights exist. Human direction retained the approved four-pose run and
+requested real-character integration checks. The original source drawing is
+unchanged; the Editor corrected run pose 6's sole pivot by ignoring disconnected
+pixels. Review evidence is not acceptance of the remaining movement artwork.
+
 ## Complete-character Mika run study
 
 On 2026-10-24 the user selected the earlier four-frame run for prototype
@@ -106,3 +192,14 @@ The image is decorative scenery and does not establish campaign themes or routes
 Generation prompt (built-in tool):
 
 > Use case: stylized-concept. Asset type: original 2D game main-menu background, landscape 1536x1024. A charming hand-painted forest river valley at warm golden hour, soft atmospheric blue-green distant hills and old mossy stone ruins, amber foliage framing the far edges, winding glimmering stream toward the distance. Painterly gouache brushwork, entirely 2D, warm adventure mood. Composition: left half tranquil low-detail deep teal woodland shadow to support a separate opaque UI panel, right half luminous misty valley vista; no sharp foreground platforms or apparent gameplay routes. Natural lighting, restrained contrast, soft edges. No characters, animals, text, logos, UI, buttons, buildings with recognizable brands, or watermark. This is decorative menu scenery, not a level layout.
+
+## Mika apex atlas-edge correction — 2026-10-24
+
+`Assets/Game/Art/Mika/Original/original-apex-isolated.png` is a local Unity
+Editor-derived copy of the existing apex atlas cell with a two-pixel transparent
+sampling border. No new image generator/model, drawing or scaling was used.
+Source: the previously documented generated Mika movement atlas; existing
+ASSET-LICENSE.md terms apply where rights exist. Human direction: remove the
+neighboring atlas speck and retain the accepted apex alignment (-2, -14 source
+pixels). The user accepted the in-game result after playtesting. Original visible
+RGBA and alpha are preserved; the atlas and sprite GUID remain intact.

@@ -1,0 +1,109 @@
+{
+  "status": "review only; not integrated",
+  "scale": 0.48,
+  "shoulderAnchors": [
+    [
+      610,
+      300
+    ],
+    [
+      600,
+      290
+    ],
+    [
+      610,
+      240
+    ],
+    [
+      610,
+      245
+    ]
+  ],
+  "sequence": [
+    [
+      0,
+      "Idle",
+      0,
+      250
+    ],
+    [
+      21,
+      "Shallow takeoff",
+      35,
+      80
+    ],
+    [
+      22,
+      "Shallow ascent",
+      90,
+      80
+    ],
+    [
+      16,
+      "Apex",
+      125,
+      120
+    ],
+    [
+      18,
+      "Early descent",
+      110,
+      80
+    ],
+    [
+      11,
+      "Descent",
+      65,
+      80
+    ],
+    [
+      19,
+      "Reach",
+      20,
+      80
+    ],
+    [
+      12,
+      "Contact",
+      0,
+      50
+    ],
+    [
+      20,
+      "Absorb",
+      0,
+      50
+    ],
+    [
+      23,
+      "Rise 1",
+      0,
+      60
+    ],
+    [
+      24,
+      "Rise 2",
+      0,
+      60
+    ],
+    [
+      13,
+      "Settle 1",
+      0,
+      60
+    ],
+    [
+      14,
+      "Settle 2",
+      0,
+      60
+    ],
+    [
+      0,
+      "Idle",
+      0,
+      350
+    ]
+  ],
+  "groundAnchor": "forward supporting toe"
+}

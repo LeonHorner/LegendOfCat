@@ -1,0 +1,14 @@
+{
+  "status": "first transition review only",
+  "uniformScale": 0.26,
+  "sourceShoulder": [
+    1080,
+    480
+  ],
+  "durationsMs": [
+    40,
+    40,
+    160
+  ],
+  "secondMidpoint": "not authored pending first transition review"
+}

@@ -123,4 +123,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 7145c9fdb6c2ff24f985988f895d1f17, type: 2}
   - {fileID: 21300000, guid: ada1b90fc62a5e849a48727724be7515, type: 2}
   - {fileID: 21300000, guid: 3ccff0c998bd7a64fae17bd3d6004389, type: 2}
-  originalFrames: 1
+  - {fileID: 21300000, guid: e97e05114adb162478f21152487cca32, type: 3}
+  - {fileID: 21300000, guid: 2fbce24972ba5c740a096b8b23073234, type: 3}
+  - {fileID: 21300000, guid: fb9d842aa0424894bab1cce221ad13a8, type: 3}
+  - {fileID: 21300000, guid: d70dc46334cc8a1429052a18ae1e1059, type: 3}
