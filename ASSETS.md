@@ -54,6 +54,16 @@ No third-party game assets have been imported.
 
 ## Mika movement completion and archive
 
+The bounded apex experiment generated one pre-apex candidate with built-in OpenAI
+image generation on 2026-10-24 (exact model ID not exposed). Source, endpoint
+reference, exact prompt and rejection notes are in movement-completion/apex-pair.
+Terms: ASSET-LICENSE.md where rights exist. The user requested two targeted added
+frames, conditional on the first being visually sound. The first still mismatches
+head/trunk proportions and was not integrated; no second candidate was created.
+An independent alpha-only cleanup removes disconnected specks from the four
+active transition textures, preserving RGB and connected silhouette pixels,
+dimensions and pivots. tools/clean-mika-transition-specks.py records the operation.
+
 The user rejected the cute legacy sample and retained the current in-game design.
 movement-completion/in-game-inbetweens contains eight new whole-character midpoint
 drawings generated with built-in OpenAI image generation on 2026-10-24 (exact

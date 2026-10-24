@@ -2,6 +2,12 @@
 
 ## Latest user review — 2026-10-24
 
+The bounded [apex experiment](movement-completion/apex-pair/README.md) tried one
+pre-apex drawing first, as authorized. It still changes head/trunk proportions,
+so it was not integrated and the second drawing was deferred. Active transition
+textures received only disconnected-alpha speck cleanup for the reported edge
+pixel; original poses, timing, pivots and physics are unchanged.
+
 The added inbetween preview was rejected as substantially worse. Do not integrate
 it or continue generating replacement pose sheets by default. The user retained
 the actual game character and requested a small improvement using existing images.
