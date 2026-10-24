@@ -21,17 +21,22 @@ public sealed class MikaRigPresentation : MonoBehaviour
         if (!controller) controller = GetComponentInParent<CatController>();
         if (!controller || parts == null || parts.Length != 8) return;
         shape = controller.GetComponent<BoxCollider2D>();
-        if (!built) Build();
+        // Editor domain reload preserves child objects but not readonly managed arrays.
+        Build();
         controller.ReturnedToStart += ResetPose;
         ResetPose();
     }
 
     Transform Part(string label, int sprite, int order, float width = 1)
     {
-        var item = new GameObject(label).transform;
-        item.SetParent(transform, false);
+        var item = transform.Find(label);
+        if (!item) {
+            item = new GameObject(label).transform;
+            item.SetParent(transform, false);
+        }
         item.localScale = new Vector3(width, 1, 1);
-        var renderer = item.gameObject.AddComponent<SpriteRenderer>();
+        var renderer = item.GetComponent<SpriteRenderer>();
+        if (!renderer) renderer = item.gameObject.AddComponent<SpriteRenderer>();
         renderer.sprite = parts[sprite];
         renderer.sortingOrder = order;
         return item;
@@ -85,7 +90,7 @@ public sealed class MikaRigPresentation : MonoBehaviour
 
     public void RenderPose(float dt)
     {
-        if (!built) return;
+        if (!built || !torso || !uppers[0]) return;
         Vector2 position = controller.transform.position;
         float floor = Floor();
         Vector2 origin = new Vector2(position.x, floor);

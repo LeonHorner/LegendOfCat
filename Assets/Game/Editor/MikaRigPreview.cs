@@ -181,10 +181,7 @@ public static class MikaRigPreview
         floor.transform.position = new Vector3(0, -0.5f, 1);
         floor.transform.localScale = new Vector3(24,1,1);
         floor.AddComponent<BoxCollider2D>().size = Vector2.one;
-        var texture = Texture2D.whiteTexture;
-        var sprite = Sprite.Create(texture, new Rect(0,0,texture.width,texture.height), Vector2.one*0.5f, texture.width);
         var render = floor.AddComponent<SpriteRenderer>();
-        render.sprite = sprite;
         render.color = new Color(0.38f,0.43f,0.46f);
         var camera = new GameObject("Preview camera").AddComponent<Camera>();
         SceneManager.MoveGameObjectToScene(camera.gameObject, scene);
@@ -194,7 +191,10 @@ public static class MikaRigPreview
         camera.backgroundColor = new Color(0.10f,0.16f,0.20f);
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.scene = scene;
-        camera.gameObject.AddComponent<MikaPreviewCamera>().target = cat.GetComponent<CatController>();
+        var follow = camera.gameObject.AddComponent<MikaPreviewCamera>();
+        follow.target = cat.GetComponent<CatController>();
+        follow.previewFloor = render;
+        if (Application.isPlaying) follow.EnsureFloor();
         return cat;
     }
 }

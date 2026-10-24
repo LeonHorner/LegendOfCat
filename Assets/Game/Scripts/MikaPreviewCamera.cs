@@ -4,8 +4,22 @@ using UnityEngine;
 public sealed class MikaPreviewCamera : MonoBehaviour
 {
     public CatController target;
+    public SpriteRenderer previewFloor;
+    Sprite floorSprite;
     bool snap = true;
-    void Start() { if (target) target.ReturnedToStart += Snap; }
+    void OnEnable() => EnsureFloor();
+    void Start() { if (target) target.ReturnedToStart += Snap; EnsureFloor(); }
+    public void EnsureFloor()
+    {
+        if (!previewFloor) {
+            var floor = System.Array.Find(gameObject.scene.GetRootGameObjects(),go => go.name == "Preview floor");
+            if (floor) previewFloor = floor.GetComponent<SpriteRenderer>();
+        }
+        if (!previewFloor || floorSprite) return;
+        var texture = Texture2D.whiteTexture;
+        floorSprite = Sprite.Create(texture,new Rect(0,0,texture.width,texture.height),Vector2.one*0.5f,texture.width);
+        previewFloor.sprite = floorSprite;
+    }
     void Snap() => snap = true;
     void LateUpdate()
     {
@@ -15,5 +29,9 @@ public sealed class MikaPreviewCamera : MonoBehaviour
         transform.position = snap ? desired : Vector3.Lerp(transform.position,desired,1-Mathf.Exp(-14*Time.deltaTime));
         snap = false;
     }
-    void OnDestroy() { if (target) target.ReturnedToStart -= Snap; }
+    void OnDestroy()
+    {
+        if (target) target.ReturnedToStart -= Snap;
+        if (floorSprite) Destroy(floorSprite);
+    }
 }
