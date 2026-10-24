@@ -21,7 +21,6 @@ public class MikaAnimationTests
     [Test]
     public void OriginalRunUsesOnlyFourSourcePosesAndStopsAtRest()
     {
-        type.GetProperty("OriginalFrames").SetValue(animation, true);
         var poses = new System.Collections.Generic.HashSet<int>();
         for (int i = 0; i < 40; i++) {
             Step(0.02f, true, 7, 0, 0.1f);
@@ -40,7 +39,6 @@ public class MikaAnimationTests
     [Test]
     public void OriginalJumpBridgesBothSidesOfApexButNotLedgeFalls()
     {
-        type.GetProperty("OriginalFrames").SetValue(animation, true);
         Step(0.02f, false, 2, -0.1f);
         Assert.That(Read("Frame"), Is.EqualTo(11), "A ledge fall has no takeoff.");
         Step(0.02f, false, 2, 11);
@@ -50,6 +48,8 @@ public class MikaAnimationTests
             Assert.That(Read("Frame"), Is.EqualTo(16));
         }
         Step(0.02f, false, 2, -4);
+        Assert.That(Read("Frame"), Is.EqualTo(18));
+        Step(0.02f, false, 2, -8);
         Assert.That(Read("Frame"), Is.EqualTo(11));
         Step(0.02f, true, 0, 0);
         Step(0.02f, false, 0, -0.1f);
@@ -60,6 +60,31 @@ public class MikaAnimationTests
     }
 
     [Test]
+    public void AuthoredFlightBridgesAndPrecontactRemainCosmeticAndInterruptible()
+    {
+        Step(0.02f, false, 2, 11); Assert.That(Read("Frame"), Is.EqualTo(10));
+        Step(0.02f, false, 2, 5); Assert.That(Read("Frame"), Is.EqualTo(17));
+        Step(0.02f, false, 2, 0); Assert.That(Read("Frame"), Is.EqualTo(16));
+        Step(0.02f, false, 2, -4); Assert.That(Read("Frame"), Is.EqualTo(18));
+        Step(0.02f, false, 2, -10); Assert.That(Read("Frame"), Is.EqualTo(11));
+        type.GetProperty("LandingSoon").SetValue(animation, true);
+        Step(0.02f, false, 2, -10); Assert.That(Read("Frame"), Is.EqualTo(19));
+        Step(0.02f, true, 2, 0); Assert.That(Read("Frame"), Is.EqualTo(12));
+        Step(0.02f, false, 2, 11); Assert.That(Read("Frame"), Is.EqualTo(10));
+    }
+
+    [Test]
+    public void MovingLandingReturnsToTheDistanceDrivenRunWithoutHoldingRecovery()
+    {
+        Step(0.02f, false, 7, -10);
+        Step(0.02f, true, 7, 0, 0.14f);
+        Assert.That(Read("Frame"), Is.EqualTo(12));
+        Step(0.041f, true, 7, 0, 0.28f);
+        Assert.That(Read("Current").ToString(), Is.EqualTo("Run"));
+        Assert.That((int)Read("Frame"), Is.InRange(4, 7));
+    }
+
+    [Test]
     public void BufferedJumpImmediatelyInterruptsLanding()
     {
         Step(0.02f, false, 0, -5);
@@ -67,7 +92,7 @@ public class MikaAnimationTests
         Assert.That(Read("Current").ToString(), Is.EqualTo("Landing"));
         Step(0.02f, false, 0, 11);
         Assert.That(Read("Current").ToString(), Is.EqualTo("Jump"));
-        Assert.That(Read("Frame"), Is.EqualTo(14));
+        Assert.That(Read("Frame"), Is.EqualTo(10));
     }
 
     [Test]
@@ -118,14 +143,14 @@ public class MikaAnimationTests
     public void ApexDoesNotSnapDirectlyFromTuckedToExtendedPaws()
     {
         Step(0.02f, false, 2, 11);
-        Step(0.08f, false, 2, 4);
-        Assert.That((int)Read("Frame"), Is.InRange(51, 53));
+        Step(0.08f, false, 2, 2);
+        Assert.That(Read("Frame"), Is.EqualTo(16));
         Step(0.02f, false, 2, -0.1f);
         Assert.That(Read("Frame"), Is.EqualTo(16));
         Step(0.10f, false, 2, -6);
-        Assert.That(Read("Frame"), Is.EqualTo(17));
+        Assert.That(Read("Frame"), Is.EqualTo(11));
         Step(0.10f, false, 2, -12);
-        Assert.That(Read("Frame"), Is.EqualTo(18));
+        Assert.That(Read("Frame"), Is.EqualTo(11));
     }
 
     [Test]
@@ -133,10 +158,12 @@ public class MikaAnimationTests
     {
         Step(0.02f, false, 0, -10);
         Step(0.02f, true, 0, 0);
-        for (int i = 0; i < 4; i++) {
-            Assert.That(Read("Frame"), Is.EqualTo(20 + i));
-            Step(0.0601f, true, 0, 0);
-        }
+        Assert.That(Read("Frame"), Is.EqualTo(12));
+        Step(0.0601f, true, 0, 0);
+        Assert.That(Read("Frame"), Is.EqualTo(20));
+        Step(0.0601f, true, 0, 0);
+        Assert.That(Read("Frame"), Is.EqualTo(13));
+        Step(0.20f, true, 0, 0);
         Assert.That(Read("Current").ToString(), Is.EqualTo("Idle"));
     }
 }

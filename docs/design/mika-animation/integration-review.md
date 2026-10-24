@@ -1,7 +1,9 @@
 # Mika presentation integration review
 
 Follow-up to merged PR #41 and the user's 2026-10-24 review. Related issue #10
-remains open. The approved four-frame run and apex pose remain unchanged.
+is completed by the active movement set, subject to final exact-head validation.
+The approved four-frame run remains unchanged; authored full-character flight
+and landing bridges are documented in movement-completion/README.md.
 
 ## Scope and coordination
 
@@ -12,8 +14,10 @@ those components or its existing tests. Integration tests consume their public
 behavior and the actual Resources/MovementCourse and Resources/MikaOriginal
 prefabs. Visual inspection additionally exposed a stray-pixel pivot in original
 run pose 6. This branch owns the Editor contact-pivot helper and its regenerated
-sprite metadata; #44 does not modify them. No settings, scene, package or new
-artwork changes are planned.
+sprite metadata; #44 does not modify them. At the user's request the scope now
+includes character animation/import tools, four complete-character transition
+drawings, the character prefab and archival cleanup. Controller/input/course,
+settings, scenes and package configuration are not independently modified.
 
 ## Review tracking
 
@@ -23,16 +27,17 @@ artwork changes are planned.
   contacts, including grounded/airborne transitions. Fix discontinuous or
   unsupported floor corrections without changing physics or deforming artwork.
 - P2: move rejected rig/optical-flow experiments out of Unity's imported asset
-  paths in a separate cleanup PR, preserving sources, metadata and provenance.
-  This branch does not add to the experimental asset collection.
+  paths, preserving sources, metadata and provenance. Completed in this PR at the
+  user's request: 208 moved/snapshotted files, verified by SHA-256 and protected
+  from checkout line-ending conversion. Rejected code/tests no longer compile.
 - P2: provide a recording of the current integrated character. Full visual
-  acceptance and final authored jump/landing sequences remain part of #10.
+  inspection and authored jump/landing bridges are included in the completion pass.
   Full Windows/Linux player/launcher validation must run for the final ready
   revision. Focused tests and static checks are not a replacement for it.
 
 ## Validation
 
-Unity 6000.3.27f1: 18 focused Mika tests passed (four real-prefab integration
+Initial foundation on Unity 6000.3.27f1: 18 focused Mika tests passed (four real-prefab integration
 tests, nine animation-state tests and five retained historical rig tests).
 The historical tests do not establish artwork acceptance. Integration cases cover
 the actual renderer references, opaque support-paw landmarks in all four running
@@ -43,8 +48,9 @@ The course test initially checked only the sprite pivot. Recording inspection
 exposed a false positive: original run pose 6 had a pivot at pixel y=0.5 while
 its connected supporting paw was at y=39.5, about 0.194 m above the floor at the
 imported scale. The importer now derives the sole from the largest connected
-opaque silhouette. Only original-frame-06.asset changes; the original drawing,
-four-pose sequence, stride, airborne pivots and controller remain unchanged.
+opaque silhouette. The original four-pose sequence, stride and controller remain
+unchanged. The completion pass additionally registers airborne shoulder anchors
+and removes disconnected source alpha without changing any RGB value or pose.
 Independent known opaque paw-pixel fixtures now verify actual visible contact,
 so aligning an empty pivot can no longer satisfy the flat-ground run test.
 
@@ -76,8 +82,12 @@ ffmpeg -framerate 60 -i Logs/mika-integrated-review/frame-%04d.png -c:v libx264 
 Tracking is scripted for inspection; Camera.Render omits the IMGUI HUD. This is
 deterministic physics playback, not a human playtest or a capture of menu flow.
 Review confirms the four source run poses, distinct ascent/apex/descent, contact
-and recovery are present. Jump/landing drawings still need artistic acceptance;
-some source specks/halos remain. The contact fix does not repaint that artwork.
+and recovery are present. The completion recording additionally includes late
+ascent, early descent, pre-contact reach and authored recovery. Source alpha specks
+are cleaned; the original PNG/metadata remain in the verified archive. Color and
+grayscale strips preserve the small actual render scale and readable platform edge.
 
-Full exact-head CI and Windows/Linux player/launcher builds have not run for this
-draft. Rejected experiment cleanup and final issue #10 acceptance remain open.
+Final full tests, Windows/Linux player/launcher builds, installation smokes and
+exact-head merge-ready status are reported on PR #45. Earlier focused counts are
+historical development results, not proof of a later revision's validation. No
+merge or release is authorized by this authoring workflow.

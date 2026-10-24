@@ -27,9 +27,40 @@
     -0.0008,
     0.015
   ],
+  "transitionFrameRanges": {
+    "17": [
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148
+    ],
+    "18": [
+      158,
+      159,
+      160,
+      161,
+      162,
+      163
+    ],
+    "19": [
+      174,
+      175,
+      176
+    ],
+    "20": [
+      181,
+      182,
+      183,
+      184
+    ]
+  },
   "limits": [
     "Scripted local-physics playback, not a human playtest",
-    "No artwork changes; jump/landing acceptance remains open",
-    "No final Windows/Linux build verification"
+    "Original four-frame run retained; complete-character jump/landing drawings added",
+    "Final exact-head platform validation is reported on PR #45"
   ]
 }

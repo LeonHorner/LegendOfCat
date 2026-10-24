@@ -1,6 +1,16 @@
 # Mika character authoring
 
-Issue #10 is in progress. This is isolated authoring work, **not accepted production artwork**.
+The active complete-character set retains the user-selected four-frame run and
+adds authored flight/landing bridges. See [movement completion](movement-completion/README.md)
+for provenance, registration and state mapping, and the [integration review](integration-review.md)
+for actual-prefab tests and recorded playback. Final exact-head validation is
+tracked on PR #45; no merge or release is performed by the authoring workflow.
+
+Rejected code, assets and tests are now outside Unity in the hash-verified
+[archive](archive/README.md). Historical Assets/tools paths in the older notes
+below resolve relative to that archive. They are not active authoring commands.
+
+## Historical decisions and experiments
 
 After merged PR #41, the [integration review](integration-review.md) tracks the
 next bounded step: real-prefab physics/presentation tests, bounded contact-skin
@@ -15,7 +25,7 @@ and explicitly requested their integration into the movement prototype. The
 course now loads the Editor-generated `Resources/MikaOriginal.prefab`, using
 original candidate poses 4–7, driven by measured travel over the original 2.4 m
 stride. No generated inbetweens, optical flow or cutout rig is used in this path.
-Idle uses a stable original pose; jump/fall/turn/landing use the original candidate
+The initial prototype's idle used a stable original pose; jump/fall/turn/landing used the original candidate
 poses as temporary companions, not newly accepted animation. Visible sole pivots
 and the existing visual-only floor alignment correct the old hovering offset.
 

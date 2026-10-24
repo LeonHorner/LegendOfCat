@@ -52,6 +52,28 @@ held/short jumps, landing and stopping; it does not verify installed builds or u
 
 No third-party game assets have been imported.
 
+## Mika movement completion and archive
+
+Rejected Mika rig/optical-flow source, assets, code and tests have moved outside
+Unity to docs/design/mika-animation/archive. Historical paths in this document
+resolve through that prefix. Original Unity .meta files and exact source bytes
+are preserved in manifest.json with SHA-256 hashes; archive checkout disables
+line-ending conversion to preserve those hashes on both platforms.
+
+Built-in OpenAI image generation created the four complete-character transition
+drawings on 2026-10-24; exact model ID was not exposed. Source, exact prompt,
+identity reference, normal/slowed review loops and manual registration decisions
+are in docs/design/mika-animation/movement-completion. Active derived PNGs are
+Assets/Game/Art/Mika/Transitions. Terms: ASSET-LICENSE.md where rights exist;
+generation does not establish exclusivity or copyright. Human direction retained
+the original four-frame run and sturdy paws, selected full-character drawing
+instead of rejected rig/optical flow, and requested smoother flight/landing
+transitions. Local processing only cleans alpha, applies one uniform scale and
+translates drawings. The original active sheet has alpha-only speck cleanup;
+all RGB values, dimensions, poses and retained alpha are unchanged. Its exact
+original PNG and metadata remain archived. No new abilities or idle/fish behavior
+were added. The integrated recording/strips are regenerated from Unity playback.
+
 ## Integrated Mika review evidence
 
 `docs/design/mika-animation/integrated-movement-review.mp4`, the two

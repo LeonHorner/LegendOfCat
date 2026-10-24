@@ -97,12 +97,11 @@ public class MikaPresentationIntegrationTests
         Assert.That(presentation, Is.Not.Null, "The course must load MikaOriginal rather than silently use the silhouette fallback.");
         Assert.That(presentation.GetType().GetField("controller").GetValue(presentation), Is.SameAs(controller));
         frames = (Sprite[])presentation.GetType().GetField("frames").GetValue(presentation);
-        Assert.That(frames, Has.Length.EqualTo(17));
+        Assert.That(frames, Has.Length.EqualTo(21));
         Assert.That(frames.All(f => f != null && f.texture != null), Is.True);
         renderer = presentation.GetComponent<SpriteRenderer>();
         motion = controller.GetType().GetField("Motion").GetValue(controller);
         animation = presentation.GetType().GetField("Animation").GetValue(presentation);
-        Assert.That(Read(animation, "OriginalFrames"), Is.True);
         Physics2D.SyncTransforms();
         Tick(15);
         Assert.That(Grounded, Is.True);
@@ -169,7 +168,7 @@ public class MikaPresentationIntegrationTests
             if (Grounded) { landed = true; Assert.That(Frame, Is.EqualTo(12)); break; }
         }
         Assert.That(apex && descent && landed, Is.True);
-        Tick(4); Assert.That(Frame, Is.EqualTo(13));
+        Tick(4); Assert.That(Frame, Is.EqualTo(20));
         Tick(15); Assert.That(Frame, Is.Zero);
         Assert.That(body.position.y, Is.EqualTo(start.y).Within(0.012f));
         Assert.That(presentation.transform.position.y, Is.EqualTo(0).Within(0.012f));
@@ -210,7 +209,7 @@ public class MikaPresentationIntegrationTests
             float before = Correction;
             Tick();
             Assert.That(Mathf.Abs(Correction - before), Is.LessThanOrEqualTo(0.0081f), "Contact correction must not pop when support changes.");
-            if (!Grounded) { fell = true; Assert.That(Frame, Is.EqualTo(11)); }
+            if (!Grounded) { fell = true; Assert.That(Frame, Is.EqualTo(11).Or.EqualTo(19)); }
         }
         Assert.That(fell, Is.True);
         Assert.That(Correction, Is.EqualTo(0).Within(0.001f));
