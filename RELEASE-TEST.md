@@ -61,6 +61,14 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 7. Confirm a second normal launch of the same installation cannot run a competing game/update.
    Directly launching the internal Unity player intentionally disables update installation.
 
+## Linux update recovery regression (#40)
+
+An existing Linux v0.1.0 AppImage was observed to find/download v0.2.0 but close without replacing itself or restarting. The update service's old process ordering can make AppImage runtime resources unavailable before Velopack is launched. After shipping the fix, verify a **new fixed-version AppImage N → later N+1** in a graphical Linux session; do not treat a successful manual installation as an updater test. Older already-shipped AppImages contain their original updater, so users affected by v0.1.0 may need a one-time manual download to reach the fixed version.
+
+The PR preflight runs the dependency-free .NET updater workflow tests (`Launcher.WorkflowTests`). They simulate HTTP 403/429, timeouts, malformed history, warning-log failures, and both platform process-ordering paths. These tests execute the same orchestration implementation as the launcher but **do not** exercise Velopack's native AppImage replacement or Unity's graphical shutdown; the physical Linux check remains mandatory.
+
+Record whether the installed AppImage's checksum/mtime actually changes, whether the process restarts to N+1, and whether settings survive. Re-run a version check when the optional GitHub REST release-history request is rate-limited (HTTP 403): the history warning must not prevent Velopack's independent update check. Sanitize logs and installation paths before storing evidence.
+
 ## Delta update validation (future stable N -> N+1)
 
 Before authorizing the release, confirm that the new Release workflow jobs for
