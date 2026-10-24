@@ -54,6 +54,16 @@ No third-party game assets have been imported.
 
 ## Mika movement completion and archive
 
+Proportion review 3 is in movement-completion/revision-3: a coherent eight-pose
+sheet generated with built-in OpenAI image generation on 2026-10-24 and refined
+by a targeted head-consistency edit (exact model ID not exposed). Its sole identity
+reference is original standing Mika; both prompts and the selected source are
+preserved. Terms: ASSET-LICENSE.md where rights exist. Human direction rejected
+flight-time shrinking and requires head/trunk consistency. Every pose uses one
+global 0.72 scale, with translation-only shoulder registration and alpha cleanup.
+Normal/slowed and stationary size-check loops remain documentation-only review
+artifacts. No Unity integration or user acceptance is claimed.
+
 Following the user's report of abrupt transitions, movement-completion/revision-2
 contains a review-only four-pose sheet from built-in OpenAI image generation,
 2026-10-24, exact model ID not exposed. Terms: ASSET-LICENSE.md where rights exist.

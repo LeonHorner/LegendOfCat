@@ -2,6 +2,11 @@
 
 ## Latest user review — 2026-10-24
 
+The user additionally rejected revision 2's changing proportions: Mika becomes
+smaller during the jump. [Proportion review 3](movement-completion/revision-3/README.md)
+uses one complete eight-pose sheet, a single global scale and a fixed-shoulder
+diagnostic loop. It is review-only and has not changed the Unity playtest.
+
 The user reported that jump/landing transitions are still too abrupt after the
 completion preview. PR #45 is back in draft; issue #10 is incomplete. Earlier
 green CI is not visual acceptance. [Revision 2](movement-completion/revision-2/README.md)

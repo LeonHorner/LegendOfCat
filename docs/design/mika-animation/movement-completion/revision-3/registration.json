@@ -1,0 +1,192 @@
+{
+  "status": "review only; not integrated",
+  "globalScale": 0.72,
+  "perPoseScaleAdjustment": false,
+  "sequence": [
+    [
+      0,
+      "Stand",
+      0,
+      250
+    ],
+    [
+      1,
+      "Toe-off",
+      45,
+      90
+    ],
+    [
+      2,
+      "Ascent",
+      100,
+      100
+    ],
+    [
+      3,
+      "Apex",
+      130,
+      120
+    ],
+    [
+      4,
+      "Descent",
+      75,
+      100
+    ],
+    [
+      5,
+      "Contact",
+      0,
+      90
+    ],
+    [
+      6,
+      "Recovery",
+      0,
+      100
+    ],
+    [
+      7,
+      "Settle",
+      0,
+      100
+    ],
+    [
+      0,
+      "Stand",
+      0,
+      350
+    ]
+  ],
+  "measurements": [
+    {
+      "pose": 0,
+      "sourceRect": [
+        0,
+        0,
+        443,
+        443
+      ],
+      "shoulder": [
+        319,
+        278
+      ],
+      "scale": 0.72,
+      "headRegionOpaquePixels": 7507,
+      "torsoRegionOpaquePixels": 10800
+    },
+    {
+      "pose": 1,
+      "sourceRect": [
+        443,
+        0,
+        887,
+        443
+      ],
+      "shoulder": [
+        326,
+        275
+      ],
+      "scale": 0.72,
+      "headRegionOpaquePixels": 7817,
+      "torsoRegionOpaquePixels": 10791
+    },
+    {
+      "pose": 2,
+      "sourceRect": [
+        887,
+        0,
+        1330,
+        443
+      ],
+      "shoulder": [
+        326,
+        257
+      ],
+      "scale": 0.72,
+      "headRegionOpaquePixels": 7261,
+      "torsoRegionOpaquePixels": 10800
+    },
+    {
+      "pose": 3,
+      "sourceRect": [
+        1330,
+        0,
+        1774,
+        443
+      ],
+      "shoulder": [
+        329,
+        242
+      ],
+      "scale": 0.72,
+      "headRegionOpaquePixels": 7383,
+      "torsoRegionOpaquePixels": 10800
+    },
+    {
+      "pose": 4,
+      "sourceRect": [
+        0,
+        443,
+        443,
+        887
+      ],
+      "shoulder": [
+        326,
+        250
+      ],
+      "scale": 0.72,
+      "headRegionOpaquePixels": 8180,
+      "torsoRegionOpaquePixels": 10526
+    },
+    {
+      "pose": 5,
+      "sourceRect": [
+        443,
+        443,
+        887,
+        887
+      ],
+      "shoulder": [
+        329,
+        295
+      ],
+      "scale": 0.72,
+      "headRegionOpaquePixels": 8183,
+      "torsoRegionOpaquePixels": 10346
+    },
+    {
+      "pose": 6,
+      "sourceRect": [
+        887,
+        443,
+        1330,
+        887
+      ],
+      "shoulder": [
+        329,
+        276
+      ],
+      "scale": 0.72,
+      "headRegionOpaquePixels": 7668,
+      "torsoRegionOpaquePixels": 10571
+    },
+    {
+      "pose": 7,
+      "sourceRect": [
+        1330,
+        443,
+        1774,
+        887
+      ],
+      "shoulder": [
+        329,
+        263
+      ],
+      "scale": 0.72,
+      "headRegionOpaquePixels": 7151,
+      "torsoRegionOpaquePixels": 10800
+    }
+  ],
+  "measurementLimit": "Regional opaque occupancy diagnoses gross size changes; not exact anatomical metrology."
+}
