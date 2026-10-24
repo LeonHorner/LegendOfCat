@@ -69,7 +69,7 @@ internal static class DesktopCommentTests
             Check(LinuxDesktopComment.RewriteGeneratedComment(entry, image), "Quoted filename should migrate");
             var changed = File.ReadAllText(entry);
             Check(changed.Contains("Comment=A little cat, a big adventure\r\n"), "CRLF must be preserved");
-            Check(changed.Contains("Comment[de]=Benutzerdefinierter Text\r\n"), "Localized comment modified");
+            Check(changed.Contains("Comment[de]=Custom localized description\r\n"), "Localized comment modified");
             Check(changed.Contains("Exec=\"" + image + "\" %U\r\n"), "Exec was modified");
         }, imageContainsSpaces: true);
         return Task.CompletedTask;
