@@ -68,6 +68,15 @@ candidate poses 4–7 without interpolation. This selects the prototype run only
 the remaining movement set still requires review. See the authoring README for
 the current course integration and reproduction steps.
 
+The subsequent completion pass preserves that run, removes rejected experiments
+from Unity's imported paths, cleans disconnected source alpha and adds four
+complete-character flight/landing bridges. Normal/slowed drawing previews precede
+integration; the integrated recording and small-scale color/grayscale strips are
+in the Mika authoring folder. Airborne poses share a shoulder anchor; supporting
+poses use visible sole anchors. No new idle/fish behavior or traversal ability is
+introduced. Current code, provenance and final validation are tracked by PR #45;
+the dated rejected experiments above remain historical warnings, not live tooling.
+
 ## Provenance
 See ASSETS.md. Images were produced with the built-in OpenAI image generation tool on 2026-10-23, using earlier generated scene references. Exact model ID was not exposed. Human direction selected cat and owl influences, rejected 2.5D, and required clearer gameplay/background separation. Full archived generation prompts are in [reference-prompts.md](reference-prompts.md).
 

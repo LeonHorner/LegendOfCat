@@ -1,0 +1,1042 @@
+[
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-00.asset",
+    "sha256": "651cbbe46b16f05f4dcd7638ca4cf7bd48a95231a88bb18706261d574dd9a9cf",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-00.asset.meta",
+    "sha256": "34f326aa9f07dc4467971b212e07762c39b1dfa980baf445b00b6c419e3cb181",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-01.asset",
+    "sha256": "baf14fbd455bc39a26e3f306508f46c2d898c1984f3604774840056caa048809",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-01.asset.meta",
+    "sha256": "477b72b9a5d15baaa01bd739427e1a3cb7880ee13b3b7cabc4eb179d440b5766",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-02.asset",
+    "sha256": "34d520fb5d8adccf504a75f804bc21d6686d1f38832b73ef1f9891becb2b0148",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-02.asset.meta",
+    "sha256": "7f2711d62271d395a50ad39ca509b4e95cf9c23e101dbf4c52af2336377ebb93",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-03.asset",
+    "sha256": "df3e1539c8a746828cd70d8c87836d638ca4e00a341b7eb2ba09a9525811b513",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-03.asset.meta",
+    "sha256": "d05e2f1af2836673280fb44b601bf1631908335c1325a8958d7aa3f9b279c34e",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-04.asset",
+    "sha256": "d41b1522c2da1da6a66e6f47df844a2b54fa136c9e8137983b3d7590bd755657",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-04.asset.meta",
+    "sha256": "3a7aacf8d85ce7a701cbbc72120fad5a25f7c4bad39921d2d2843f46e350c773",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-05.asset",
+    "sha256": "cd4db973af41ba6ac05def430bd30ba496607402c8243045b63ee4278e480d87",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-05.asset.meta",
+    "sha256": "d1f3b9ea0da8c6cc2328341e0758e6039818badbba2f94530473df0dfcbe6e40",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-06.asset",
+    "sha256": "fa298a62117d0bf3b61340dcb3aa2b895b50cb6ce08dd24fb21f984ad8434702",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-06.asset.meta",
+    "sha256": "6cca367ef255b622eddd1273512a2c95dfd8d08c62e1befdd3073769fbeb1123",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-07.asset",
+    "sha256": "afbddacf209a8ab4a5b5417a1b5c85e8319fb27e7141b05022beb7b3f4fcca6e",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-07.asset.meta",
+    "sha256": "4b6b32beebdd96b853f5ec5b162be822ad141a2be9a283829c2ce141caa9c2f2",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-08.asset",
+    "sha256": "3237c51c63fd8f82d134d1659586f51b0b95a2a19ec82a05fcd43a4c43ccbcdb",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-08.asset.meta",
+    "sha256": "fd9190eff5f35756ca70ebdaf858582466dda11d96964bdbf4964b72ea87a338",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-09.asset",
+    "sha256": "375a87d037dcc8de6aa42c266f1b4290de5d31ad7a8e6bad8154a6b27eaee823",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-09.asset.meta",
+    "sha256": "3c45fec5e384e2a2aefdaa01fa82e32041fb075a3f1d127d8148b8540cbb7fe0",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-10.asset",
+    "sha256": "90ed4a2faddcbd4d2a11eb736eadccae239d1e4e26a8d29731afad5ea4f2a232",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-10.asset.meta",
+    "sha256": "2c4e3f3df389154dd1ead131eb9659ac95f752156c0247a25e27aa77e4ec85d6",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-11.asset",
+    "sha256": "bada9725a13450fa8be0f6b56371101bd72aff9418adc1002d8fc67029224fba",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-11.asset.meta",
+    "sha256": "438ebef322395aacc6f90ce9f40b26321d98599446b906ec77b565e324b34626",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-12.asset",
+    "sha256": "062b56afaa618561539f357278e41715ba06f87c2eddd5cd26ff3827f77bbd70",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-12.asset.meta",
+    "sha256": "a8f7d6916a744a73d2779ae4059325de0b9c6993dd594ada89d8505e6db59cf9",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-13.asset",
+    "sha256": "fb1894d705cfea00897099a1c76911449cd67b63d11311acb261ae048607e77d",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-13.asset.meta",
+    "sha256": "f85c754f9b3075360921cc079e3b64d8ffc6dd8c69768078b66d15a8ab8fea28",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-14.asset",
+    "sha256": "eb691188c06e2bf407ac5a9cf40880c198a89ce360cf2d39d0f9240582b60952",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-14.asset.meta",
+    "sha256": "38fdbef9b0b5f87ec64184d24955a68d4277eb397927f4b7411d516275e2d4b4",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-15.asset",
+    "sha256": "fe2abe4479c21cdb89c699599a7847abe9f139d0a8676011046c4f6ad781de16",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-15.asset.meta",
+    "sha256": "84e5e05e5bc0333c161f77c970073d579007433b55c037f2aaf4541bf8147fc2",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-16.asset",
+    "sha256": "049a7343a9715794e224a2dffc33ed96c4e50f823f50b6d068972efe58b1fee0",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-16.asset.meta",
+    "sha256": "11ad9cd6869834d80a70f49e9fd6fcef7d68dafab347c0590c8141dd6793d215",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-17.asset",
+    "sha256": "89ecad5e0f92c21035d5e96f46dc451f4239af8cc7edf08a9ff8501b596ee80e",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-17.asset.meta",
+    "sha256": "58dfe7d8ef5516315752b3029435ffa2d7a0e8b75f21169dd8fe60a3523bc5ad",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-18.asset",
+    "sha256": "a4085daeebc0c1b54c470a7d3c9c3fb6efc2349ab3cecf7aca30a073e1c193e3",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-18.asset.meta",
+    "sha256": "e437d68b5fb8d41536257c74d1aad1832a328c11de362478a1ef050e9b787f48",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-19.asset",
+    "sha256": "981a5a900c4ac1cf4aa5ec804a085b979c38c82aa482de8a24bb6f05fe699e01",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-19.asset.meta",
+    "sha256": "5a082b58c783ea5787db9c8a34974b580d9eaad3216a62393a171cf3334b38cb",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-20.asset",
+    "sha256": "faaaa084389d2017820c322017a844d94870cff61191151f0e998a9148cd7ddc",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-20.asset.meta",
+    "sha256": "1e43bc5994d037e19f7e14637479983ce28495aaad35515cf2ea23884aa0c809",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-21.asset",
+    "sha256": "e43f376635432c515b307eb0deb7a6a797fe3659d25b521540fde89134681d6c",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-21.asset.meta",
+    "sha256": "ea06b0e25672d2935cf8af5caf2c4860f0ef68269e37ae5df76b2a9db11a2a0a",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-22.asset",
+    "sha256": "c27203aab442a01fa7315c737aa59636963a19ae98620d95263926b37d148c75",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-22.asset.meta",
+    "sha256": "df98dc4d3d24097e61249c693584a25e9345291aaf555463159c03ec7bc2ac60",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-23.asset",
+    "sha256": "c10842691c782a5156e00f52cb9944a2dec9f76873d775d139e8c32395163503",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-23.asset.meta",
+    "sha256": "77cbb6e864001701e7421aaf9dd559e91a01d64d76144487ba90a72cb3b09d22",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-24.asset",
+    "sha256": "72717e486c289f68f653ba66318e4061c42dacebd53b1193e47aae30b619d4e6",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-24.asset.meta",
+    "sha256": "750a2defb631c6a5d07808771c62ecd76b0b4ca5d37047e658f11f88adc77d3a",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-25.asset",
+    "sha256": "075f2ff4d4cbc0b89e3828e063297102d313662b3ea797c2c5bffab2364706ee",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-25.asset.meta",
+    "sha256": "5e5ddf959a09e5d5e7507520b5a3309a1da3ad6b2d98cf2762955a4bca0a4534",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-26.asset",
+    "sha256": "7ed61e6b348c398d62e2a641789a9953ddae9a493e2a52ff72ead381466d1307",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-26.asset.meta",
+    "sha256": "f1c1f0bae4a8129270b573e3d907e5603ac7954fb1e7c63a8e39e61d18f38a5e",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-27.asset",
+    "sha256": "b89f991b7eb5777184966c4e4b6b3d0cbdfb9a0734dc1367ab9943f2b7bc0e9a",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-27.asset.meta",
+    "sha256": "3a22900a6d664389419af94f5eb90280f1dc4492709f176ad3fa7f1750932eac",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-28.asset",
+    "sha256": "d6d131a1b88e63910c115f28dd8869d3f000a8fe2afce9b010fe744eec51cd74",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-28.asset.meta",
+    "sha256": "5bb09fe64856b8574874819fc90d7eafc48cd540bd1399aff34e38552a413de0",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-29.asset",
+    "sha256": "3eaa2ee2aee4d350f33a179759a3cc47af3211e9215a69da3162603fca1dfa7e",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-29.asset.meta",
+    "sha256": "058cd706b50486a697d10c2289d479737088281a2a86619d9bfc0cd61dec2a4f",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-30.asset",
+    "sha256": "e3c1e7146fdac0a825e5678315fd16dbfafdb4dc4995a9cec34b8b8fa5040c64",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-30.asset.meta",
+    "sha256": "afb774e0b85e6f514172a79f69773a65078a8d1025f9ad0fc4784ab871269f68",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-31.asset",
+    "sha256": "b55f87380fbc35136514a6a3f487f048ca5f083391d921e7c0351f4d8aa97950",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-31.asset.meta",
+    "sha256": "e53fbc82f11f4bf91507578023da76ce3f3540983f9b39e92d1ee270f0c1c37c",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-32.asset",
+    "sha256": "7fdcc441beb822a98407f8fe50b89d86f695513b24336f21c58a7c3779d2a0b0",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-32.asset.meta",
+    "sha256": "41c610f9acb05f7dd085eb81d1a26fcb3fb056841c4783a9c0e1f1150818c1db",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-33.asset",
+    "sha256": "d52b77a431d21d023dc9beb8752376bea2e60e6cafcd7695d85edc350c4e70f9",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-33.asset.meta",
+    "sha256": "539a0270e178d0d3bc616c4ce5e1f03b8aa7a00b4fbce959815694ed067329dd",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-34.asset",
+    "sha256": "a3cfb328c50856001b671151c4e732b72303d68e79f713ae5bb4f3968b57cb31",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-34.asset.meta",
+    "sha256": "18d4dd047a5c0d0d6273c6efefaa47224b4caaac446793f421f8b00c637a1588",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-35.asset",
+    "sha256": "e66ac76ca4ba4588ca4285f5cf358b897ed9cd1c32b0768dfb4528ab2423fa64",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-35.asset.meta",
+    "sha256": "63879c14370309aeb2f6e0a58c728c7052b66beae9f1ec07d9a615fbce65f1b3",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-36.asset",
+    "sha256": "ff8a7f022b1ecb59d4dc9c8874165b4f1d7ed1896ca2da21997aa164016fa420",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-36.asset.meta",
+    "sha256": "a009ea1381d3d43724c17a58115861123893161a58461e1bafaef10468bf44fb",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-37.asset",
+    "sha256": "49ad7d1acd7f7d67bbc4b81fc1f4eb1f2c135be9d083f13db695d8bde0a0136e",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-37.asset.meta",
+    "sha256": "fdf388faaafc707bf64478dda28e76bc19d10de2147000735af5d1df68188f6f",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-38.asset",
+    "sha256": "19dd37fdc93a0a8a31236f4e670d1ec0aa9d98fc37e53511a30ff33b134d31cd",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-38.asset.meta",
+    "sha256": "1d8dc5972840b2ba5b7678f3e3d5a2902e617377166553b17657cfa63cfa315f",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-39.asset",
+    "sha256": "03f07e3f14324985e5a8eb5d5dff6613a58b0fc6e2dafab48fef6716b04bd179",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-39.asset.meta",
+    "sha256": "c59033669912c61292dc50a39ecfcbc0f627331d40b3cf9e91e8d202bf174d75",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-40.asset",
+    "sha256": "fe81a1acb4c6f83b5844759bc966b09ecf441195dfe30d28831a6c80c235eaf8",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-40.asset.meta",
+    "sha256": "7573681680fe6819aa002d701f09f740e35ff31a33c3231224672c38784bff0c",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-41.asset",
+    "sha256": "29c85520b450bda0c4f4ce612cd6f24ae3e326913f02c06fe19ec018795af99f",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-41.asset.meta",
+    "sha256": "e7a0ef7edf152abae3d5f0d6eb0fce6630bfde2e30641af3288f77104843a491",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-42.asset",
+    "sha256": "e8039e3ee0d31d666e6420adee2be6b1ea8a5f0e1a2937bc0ffc9ba62b9f78da",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-42.asset.meta",
+    "sha256": "c10016a3eb52989831aac7af7d11baf8921f26dcba2cf65c23b118d6b4fc1121",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-43.asset",
+    "sha256": "db8235b150a512a351921cca9cceee9ed653868fc0c305f0e106f74326eaccda",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-43.asset.meta",
+    "sha256": "9cd928674647c461426288bf08bace9be7bb189a4cd983b0d9c8468aa2c55011",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-44.asset",
+    "sha256": "25c75170fc12496f963f08159d06aac69d2c9d45b2daf867f482b217f7a20edb",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-44.asset.meta",
+    "sha256": "a1a5195135aac770ee26ec3cb9277379c780570b776fc989ba6d7c11ba8dfaa9",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-45.asset",
+    "sha256": "42b8ad6c4c1305f91319fb1df67baa06808b3836e9ebe25254d80e4fb48f6702",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-45.asset.meta",
+    "sha256": "3ac28fdf2b2402c3ac4361b89fdc69f40624929c434b51d456d21b1ffdf99da0",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-46.asset",
+    "sha256": "23e8675ee749f89754e6d94a51e841639fc9e75adbd84f6398edd251eca6be80",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-46.asset.meta",
+    "sha256": "9aef6130be22ce85be7db96ee838166ae8a770a6729ede38bf5d137702e0eb62",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-47.asset",
+    "sha256": "4ee57e0828a88fc36eb2d1bf80dfc9bb658c578787e20674f41e4a78c4e36c77",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-47.asset.meta",
+    "sha256": "7b978d18211c564806d893a766d9936bc2293e3f698ba0a2829670452c8cc45f",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-48.asset",
+    "sha256": "2e1fb264b1a7c181d3988ae241305f21ff3f5370a73bb2bd0a81719b65ee80d1",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-48.asset.meta",
+    "sha256": "da91921fae42897a70f219ec867bc6fa4ed323fd9339c8b39a91de5529ee39b6",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-49.asset",
+    "sha256": "c2d5c76b23d5d67f59a0909b26c9949bc2ba6c058b2e095931ddf86beb3aa102",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-49.asset.meta",
+    "sha256": "869cd4a039f680cd967082ad0e7ed07334e73a3c12ce5a7039a9315353865b75",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-50.asset",
+    "sha256": "b4a07792f349251b42dcb6b1bb9578922155685584088603e166e2ef3a2d10d7",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-50.asset.meta",
+    "sha256": "9dfed7587de00b4fd1ab3a89e06f2fcd1b21d44e79e03b6fc0b4b5a34a235bcc",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-51.asset",
+    "sha256": "752d3a7cf0d466b6324148629272b7f2a16ad33faa8902e6fe95595f1b7ee5e5",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-51.asset.meta",
+    "sha256": "f72c63504db48ff0e397de65a80eab7bd989eda6a7f429ef4372870bf5a8d581",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-52.asset",
+    "sha256": "2c3c135ede275479b89dd91db54e620c2b8fc68db9da84789e1b9135391e024f",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-52.asset.meta",
+    "sha256": "57b667cc78ec0daca6c413a498b5f5ff5c346513ea64db48d5813d4e6d338e0a",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-53.asset",
+    "sha256": "56c497d7cf0165535f617d056928f6c60ff81a598cf43cdf3d0613e85d175b66",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-53.asset.meta",
+    "sha256": "e08818fae55de13af12c6d825c90c6e131f577433506f116f14470383e0b7b40",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-54.asset",
+    "sha256": "d8904fd5cb2058cfcf5ac0944f0a47b6856bdfac8aeadfb83d3086ffd12ceecd",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-54.asset.meta",
+    "sha256": "f415645b1486afa4168c020b39221c1e1409118db9df277a21d79ede7a9e31e2",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-55.asset",
+    "sha256": "eeeb4072f9ae8c042c04f2c88a7b5e6e8fb16d541b022554e0d7122cd26c9a92",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-55.asset.meta",
+    "sha256": "58727d0632e905ecf8e67e11d472be2accf0a7b3a6fe7228d65270621d42aba1",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-56.asset",
+    "sha256": "e92a47c2c3d360a6e54be0ea91192e5accca176e06eb5be2b4e2cb2e942e9651",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-56.asset.meta",
+    "sha256": "45224d6ab09f6d8238a1002ff30848f83db13565ca90774881edec1966f6d567",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-57.asset",
+    "sha256": "ff5d095d03a956a91aa70e4b48c0dff22dbd505fd082a412a03250a3a470d43e",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-57.asset.meta",
+    "sha256": "5a42320f52f38228c80f88fe7a07d7de5dc60b615081348c0abca194776d0595",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-58.asset",
+    "sha256": "f39947421c9423bf7762f4475af51897f22838968b47339122c4e566033cd85c",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-58.asset.meta",
+    "sha256": "a035590ca546fce57c5b93941376eccbbd9bf8dd48aa38fe5b5db24b2e8ee934",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-59.asset",
+    "sha256": "15b7876389006dedcebcde5606f685b561bf1334b3566d23e0c5c1adfb2f8e86",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-59.asset.meta",
+    "sha256": "0cc16e52789618bb2df4521ea4c504873d550837574ebd4a8dc73a6403228386",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-60.asset",
+    "sha256": "54e7d9657f213871e81b06cd59fafaf5c36c6bdf01e83c4bb27a31bcbcc9f7d7",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-60.asset.meta",
+    "sha256": "cc33f61c9c3e8f4f4a7d837626790e368ad1629cb5f74c49b79d138cedd2958d",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-61.asset",
+    "sha256": "5d0eadb090b9846151817c4c43af686876394d548f3f4e4a3069d1be705402a2",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-61.asset.meta",
+    "sha256": "e6a1819ae26c5d18b8a33efe756d4943a51334e1d7f88af0e1e87d585509c1ed",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-62.asset",
+    "sha256": "5d1df61956d282f008189eb0e664e8d815735ded97b7cd2661204779780fee68",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-62.asset.meta",
+    "sha256": "73f8590b6221555fbde1fbe326933f3610ced290bf2879e289fcaf648c58b7ab",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-63.asset",
+    "sha256": "6cb3fa6a953ced944b8b435db0c5f0890b8d585da0c02630012ab35cc48c1d68",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-63.asset.meta",
+    "sha256": "6994cf11d9bd61610875657d723bc52bba7bc177c36e7c0283f2988dd23b90c2",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-64.asset",
+    "sha256": "1f7ea4f35208dc4d846653904453d3eb080d8ffd1d66ca60ce7741cae40f3af7",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-64.asset.meta",
+    "sha256": "612b87db3095ea7c6194be92f02ff555a9785b5982bdbf1ada069f0568cd4199",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-65.asset",
+    "sha256": "351d17da026b8c9747f2dcd659a7e1e14ae0b5a23fd34a9080405daef6762a74",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-65.asset.meta",
+    "sha256": "22b57693d52c30209036f6cb6ae8c0ee84ce9ecabc072a65952b97a55d86b1b7",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-66.asset",
+    "sha256": "81e311f32ddc666ab060a7493418e60cb3b7dc27c6746e5a82818d7f23bcf682",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-66.asset.meta",
+    "sha256": "a80a7da7f2fba29a546ad5d2522a159053ea8540138ae00c5326783b1c0082ee",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-67.asset",
+    "sha256": "9b9d61bec694e9b25eb3eb5f1be56261624d445408fdfe96b4e571cf6d30d95b",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-67.asset.meta",
+    "sha256": "1ad8298557618f0bea63e669c213ae7857d156a712aa5fc61658b49f3d110fac",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-68.asset",
+    "sha256": "d4622650b1333edbc823610da213a97c137fbf45ae717ef4565e6b3923afa8da",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-68.asset.meta",
+    "sha256": "88c9a5d3493807d2cb019f63f35a910390110556af544a4dceb7cece41d19c6d",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-69.asset",
+    "sha256": "de75c160bfc8598b55de943886dfdc182be9a5f1d2cdde61310385b484c3a8d1",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-69.asset.meta",
+    "sha256": "86cb20133348391746e4a87e939fdda099b5507c366ec007f23369d8dbb64cee",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-70.asset",
+    "sha256": "e521a884181281db2b605c7ea6c0abcb44eec6abfd37bdef8b634f1c8bebb0f3",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-70.asset.meta",
+    "sha256": "f6cd4b52cdc69fbc84993928c94f5d53b4339073bc78e0cae123cc8299392741",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-71.asset",
+    "sha256": "b714d8acf24ced0326731533cb885c22c6025e47e1e4d178a6acaab6f3516c99",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-71.asset.meta",
+    "sha256": "3e4112861cfb78dbfb30adda425d448cebe80e4532c931b8b488ac13b7d9a342",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-72.asset",
+    "sha256": "7c5da5bc4b0d8a0efa5d3c49bfa3828ace59e38a3e6822928a6e2302b963d121",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-72.asset.meta",
+    "sha256": "495ae9164a9e3f35113e7046d129549cab9ccfedcebf37fb2ff73606a7cc8fad",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-73.asset",
+    "sha256": "f585f54313cd5882eee020f38abb71094a0e38e56dca0f165d27761fab942c91",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-73.asset.meta",
+    "sha256": "5a24c9891038328f73571667273f3847816b30b1ef2434478c42c39cd96e01c1",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-74.asset",
+    "sha256": "b7682be81aeba86e5e31687e1739491e01705673d97fe1f98824a5d97cc1f550",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-74.asset.meta",
+    "sha256": "1808795572471dadbe04e561d35285912baa0f9e289185d920f1ac85e6a2845a",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-75.asset",
+    "sha256": "cc80fd096e138b710a0b56a4f43c0d1e5906caa8e5cf02a1f09bf4adc82602c8",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-75.asset.meta",
+    "sha256": "37630a85f8e8f41a62233d98a1237188437768092f127374cb4f522c70c397ac",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-76.asset",
+    "sha256": "628601d334051db319b745008111bf1d38df62adad97dffaf0f272d5b57c3f47",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-76.asset.meta",
+    "sha256": "a8b54926d3dd29511f7a0d15a01d20e8429889cffa20e349486bf1de73a5d689",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-77.asset",
+    "sha256": "64cdf25d4e68001b3bd3b952ac86fc2e89b20f7fa18d2bc96602cf4438685a8a",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/candidate-frame-77.asset.meta",
+    "sha256": "68860f7a16bacce37efa2f5fef6575320e8814b465b683056480b2cda29869e4",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-movement-refined-source.png",
+    "sha256": "f8a1e5e12c918429ab939f0f8c0710341ae044da1dbf14e4adca432886613d20",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-movement-refined-source.png.meta",
+    "sha256": "ef542a51714ada1f82d5e2dabdf6e00197a48147a102dd2afcdba2c0113fdcae",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-movement-refined.png",
+    "sha256": "b022b0d0cd1ddaa452184e40dd9d0db65e9df89815adbd2acd449d13f9c807f6",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-movement-refined.png.meta",
+    "sha256": "210eb0b2a76778428f913d2f03ababd2806df3919cf62514a8a2c6b37af6735b",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-movement-smooth.png",
+    "sha256": "48d52eb5339b2c06f929783e45c3cb5f0810eae3a387ec95f060a6614bfb90e4",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-movement-smooth.png.meta",
+    "sha256": "5f18169b0d9d45bbe8873b47203eba6ce514e9db8774a61fcc077bd295d96a6f",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-rig-clean-source.png",
+    "sha256": "a9189526930369b4409355004416e671f625e4dae4bd804566c70dd2cb51cbcd",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-rig-clean-source.png.meta",
+    "sha256": "4a512108002727748c2c8718f796e2eca48ab069bcbb34b031d407d248641add",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-rig-source.png",
+    "sha256": "c91d342a4d5bcb7cf626ab8778e7f7167114a9f59367e5802d28b933fc5d1b94",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-rig-source.png.meta",
+    "sha256": "029783ecd7d2e7626259f44e0a10629cdce2c461159ba6a74e7613e2e764bc43",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/MikaCandidate.prefab",
+    "sha256": "242c622310543ef19bc7ca4025180162b0668cf57a17c064bbd487056b05b0f4",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/MikaCandidate.prefab.meta",
+    "sha256": "670eb76292d95aabe7bde2f01a930c7425119a4b19888b29efad4801aff8180a",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/MikaRigCandidate.prefab",
+    "sha256": "d51aaad609f37f7f45022b7a44fb9582b42918672439c6ae51e9c869b250bd38",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/MikaRigCandidate.prefab.meta",
+    "sha256": "67b202db5beab6e1a742d88e5679c7b786407a51f2bbc18981b982087a3ae7f8",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-00.png",
+    "sha256": "6670c6f4267a8042ab3141406633be14f3e0e850e5e11c798403556fd84045b9",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-00.png.meta",
+    "sha256": "38ae036c871ea4fdd04bcde6b35a27ba1af5c7b617d9c4d1b5d48a05c9f4cc83",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-01.png",
+    "sha256": "7342b86a01da6304e665f60982b5bd9e3cb567a27a5e484a7af41c0f33baa6f0",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-01.png.meta",
+    "sha256": "09e8787fdb3157cc0f2aa951c6917536f0ec89b5c46c24f7b4ef2a511a8a4290",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-02.png",
+    "sha256": "954653a538a9c49996a87dad4c00b3b4cd2edc29198cfe01d265312662617343",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-02.png.meta",
+    "sha256": "27d78ee261724aa4962a017f5b3764d5aa53d9d68e849ca389f280f75c4fbf22",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-03.png",
+    "sha256": "952448a33c6c85018f0e0b21b543f7f37b0403b7a8c9b4967979f30d9086fce3",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-03.png.meta",
+    "sha256": "020deae648ee6562dff4632626a5b49476d5ab54e06cbae263e90f5c0a721c0e",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-04.png",
+    "sha256": "22f37df48fd0b967d538438eda2235ffd0ada5f2d7d0d34317931cb1bf0e8510",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-04.png.meta",
+    "sha256": "0c2cffaae044fad05249b396417272c8bd0aa86942530a4502b24865d12ea7ae",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-05.png",
+    "sha256": "99f348f9bf3ed815ed8193aaf789816d3cddc959e23537ebcd704cabe96ce903",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-05.png.meta",
+    "sha256": "809e79b9061b2bbb1f18db3aea3009ae41c28fa451888fa2cbe14106245c4a14",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-06.png",
+    "sha256": "c788db7777c67798898fbdc911533c4c092d0ee32b979e035a30155c4f766716",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-06.png.meta",
+    "sha256": "a158974577b00ef8dd63d56ff1e5129e19c85753df62408f3605053a7507f08f",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-07.png",
+    "sha256": "115f801d5359c25f66e58b10b754032c1b3fa889db2065200e0f89f5d5afb0ef",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/rig-part-07.png.meta",
+    "sha256": "8dc79ffadcf7c1fc9e532c0af29e2a4aefa09fa907dc9f8ed37ddce4e2a2ed63",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Scripts/MikaGait.cs",
+    "sha256": "0c6504a3ffcd4d26ec248bd96086db0a6163e5a95e06a6d8c7146c8af0103267",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Scripts/MikaGait.cs.meta",
+    "sha256": "729a0a32534339691523a5cfc104c383ee9c96eceab3e8c77fdeedfc313f7562",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Scripts/MikaRigPresentation.cs",
+    "sha256": "847698473a9178ed903ae619de926b36e29873087bf5b5a9753fc90b85b35621",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Scripts/MikaRigPresentation.cs.meta",
+    "sha256": "c9ad4c92de97b79baf227239c99b3aa475e851606b91ec0b75a07b7e084df8aa",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Scripts/MikaPreviewCamera.cs",
+    "sha256": "a1f01022b0ff8e377f7867af974113280c35148c75d9cfcbb61e153b9847819c",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Scripts/MikaPreviewCamera.cs.meta",
+    "sha256": "3cf2b80b91d760c9590e9254c57b86e1074027686f954922142a2588fc2af2eb",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Editor/MikaRigPreview.cs",
+    "sha256": "7197f914fbd2768223ef39ca8a6446f04d55d3091b6119fd665a73dd2589fee9",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Editor/MikaRigPreview.cs.meta",
+    "sha256": "4cf2cc87c6771249255788172018b0adbee6f7c19393bb40d9038f3d3efeed1c",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Tests/Editor/MikaGaitTests.cs",
+    "sha256": "72b74fbf6d2a7cf154d1574bda882c124cd8a73629d68f776e28d218a7e1f214",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Tests/Editor/MikaGaitTests.cs.meta",
+    "sha256": "4032b2c3687e3c317ff05a38bd2e6bf606d19889e3a2e646543b376e3ce6a8d1",
+    "operation": "move"
+  },
+  {
+    "original": "tools/prepare-mika-rig.py",
+    "sha256": "f3ca3e8ad014e0de6185876ff700139a86c3878d2282cbb57a51483f89462741",
+    "operation": "move"
+  },
+  {
+    "original": "tools/prepare-mika-sprites.py",
+    "sha256": "360915b9140a4fabe47496c301b8ccbfca67e842a21c6b727e925321dca8b6d6",
+    "operation": "move"
+  },
+  {
+    "original": "tools/interpolate-mika-sprites.py",
+    "sha256": "c52507eb86654fe95f8a5382bc755fd494995746c0dca93206bac32199835982",
+    "operation": "move"
+  },
+  {
+    "original": "tools/prepare-mika-run-study.py",
+    "sha256": "4d747753d17e99317ba884efd8b47cbc8ce0452ece32f132b318cd884a596f03",
+    "operation": "move"
+  },
+  {
+    "original": "Assets/Game/Scripts/MikaAnimation.cs",
+    "sha256": "62074ca3ebbb20b6f68086c334ac1b9a7d0b51c949fc8e4e2c6797c43d2bf646",
+    "operation": "snapshot"
+  },
+  {
+    "original": "Assets/Game/Scripts/MikaAnimation.cs.meta",
+    "sha256": "c68d2ad0f9207cbc315ddacac69791cc6a8be590fbb754568652fa706e7e7a6d",
+    "operation": "snapshot"
+  },
+  {
+    "original": "Assets/Game/Editor/MikaCharacterPreview.cs",
+    "sha256": "0acce09bf947b2dadf588e5ab53532225c25c7ac88edcf5c3e384a2bf4760971",
+    "operation": "snapshot"
+  },
+  {
+    "original": "Assets/Game/Editor/MikaCharacterPreview.cs.meta",
+    "sha256": "47747a7766cd640b51d7d484f06aeb81eeea317b021ecd02007cdf659c905c23",
+    "operation": "snapshot"
+  },
+  {
+    "original": "Assets/Game/Tests/Editor/MikaAnimationTests.cs",
+    "sha256": "c6939a70f3ff665dc3af9dc796557ef3e86f7e8eca4095265c16f5ed8e10fcbd",
+    "operation": "snapshot"
+  },
+  {
+    "original": "Assets/Game/Tests/Editor/MikaAnimationTests.cs.meta",
+    "sha256": "1c6d2fb38195b761fd5eb89960f696c931317edd4574361f89c0963823029648",
+    "operation": "snapshot"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-movement-candidate.png",
+    "sha256": "d17c6083c0bbefd927f46b03b3335b3c051fc787f7f4d30b9c77d60ea630de22",
+    "operation": "snapshot"
+  },
+  {
+    "original": "Assets/Game/Art/Mika/mika-movement-candidate.png.meta",
+    "sha256": "f61bb62a7e3e2af8ca9d502617f16d760cff310a875836b4ae57323f290bf362",
+    "operation": "snapshot"
+  }
+]
