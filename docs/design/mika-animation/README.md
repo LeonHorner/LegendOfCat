@@ -2,6 +2,14 @@
 
 ## Latest user review — 2026-10-24
 
+The added inbetween preview was rejected as substantially worse. Do not integrate
+it or continue generating replacement pose sheets by default. The user retained
+the actual game character and requested a small improvement using existing images.
+The next runtime adjustment only stabilizes pose selection: apex hysteresis
+(enter at 2.2 m/s, exit beyond 2.8 m/s) and an 80 ms cosmetic pre-contact grace
+for brief surface-probe misses. Upward motion, grounding and reset clear reach
+history immediately. No drawings, run frames, pivots or physics are changed.
+
 The latest direction keeps the actual in-game cat and rejects the cute legacy
 sample. The user requests more images specifically between existing transition
 poses. [Existing-game inbetweens](movement-completion/in-game-inbetweens/README.md)

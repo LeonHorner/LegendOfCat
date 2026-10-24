@@ -13,6 +13,8 @@ public sealed class MikaAnimation
     public bool LandingSoon { get; set; }
     float elapsed, distance;
     bool initialized, wasGrounded, jumped;
+    bool apexPose;
+    float landingReach;
 
     public void Reset()
     {
@@ -22,6 +24,8 @@ public sealed class MikaAnimation
         elapsed = distance = 0;
         initialized = wasGrounded = jumped = false;
         LandingSoon = false;
+        apexPose = false;
+        landingReach = 0;
     }
 
     public void Step(float deltaTime, bool grounded, Vector2 velocity, float travelled)
@@ -30,6 +34,13 @@ public sealed class MikaAnimation
         elapsed += dt;
         if (grounded) { jumped = false; LandingSoon = false; }
         else if (velocity.y > 0) jumped = true;
+        // Brief probe misses at platform edges must not alternate reach/fall drawings.
+        // A real jump immediately clears the cosmetic reach, including buffered jumps.
+        if (grounded || velocity.y >= 0) landingReach = 0;
+        else landingReach = LandingSoon ? 0.08f : Mathf.Max(0, landingReach - dt);
+        // Hysteresis prevents threshold noise from repeatedly entering/leaving the apex.
+        if (grounded || !jumped || Mathf.Abs(velocity.y) > 2.8f) apexPose = false;
+        else if (Mathf.Abs(velocity.y) <= 2.2f) apexPose = true;
         bool moving = Mathf.Abs(velocity.x) > 0.1f;
         int direction = moving ? (velocity.x < 0 ? -1 : 1) : Facing;
         bool turned = direction != Facing;
@@ -55,7 +66,7 @@ public sealed class MikaAnimation
         if (grounded && moving) distance = Mathf.Repeat(distance + Mathf.Abs(travelled), StrideLength);
         // A complete-character tucked pose bridges ascent and descent at the apex.
         // Entering a fall from a ledge must not invent a jump apex.
-        if (!grounded && jumped && Mathf.Abs(velocity.y) <= 2.2f) {
+        if (apexPose) {
             Frame = 16;
             return;
         }
@@ -63,7 +74,7 @@ public sealed class MikaAnimation
             case Pose.Run: Frame = 4 + Mathf.Min(3, (int)(distance / StrideLength * 4)); break;
             case Pose.Turn: Frame = elapsed < 0.05f ? 8 : 9; break;
             case Pose.Jump: Frame = velocity.y > 6 ? 10 : 17; break;
-            case Pose.Fall: Frame = LandingSoon ? 19 : jumped && velocity.y > -5.5f ? 18 : 11; break;
+            case Pose.Fall: Frame = landingReach > 0 ? 19 : jumped && velocity.y > -5.5f ? 18 : 11; break;
             case Pose.Landing: Frame = elapsed < 0.06f ? 12 : elapsed < 0.12f ? 20 : 13; break;
             default: Frame = 0; break;
         }

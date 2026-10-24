@@ -154,6 +154,32 @@ public class MikaAnimationTests
     }
 
     [Test]
+    public void BriefLandingProbeMissDoesNotFlashBackToFallAndJumpStillInterrupts()
+    {
+        Step(0.02f, false, 0, -8);
+        type.GetProperty("LandingSoon").SetValue(animation, true);
+        Step(0.02f, false, 0, -8); Assert.That(Read("Frame"), Is.EqualTo(19));
+        type.GetProperty("LandingSoon").SetValue(animation, false);
+        Step(0.02f, false, 0, -8); Assert.That(Read("Frame"), Is.EqualTo(19));
+        Step(0.02f, false, 0, 11); Assert.That(Read("Frame"), Is.EqualTo(10));
+        Step(0.02f, false, 0, -8);
+        Assert.That(Read("Frame"), Is.EqualTo(11));
+    }
+
+    [Test]
+    public void ApexThresholdNoiseDoesNotAlternateDrawings()
+    {
+        Step(0.02f, false, 0, 3);
+        Step(0.02f, false, 0, 2.1f);
+        foreach (float speed in new[] { 2.3f, 2.1f, -2.3f, -2.1f }) {
+            Step(0.02f, false, 0, speed);
+            Assert.That(Read("Frame"), Is.EqualTo(16));
+        }
+        Step(0.02f, false, 0, -3);
+        Assert.That(Read("Frame"), Is.EqualTo(18));
+    }
+
+    [Test]
     public void LandingPlaysContactAbsorptionAndRecoveryBeforeIdle()
     {
         Step(0.02f, false, 0, -10);
