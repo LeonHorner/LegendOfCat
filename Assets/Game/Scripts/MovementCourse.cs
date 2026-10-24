@@ -131,7 +131,8 @@ public sealed class MovementCourse : MonoBehaviour
         if (Run.Paused || !Cat.Grounded) return;
         var position = Cat.GetComponent<Rigidbody2D>().position;
         for (int i = 0; i < CheckpointSpawns.Length; i++) {
-            var point = CheckpointSpawns[i];
+            Vector2 point = transform.TransformPoint(CheckpointSpawns[i]);
+            // Marker/spawn follow the course transform when reused in another scene.
             // Only grounded main-route positions may activate a checkpoint.
             if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f)
                 Run.TryActivateCheckpoint(i + 1, point, true);
