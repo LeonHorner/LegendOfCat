@@ -2,6 +2,25 @@
 
 Issue #10 is in progress. This is isolated authoring work, **not accepted production artwork**.
 
+## Current prototype: original four-frame run (2026-10-24)
+
+After comparing animated loops, the user preferred the first four run drawings
+and explicitly requested their integration into the movement prototype. The
+course now loads the Editor-generated `Resources/MikaOriginal.prefab`, using
+original candidate poses 4–7, driven by measured travel over the original 2.4 m
+stride. No generated inbetweens, optical flow or cutout rig is used in this path.
+Idle uses a stable original pose; jump/fall/turn/landing use the original candidate
+poses as temporary companions, not newly accepted animation. Visible sole pivots
+and the existing visual-only floor alignment correct the old hovering offset.
+
+`LegendOfCat/Mika/Create isolated character preview` prepares the original assets
+and opens a temporary movement-course scene. Press Play to test. The preparation
+menu can regenerate the prefab and sprite metadata without changing a scene.
+MovementCourse integration belongs to this feature after #36/#37 merged; camera,
+viewport, HUD, physics and input stay owned by their existing implementations.
+The old eight-pose, optical-flow, rig and sixteen-pose studies below remain
+historical. This approval covers the four-frame prototype, not completion of #10.
+
 ## Current decision: rig rejected; restart with a reviewed run loop (2026-10-24)
 
 The user explicitly rejected the articulated revision as substantially worse:
@@ -23,9 +42,9 @@ not validate visual quality. The user rejection takes precedence over those earl
 technical results and optimistic progress descriptions. Read the authoritative
 [animation decision](../art-direction.md#mika-animation-decision--2026-10-24).
 
-Documentation-only status update: code/assets are preserved. The current **Create
-isolated character preview** command still opens the rejected rig; it has not been
-replaced or rolled back by this decision record. The MP4, PNGs, prefabs, prompts and
+Historical status at the rejection decision: code/assets were preserved and the
+preview command still opened the rejected rig. The current command is superseded
+by the four-frame prototype above. The MP4, PNGs, prefabs, prompts and
 source sheets below are historical evidence. Do not present them as the approved
 target, integrate them into the course, close #10 or mark PR #41 ready based on them.
 A [complete-character run study](frame-run-study/README.md) now includes normal

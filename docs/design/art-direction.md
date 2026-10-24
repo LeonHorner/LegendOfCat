@@ -61,6 +61,13 @@ See [Mika character authoring](mika-animation/README.md) for retained negative
 examples and implementation status. No final Mika movement set has been accepted;
 issue #10 remains incomplete.
 
+Subsequent loop review on 2026-10-24: the user preferred the original four-frame
+run over both added inbetweens and the new sixteen-pose study, and explicitly
+authorized putting that four-frame run into the movement prototype. Use original
+candidate poses 4–7 without interpolation. This selects the prototype run only;
+the remaining movement set still requires review. See the authoring README for
+the current course integration and reproduction steps.
+
 ## Provenance
 See ASSETS.md. Images were produced with the built-in OpenAI image generation tool on 2026-10-23, using earlier generated scene references. Exact model ID was not exposed. Human direction selected cat and owl influences, rejected 2.5D, and required clearer gameplay/background separation. Full archived generation prompts are in [reference-prompts.md](reference-prompts.md).
 

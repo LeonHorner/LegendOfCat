@@ -19,6 +19,7 @@ public sealed class MovementCourse : MonoBehaviour
     float stride, facing = 1;
     string previousPose;
     float landing;
+    bool originalMika;
 
     void Awake()
     {
@@ -46,6 +47,14 @@ public sealed class MovementCourse : MonoBehaviour
         input.BackToMenu = () => BackToMenu?.Invoke();
         visual = new GameObject("Temporary quadruped silhouette").transform;
         visual.SetParent(player.transform, false);
+        var original = Resources.Load<GameObject>("MikaOriginal");
+        if (original) {
+            Destroy(visual.gameObject);
+            visual = Instantiate(original, player.transform).transform;
+            visual.GetComponent<MikaSpritePresentation>().controller = Cat;
+            originalMika = true;
+        }
+        if (!originalMika) {
         Part("Body", new Vector2(-0.04f, 0.03f), new Vector2(0.94f, 0.4f), new Color(0.95f, 0.53f, 0.2f));
         Part("Chest", new Vector2(0.3f, 0), new Vector2(0.22f, 0.38f), new Color(1, 0.86f, 0.62f));
         Part("Head", new Vector2(0.4f, 0.25f), new Vector2(0.35f, 0.32f), new Color(0.95f, 0.53f, 0.2f));
@@ -54,6 +63,7 @@ public sealed class MovementCourse : MonoBehaviour
         var tail = Part("Tail", new Vector2(-0.65f, 0.18f), new Vector2(0.45f, 0.12f), new Color(0.8f, 0.36f, 0.12f));
         tail.localRotation = Quaternion.Euler(0, 0, -30);
         for (int i = 0; i < 4; i++) feet[i] = Part("Leg", new Vector2(-0.32f + i * 0.2f, -0.27f), new Vector2(0.1f, 0.32f), new Color(1, 0.79f, 0.5f));
+        }
         courseCamera = new GameObject("Course camera").AddComponent<Camera>();
         courseCamera.transform.SetParent(transform, false);
         courseCamera.orthographic = true;
@@ -108,6 +118,7 @@ public sealed class MovementCourse : MonoBehaviour
             courseCamera.aspect = 16f / 9f;
         }
         var velocity = Cat.Motion.Velocity;
+        if (originalMika) return;
         if (Mathf.Abs(velocity.x) > 0.1f) facing = Mathf.Sign(velocity.x);
         visual.localScale = new Vector3(facing, 1, 1);
         stride += Mathf.Abs(velocity.x) * Time.deltaTime * 2;

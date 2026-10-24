@@ -54,6 +54,15 @@ No third-party game assets have been imported.
 
 ## Complete-character Mika run study
 
+On 2026-10-24 the user selected the earlier four-frame run for prototype
+integration after comparing animated loops. `Assets/Game/Art/Mika/Original/`
+contains Editor-created sprite metadata referencing the unchanged original
+`mika-movement-candidate.png`; `Assets/Game/Resources/MikaOriginal.prefab` is
+the corresponding cosmetic presentation. No new generated artwork is involved.
+Human decisions: preserve original run poses 4–7 and substantial paws, remove
+inbetweens, register visible sole pivots and retain physics/input timing.
+Other original poses remain temporary; this does not accept the full movement set.
+
 `docs/design/mika-animation/frame-run-study/` contains an original generated
 complete-cat run sheet and derived review artwork, produced with built-in OpenAI
 image generation on 2026-10-24; exact model ID was not exposed. Terms:

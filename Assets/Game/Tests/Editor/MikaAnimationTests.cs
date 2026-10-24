@@ -19,6 +19,25 @@ public class MikaAnimationTests
     }
 
     [Test]
+    public void OriginalRunUsesOnlyFourSourcePosesAndStopsAtRest()
+    {
+        type.GetProperty("OriginalFrames").SetValue(animation, true);
+        var poses = new System.Collections.Generic.HashSet<int>();
+        for (int i = 0; i < 40; i++) {
+            Step(0.02f, true, 7, 0, 0.1f);
+            poses.Add((int)Read("Frame"));
+        }
+        Assert.That(poses, Is.EquivalentTo(new[] { 4, 5, 6, 7 }));
+        var frame = Read("Frame");
+        Step(1, true, 7, 0, 0);
+        Assert.That(Read("Frame"), Is.EqualTo(frame));
+        Step(0.02f, true, 0, 0);
+        Assert.That(Read("Frame"), Is.EqualTo(0));
+        Step(0.02f, false, 0, 11);
+        Assert.That(Read("Frame"), Is.EqualTo(10));
+    }
+
+    [Test]
     public void BufferedJumpImmediatelyInterruptsLanding()
     {
         Step(0.02f, false, 0, -5);

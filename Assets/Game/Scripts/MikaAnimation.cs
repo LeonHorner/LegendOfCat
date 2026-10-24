@@ -10,6 +10,7 @@ public sealed class MikaAnimation
     public const int FrameCount = 78;
     public const float StrideLength = 3.6f;
     public const float LandingDuration = 0.24f;
+    public bool OriginalFrames { get; set; }
     float elapsed, distance;
     bool initialized, wasGrounded;
 
@@ -48,7 +49,19 @@ public sealed class MikaAnimation
         }
         // Drive the gait from measured displacement, not wall-clock time or input intent.
         // Reset on retry/teleport through the adapter; never animate a stationary run.
-        if (grounded && moving) distance = Mathf.Repeat(distance + Mathf.Abs(travelled), StrideLength);
+        float strideLength = OriginalFrames ? 2.4f : StrideLength;
+        if (grounded && moving) distance = Mathf.Repeat(distance + Mathf.Abs(travelled), strideLength);
+        if (OriginalFrames) {
+            switch (Current) {
+                case Pose.Run: Frame = 4 + Mathf.Min(3, (int)(distance / strideLength * 4)); break;
+                case Pose.Turn: Frame = elapsed < 0.05f ? 8 : 9; break;
+                case Pose.Jump: Frame = 10; break;
+                case Pose.Fall: Frame = 11; break;
+                case Pose.Landing: Frame = elapsed < 0.06f ? 12 : 13; break;
+                default: Frame = 0; break;
+            }
+            return;
+        }
         switch (Current) {
             case Pose.Run:
                 // Optical-flow leg inbetweens distorted paw shape during contact.

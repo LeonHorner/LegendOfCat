@@ -6,6 +6,7 @@ public sealed class MikaSpritePresentation : MonoBehaviour
 {
     public CatController controller;
     public Sprite[] frames;
+    public bool originalFrames;
     public readonly MikaAnimation Animation = new MikaAnimation();
     SpriteRenderer target;
     Vector3 previousPosition;
@@ -15,6 +16,7 @@ public sealed class MikaSpritePresentation : MonoBehaviour
     void OnEnable()
     {
         target = GetComponent<SpriteRenderer>();
+        Animation.OriginalFrames = originalFrames;
         if (!controller) controller = GetComponentInParent<CatController>();
         if (controller) {
             shape = controller.GetComponent<BoxCollider2D>();
@@ -64,7 +66,7 @@ public sealed class MikaSpritePresentation : MonoBehaviour
 
     void ApplyFrame()
     {
-        if (frames != null && frames.Length == MikaAnimation.FrameCount) target.sprite = frames[Animation.Frame];
+        if (frames != null && frames.Length == (originalFrames ? 16 : MikaAnimation.FrameCount)) target.sprite = frames[Animation.Frame];
         target.flipX = Animation.Facing < 0;
     }
 

@@ -52,7 +52,50 @@ public static class MikaCharacterPreview
     }
 
     [MenuItem("LegendOfCat/Mika/Create isolated character preview")]
-    public static void Create() => MikaRigPreview.Create();
+    public static void Create()
+    {
+        CreateOriginal();
+        if (Application.isBatchMode) return;
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        new GameObject("Mika original movement course").AddComponent<MovementCourse>();
+    }
+
+    [MenuItem("LegendOfCat/Mika/Prepare original four-frame prototype")]
+    public static void CreateOriginal()
+    {
+        const string source = "Assets/Game/Art/Mika/mika-movement-candidate.png";
+        const string folder = "Assets/Game/Art/Mika/Original";
+        if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder("Assets/Game/Art/Mika", "Original");
+        var importer = (TextureImporter)AssetImporter.GetAtPath(source);
+        importer.isReadable = true;
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+        importer.SaveAndReimport();
+        var atlas = AssetDatabase.LoadAssetAtPath<Texture2D>(source);
+        float width = atlas.width / 4f, height = atlas.height / 4f;
+        var frames = new Sprite[16];
+        for (int i = 0; i < 16; i++) {
+            var rect = new Rect(i % 4 * width, (3 - i / 4) * height, width, height);
+            var pivot = ContactPivot(atlas, rect);
+            if (i == 10 || i == 11) pivot.y = 0.08f;
+            var sprite = Sprite.Create(atlas, rect, pivot, width / 1.8f, 0, SpriteMeshType.FullRect);
+            sprite.name = $"original-frame-{i:00}";
+            string path = $"{folder}/{sprite.name}.asset";
+            var existing = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (existing) { EditorUtility.CopySerialized(sprite, existing); Object.DestroyImmediate(sprite); }
+            else { AssetDatabase.CreateAsset(sprite, path); existing = sprite; }
+            frames[i] = existing;
+        }
+        var visual = new GameObject("Mika original four-frame animation");
+        var renderer = visual.AddComponent<SpriteRenderer>();
+        renderer.sprite = frames[0]; renderer.sortingOrder = 3;
+        var presentation = visual.AddComponent<MikaSpritePresentation>();
+        presentation.originalFrames = true;
+        presentation.frames = frames;
+        PrefabUtility.SaveAsPrefabAsset(visual, "Assets/Game/Resources/MikaOriginal.prefab");
+        Object.DestroyImmediate(visual);
+        AssetDatabase.SaveAssets();
+    }
 
     [MenuItem("LegendOfCat/Mika/Create archived sprite preview")]
     public static void CreateSpriteArchive()
