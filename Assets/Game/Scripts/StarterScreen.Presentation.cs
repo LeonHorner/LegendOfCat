@@ -148,11 +148,11 @@ public sealed partial class StarterScreen
             if (display != null) {
                 GUILayout.Space(12);
                 Label("Display", headingStyle);
-                GUI.enabled = !popup && !display.Pending;
+                GUI.enabled = !popup && !display.Switching;
                 if (Button(fullscreen ? "Fullscreen: On" : "Fullscreen: Off"))
                     SetFullscreen(!fullscreen);
                 GUI.enabled = !popup;
-                Label("Resize the window by dragging its borders. Alt+Enter toggles fullscreen.", smallStyle);
+                Label("Resize the window by dragging its borders. F11 or Alt+Enter toggles fullscreen.", smallStyle);
             }
             if (Button(string.IsNullOrEmpty(available) ? "Versions & updates" : "Versions & updates - Available")) page = "updates";
             if (Button("Back to menu")) page = "menu";

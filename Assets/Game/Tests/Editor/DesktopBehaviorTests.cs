@@ -2,8 +2,11 @@ using System;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
-public class DesktopBehaviorTests
+public class DesktopBehaviorTests : InputTestFixture
 {
     static Type Runtime(string name) => AppDomain.CurrentDomain.GetAssemblies()
         .Select(a => a.GetType(name)).First(t => t != null);
@@ -34,7 +37,7 @@ public class DesktopBehaviorTests
         Assert.That(Call(state, "Observe", 1920, 1080, true, 0.2f, false), Is.False);
         Call(state, "Observe", 1920, 1080, true, 0.3f, false);
         Call(state, "Observe", 1920, 1080, true, 1f, false);
-        Assert.That(Property(state, "Pending"), Is.True, "Controls remain pending until the observed mode is committed.");
+        Assert.That(Property(state, "Pending"), Is.True, "Persistence remains pending until the observed mode is stable.");
         Assert.That(Call(state, "Observe", 1920, 1080, true, 2f, false), Is.True);
         Assert.That(Property(state, "Fullscreen"), Is.True);
         Assert.That(Property(state, "Width"), Is.EqualTo(1280));
@@ -99,5 +102,166 @@ public class DesktopBehaviorTests
         Assert.That(Parse(null).Length, Is.Zero);
         Assert.That(Parse("```\ncode\n```\n[ref]: https://example.org\n| table |").Length, Is.Zero);
         Assert.That(Parse(string.Join("\n", Enumerable.Repeat("- Entry", 10000))).Length, Is.LessThanOrEqualTo(121));
+    }
+    static bool Shortcut(Keyboard keyboard) => (bool)Runtime("StarterScreen")
+        .GetMethod("FullscreenShortcutPressed", BindingFlags.Static | BindingFlags.NonPublic)
+        .Invoke(null, new object[] { keyboard });
+
+    [TestCase(Key.LeftAlt, Key.Enter)]
+    [TestCase(Key.RightAlt, Key.Enter)]
+    [TestCase(Key.LeftAlt, Key.NumpadEnter)]
+    [TestCase(Key.RightAlt, Key.NumpadEnter)]
+    public void FullscreenShortcutRequiresAnEnterEdgeAndDoesNotRepeat(Key alt, Key enter)
+    {
+        var keyboard = InputSystem.AddDevice<Keyboard>();
+        try {
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(alt));
+            InputSystem.Update();
+            Assert.That(Shortcut(keyboard), Is.False);
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(alt, enter));
+            InputSystem.Update();
+            Assert.That(Shortcut(keyboard), Is.True);
+            InputSystem.Update();
+            Assert.That(Shortcut(keyboard), Is.False, "Holding the chord must not toggle every frame.");
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(alt));
+            InputSystem.Update();
+            Assert.That(Shortcut(keyboard), Is.False);
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(alt, enter));
+            InputSystem.Update();
+            Assert.That(Shortcut(keyboard), Is.True, "Release and repress permits the next toggle.");
+        } finally { InputSystem.RemoveDevice(keyboard); }
+    }
+
+    [TestCase(Key.Enter)]
+    [TestCase(Key.NumpadEnter)]
+    public void OrdinaryEnterAndAddingAltToHeldEnterDoNotToggle(Key enter)
+    {
+        var keyboard = InputSystem.AddDevice<Keyboard>();
+        try {
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(enter));
+            InputSystem.Update();
+            Assert.That(Shortcut(keyboard), Is.False);
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(enter, Key.LeftAlt));
+            InputSystem.Update();
+            Assert.That(Shortcut(keyboard), Is.False);
+        } finally { InputSystem.RemoveDevice(keyboard); }
+    }
+
+    [Test]
+    public void FullscreenShortcutWithoutAKeyboardIsHarmless()
+        => Assert.That(Shortcut(null), Is.False);
+    [TestCase(false)]
+    [TestCase(true)]
+    public void GameplayDevicesReleaseAndRecoverAfterFocusLoss(bool gamepad)
+    {
+        var keyboard = InputSystem.AddDevice<Keyboard>();
+        var pad = InputSystem.AddDevice<Gamepad>();
+        var host = new GameObject("Input adapter test");
+        var controller = host.AddComponent(Runtime("CatController"));
+        var input = host.AddComponent(Runtime("CatInput"));
+        var type = input.GetType();
+        void Lifecycle(string name, params object[] args) => type.GetMethod(name,
+            BindingFlags.Instance | BindingFlags.NonPublic).Invoke(input, args);
+        var motion = controller.GetType().GetField("Motion").GetValue(controller);
+        Vector2 Step(bool grounded, Vector2 velocity) => (Vector2)Call(motion, "Step", 0.02f, grounded, velocity);
+        void State(bool pressed) {
+            if (gamepad) InputSystem.QueueStateEvent(pad, pressed
+                ? new GamepadState { leftStick = Vector2.right }.WithButton(GamepadButton.South)
+                    .WithButton(GamepadButton.Select).WithButton(GamepadButton.Start)
+                : new GamepadState());
+            else InputSystem.QueueStateEvent(keyboard, pressed
+                ? new KeyboardState(Key.D, Key.Space, Key.R, Key.Escape) : new KeyboardState());
+            InputSystem.Update();
+        }
+        InputActionMap actions = null;
+        try {
+            type.GetField("controller").SetValue(input, controller);
+            Lifecycle("Awake");
+            actions = (InputActionMap)type.GetProperty("Actions").GetValue(input);
+            int retries = 0, menus = 0;
+            type.GetField("RetryCheckpoint").SetValue(input, (Action)(() => retries++));
+            type.GetField("BackToMenu").SetValue(input, (Action)(() => menus++));
+            Lifecycle("OnApplicationFocus", true);
+            State(true);
+            var velocity = Step(true, Vector2.zero);
+            Assert.That(velocity.x, Is.GreaterThan(0));
+            Assert.That(velocity.y, Is.GreaterThan(10));
+            Assert.That(retries, Is.EqualTo(1));
+            Assert.That(menus, Is.EqualTo(1));
+            State(false);
+            var released = Step(false, velocity);
+            Assert.That(released.y, Is.LessThan(5), "Jump release cuts ascent.");
+            Assert.That(released.x, Is.Zero, "Movement release must clear the axis.");
+            Call(motion, "Reset");
+            Assert.That(Step(true, Vector2.zero).x, Is.Zero);
+            State(true);
+            Lifecycle("OnApplicationFocus", false);
+            Assert.That(actions.enabled, Is.False);
+            Assert.That(Step(true, Vector2.zero).x, Is.Zero);
+            Assert.That((bool)Property(motion, "Jumped"), Is.False);
+            State(false);
+            Lifecycle("OnApplicationFocus", true);
+            InputSystem.Update();
+            Assert.That(Step(true, Vector2.zero).x, Is.Zero, "Released background input must not stick.");
+            State(true);
+            Assert.That(Step(true, Vector2.zero).y, Is.GreaterThan(10));
+            Assert.That(retries, Is.EqualTo(3));
+            Assert.That(menus, Is.EqualTo(3));
+            Lifecycle("OnDisable");
+            Assert.That(actions.enabled, Is.False);
+            Assert.That(Step(true, Vector2.zero).x, Is.Zero);
+        } finally {
+            actions?.Dispose();
+            UnityEngine.Object.DestroyImmediate(host);
+            InputSystem.RemoveDevice(pad);
+            InputSystem.RemoveDevice(keyboard);
+        }
+    }
+    [Test]
+    public void F11TogglesWithoutAltOnlyOnNewPresses()
+    {
+        var keyboard = InputSystem.AddDevice<Keyboard>();
+        InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.F11));
+        InputSystem.Update();
+        Assert.That(Shortcut(keyboard), Is.True);
+        InputSystem.Update();
+        Assert.That(Shortcut(keyboard), Is.False);
+        InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+        InputSystem.Update();
+        Assert.That(Shortcut(keyboard), Is.False);
+        InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.F11));
+        InputSystem.Update();
+        Assert.That(Shortcut(keyboard), Is.True);
+    }
+
+    [Test]
+    public void ConfirmedModeCanReverseBeforePersistenceDebounceWithoutLosingWindowSize()
+    {
+        var state = State();
+        Call(state, "Request", true, 0f);
+        Assert.That(Property(state, "Switching"), Is.True);
+        Call(state, "Observe", 1280, 720, false, 0.01f, false);
+        Assert.That(Property(state, "Switching"), Is.True);
+        Call(state, "Observe", 1920, 1080, true, 0.02f, false);
+        Call(state, "Observe", 1920, 1080, true, 0.03f, false);
+        Assert.That(Property(state, "Switching"), Is.True);
+        Assert.That(Call(state, "Observe", 1920, 1080, true, 0.04f, false), Is.False);
+        Assert.That(Property(state, "Switching"), Is.False, "Controls should unlock after mode confirmation.");
+        Assert.That(Property(state, "Pending"), Is.True, "Saving still debounces.");
+        Call(state, "Request", false, 0.05f);
+        Call(state, "Observe", 1920, 1080, true, 0.06f, true);
+        Assert.That(Property(state, "Switching"), Is.True);
+        // Some compositors report the old desktop dimensions briefly on exit.
+        Call(state, "Observe", 1920, 1080, false, 0.07f, false);
+        Call(state, "Observe", 1280, 720, false, 0.08f, false);
+        Call(state, "Observe", 1280, 720, false, 0.09f, false);
+        Call(state, "Observe", 1280, 720, false, 0.10f, false);
+        Assert.That(Property(state, "Switching"), Is.False);
+        Assert.That(Property(state, "Width"), Is.EqualTo(1280));
+        Call(state, "Observe", 1280, 720, false, 2f, false);
+        Assert.That(Property(state, "Pending"), Is.False);
+        Assert.That(Property(state, "Fullscreen"), Is.False);
+        Assert.That(Property(state, "Width"), Is.EqualTo(1280));
+        Assert.That(Property(state, "Height"), Is.EqualTo(720));
     }
 }

@@ -81,6 +81,8 @@ jobs:
         run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
       - name: Check application icons and packaging contracts
         run: node --test tools/application-icon.test.mjs
+      - name: Test Linux native update supervisor with real processes
+        run: node --test tools/linux-update-supervisor.test.mjs
       - name: Set up .NET for updater workflow tests
         uses: actions/setup-dotnet@v4
         with:
@@ -263,6 +265,27 @@ jobs:
           if (-not (Get-ChildItem $folder -Filter $extension)) { throw 'Missing installer/AppImage' }
       - name: Inspect embedded application and package icons
         run: ./tools/check-package-icons.ps1 -PackageDirectory 'artifacts/releases/${{ matrix.platform }}'
+      - name: Exercise real mounted Linux AppImage N to N+1 update
+        if: matrix.platform == 'linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y fuse libfuse2
+          if [ ! -e /dev/fuse ]; then
+            echo "::error::FUSE is unavailable on this runner; real AppImage update cannot be certified."
+            exit 1
+          fi
+          mkdir -p artifacts/integration/next
+          dotnet vpk pack --packId LeonHorner.LegendOfCat --packVersion 0.0.2 \
+            --packDir publish --mainExe LegendOfCat --runtime linux-x64 \
+            --channel linux --packTitle LegendOfCat \
+            --icon Assets/Game/Branding/icon.png --outputDir artifacts/integration/next
+          old="$(find artifacts/releases/linux -maxdepth 1 -name '*.AppImage' -print -quit)"
+          next="$(find artifacts/integration/next -maxdepth 1 -name '*-full.nupkg' -print -quit)"
+          test -n "$old" && test -n "$next"
+          chmod +x "$old"
+          xvfb-run -a node tools/linux-appimage-update-integration.mjs "$old" "$next"
       - uses: actions/upload-artifact@v4
         with:
           name: pr-package-${{ matrix.platform }}

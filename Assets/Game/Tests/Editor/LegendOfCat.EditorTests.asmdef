@@ -1,5 +1,6 @@
 {
   "name": "LegendOfCat.EditorTests",
+  "references": ["Unity.InputSystem", "Unity.InputSystem.TestFramework"],
   "overrideReferences": true,
   "precompiledReferences": [
     "Newtonsoft.Json.dll",

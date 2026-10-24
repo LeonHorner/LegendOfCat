@@ -1,0 +1,72 @@
+name: Linux AppImage self-update integration
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-fuse-update:
+    name: Real FUSE AppImage N to N+1
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: game-ci/unity-builder@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneLinux64
+          buildMethod: BuildGame.Build
+          versioning: Custom
+          version: 0.0.1
+          customParameters: -releaseVersion 0.0.1 -releaseOutput build/linux/Game/LegendOfCat
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: dotnet tool restore
+      - name: Prepare mounted-AppImage integration dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y fuse libfuse2 xvfb xauth
+          test -e /dev/fuse || { echo "::error::Host does not expose /dev/fuse; use a Linux VM with FUSE."; exit 1; }
+      - name: Assemble the actual Linux player and self-contained launcher
+        shell: bash
+        run: |
+          mkdir -p publish
+          cp -r build/linux/Game publish/Game
+          chmod +x publish/Game/LegendOfCat
+          dotnet publish Launcher/Launcher.csproj -c Release -r linux-x64 --self-contained true -p:Version=0.0.1 -p:RestoreLockedMode=true -o publish
+          chmod +x publish/LegendOfCat
+          test -f publish/linux-update-runner.sh
+      - name: Build isolated old and new Velopack AppImages without publishing
+        shell: bash
+        run: |
+          mkdir -p artifacts/integration/old artifacts/integration/new
+          for version in 0.0.1 0.0.2; do
+            output=artifacts/integration/new
+            if [ "$version" = 0.0.1 ]; then output=artifacts/integration/old; fi
+            dotnet vpk pack --packId LeonHorner.LegendOfCat \
+              --packVersion "$version" --packDir publish --mainExe LegendOfCat \
+              --runtime linux-x64 --channel linux --packTitle LegendOfCat \
+              --icon Assets/Game/Branding/icon.png --outputDir "$output"
+          done
+          test -n "$(find artifacts/integration/old -maxdepth 1 -name '*.AppImage' -print -quit)"
+          test -n "$(find artifacts/integration/new -maxdepth 1 -name '*-full.nupkg' -print -quit)"
+      - name: Verify real FUSE mount disappears before out-of-mount native update
+        shell: bash
+        run: |
+          set -eu
+          old="$(find artifacts/integration/old -maxdepth 1 -name '*.AppImage' -print -quit)"
+          next="$(find artifacts/integration/new -maxdepth 1 -name '*-full.nupkg' -print -quit)"
+          chmod +x "$old"
+          xvfb-run -a node tools/linux-appimage-update-integration.mjs "$old" "$next"
+      - name: Upload sanitized debugging guidance only
+        if: failure()
+        run: |
+          echo "::error::Inspect runner logs and verify FUSE availability, staged native locator, PID barrier and Velopack package layout."
+          echo "Do not publish personal tester paths or crash dumps."

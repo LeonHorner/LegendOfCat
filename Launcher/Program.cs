@@ -43,10 +43,14 @@ static class UpdateService
             Send(new { state = "downloading", progress, downloadedBytes, totalBytes }));
         var manager = new UpdateManager(new GithubSource(Repository, null, false, transfer));
         if (File.Exists(marker)) {
-            var target = await File.ReadAllTextAsync(marker);
-            if (target != installedVersion)
+            var target = (await File.ReadAllTextAsync(marker)).Trim();
+            // A pending marker is not proof of failure: verify the actual version.
+            if (target == installedVersion || UpdatePolicy.IsNewerStableVersion(installedVersion, target)) {
+                File.Delete(marker);
+            } else {
                 Send(new { state = "warning", message = "The previous update did not complete. Retry from Settings. See updates.log and Velopack logs." });
-            File.Delete(marker);
+                // Keep the target across launches until installation is confirmed.
+            }
         }
         UpdateInfo? update = null;
         bool downloaded = false;
@@ -87,7 +91,7 @@ static class UpdateService
                         async historyError => {
                             try {
                                 await File.AppendAllTextAsync(log,
-                                    $"{DateTimeOffset.UtcNow:O} Optional release history unavailable: {historyError.GetType().Name} (HTTP {(historyError as HttpRequestException)?.StatusCode})\\n");
+                                    $"{DateTimeOffset.UtcNow:O} Optional release history unavailable: {historyError.GetType().Name} (HTTP {(historyError as HttpRequestException)?.StatusCode})\n");
                             } catch (Exception) { /* Diagnostics are best effort. */ }
                             Send(new { state = "warning", message = "Release history is temporarily unavailable. Update checking continues." });
                         });
@@ -100,21 +104,34 @@ static class UpdateService
                     downloaded = true;
                     Send(new { state = "ready" });
                 } else if (command == "apply" && update != null && downloaded) {
+                    if (OperatingSystem.IsLinux()) {
+                        // Prepare and acknowledge the staged native supervisor BEFORE
+                        // asking Unity to exit. The .NET helper then exits before the
+                        // AppImage mount can be torn down.
+                        await LinuxUpdateHandoff.StartAsync(
+                            gamePid, launcherPid, stateDirectory, update.TargetFullRelease.FileName);
+                        await File.WriteAllTextAsync(marker, update.TargetFullRelease.Version.ToString());
+                        await File.AppendAllTextAsync(log,
+                            $"{DateTimeOffset.UtcNow:O} Linux shutdown authorized; staged updater ready\n");
+                        Send(new { state = "applying" });
+                        return 0;
+                    }
+
+                    // Retain the proven Windows sequence. No staging on Windows.
                     await File.WriteAllTextAsync(marker, update.TargetFullRelease.Version.ToString());
                     await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Applying {update.TargetFullRelease.Version}\n");
                     Send(new { state = "applying" });
-                    await UpdateWorkflow.ApplyAsync(
-                        OperatingSystem.IsLinux(),
+                    await UpdateWorkflow.ApplyAfterShutdownAsync(
                         async () => {
                             await WaitForExit(gamePid);
-                            await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Game exited\\n");
+                            await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Game exited\n");
                         },
                         async () => {
                             if (launcherPid > 0) await WaitForExit(launcherPid);
-                            await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Launcher exited\\n");
+                            await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Launcher exited\n");
                         },
                         () => {
-                            File.AppendAllText(log, $"{DateTimeOffset.UtcNow:O} Starting Velopack handoff\\n");
+                            File.AppendAllText(log, $"{DateTimeOffset.UtcNow:O} Starting Windows Velopack handoff\n");
                             manager.ApplyUpdatesAndRestart(update);
                         });
                     return 0;
