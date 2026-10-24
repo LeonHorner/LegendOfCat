@@ -100,11 +100,11 @@ internal static class DesktopCommentTests
             var image = Path.Combine(dataHome.FullName, "LegendOfCat.AppImage");
             File.WriteAllText(image, "AppImage placeholder");
             var entry = Path.Combine(applications, "legendofcat-linux-x86_64.desktop");
-            File.WriteAllText(entry, "[Desktop Entry]\\nName=LegendOfCat\\n" +
-                "Comment=LegendOfCat 0.5.0\\nExec=" + image + "\\n");
+            File.WriteAllText(entry, "[Desktop Entry]\nName=LegendOfCat\n" +
+                "Comment=LegendOfCat 0.5.0\nExec=" + image + "\n");
             var unrelated = Path.Combine(applications, "another-game.desktop");
-            File.WriteAllText(unrelated, "[Desktop Entry]\\nName=LegendOfCat\\n" +
-                "Comment=LegendOfCat 0.5.0\\nExec=" + image + "\\n");
+            File.WriteAllText(unrelated, "[Desktop Entry]\nName=LegendOfCat\n" +
+                "Comment=LegendOfCat 0.5.0\nExec=" + image + "\n");
             Environment.SetEnvironmentVariable("XDG_DATA_HOME", dataHome.FullName);
             Environment.SetEnvironmentVariable("APPIMAGE", image);
 
