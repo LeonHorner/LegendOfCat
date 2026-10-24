@@ -1,5 +1,14 @@
 # Mika character authoring
 
+## Latest user review — 2026-10-24
+
+The user reported that jump/landing transitions are still too abrupt after the
+completion preview. PR #45 is back in draft; issue #10 is incomplete. Earlier
+green CI is not visual acceptance. [Revision 2](movement-completion/revision-2/README.md)
+provides a shallower takeoff and additional recovery drawings for comparison only.
+It is not integrated; the current Unity playtest is unchanged. Resolve this
+feedback before claiming completion or repeating final merge validation.
+
 The active complete-character set retains the user-selected four-frame run and
 adds authored flight/landing bridges. See [movement completion](movement-completion/README.md)
 for provenance, registration and state mapping, and the [integration review](integration-review.md)

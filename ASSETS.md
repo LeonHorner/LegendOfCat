@@ -54,6 +54,14 @@ No third-party game assets have been imported.
 
 ## Mika movement completion and archive
 
+Following the user's report of abrupt transitions, movement-completion/revision-2
+contains a review-only four-pose sheet from built-in OpenAI image generation,
+2026-10-24, exact model ID not exposed. Terms: ASSET-LICENSE.md where rights exist.
+Its identity reference uses the existing Mika drawings. The exact prompt and
+uniform scale/toe-registration decisions are recorded alongside the source.
+Human direction: shallower takeoff and more gradual recovery. No revision-2 art
+is imported into Unity; it is not accepted production content.
+
 Rejected Mika rig/optical-flow source, assets, code and tests have moved outside
 Unity to docs/design/mika-animation/archive. Historical paths in this document
 resolve through that prefix. Original Unity .meta files and exact source bytes
