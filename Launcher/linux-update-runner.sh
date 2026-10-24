@@ -13,6 +13,12 @@ appimage=$8
 package=$9
 shift 9
 packages_dir=$1
+shutdown_timeout=${2:-180}
+case "$shutdown_timeout" in
+    ''|*[!0-9]*) echo "Invalid handoff timeout" >&2; exit 2 ;;
+esac
+[ "$shutdown_timeout" -gt 0 ] && [ "$shutdown_timeout" -le 180 ] ||
+    { echo "Invalid handoff timeout" >&2; exit 2; }
 updater="$stage/usr/bin/UpdateNix"
 
 # Never retain pipes or a working directory owned by the disappearing AppImage.
@@ -53,7 +59,7 @@ fi
 # Parent sends Unity the shutdown command only after this readiness acknowledgement.
 printf 'ready\n' >"$ready"
 echo "Linux update handoff ready; waiting for both game and entry launcher"
-deadline=$(($(date +%s) + 180))
+deadline=$(($(date +%s) + shutdown_timeout))
 while alive_with_identity "$launcher_pid" "$launcher_identity" ||
       alive_with_identity "$game_pid" "$game_identity"; do
     if [ "$(date +%s)" -ge "$deadline" ]; then
