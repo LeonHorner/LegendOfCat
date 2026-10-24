@@ -77,7 +77,19 @@ poses use visible sole anchors. No new idle/fish behavior or traversal ability i
 introduced. Current code, provenance and final validation are tracked by PR #45;
 the dated rejected experiments above remain historical warnings, not live tooling.
 
-## Provenance
+## Level 1 background evaluation — 2026-10-24
+
+Issue #50's [isolated background comparison lab](background-study/README.md)
+compares three-layer parallax, a unified panorama and subtler three-layer motion
+over the same short movement segment. Candidate factors are adjustable prototype
+values. Recommendation: consider subtle parallax with occasional unique landmarks;
+**user selection is pending**. No final background production direction is approved.
+The generated strip atlas and mirrored reuse are evaluation assets, with visible
+symmetry/ghosting limitations documented in the comparison. Keep gameplay surfaces
+in world space and retain the readability requirements above. Full Level 1 content
+remains scoped to #16.
+
+## Reference provenance
 See ASSETS.md. Images were produced with the built-in OpenAI image generation tool on 2026-10-23, using earlier generated scene references. Exact model ID was not exposed. Human direction selected cat and owl influences, rejected 2.5D, and required clearer gameplay/background separation. Full archived generation prompts are in [reference-prompts.md](reference-prompts.md).
 
 ## Historical boss artwork

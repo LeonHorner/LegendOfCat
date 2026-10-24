@@ -36,6 +36,10 @@ public static class BuildBackgroundStudy
             for (int mode = 0; mode < 3; mode++) {
                 study.concept = (BackgroundStudy.Concept)mode;
                 study.Cat.transform.position = new Vector3(15, 1.48f);
+                // Edit-mode capture has no presentation LateUpdate: register the existing idle
+                // sprite's paw baseline to the platform top without changing the prefab.
+                var catSprite = study.Cat.GetComponentInChildren<SpriteRenderer>();
+                catSprite.transform.position += Vector3.up * (1f - catSprite.bounds.min.y);
                 study.ApplyView(17, 3);
                 Save(study.View, $"{Evidence}/candidate-{mode}.png", 1280, 720, false);
                 Save(study.View, $"{Evidence}/candidate-{mode}-small-grayscale.png", 640, 360, true);

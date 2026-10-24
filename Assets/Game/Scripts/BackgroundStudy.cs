@@ -50,8 +50,8 @@ public sealed class BackgroundStudy : MonoBehaviour
                 DestroyImmediate(panel.GetComponent<Collider>());
                 panel.name = "Mirrored scenery tile " + tile;
                 panel.transform.SetParent(layers[i], false);
-                panel.transform.localPosition = new Vector3(tile * 64, i == 0 ? 4 : i == 1 ? 1.5f : -0.5f, 20 - i * 2);
-                panel.transform.localScale = new Vector3(64, i == 0 ? 15 : i == 1 ? 10 : 8, 1);
+                panel.transform.localPosition = new Vector3(tile * 64, i == 0 ? 0 : i == 1 ? -1 : -2, 20 - i * 2);
+                panel.transform.localScale = new Vector3(64, i == 0 ? 20 : i == 1 ? 16 : 14, 1);
                 panel.GetComponent<MeshRenderer>().sharedMaterial = materials[i];
             }
         }
@@ -90,7 +90,9 @@ public sealed class BackgroundStudy : MonoBehaviour
             : concept == Concept.Subtle ? new[] { 0.05f, 0.14f, 0.24f } : new[] { farSpeed, middleSpeed, nearSpeed };
         for (int i = 0; i < 3; i++) {
             float center = TileCenter(x, speeds[i], 64);
-            layers[i].position = new Vector3(Offset(x, speeds[i]) + center, y * (1 - speeds[i]), 0);
+            // Only horizontal parallax is under evaluation. Lock vertical registration
+            // to the camera so jump follow cannot reveal the outer panorama boundary.
+            layers[i].position = new Vector3(Offset(x, speeds[i]) + center, y, 0);
             int tileIndex = Mathf.RoundToInt(center / 64);
             for (int j = 0; j < 3; j++) {
                 var panel = layers[i].GetChild(j);

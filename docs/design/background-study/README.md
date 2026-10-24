@@ -56,11 +56,53 @@ no measured player GPU timings or platform performance claim is made.
 Capture reproducibly with **LegendOfCat > Background study > Capture comparison**
 (requires a graphics device). Candidate images use the same camera, cat pose and
 platforms. Small grayscale captures are 640x360 with luminance conversion.
+Then run `pwsh -File tools/export-background-study.ps1` with FFmpeg available to
+encode the MP4s and comparison GIF and remove the numbered intermediate PNGs.
 Motion sequences use the same 5-unit/s camera sweep, reverse and return; they are
 camera/scenery recordings, not recordings of player input. Wrap stress stills
 inspect negative travel, the near-layer wrap boundary and long travel.
 
-Remaining review: inspect captured images and motion, record observed defects and
-recommendation, then present A/B/C to the user. Keep the PR draft and issue open
-until the user chooses and that choice is recorded in art-direction.md. Full
-merge validation is deferred while this acceptance criterion remains unfinished.
+![A, B and C from left to right, same camera sweep](comparison.gif)
+
+| Evidence | A: Three layers | B: Panorama | C: Subtle layers |
+| --- | --- | --- | --- |
+| Color | [1280x720](candidate-0.png) | [1280x720](candidate-1.png) | [1280x720](candidate-2.png) |
+| Small grayscale | [640x360](candidate-0-small-grayscale.png) | [640x360](candidate-1-small-grayscale.png) | [640x360](candidate-2-small-grayscale.png) |
+| Camera sweep and reversal | [MP4](candidate-0.mp4) | [MP4](candidate-1.mp4) | [MP4](candidate-2.mp4) |
+
+Review observations: A has the clearest relative motion, but its nearest vegetation
+pulls more attention toward the bottom of the view. B is calm and inexpensive but
+flattens spatial depth; its distant landmarks barely move over the short segment.
+C retains separation with less motion competing with landings. All three preserve
+the crisp dark platform silhouettes in the small grayscale stills; Mika's silhouette
+remains visible, though its value separation against pale foliage is modest and
+needs another gameplay review with final art. The camera sweep shows scenery
+moving behind gaps, never moving the platform edges. It is a camera-only sweep,
+so it does not establish readability during a complete player traversal.
+
+Wrap stress captures reveal symmetric tree clusters around mirrored joins. No
+empty horizontal tile gaps appear; recognizable repeated towers and mirrored
+foliage remain an art limitation. Atmospheric strip fades also leave ghosted
+landmark silhouettes. Clean transparent authored layers and variant modules are
+required before production. The initial panorama capture exposed a bare strip at
+the lower screen edge; enlarged vertical coverage and camera-locked vertical
+registration address that. Horizontal parallax is the only evaluated motion axis.
+
+Recommendation for user consideration: **C, subtle three-layer parallax**, with
+occasional unique world-space landmarks for route identity. It retains the reuse
+and depth of A at a calmer apparent speed. This recommendation does not authorize
+production. Choose A for stronger depth or B for a quieter moving painting.
+
+Recordings are reproducible Unity camera renders sampled at **5 fps**, not a
+real-time performance capture. Use Play mode to judge frame pacing at the actual
+display refresh rate. Smooth follow uses elapsed time; automated tests establish
+registration and collision separation, not perceived smoothness or art acceptance.
+
+Validation: pinned Editor import/scene generation and graphics captures succeeded;
+seven focused Unity tests passed, including a Play-Mode test for ground contact
+and world-space collision stability through all concept switches. Test logs are
+local under ignored Logs/. No Windows/Linux player/launcher build, actual install
+test or measured GPU performance is claimed. Package lock remained unchanged
+after Editor import. Keep the PR draft and issue open until the user chooses and
+that choice is recorded in art-direction.md. Full merge validation is deferred
+while this acceptance criterion remains unfinished.
