@@ -203,3 +203,28 @@ ASSET-LICENSE.md terms apply where rights exist. Human direction: remove the
 neighboring atlas speck and retain the accepted apex alignment (-2, -14 source
 pixels). The user accepted the in-game result after playtesting. Original visible
 RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
+
+## Mika natural look study, revision 3 — 2026-10-24
+
+- Files: `art/blender/mika-v3/`, including the original source GLB, native Blender
+  look study, editable material authoring script and actual Blender review renders.
+- Human direction: both prior Blender revisions were rejected. Prioritize a
+  natural-looking cat matching the concept art, especially anatomy, coat, eyes
+  and ears; add bones later after the appearance works.
+- Third-party source: Grab3D, **Tabby Cat**,
+  https://grab3d.com/models/animals/cat/ (downloaded 2026-10-24).
+  Source mesh and all source textures are dedicated to CC0 1.0. The original
+  `source/LICENSE.txt` and `source/manifest.json` are preserved verbatim.
+  The CC0 dedication permits modification and public source redistribution.
+- Generator/model disclosure: Grab3D identifies an AI-assisted Meshy image-to-3D
+  base, followed by cleanup, scaling, texturing and checking in Blender. Exact
+  model revision and prompt are not provided. This source is not represented as
+  original Codex sculpture or as a generation made from the user's concepts.
+- Local work: Codex/Blender 5.2.3 LTS material adaptation to ginger and cream,
+  preserving source facial colors and fur detail; slightly narrower trunk; packed
+  project concept references and studio cameras for full-body and face review.
+  Known concept-image provenance remains as recorded in the earlier entries.
+- Review: the user accepted the visible model on 2026-10-24 and requested a
+  work-in-progress push linked to issue #49. This acceptance covers appearance
+  only. Production topology, skeleton, animation, Unity validation and gameplay
+  integration remain unfinished. Previous Blender models remain rejected.
