@@ -2,6 +2,16 @@ using UnityEngine;
 
 public static class MenuLayout
 {
+    public static Rect Letterbox16By9(int width, int height)
+    {
+        if (width <= 0 || height <= 0) return new Rect(0, 0, 1, 1);
+        float ratio = (float)width / height;
+        const float target = 16f / 9f;
+        return ratio > target
+            ? new Rect((1f - target / ratio) * 0.5f, 0, target / ratio, 1)
+            : new Rect(0, (1f - ratio / target) * 0.5f, 1, ratio / target);
+    }
+
     // Screen.safeArea uses a bottom-left origin; IMGUI uses top-left.
     public static Rect ContentRegion(int width, int height, Rect safeArea)
     {

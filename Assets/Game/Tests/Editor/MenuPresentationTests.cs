@@ -24,6 +24,21 @@ public class MenuPresentationTests
         Assert.That(region.width / scale, Is.GreaterThanOrEqualTo(390));
     }
 
+    [TestCase(1280, 720)]
+    [TestCase(960, 540)]
+    [TestCase(2560, 1080)]
+    [TestCase(800, 1200)]
+    public void GameplayViewportMaintainsSixteenByNine(int width, int height)
+    {
+        var rect = (Rect)RuntimeType("MenuLayout").GetMethod("Letterbox16By9")
+            .Invoke(null, new object[] { width, height });
+        Assert.That(rect.xMin, Is.GreaterThanOrEqualTo(0));
+        Assert.That(rect.yMin, Is.GreaterThanOrEqualTo(0));
+        Assert.That(rect.xMax, Is.LessThanOrEqualTo(1));
+        Assert.That(rect.yMax, Is.LessThanOrEqualTo(1));
+        Assert.That(width * rect.width / (height * rect.height), Is.EqualTo(16f / 9f).Within(0.001f));
+    }
+
     [Test]
     public void UnsupportedServiceHasNoMessagesOrDesktopSideEffects()
     {

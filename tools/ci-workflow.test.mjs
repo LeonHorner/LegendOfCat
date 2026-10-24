@@ -36,7 +36,7 @@ function mock(options = {}) {
   const statuses = [];
   const outputs = {};
   const failures = [];
-  const results = { PREFLIGHT: 'success', TEST: 'success', BUILD: 'success', DELTA_INTEGRATION: 'success', ...options.results };
+  const results = { PREFLIGHT: 'success', TEST: 'success', BUILD: 'success', PACKAGE: 'success', DELTA_INTEGRATION: 'success', ...options.results };
   return {
     pr,
     statuses,
@@ -144,6 +144,9 @@ test('the gate rejects failures, cancellations, skips and stale PR revisions', a
     { results: { BUILD: 'failure' } },
     { results: { BUILD: 'cancelled' } },
     { results: { BUILD: 'skipped' } },
+    { results: { PACKAGE: 'failure' } },
+    { results: { PACKAGE: 'cancelled' } },
+    { results: { PACKAGE: 'skipped' } },
     { results: { DELTA_INTEGRATION: 'failure' } },
     { results: { DELTA_INTEGRATION: 'cancelled' } },
     { results: { DELTA_INTEGRATION: 'skipped' } },
@@ -174,9 +177,10 @@ test('PR workflow triggers and job graph keep validation on ready PRs', () => {
   assert.equal(prWorkflow.on.workflow_dispatch.inputs.pr_number.required, true);
   assert.equal(prWorkflow.concurrency['cancel-in-progress'], true);
   assert.deepEqual(prWorkflow.jobs.gate.needs,
-    ['preflight', 'test', 'build', 'delta-integration']);
+    ['preflight', 'test', 'build', 'package', 'delta-integration']);
   assert.equal(prWorkflow.jobs.test.needs, 'preflight');
   assert.equal(prWorkflow.jobs.build.needs, 'preflight');
+  assert.deepEqual(prWorkflow.jobs.package.needs, ['preflight', 'build']);
   assert.equal(prWorkflow.jobs['delta-integration'].needs, 'preflight');
   assert.equal(prWorkflow.jobs.preflight.steps[0].uses, 'actions/github-script@v7');
   assert.deepEqual(prWorkflow.jobs.preflight.steps[0].env, {
@@ -206,11 +210,12 @@ test('both platforms perform real Velopack Delta reconstruction before merge gat
   assert.ok(integration.steps.some(step =>
     step.run?.trim() === 'node tools/integration-delta.mjs ${{ matrix.platform }}'));
   const gate = prWorkflow.jobs.gate.steps.find(step => step.uses?.startsWith('actions/github-script@'));
-  assert.deepEqual(Object.fromEntries(['PREFLIGHT', 'TEST', 'BUILD', 'DELTA_INTEGRATION'].map(key =>
+  assert.deepEqual(Object.fromEntries(['PREFLIGHT', 'TEST', 'BUILD', 'PACKAGE', 'DELTA_INTEGRATION'].map(key =>
     [key, gate.env[key]])), {
     PREFLIGHT: '${{ needs.preflight.result }}',
     TEST: '${{ needs.test.result }}',
     BUILD: '${{ needs.build.result }}',
+    PACKAGE: '${{ needs.package.result }}',
     DELTA_INTEGRATION: '${{ needs.delta-integration.result }}'
   });
 });
