@@ -235,3 +235,37 @@ lower camera framing, use independent transparent silhouettes rather than broad
 strip crossfades, retain image proportions, reject low-alpha halos at runtime and
 place smaller near vegetation below the gameplay plane. This feedback does not
 select A/B/C or approve final production backgrounds.
+
+## Golden River painted terrain and corner framing — 2026-10-25
+
+`Assets/Game/Resources/BackgroundStudy/painted-terrain.png` and
+`foreground-corners.png` were generated with the built-in OpenAI image tool;
+exact model ID was not exposed. Source reference: our Golden River Ruins v2
+archive for style/palette only. License: ASSET-LICENSE.md where rights exist.
+No external assets/fonts were added. Original PNG pixels are preserved; runtime
+sampling separates the turf cap from repeatable stone fill and rejects corner
+alpha halos. Full prompts: docs/design/background-study/terrain-and-corner-prompts.md.
+Human direction: add foreground accents in the corners, at least double the test
+length, and make platforms look grounded and fit the reference; some suspended
+jump platforms are also acceptable. Implementation: a 109-unit lab with ten
+massive stone/earth fronts and four tapered stationary floating rocks, clear
+flat collision-aligned grass tops, and sparse dark lower-corner foliage outside
+the landing plane. This remains prototype art and does not approve a final
+background concept, level layout or campaign expansion.
+
+## Golden River painted depth and hanging foliage — 2026-10-25
+
+`Assets/Game/Resources/BackgroundStudy/foreground-river.png`, `meadow-surface.png`
+and `hanging-foliage.png` are original generations from the built-in OpenAI image
+tool, exact model ID not exposed. Source: our Golden River Ruins v2 archive for
+style/palette. License: ASSET-LICENSE.md where rights exist. Original PNG pixels
+are preserved; the renderer samples foliage atlas columns and rejects low-alpha
+halos. Full prompts: docs/design/background-study/depth-and-foliage-prompts.md.
+Human direction: visible spatial depth like the reference, small stones/water in
+front, varied platforms behind them and backgrounds farther back; hanging leaves
+and greenery with differing shapes/lengths are important. Implementation: a shallow
+painted meadow face recedes behind each exact collision lip, different rock tints
+and registration break repetition, ivy/moss/fern patches hang across fronts and
+sides, and a separate foreground river overlaps the lower cliff bases. This is
+painted depth within the 2D prototype, with no new swimming, moving-platform or
+3D gameplay behavior. No final production art or A/B/C selection is implied.

@@ -16,8 +16,10 @@ Base: main d01d470, including the merged Mika presentation from PR #45.
 
 Use Unity 6000.3.27f1. Open `Assets/Game/Scenes/BackgroundStudy.unity` and press
 Play. Alternatively use **LegendOfCat > Background study > Create isolated scene**.
-A/D/arrows move, Space jumps, R retries. The original movement course geometry is
-reused as a short comparison route, not an approved Level 1 layout. The camera
+A/D/arrows move, Space jumps, R retries. The lab preserves the original seven
+platform positions, then adds seven more: **109 world units from x=-5 to x=104**,
+more than twice the original 52-unit span. This remains a review route, not an
+approved Level 1 layout. The camera
 follows the interpolated cat transform with smoothing and viewport-aware bounds.
 Like the existing movement course, the view is fixed to **16:9**, with black bars
 outside that viewport in other window shapes. The camera baseline is y=1 instead
@@ -25,6 +27,31 @@ of y=3, exposing two more world units below the platforms; jump follow is simila
 lowered. Character scale, collisions and jump physics are unchanged.
 Use the on-screen buttons to switch candidates without moving the camera or cat.
 Camera-only tour travels at 5 units/s and reverses; turn it off to follow Mika.
+Its one-way sweep is now 100 units (20 seconds, or 40 seconds there and back).
+The last platform has broad safe ground; reverse direction to test return travel.
+
+Ten land masses extend to y=-10, below the visible play area, with painted dark
+stone/earth and a naturally lit grass cap. Four narrower jump platforms have
+tapered irregular rock undersides using the same painting. Tops remain flat,
+world-space and aligned to the existing BoxCollider2D contacts. Shared movement
+course assets, Mika and motor values are unchanged. Floating terrain here means
+stationary suspended rocks, not moving supports or a new traversal mechanic.
+Sparse dark foliage frames the lower left/right corners like the README reference.
+It is camera-relative decoration without collision. Each source half is scaled
+proportionally into its own 4.5x6-unit corner quad; only the authored low foliage
+is opaque, leaving the center and landing plane open. Natural leaf contours are
+retained instead of clipping a straight top edge. All three candidates share it.
+The painted depth ordering is now foreground river/small stones and corner
+foliage, then platform faces and their receding meadow surfaces, then near/middle/
+far scenery. The foreground river stays at a fixed world elevation below landing
+edges and travels at factor 1.1 to strengthen the depth cue. It is decorative,
+not a swimming mechanic or collision surface.
+Each platform receives one to three ivy/moss/fern patches from three cutouts,
+with different lengths, positions and facing. Rock tint, texture registration,
+floating underside shape and apparent top depth also vary. The shallow visible
+upper face recedes behind the collision-aligned front lip; it adds painted spatial
+depth without changing the 2D motor or prescribing 3D gameplay. Geometry remains
+a bounded readability prototype, not approved final terrain art.
 
 | Candidate | Far / middle / near travel | Depth and readability | Variety and effort |
 | --- | --- | --- | --- |
@@ -58,6 +85,13 @@ modules, with unique landmarks placed in world space behind the gameplay plane.
 Nine unlit quads use three 1536x1024 uncompressed textures (approximately 18 MiB RGBA
 before platform overhead) and three materials. Transparent overlap adds overdraw;
 no measured player GPU timings or platform performance claim is made.
+The terrain meshes share an additional opaque turf/stone painting and material;
+two transparent corner quads add one shared framing texture/material. These are prototype
+assets with provenance and prompts in ASSETS.md and terrain-and-corner-prompts.md.
+Three river quads, fourteen shallow upper faces and twenty-seven hanging-foliage
+quads add overlap and draw work. They share their respective materials; no measured
+GPU or target-device performance is claimed. See depth-and-foliage-prompts.md for
+the additional river, meadow and hanging vegetation generators' prompts.
 
 ## Evidence and decision
 
@@ -66,6 +100,8 @@ Capture reproducibly with **LegendOfCat > Background study > Capture comparison*
 platforms. Small grayscale captures are 640x360 with luminance conversion.
 Then run `pwsh -File tools/export-background-study.ps1` with FFmpeg available to
 encode the MP4s and comparison GIF and remove the numbered intermediate PNGs.
+Intermediate frames now live under ignored `Logs/background-study-motion/`;
+existing manually captured frames under the documentation folder are left alone.
 Motion sequences use the same 5-unit/s camera sweep, reverse and return; they are
 camera/scenery recordings, not recordings of player input. Wrap stress stills
 inspect negative travel, several world positions and long travel. Unit tests sweep
@@ -108,9 +144,12 @@ display refresh rate. Smooth follow uses elapsed time; automated tests establish
 registration and collision separation, not perceived smoothness or art acceptance.
 
 Validation: pinned Editor import/scene generation and graphics captures succeeded;
-seven focused Unity tests cover ground contact, world-space collision stability
+Eight focused Unity tests cover ground contact, world-space collision stability
 through all concept switches, tile coverage and fixed 16:9 at 640x360, 1280x720,
-1024x768 and 2560x1080. Test logs are
+1024x768 and 2560x1080, the at-least-double course span, matching terrain contact
+lips, varied hanging greenery and foreground travel coverage. The extended
+revision is rendered/tested in an ignored isolated project copy under artifacts/
+while the working Editor is open, with a separate Library. Test logs are
 local under ignored Logs/. No Windows/Linux player/launcher build, actual install
 test or measured GPU performance is claimed. Package lock remained unchanged
 after Editor import. Keep the PR draft and issue open until the user chooses and

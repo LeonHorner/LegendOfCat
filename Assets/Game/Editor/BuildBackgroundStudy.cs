@@ -22,7 +22,7 @@ public static class BuildBackgroundStudy
     [MenuItem("LegendOfCat/Background study/Import painted layers")]
     public static void ImportLayers()
     {
-        foreach (string name in new[] { "painted-atlas", "middle-cutout", "near-cutout" }) {
+        foreach (string name in new[] { "painted-atlas", "middle-cutout", "near-cutout", "painted-terrain", "foreground-corners", "foreground-river", "meadow-surface", "hanging-foliage" }) {
             var importer = (TextureImporter)AssetImporter.GetAtPath($"Assets/Game/Resources/BackgroundStudy/{name}.png");
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.mipmapEnabled = false; importer.isReadable = false;
@@ -35,7 +35,10 @@ public static class BuildBackgroundStudy
     [MenuItem("LegendOfCat/Background study/Capture comparison")]
     public static void Capture()
     {
+        bool stillsOnly = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-studyStills") >= 0;
         Directory.CreateDirectory(Evidence);
+        const string Motion = "Logs/background-study-motion";
+        Directory.CreateDirectory(Motion);
         ImportLayers();
         var scene = EditorSceneManager.NewPreviewScene();
         var root = new GameObject("Evidence only");
@@ -54,10 +57,14 @@ public static class BuildBackgroundStudy
                 Save(study.View, $"{Evidence}/candidate-{mode}.png", 1280, 720, false);
                 Save(study.View, $"{Evidence}/candidate-{mode}-small-grayscale.png", 640, 360, true);
                 // 5 fps review recording: 5 world units/s, including a complete reversal.
-                for (int frame = 0; frame < 97; frame++) {
-                    study.ApplyView(Mathf.PingPong(frame, 48) - 2, BackgroundStudy.CameraFloor);
-                    Save(study.View, $"{Evidence}/motion-{mode}-{frame:00}.png", 640, 360, false);
+                for (int frame = 0; !stillsOnly && frame <= BackgroundStudy.TourDistance * 2; frame++) {
+                    study.ApplyView(Mathf.PingPong(frame, BackgroundStudy.TourDistance) - 2, BackgroundStudy.CameraFloor);
+                    Save(study.View, $"{Motion}/motion-{mode}-{frame:000}.png", 640, 360, false);
                 }
+                study.ApplyView(83, BackgroundStudy.CameraFloor);
+                Save(study.View, $"{Evidence}/extended-course-{mode}.png", 1280, 720, false);
+                study.ApplyView(17, 3);
+                Save(study.View, $"{Evidence}/jump-framing-{mode}.png", 640, 360, true);
                 foreach (float x in new[] { -120f, 57f, 59f, 240f }) {
                     study.ApplyView(x, BackgroundStudy.CameraFloor);
                     Save(study.View, $"{Evidence}/wrap-{mode}-{x}.png", 640, 360, false);

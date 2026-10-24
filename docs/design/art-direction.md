@@ -88,6 +88,13 @@ The initial broad strip crossfades were rejected in Unity feedback on 2026-10-25
 for blurry transitions and insufficient lower scenery. The revised lab enforces
 the existing 16:9 viewport, lowers camera framing, and uses independent transparent
 middle/near layers with their painted contours instead of height-based fades.
+Further user feedback requested at least double the review length, foreground
+corner plants and water/small stones, varied substantial platforms with some
+floating jump rocks, visible top surfaces and differently hanging greenery. The
+lab now spans 109 world units, with ten grounded cliff fronts, four suspended rock
+platforms, receding painted meadow tops, varied ivy/moss/fern patches and a closer
+river layer. These are painted depth cues within the 2D test; they do not change
+the movement/collision contract or approve 3D gameplay or final Level 1 artwork.
 Mirrored reuse remains an evaluation technique with visible symmetry limitations
 documented in the comparison. Keep gameplay surfaces
 in world space and retain the readability requirements above. Full Level 1 content

@@ -11,11 +11,11 @@ public sealed class BackgroundStudyTests
     Type Study => AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("BackgroundStudy")).First(t => t != null);
     float Call(string method, params object[] args) => (float)Study.GetMethod(method).Invoke(null, args);
 
-    [TestCase(0f)] [TestCase(0.08f)] [TestCase(0.28f)] [TestCase(0.55f)] [TestCase(1f)]
+    [TestCase(0f)] [TestCase(0.08f)] [TestCase(0.28f)] [TestCase(0.55f)] [TestCase(1f)] [TestCase(1.1f)]
     public void MirroredTilesCoverViewAcrossNegativeAndPositiveWraps(float speed)
     {
         // Both the sky and cutout tile families cover the fixed 16:9 viewport.
-        foreach (float width in new[] { 24f, 64f })
+        foreach (float width in new[] { 24f, 32f, 64f })
         for (int step = -2000; step <= 2000; step++) {
             float camera = step * 0.5f;
             float center = Call("Offset", camera, speed) + Call("TileCenter", camera, speed, width);
@@ -43,7 +43,32 @@ public sealed class BackgroundStudyTests
         var study = root.AddComponent(Study);
         yield return null;
         var colliders = root.GetComponentsInChildren<BoxCollider2D>().Where(c => !c.GetComponent<Rigidbody2D>()).ToArray();
-        Assert.That(colliders.Length, Is.EqualTo(7));
+        Assert.That(colliders.Length, Is.EqualTo(14));
+        Assert.That(colliders.Last().bounds.max.x - colliders.First().bounds.min.x, Is.GreaterThanOrEqualTo(104),
+            "The review course must be at least twice the original 52-unit length.");
+        var terrain = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.name.StartsWith("Painted grounded") || r.name.StartsWith("Painted floating")).ToArray();
+        var upperSurfaces = root.GetComponentsInChildren<MeshFilter>().Where(r => r.name == "Painted upper surface").ToArray();
+        Assert.That(upperSurfaces.Length, Is.EqualTo(colliders.Length));
+        var foliage = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.name == "Hanging platform foliage").ToArray();
+        Assert.That(foliage.Length, Is.GreaterThan(colliders.Length));
+        Assert.That(foliage.Select(r => r.bounds.size.y).Distinct().Count(), Is.GreaterThan(2),
+            "Hanging greenery must vary rather than repeat a single length.");
+        Assert.That(foliage.All(r => r.bounds.min.z > 0), Is.True, "Leaves render behind Mika's gameplay plane.");
+        Assert.That(terrain.Length, Is.EqualTo(colliders.Length));
+        Assert.That(root.GetComponentsInChildren<Collider>().Length, Is.Zero,
+            "Terrain art and corner foliage must not introduce 3D collision.");
+        Assert.That(terrain.Count(r => r.name == "Painted grounded cliff"), Is.GreaterThan(terrain.Length / 2));
+        for (int i = 0; i < terrain.Length; i++) {
+            Assert.That(terrain[i].bounds.max.y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f));
+            Assert.That(terrain[i].bounds.size.x, Is.EqualTo(colliders[i].bounds.size.x).Within(0.001f));
+            Assert.That(upperSurfaces[i].sharedMesh.vertices[0].y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f),
+                "The receding top must meet the exact collision lip at its front edge.");
+            if (terrain[i].name == "Painted grounded cliff") Assert.That(terrain[i].bounds.min.y, Is.EqualTo(-10).Within(0.001f));
+            if (i > 0) {
+                Assert.That(colliders[i].bounds.min.x - colliders[i - 1].bounds.max.x, Is.InRange(1f, 4f));
+                Assert.That(colliders[i].bounds.max.y - colliders[i - 1].bounds.max.y, Is.LessThanOrEqualTo(1f));
+            }
+        }
         var positions = colliders.Select(c => c.transform.position).ToArray();
         for (int mode = 0; mode < 3; mode++) {
             Study.GetField("concept").SetValue(study, Enum.ToObject(Study.GetNestedType("Concept"), mode));
