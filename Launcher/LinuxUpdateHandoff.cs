@@ -71,7 +71,7 @@ internal static class LinuxUpdateHandoff
                 stagedRunner, ready, stage, log,
                 launcherPid.ToString(), launcherIdentity,
                 gamePid.ToString(), gameIdentity,
-                originalAppImage, package, packagesDir
+                originalAppImage, package, packagesDir, "180"
             }) start.ArgumentList.Add(argument);
             process = Process.Start(start) ??
                 throw new InvalidOperationException("Unable to launch the Linux native update supervisor.");
