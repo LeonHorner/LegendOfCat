@@ -121,8 +121,7 @@ static class UpdateService
                     await File.WriteAllTextAsync(marker, update.TargetFullRelease.Version.ToString());
                     await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Applying {update.TargetFullRelease.Version}\n");
                     Send(new { state = "applying" });
-                    await UpdateWorkflow.ApplyAsync(
-                        false,
+                    await UpdateWorkflow.ApplyAfterShutdownAsync(
                         async () => {
                             await WaitForExit(gamePid);
                             await File.AppendAllTextAsync(log, $"{DateTimeOffset.UtcNow:O} Game exited\n");
