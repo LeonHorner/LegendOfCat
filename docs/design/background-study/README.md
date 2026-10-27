@@ -43,14 +43,17 @@ It is camera-relative decoration without collision. Each source half is scaled
 proportionally into its own 4.5x6-unit corner quad; only the authored low foliage
 is opaque, leaving the center and landing plane open. Natural leaf contours are
 retained instead of clipping a straight top edge. All three candidates share it.
-The painted depth ordering is now foreground river/small stones and corner
-foliage, then platform faces and their receding meadow surfaces, then near/middle/
-far scenery. The foreground river stays at a lower fixed world elevation below landing
-edges and is registered to the same world coordinates as the platforms. It is decorative,
-not a swimming mechanic or collision surface.
+The river now uses **one connected river-and-bank painting** from its distant
+waterfalls to its nearest stones. The middle depth's three quads share one texture,
+material, UV layout, scale and motion. Their low-water compositing pass samples
+the exact same pixels to cover the cliff bases around y=-3.4; no independent
+foreground-water graphic or scroll factor remains. Sky and near foliage can
+still parallax separately. The river is decorative, not a swimming/collision
+surface. Corner plants and platform vegetation remain separate natural cutouts.
 User review on 2026-10-27 rejected the high foreground water, broad slab-like top
-faces and front-rim stance. River motifs now use 16-unit tiles, a lower placement
-and quieter saturation, with smaller stones still visible near the bottom. The
+faces and front-rim stance. A subsequent 16-unit foreground river was also rejected
+for looking disconnected from the background water. It has been superseded by
+the single 24-unit-tiled `connected-river.png` composition. The
 surfaces are approximately 0.22–0.25 units deep instead of 0.38–0.58; almost-square
 fronts and reduced side shading retain the concept's painted 2D character. Larger
 rock motifs, a shared warm olive palette and mipmapped ground textures reduce the
@@ -98,10 +101,13 @@ no measured player GPU timings or platform performance claim is made.
 The terrain meshes share an additional opaque turf/stone painting and material;
 two transparent corner quads add one shared framing texture/material. These are prototype
 assets with provenance and prompts in ASSETS.md and terrain-and-corner-prompts.md.
-Three river quads, fourteen shallow upper faces and twenty-seven hanging-foliage
-quads add overlap and draw work. They share their respective materials; no measured
-GPU or target-device performance is claimed. See depth-and-foliage-prompts.md for
-the additional river, meadow and hanging vegetation generators' prompts.
+The three river quads (already counted among the nine depth quads) use an additional
+low-water compositing pass. Fourteen shallow upper faces and twenty-seven
+hanging-foliage quads add overlap/draw work. No measured GPU or target-device
+performance is claimed. The old middle-cutout and foreground-river paintings are
+retained as superseded sources and are not loaded by this lab. See
+connected-river-prompt.md for the new painting and depth-and-foliage-prompts.md for
+the retained meadow and hanging-vegetation sources.
 
 ## Evidence and decision
 
@@ -157,7 +163,8 @@ Validation: pinned Editor import/scene generation and graphics captures succeede
 Eight focused Unity tests cover ground contact, world-space collision stability
 through all concept switches, tile coverage and fixed 16:9 at 640x360, 1280x720,
 1024x768 and 2560x1080, the at-least-double course span, matching terrain contact
-lips/grass-band registration, varied hanging greenery and foreground travel coverage. The extended
+lips/grass-band registration, varied hanging greenery and one shared river source
+without separate foreground-water graphics. The extended
 revision is rendered/tested in an ignored isolated project copy under artifacts/
 while the working Editor is open, with a separate Library. Test logs are
 local under ignored Logs/. No Windows/Linux player/launcher build, actual install

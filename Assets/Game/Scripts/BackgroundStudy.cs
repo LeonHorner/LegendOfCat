@@ -30,8 +30,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     readonly Transform[] layers = new Transform[3];
     readonly Material[] materials = new Material[3];
     readonly System.Collections.Generic.List<Mesh> terrainMeshes = new System.Collections.Generic.List<Mesh>();
-    Material terrainMaterial, cornerMaterial, waterMaterial, foliageMaterial;
-    Transform water;
+    Material terrainMaterial, cornerMaterial, foliageMaterial;
     Texture2D pixel;
     Sprite square;
     float tourTime;
@@ -61,21 +60,22 @@ public sealed class BackgroundStudy : MonoBehaviour
         bars.depth = 0; bars.clearFlags = CameraClearFlags.SolidColor;
         bars.backgroundColor = Color.black; bars.cullingMask = 0;
         var atlas = Resources.Load<Texture2D>("BackgroundStudy/painted-atlas");
-        var textures = new[] { atlas, Resources.Load<Texture2D>("BackgroundStudy/middle-cutout"),
+        var textures = new[] { atlas, Resources.Load<Texture2D>("BackgroundStudy/connected-river"),
             Resources.Load<Texture2D>("BackgroundStudy/near-cutout") };
         for (int i = 0; i < 3; i++) {
             layers[i] = new GameObject("Painted depth " + i).transform;
             layers[i].SetParent(transform, false);
-            materials[i] = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
+            materials[i] = new Material(Shader.Find(i == 1 ? "LegendOfCat/StudyRiver" : "LegendOfCat/BackgroundStudy"));
             materials[i].mainTexture = textures[i];
             materials[i].SetFloat("_Cutout", i == 0 ? 0 : 1);
+            if (i == 1) materials[i].SetFloat("_Waterline", -3.4f);
             float width = i == 0 ? 64 : 24;
             for (int tile = -1; tile <= 1; tile++) {
                 var panel = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 DestroyImmediate(panel.GetComponent<Collider>());
                 panel.name = "Mirrored scenery tile " + tile;
                 panel.transform.SetParent(layers[i], false);
-                panel.transform.localPosition = new Vector3(tile * width, i == 0 ? 0 : i == 1 ? 1 : -2, 20 - i * 2);
+                panel.transform.localPosition = new Vector3(tile * width, i == 0 ? 0 : i == 1 ? -1.5f : -2, 20 - i * 2);
                 // Preserve the painting's proportions instead of stretching thin atlas strips.
                 panel.transform.localScale = new Vector3(width, i == 0 ? width / 4.5f : width / 1.5f, 1);
                 panel.GetComponent<MeshRenderer>().sharedMaterial = materials[i];
@@ -95,21 +95,6 @@ public sealed class BackgroundStudy : MonoBehaviour
             ground.GetComponent<SpriteRenderer>().enabled = false;
             ground.AddComponent<BoxCollider2D>();
             Terrain(p, IsFloating(index), index);
-        }
-        water = new GameObject("Foreground river and small stones").transform;
-        water.SetParent(transform, false);
-        waterMaterial = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
-        waterMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-river");
-        waterMaterial.SetFloat("_Cutout", 1); waterMaterial.SetFloat("_Fog", 0.18f);
-        waterMaterial.SetFloat("_Saturation", 0.82f);
-        for (int tile = -1; tile <= 1; tile++) {
-            var panel = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            DestroyImmediate(panel.GetComponent<Collider>());
-            panel.name = "Foreground river tile"; panel.transform.SetParent(water, false);
-            // Lower, smaller river motifs connect to the scenery rather than forming a tall foreground curtain.
-            panel.transform.localPosition = new Vector3(tile * 16, -0.5f, -1);
-            panel.transform.localScale = new Vector3(16, 16 / 1.5f, 1);
-            panel.GetComponent<MeshRenderer>().sharedMaterial = waterMaterial;
         }
         cornerMaterial = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
         cornerMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-corners");
@@ -230,16 +215,6 @@ public sealed class BackgroundStudy : MonoBehaviour
                 panel.localScale = scale;
             }
         }
-        if (water) {
-            float center = TileCenter(x, 1, 16);
-            water.position = new Vector3(center, 0, 0);
-            int tileIndex = Mathf.RoundToInt(center / 16);
-            for (int tile = 0; tile < 3; tile++) {
-                var panel = water.GetChild(tile); var scale = panel.localScale;
-                scale.x = ((tileIndex + tile - 1) & 1) == 0 ? 16 : -16;
-                panel.localScale = scale;
-            }
-        }
     }
 
     public void ApplyViewport(int width, int height)
@@ -292,7 +267,6 @@ public sealed class BackgroundStudy : MonoBehaviour
         foreach (var mesh in terrainMeshes) if (mesh) DestroyImmediate(mesh);
         if (terrainMaterial) DestroyImmediate(terrainMaterial);
         if (cornerMaterial) DestroyImmediate(cornerMaterial);
-        if (waterMaterial) DestroyImmediate(waterMaterial);
         if (foliageMaterial) DestroyImmediate(foliageMaterial);
         if (square) DestroyImmediate(square); if (pixel) DestroyImmediate(pixel);
     }

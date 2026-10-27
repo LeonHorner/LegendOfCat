@@ -280,3 +280,18 @@ quieter water saturation, narrow grass bands surrounding the unchanged contact
 line, restrained side shading, larger rock motifs and mipmapped ground textures.
 The original movement/collision geometry and Mika artwork are preserved. This
 records a revision target, not user acceptance of final artwork or an A/B/C choice.
+
+## Connected Golden River painting — 2026-10-27
+
+`Assets/Game/Resources/BackgroundStudy/connected-river.png` is an original RGBA
+painting generated with the built-in OpenAI image tool; exact model ID was not
+exposed. Source reference: our Golden River Ruins v2 archive for palette/style.
+License: ASSET-LICENSE.md where rights exist. Original generated pixels are
+preserved. Full prompt: docs/design/background-study/connected-river-prompt.md.
+Human direction: foreground water must connect to background water, potentially
+using one image. Implementation: replace the separate foreground-river and
+middle-cutout water paintings with a single river/bank/waterfall composition.
+The full scene and lower cliff-base overlap sample the same texture and UVs on
+the same quads, with shared tint, scale and movement. Sky, foliage and playable
+terrain remain separate. Superseded paintings are retained but not loaded by
+this lab. No final production or A/B/C selection is implied.

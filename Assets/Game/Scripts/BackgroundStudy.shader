@@ -6,6 +6,7 @@ Shader "LegendOfCat/BackgroundStudy"
         Blend SrcAlpha OneMinusSrcAlpha
         ZWrite Off Cull Off
         Pass {
+            Name "PAINTED"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag

@@ -57,6 +57,15 @@ public sealed class BackgroundStudyTests
         Assert.That(terrain.Length, Is.EqualTo(colliders.Length));
         Assert.That(root.GetComponentsInChildren<Collider>().Length, Is.Zero,
             "Terrain art and corner foliage must not introduce 3D collision.");
+        var river = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.sharedMaterial.shader.name == "LegendOfCat/StudyRiver").ToArray();
+        Assert.That(river.Length, Is.EqualTo(3), "Only one tiled river scene is needed.");
+        Assert.That(river.Select(r => r.sharedMaterial).Distinct().Count(), Is.EqualTo(1));
+        Assert.That(river[0].sharedMaterial.mainTexture.name, Is.EqualTo("connected-river"));
+        Assert.That(root.GetComponentsInChildren<MeshRenderer>().Any(r => r.name == "Foreground river tile"), Is.False,
+            "Do not reintroduce an independent foreground-water graphic.");
+        Assert.That(root.GetComponentsInChildren<Renderer>().Any(r => r.sharedMaterial && r.sharedMaterial.mainTexture &&
+            (r.sharedMaterial.mainTexture.name == "foreground-river" || r.sharedMaterial.mainTexture.name == "middle-cutout")), Is.False,
+            "The superseded near/far water paintings must not be mixed into the connected river.");
         Assert.That(terrain.Count(r => r.name == "Painted grounded cliff"), Is.GreaterThan(terrain.Length / 2));
         for (int i = 0; i < terrain.Length; i++) {
             Assert.That(terrain[i].bounds.max.y, Is.LessThan(colliders[i].bounds.max.y));
