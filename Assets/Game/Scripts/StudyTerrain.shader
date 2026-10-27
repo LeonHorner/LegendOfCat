@@ -16,15 +16,16 @@ Shader "LegendOfCat/StudyTerrain"
             float mirror(float value) { return 1 - abs(frac(value * 0.5) * 2 - 1); }
             fixed4 frag(Output i) : SV_Target {
                 if (_Surface > 0.5) {
-                    fixed4 grass = tex2D(_TopTex, float2(mirror(i.uv.x * _Width / 4 + _Seed), i.uv.y * 0.6 + 0.2));
-                    grass.rgb *= _Tint.rgb * lerp(1.02, 0.84, i.uv.y); grass.a = 1; return grass;
+                    fixed4 grass = tex2D(_TopTex, float2(mirror(i.uv.x * _Width / 6 + _Seed), i.uv.y * 0.12 + 0.44));
+                    grass.rgb *= _Tint.rgb * lerp(0.94, 0.90, i.uv.y); grass.a = 1; return grass;
                 }
                 float belowTop = (1 - i.uv.y) * _Depth;
-                float u = mirror(i.uv.x * _Width / 4 + _Seed);
-                float v = belowTop < 0.32 ? lerp(0.975, 0.88, belowTop / 0.32)
-                    : lerp(0.88, 0.04, mirror((belowTop - 0.32) / 3.5));
+                float u = mirror(i.uv.x * _Width / 6 + _Seed);
+                float v = belowTop < 0.12 ? lerp(0.975, 0.88, belowTop / 0.12)
+                    : lerp(0.88, 0.04, mirror((belowTop - 0.12) / 5));
                 fixed4 color = tex2D(_MainTex, float2(u, v));
-                color.rgb *= _Tint.rgb * lerp(1, 0.72, smoothstep(0.82, 1, i.uv.x));
+                color.rgb *= _Tint.rgb * lerp(1, 0.94, smoothstep(0.82, 1, i.uv.x));
+                color.rgb = lerp(color.rgb, float3(0.30, 0.32, 0.22), 0.10);
                 color.a = 1; return color;
             }
             ENDCG

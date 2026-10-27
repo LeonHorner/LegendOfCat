@@ -269,3 +269,14 @@ and registration break repetition, ivy/moss/fern patches hang across fronts and
 sides, and a separate foreground river overlaps the lower cliff bases. This is
 painted depth within the 2D prototype, with no new swimming, moving-platform or
 3D gameplay behavior. No final production art or A/B/C selection is implied.
+
+## Golden River composition refinement — 2026-10-27
+
+No new images or generators were used. Existing documented PNGs remain unchanged.
+Human feedback rejected the high water, exaggerated platform perspective and
+front-rim stance, requesting foreground/background coherence like the concept.
+Rendering decisions: smaller lower river motifs aligned to world-space platforms,
+quieter water saturation, narrow grass bands surrounding the unchanged contact
+line, restrained side shading, larger rock motifs and mipmapped ground textures.
+The original movement/collision geometry and Mika artwork are preserved. This
+records a revision target, not user acceptance of final artwork or an A/B/C choice.

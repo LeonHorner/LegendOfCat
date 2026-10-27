@@ -32,8 +32,10 @@ The last platform has broad safe ground; reverse direction to test return travel
 
 Ten land masses extend to y=-10, below the visible play area, with painted dark
 stone/earth and a naturally lit grass cap. Four narrower jump platforms have
-tapered irregular rock undersides using the same painting. Tops remain flat,
-world-space and aligned to the existing BoxCollider2D contacts. Shared movement
+tapered irregular rock undersides using the same painting. The contact line lies
+inside a narrow painted grass band, with the visible front rim 0.12 units below
+the unchanged BoxCollider2D contact and the back edge 0.10–0.13 units above it.
+This keeps Mika within the turf rather than balancing on the front rim. Shared movement
 course assets, Mika and motor values are unchanged. Floating terrain here means
 stationary suspended rocks, not moving supports or a new traversal mechanic.
 Sparse dark foliage frames the lower left/right corners like the README reference.
@@ -43,14 +45,22 @@ is opaque, leaving the center and landing plane open. Natural leaf contours are
 retained instead of clipping a straight top edge. All three candidates share it.
 The painted depth ordering is now foreground river/small stones and corner
 foliage, then platform faces and their receding meadow surfaces, then near/middle/
-far scenery. The foreground river stays at a fixed world elevation below landing
-edges and travels at factor 1.1 to strengthen the depth cue. It is decorative,
+far scenery. The foreground river stays at a lower fixed world elevation below landing
+edges and is registered to the same world coordinates as the platforms. It is decorative,
 not a swimming mechanic or collision surface.
+User review on 2026-10-27 rejected the high foreground water, broad slab-like top
+faces and front-rim stance. River motifs now use 16-unit tiles, a lower placement
+and quieter saturation, with smaller stones still visible near the bottom. The
+surfaces are approximately 0.22–0.25 units deep instead of 0.38–0.58; almost-square
+fronts and reduced side shading retain the concept's painted 2D character. Larger
+rock motifs, a shared warm olive palette and mipmapped ground textures reduce the
+separate, highly tiled look. These refinements are candidates for another review,
+not a claim that the artwork now matches the concept or has been accepted.
 Each platform receives one to three ivy/moss/fern patches from three cutouts,
 with different lengths, positions and facing. Rock tint, texture registration,
 floating underside shape and apparent top depth also vary. The shallow visible
-upper face recedes behind the collision-aligned front lip; it adds painted spatial
-depth without changing the 2D motor or prescribing 3D gameplay. Geometry remains
+upper band surrounds the collision contact line; it adds restrained painted depth
+without changing the 2D motor or prescribing 3D gameplay. Geometry remains
 a bounded readability prototype, not approved final terrain art.
 
 | Candidate | Far / middle / near travel | Depth and readability | Variety and effort |
@@ -147,7 +157,7 @@ Validation: pinned Editor import/scene generation and graphics captures succeede
 Eight focused Unity tests cover ground contact, world-space collision stability
 through all concept switches, tile coverage and fixed 16:9 at 640x360, 1280x720,
 1024x768 and 2560x1080, the at-least-double course span, matching terrain contact
-lips, varied hanging greenery and foreground travel coverage. The extended
+lips/grass-band registration, varied hanging greenery and foreground travel coverage. The extended
 revision is rendered/tested in an ignored isolated project copy under artifacts/
 while the working Editor is open, with a separate Library. Test logs are
 local under ignored Logs/. No Windows/Linux player/launcher build, actual install

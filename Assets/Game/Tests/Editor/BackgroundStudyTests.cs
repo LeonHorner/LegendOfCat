@@ -15,7 +15,7 @@ public sealed class BackgroundStudyTests
     public void MirroredTilesCoverViewAcrossNegativeAndPositiveWraps(float speed)
     {
         // Both the sky and cutout tile families cover the fixed 16:9 viewport.
-        foreach (float width in new[] { 24f, 32f, 64f })
+        foreach (float width in new[] { 16f, 24f, 64f })
         for (int step = -2000; step <= 2000; step++) {
             float camera = step * 0.5f;
             float center = Call("Offset", camera, speed) + Call("TileCenter", camera, speed, width);
@@ -59,10 +59,13 @@ public sealed class BackgroundStudyTests
             "Terrain art and corner foliage must not introduce 3D collision.");
         Assert.That(terrain.Count(r => r.name == "Painted grounded cliff"), Is.GreaterThan(terrain.Length / 2));
         for (int i = 0; i < terrain.Length; i++) {
-            Assert.That(terrain[i].bounds.max.y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f));
+            Assert.That(terrain[i].bounds.max.y, Is.LessThan(colliders[i].bounds.max.y));
             Assert.That(terrain[i].bounds.size.x, Is.EqualTo(colliders[i].bounds.size.x).Within(0.001f));
-            Assert.That(upperSurfaces[i].sharedMesh.vertices[0].y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f),
-                "The receding top must meet the exact collision lip at its front edge.");
+            Assert.That(upperSurfaces[i].sharedMesh.bounds.min.y, Is.LessThan(colliders[i].bounds.max.y),
+                "Mika's contact line must sit inside the grass band rather than on its front rim.");
+            Assert.That(upperSurfaces[i].sharedMesh.bounds.max.y, Is.GreaterThan(colliders[i].bounds.max.y));
+            Assert.That(upperSurfaces[i].sharedMesh.bounds.size.y, Is.LessThan(0.3f),
+                "Keep the painted surface narrow rather than a broad 3D-looking slab.");
             if (terrain[i].name == "Painted grounded cliff") Assert.That(terrain[i].bounds.min.y, Is.EqualTo(-10).Within(0.001f));
             if (i > 0) {
                 Assert.That(colliders[i].bounds.min.x - colliders[i - 1].bounds.max.x, Is.InRange(1f, 4f));

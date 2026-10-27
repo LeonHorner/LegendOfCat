@@ -25,7 +25,8 @@ public static class BuildBackgroundStudy
         foreach (string name in new[] { "painted-atlas", "middle-cutout", "near-cutout", "painted-terrain", "foreground-corners", "foreground-river", "meadow-surface", "hanging-foliage" }) {
             var importer = (TextureImporter)AssetImporter.GetAtPath($"Assets/Game/Resources/BackgroundStudy/{name}.png");
             importer.textureCompression = TextureImporterCompression.Uncompressed;
-            importer.mipmapEnabled = false; importer.isReadable = false;
+            importer.mipmapEnabled = name == "meadow-surface" || name == "painted-terrain";
+            importer.isReadable = false;
             importer.alphaIsTransparency = true;
             importer.wrapMode = TextureWrapMode.Clamp; importer.maxTextureSize = 2048;
             importer.SaveAndReimport();

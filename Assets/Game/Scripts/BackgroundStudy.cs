@@ -14,6 +14,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     public const float CameraFloor = 1f;
     public const float CourseLeft = -5, CourseRight = 104;
     public const float TourDistance = 100;
+    public const float SurfaceFrontInset = 0.12f;
     // Keep the shared course untouched; this lab adds a second sequence for longer art review.
     public static readonly Vector3[] Platforms = {
         new Vector3(0, -0.75f, 10), new Vector3(9, -0.75f, 4),
@@ -99,13 +100,15 @@ public sealed class BackgroundStudy : MonoBehaviour
         water.SetParent(transform, false);
         waterMaterial = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
         waterMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-river");
-        waterMaterial.SetFloat("_Cutout", 1); waterMaterial.SetFloat("_Fog", 0.08f);
+        waterMaterial.SetFloat("_Cutout", 1); waterMaterial.SetFloat("_Fog", 0.18f);
+        waterMaterial.SetFloat("_Saturation", 0.82f);
         for (int tile = -1; tile <= 1; tile++) {
             var panel = GameObject.CreatePrimitive(PrimitiveType.Quad);
             DestroyImmediate(panel.GetComponent<Collider>());
             panel.name = "Foreground river tile"; panel.transform.SetParent(water, false);
-            panel.transform.localPosition = new Vector3(tile * 24, 2, -1);
-            panel.transform.localScale = new Vector3(24, 16, 1);
+            // Lower, smaller river motifs connect to the scenery rather than forming a tall foreground curtain.
+            panel.transform.localPosition = new Vector3(tile * 16, -0.5f, -1);
+            panel.transform.localScale = new Vector3(16, 16 / 1.5f, 1);
             panel.GetComponent<MeshRenderer>().sharedMaterial = waterMaterial;
         }
         cornerMaterial = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
@@ -144,7 +147,8 @@ public sealed class BackgroundStudy : MonoBehaviour
 
     void Terrain(Vector3 platform, bool floating, int variant)
     {
-        float top = platform.y + 0.75f;
+        float contact = platform.y + 0.75f;
+        float top = contact - SurfaceFrontInset;
         float depth = floating ? 1.8f + variant % 3 * 0.25f : top + 10;
         // The exposed underside is irregular; the standable top remains flat and exact.
         var shape = floating ? new[] { new Vector2(0, 1), new Vector2(1, 1),
@@ -168,16 +172,16 @@ public sealed class BackgroundStudy : MonoBehaviour
         var parameters = new MaterialPropertyBlock();
         parameters.SetFloat("_Width", platform.z); parameters.SetFloat("_Depth", depth);
         parameters.SetFloat("_Seed", variant * 0.37f);
-        parameters.SetColor("_Tint", variant % 3 == 0 ? new Color(1.04f, 1, 0.92f)
-            : variant % 3 == 1 ? new Color(0.92f, 1, 0.94f) : new Color(0.96f, 0.97f, 1.04f));
+        parameters.SetColor("_Tint", variant % 3 == 0 ? new Color(1.02f, 1, 0.96f)
+            : variant % 3 == 1 ? new Color(0.96f, 1, 0.94f) : new Color(1, 0.97f, 0.91f));
         renderer.SetPropertyBlock(parameters);
-        // A shallow painted top recedes behind the exact front contact edge. This
-        // is visual perspective only; the 2D motor still lands on the front lip.
-        float back = 0.38f + variant % 3 * 0.1f;
+        // The contact line sits inside a narrow painted grass band, like the concept.
+        // Keep the real collider unchanged and avoid broad trapezoids or box-like side faces.
+        float back = SurfaceFrontInset + 0.10f + variant % 3 * 0.015f;
         var upper = new Mesh { name = "Painted upper surface" };
         float half = platform.z * 0.5f;
         upper.vertices = new[] { new Vector3(-half, top, 1.9f), new Vector3(half, top, 1.9f),
-            new Vector3(half - 0.22f, top + back, 2.1f), new Vector3(-half + 0.22f, top + back, 2.1f) };
+            new Vector3(half - 0.04f, top + back, 2.1f), new Vector3(-half + 0.04f, top + back, 2.1f) };
         upper.uv = new[] { Vector2.zero, Vector2.right, Vector2.one, Vector2.up };
         upper.triangles = new[] { 0, 1, 2, 0, 2, 3 }; upper.RecalculateBounds(); terrainMeshes.Add(upper);
         var topVisual = new GameObject(upper.name); topVisual.transform.SetParent(transform, false);
@@ -227,12 +231,12 @@ public sealed class BackgroundStudy : MonoBehaviour
             }
         }
         if (water) {
-            float center = TileCenter(x, 1.1f, 24);
-            water.position = new Vector3(Offset(x, 1.1f) + center, 0, 0);
-            int tileIndex = Mathf.RoundToInt(center / 24);
+            float center = TileCenter(x, 1, 16);
+            water.position = new Vector3(center, 0, 0);
+            int tileIndex = Mathf.RoundToInt(center / 16);
             for (int tile = 0; tile < 3; tile++) {
                 var panel = water.GetChild(tile); var scale = panel.localScale;
-                scale.x = ((tileIndex + tile - 1) & 1) == 0 ? 24 : -24;
+                scale.x = ((tileIndex + tile - 1) & 1) == 0 ? 16 : -16;
                 panel.localScale = scale;
             }
         }

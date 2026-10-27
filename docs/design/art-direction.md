@@ -95,6 +95,12 @@ lab now spans 109 world units, with ten grounded cliff fronts, four suspended ro
 platforms, receding painted meadow tops, varied ivy/moss/fern patches and a closer
 river layer. These are painted depth cues within the 2D test; they do not change
 the movement/collision contract or approve 3D gameplay or final Level 1 artwork.
+On 2026-10-27 the user rejected the high water, exaggerated slab-like surface
+perspective and Mika's front-rim stance, requesting a unified composition closer
+to the concept. The follow-up lowers the river, registers it with the platforms,
+quiets its saturation, narrows the grass bands around the unchanged contact line
+and reduces side shading/texture repetition. This supersedes the exaggerated top
+faces as the current prototype target; final visual acceptance is still pending.
 Mirrored reuse remains an evaluation technique with visible symmetry limitations
 documented in the comparison. Keep gameplay surfaces
 in world space and retain the readability requirements above. Full Level 1 content
