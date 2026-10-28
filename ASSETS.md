@@ -292,6 +292,16 @@ Human direction: foreground water must connect to background water, potentially
 using one image. Implementation: replace the separate foreground-river and
 middle-cutout water paintings with a single river/bank/waterfall composition.
 The full scene and lower cliff-base overlap sample the same texture and UVs on
-the same quads, with shared tint, scale and movement. Sky, foliage and playable
+registered background/foreground quads, with shared tint, scale and movement. Sky, foliage and playable
 terrain remain separate. Superseded paintings are retained but not loaded by
 this lab. No final production or A/B/C selection is implied.
+
+## River composition correction — 2026-10-28
+
+User review showed floating-looking cliff bases and missing foreground water.
+No new pixels or external assets were introduced. The same river painting now
+uses registered foreground copies drawn after nearby bank vegetation, replacing
+the incorrect multipass order. Grounded cliffs have subtly broadened submerged
+feet, and this bounded course keeps camera height fixed during jumps to retain
+the water. Collision contacts and the four intentional suspended rocks are
+unchanged. These are human-directed prototype refinements, pending visual review.

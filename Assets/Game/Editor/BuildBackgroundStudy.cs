@@ -57,6 +57,8 @@ public static class BuildBackgroundStudy
                 study.ApplyView(17, BackgroundStudy.CameraFloor);
                 Save(study.View, $"{Evidence}/candidate-{mode}.png", 1280, 720, false);
                 Save(study.View, $"{Evidence}/candidate-{mode}-small-grayscale.png", 640, 360, true);
+                study.ApplyView(10, BackgroundStudy.CameraFloor);
+                Save(study.View, $"{Evidence}/river-contact-{mode}.png", 1280, 720, false);
                 // 5 fps review recording: 5 world units/s, including a complete reversal.
                 for (int frame = 0; !stillsOnly && frame <= BackgroundStudy.TourDistance * 2; frame++) {
                     study.ApplyView(Mathf.PingPong(frame, BackgroundStudy.TourDistance) - 2, BackgroundStudy.CameraFloor);

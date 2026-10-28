@@ -58,8 +58,13 @@ public sealed class BackgroundStudyTests
         Assert.That(root.GetComponentsInChildren<Collider>().Length, Is.Zero,
             "Terrain art and corner foliage must not introduce 3D collision.");
         var river = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.sharedMaterial.shader.name == "LegendOfCat/StudyRiver").ToArray();
-        Assert.That(river.Length, Is.EqualTo(3), "Only one tiled river scene is needed.");
-        Assert.That(river.Select(r => r.sharedMaterial).Distinct().Count(), Is.EqualTo(1));
+        Assert.That(river.Length, Is.EqualTo(6), "Background and foreground must use aligned copies of one painting.");
+        Assert.That(river.Select(r => r.sharedMaterial.mainTexture).Distinct().Count(), Is.EqualTo(1));
+        var backWater = river.Where(r => r.sharedMaterial.GetFloat("_Foreground") == 0).ToArray();
+        var frontWater = river.Where(r => r.sharedMaterial.GetFloat("_Foreground") == 1).ToArray();
+        Assert.That(backWater.Length, Is.EqualTo(3)); Assert.That(frontWater.Length, Is.EqualTo(3));
+        Assert.That(frontWater.All(r => r.bounds.max.z < 0), Is.True,
+            "Water must draw in front of near-bank vegetation and cliff faces.");
         Assert.That(river[0].sharedMaterial.mainTexture.name, Is.EqualTo("connected-river"));
         Assert.That(root.GetComponentsInChildren<MeshRenderer>().Any(r => r.name == "Foreground river tile"), Is.False,
             "Do not reintroduce an independent foreground-water graphic.");
@@ -69,7 +74,9 @@ public sealed class BackgroundStudyTests
         Assert.That(terrain.Count(r => r.name == "Painted grounded cliff"), Is.GreaterThan(terrain.Length / 2));
         for (int i = 0; i < terrain.Length; i++) {
             Assert.That(terrain[i].bounds.max.y, Is.LessThan(colliders[i].bounds.max.y));
-            Assert.That(terrain[i].bounds.size.x, Is.EqualTo(colliders[i].bounds.size.x).Within(0.001f));
+            Assert.That(Mathf.Abs(terrain[i].GetComponent<MeshFilter>().sharedMesh.vertices[1].x -
+                terrain[i].GetComponent<MeshFilter>().sharedMesh.vertices[0].x), Is.EqualTo(colliders[i].bounds.size.x).Within(0.001f));
+            Assert.That(terrain[i].bounds.size.x, Is.InRange(colliders[i].bounds.size.x - 0.001f, colliders[i].bounds.size.x + 0.61f));
             Assert.That(upperSurfaces[i].sharedMesh.bounds.min.y, Is.LessThan(colliders[i].bounds.max.y),
                 "Mika's contact line must sit inside the grass band rather than on its front rim.");
             Assert.That(upperSurfaces[i].sharedMesh.bounds.max.y, Is.GreaterThan(colliders[i].bounds.max.y));
@@ -86,6 +93,11 @@ public sealed class BackgroundStudyTests
             Study.GetField("concept").SetValue(study, Enum.ToObject(Study.GetNestedType("Concept"), mode));
             foreach (float x in new[] { -120f, 57f, 59f, 240f, 17f })
                 Study.GetMethod("ApplyView").Invoke(study, new object[] { x, 3f });
+            for (int tile = 0; tile < 3; tile++) {
+                Assert.That((Vector2)backWater[tile].bounds.center, Is.EqualTo((Vector2)frontWater[tile].bounds.center));
+                Assert.That((Vector2)backWater[tile].bounds.size, Is.EqualTo((Vector2)frontWater[tile].bounds.size));
+                Assert.That(backWater[tile].transform.localScale, Is.EqualTo(frontWater[tile].transform.localScale));
+            }
             for (int i = 0; i < positions.Length; i++) Assert.That(colliders[i].transform.position, Is.EqualTo(positions[i]));
             foreach (float y in new[] { 1f, 3f }) {
                 Study.GetMethod("ApplyView").Invoke(study, new object[] { 17f, y });
@@ -108,8 +120,43 @@ public sealed class BackgroundStudyTests
         Assert.That(cat.GetComponentInChildren<SpriteRenderer>().sprite, Is.Not.Null);
         yield return new WaitForSeconds(0.25f);
         Assert.That(cat.transform.position.y, Is.InRange(0.4f, 0.6f), "Existing motor must settle onto world-space starting ground.");
+        cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(28.5f, 2.48f) });
+        yield return new WaitForSeconds(0.25f);
+        Study.GetMethod("ApplyView").Invoke(study, new object[] { 28.5f, 1f });
+        var motion = cat.GetType().GetField("Motion").GetValue(cat);
+        motion.GetType().GetMethod("PressJump").Invoke(motion, null);
+        float highest = cat.transform.position.y;
+        for (int frame = 0; frame < 25; frame++) {
+            yield return new WaitForFixedUpdate();
+            // EditMode coroutine scheduling does not guarantee a LateUpdate per physics step.
+            Study.GetMethod("LateUpdate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(study, null);
+            highest = Mathf.Max(highest, cat.transform.position.y);
+            Assert.That(view.transform.position.y, Is.EqualTo(1).Within(0.01f), "Keep foreground water framed during jumps.");
+            Assert.That(cat.GetComponentInChildren<SpriteRenderer>().bounds.max.y,
+                Is.LessThan(view.transform.position.y + view.orthographicSize), "The highest course jump must remain visible.");
+            Assert.That(view.WorldToViewportPoint(cat.transform.position).x, Is.InRange(0.1f, 0.9f));
+            if (frame == 12 && Array.IndexOf(Environment.GetCommandLineArgs(), "-captureStudyJump") >= 0)
+                CaptureJump(view);
+        }
+        Assert.That(highest, Is.GreaterThan(3));
         UnityEngine.Object.Destroy(root);
         yield return null;
         yield return new ExitPlayMode();
+    }
+
+    static void CaptureJump(Camera view)
+    {
+        // Optional graphics-device evidence of the actual motor/animation in Play mode.
+        var target = new RenderTexture(1280, 720, 24);
+        var pixels = new Texture2D(1280, 720, TextureFormat.RGB24, false);
+        var previous = RenderTexture.active; var previousTarget = view.targetTexture; var previousRect = view.rect;
+        try {
+            view.targetTexture = target; view.rect = new Rect(0, 0, 1, 1); view.Render();
+            RenderTexture.active = target; pixels.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0); pixels.Apply();
+            System.IO.File.WriteAllBytes("docs/design/background-study/play-jump.png", pixels.EncodeToPNG());
+        } finally {
+            RenderTexture.active = previous; view.targetTexture = previousTarget; view.rect = previousRect;
+            target.Release(); UnityEngine.Object.DestroyImmediate(target); UnityEngine.Object.DestroyImmediate(pixels);
+        }
     }
 }

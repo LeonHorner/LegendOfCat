@@ -30,7 +30,8 @@ public sealed class BackgroundStudy : MonoBehaviour
     readonly Transform[] layers = new Transform[3];
     readonly Material[] materials = new Material[3];
     readonly System.Collections.Generic.List<Mesh> terrainMeshes = new System.Collections.Generic.List<Mesh>();
-    Material terrainMaterial, cornerMaterial, foliageMaterial;
+    Material terrainMaterial, cornerMaterial, foliageMaterial, riverFrontMaterial;
+    Transform riverFront;
     Texture2D pixel;
     Sprite square;
     float tourTime;
@@ -68,7 +69,7 @@ public sealed class BackgroundStudy : MonoBehaviour
             materials[i] = new Material(Shader.Find(i == 1 ? "LegendOfCat/StudyRiver" : "LegendOfCat/BackgroundStudy"));
             materials[i].mainTexture = textures[i];
             materials[i].SetFloat("_Cutout", i == 0 ? 0 : 1);
-            if (i == 1) materials[i].SetFloat("_Waterline", -3.4f);
+            if (i == 1) materials[i].SetFloat("_Waterline", -3.2f);
             float width = i == 0 ? 64 : 24;
             for (int tile = -1; tile <= 1; tile++) {
                 var panel = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -80,6 +81,20 @@ public sealed class BackgroundStudy : MonoBehaviour
                 panel.transform.localScale = new Vector3(width, i == 0 ? width / 4.5f : width / 1.5f, 1);
                 panel.GetComponent<MeshRenderer>().sharedMaterial = materials[i];
             }
+        }
+        // Register the foreground to the same painting; draw it after near-bank foliage.
+        riverFront = new GameObject("Connected river foreground").transform;
+        riverFront.SetParent(transform, false);
+        riverFrontMaterial = new Material(materials[1]); riverFrontMaterial.SetFloat("_Foreground", 1);
+        for (int tile = 0; tile < 3; tile++) {
+            var source = layers[1].GetChild(tile);
+            var front = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            DestroyImmediate(front.GetComponent<Collider>());
+            front.name = "Connected river foreground tile " + tile;
+            front.transform.SetParent(riverFront, false);
+            front.transform.localPosition = new Vector3(source.localPosition.x, source.localPosition.y, -2);
+            front.transform.localScale = source.localScale;
+            front.GetComponent<MeshRenderer>().sharedMaterial = riverFrontMaterial;
         }
         // Reuse the approved motor and presentation, but own every object in this lab.
         terrainMaterial = new Material(Shader.Find("LegendOfCat/StudyTerrain"));
@@ -136,10 +151,14 @@ public sealed class BackgroundStudy : MonoBehaviour
         float top = contact - SurfaceFrontInset;
         float depth = floating ? 1.8f + variant % 3 * 0.25f : top + 10;
         // The exposed underside is irregular; the standable top remains flat and exact.
+        float foot = (-2.85f - (top - depth)) / depth;
+        float flare = (0.14f + variant % 3 * 0.03f) / platform.z;
         var shape = floating ? new[] { new Vector2(0, 1), new Vector2(1, 1),
             new Vector2(0.93f, 0.42f), new Vector2(0.72f, 0.18f),
             new Vector2(0.38f + variant % 3 * 0.1f, 0), new Vector2(0.24f, 0.23f), new Vector2(0.06f, 0.48f) }
-            : new[] { new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0), new Vector2(0, 0) };
+            : new[] { new Vector2(0, 1), new Vector2(1, 1),
+                new Vector2(1 + flare, foot), new Vector2(1 + flare * 1.5f, 0),
+                new Vector2(-flare * 1.5f, 0), new Vector2(-flare, foot) };
         var vertices = new Vector3[shape.Length];
         var indices = new int[(shape.Length - 2) * 3];
         for (int i = 0; i < shape.Length; i++)
@@ -215,6 +234,14 @@ public sealed class BackgroundStudy : MonoBehaviour
                 panel.localScale = scale;
             }
         }
+        RegisterRiverForeground();
+    }
+
+    void RegisterRiverForeground()
+    {
+        riverFront.position = layers[1].position;
+        for (int tile = 0; tile < 3; tile++)
+            riverFront.GetChild(tile).localScale = layers[1].GetChild(tile).localScale;
     }
 
     public void ApplyViewport(int width, int height)
@@ -233,7 +260,8 @@ public sealed class BackgroundStudy : MonoBehaviour
         } else {
             float half = View.orthographicSize * View.aspect;
             float x = Mathf.Clamp(Cat.transform.position.x + 2, half + CourseLeft, CourseRight - half);
-            var desired = new Vector3(x, Mathf.Clamp(Cat.transform.position.y - 0.8f, CameraFloor, 3), -10);
+            // The course's highest jump fits here; keep water and cliff feet in view.
+            var desired = new Vector3(x, CameraFloor, -10);
             var position = Vector3.SmoothDamp(View.transform.position, desired, ref cameraVelocity, 0.16f);
             ApplyView(position.x, position.y);
         }
@@ -268,6 +296,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         if (terrainMaterial) DestroyImmediate(terrainMaterial);
         if (cornerMaterial) DestroyImmediate(cornerMaterial);
         if (foliageMaterial) DestroyImmediate(foliageMaterial);
+        if (riverFrontMaterial) DestroyImmediate(riverFrontMaterial);
         if (square) DestroyImmediate(square); if (pixel) DestroyImmediate(pixel);
     }
 }

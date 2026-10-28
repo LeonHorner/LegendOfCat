@@ -103,10 +103,9 @@ and reduces side shading/texture repetition. This supersedes the exaggerated top
 faces as the current prototype target; final visual acceptance is still pending.
 Further feedback identified the near and far water as separate-looking graphics.
 The lab now uses one continuous river/bank painting for both distances, with the
-same UVs and movement throughout. A lower compositing pass of that same image
-lets water overlap cliff bases; the old foreground river and middle-distance
+same UVs and movement throughout. Registered foreground copies of that same image draw after near-bank vegetation and overlap subtly flared cliff feet; the old foreground river and middle-distance
 water painting are superseded. No second water texture/scrolling strip is used.
-Mirrored reuse remains an evaluation technique with visible symmetry limitations
+The course camera stays vertically fixed during jumps to retain foreground water. These corrections address the subsequent floating-cliff screenshot. Mirrored reuse remains an evaluation technique with visible symmetry limitations
 documented in the comparison. Keep gameplay surfaces
 in world space and retain the readability requirements above. Full Level 1 content
 remains scoped to #16.

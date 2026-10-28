@@ -23,15 +23,14 @@ approved Level 1 layout. The camera
 follows the interpolated cat transform with smoothing and viewport-aware bounds.
 Like the existing movement course, the view is fixed to **16:9**, with black bars
 outside that viewport in other window shapes. The camera baseline is y=1 instead
-of y=3, exposing two more world units below the platforms; jump follow is similarly
-lowered. Character scale, collisions and jump physics are unchanged.
+of y=3, exposing two more world units below the platforms; vertical framing stays at y=1 throughout this bounded course, including jumps from its highest platform. Character scale, collisions and jump physics are unchanged.
 Use the on-screen buttons to switch candidates without moving the camera or cat.
 Camera-only tour travels at 5 units/s and reverses; turn it off to follow Mika.
 Its one-way sweep is now 100 units (20 seconds, or 40 seconds there and back).
 The last platform has broad safe ground; reverse direction to test return travel.
 
 Ten land masses extend to y=-10, below the visible play area, with painted dark
-stone/earth and a naturally lit grass cap. Four narrower jump platforms have
+stone/earth, subtly flared submerged feet and a naturally lit grass cap. Four narrower jump platforms have
 tapered irregular rock undersides using the same painting. The contact line lies
 inside a narrow painted grass band, with the visible front rim 0.12 units below
 the unchanged BoxCollider2D contact and the back edge 0.10–0.13 units above it.
@@ -44,12 +43,14 @@ proportionally into its own 4.5x6-unit corner quad; only the authored low foliag
 is opaque, leaving the center and landing plane open. Natural leaf contours are
 retained instead of clipping a straight top edge. All three candidates share it.
 The river now uses **one connected river-and-bank painting** from its distant
-waterfalls to its nearest stones. The middle depth's three quads share one texture,
-material, UV layout, scale and motion. Their low-water compositing pass samples
-the exact same pixels to cover the cliff bases around y=-3.4; no independent
-foreground-water graphic or scroll factor remains. Sky and near foliage can
-still parallax separately. The river is decorative, not a swimming/collision
-surface. Corner plants and platform vegetation remain separate natural cutouts.
+waterfalls to its nearest stones. Three background quads and three registered
+foreground copies share one texture, UV layout, scale, tint and motion. The
+foreground material masks the same pixels below y=-3.2 and renders in front of
+near-bank vegetation and cliff bases. This corrects the earlier multipass
+ordering, which let shrubs hide the foreground water. No independent water
+painting or scroll factor remains. Sky and near foliage can still parallax
+separately. The river is decorative, not a swimming/collision surface.
+Corner plants and platform vegetation remain separate natural cutouts.
 User review on 2026-10-27 rejected the high foreground water, broad slab-like top
 faces and front-rim stance. A subsequent 16-unit foreground river was also rejected
 for looking disconnected from the background water. It has been superseded by
@@ -101,8 +102,7 @@ no measured player GPU timings or platform performance claim is made.
 The terrain meshes share an additional opaque turf/stone painting and material;
 two transparent corner quads add one shared framing texture/material. These are prototype
 assets with provenance and prompts in ASSETS.md and terrain-and-corner-prompts.md.
-The three river quads (already counted among the nine depth quads) use an additional
-low-water compositing pass. Fourteen shallow upper faces and twenty-seven
+Three foreground river copies add one material and three draws using the existing river texture. Fourteen shallow upper faces and twenty-seven
 hanging-foliage quads add overlap/draw work. No measured GPU or target-device
 performance is claimed. The old middle-cutout and foreground-river paintings are
 retained as superseded sources and are not loaded by this lab. See
@@ -119,7 +119,7 @@ encode the MP4s and comparison GIF and remove the numbered intermediate PNGs.
 Intermediate frames now live under ignored `Logs/background-study-motion/`;
 existing manually captured frames under the documentation folder are left alone.
 Motion sequences use the same 5-unit/s camera sweep, reverse and return; they are
-camera/scenery recordings, not recordings of player input. Wrap stress stills
+camera/scenery recordings, not recordings of player input. The [river contact still](river-contact-0.png) shows the foreground and submerged feet. The [actual highest-platform jump](play-jump.png) captures the motor in Play Mode. The jump-framing images are raised-camera stress views, not runtime jump captures. Wrap stress stills
 inspect negative travel, several world positions and long travel. Unit tests sweep
 both tile widths across positive and negative wrap boundaries.
 
@@ -164,7 +164,7 @@ Eight focused Unity tests cover ground contact, world-space collision stability
 through all concept switches, tile coverage and fixed 16:9 at 640x360, 1280x720,
 1024x768 and 2560x1080, the at-least-double course span, matching terrain contact
 lips/grass-band registration, varied hanging greenery and one shared river source
-without separate foreground-water graphics. The extended
+without separate foreground-water graphics, front/back registration and draw depth, and highest-platform jump framing with the camera fixed at y=1. The extended
 revision is rendered/tested in an ignored isolated project copy under artifacts/
 while the working Editor is open, with a separate Library. Test logs are
 local under ignored Logs/. No Windows/Linux player/launcher build, actual install

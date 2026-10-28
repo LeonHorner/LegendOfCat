@@ -6,9 +6,9 @@ original generated RGBA PNG is retained without pixel edits as
 `Assets/Game/Resources/BackgroundStudy/connected-river.png`.
 
 One painting contains the banks, waterfalls, distant water, near water and small
-stones. One material and one set of tiled quads renders the entire image; a
-second compositing pass samples the identical UVs, texture, tint and
-motion to let the same water cover the lowest cliff bases. It introduces no
+stones. Registered background and foreground quads sample identical UVs,
+texture, tint, scale and motion. The foreground material masks the lowest water
+and draws after near-bank vegetation, so plants cannot hide it. It introduces no
 independent water image, scale, scroll factor or image-space join. Mirrored reuse
 is still a prototype limitation, not final production scenery.
 
