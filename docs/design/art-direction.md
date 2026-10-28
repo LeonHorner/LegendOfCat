@@ -125,3 +125,14 @@ silhouettes. Contact registration is independent of decorative flowers and the
 submerged body; collision geometry is unchanged. See background-study/README.md
 and terrain-module-prompts.md for evidence, generation and limitations. This
 supersedes the textured-wall approach; it does not establish visual acceptance.
+
+### Platform and river integration — 2026-10-28
+
+Further user feedback identified the platforms as visually detached from scenery.
+The terrain shader now reduces isolated yellow saturation, shares a restrained
+sage atmospheric tint with the river banks, and gives lower submerged rocks a
+cool damp tone. The foreground-water mask has a narrower irregular contact edge
+and sits slightly lower, exposing more of the authored boulder feet instead of
+cutting them with a soft horizontal band. Landing silhouettes stay crisp.
+These are shader-only composition refinements; source artwork is unmodified.
+Visual coherence remains under user review.

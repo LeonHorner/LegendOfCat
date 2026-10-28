@@ -323,3 +323,13 @@ painted landing row to collision independently of decorative crown and submerged
 body height. No change to Mika, collision layout or physics. Shader alpha clipping
 rejects generated outer haze; pixels remain unmodified. Two-source reuse and body
 stretching remain prototype limitations, with visual acceptance pending.
+
+## Terrain integration grading — 2026-10-28
+
+No new generated assets. The original pillar/bank PNGs are unchanged. In response
+to feedback about detached-looking platforms, shader grading reduces yellow
+saturation, introduces restrained shared sage atmosphere and cool wet coloration
+at grounded feet. A lower, narrowly irregular water mask reveals the boulder
+silhouettes. No painted fake foam or independent water texture was introduced.
+Human direction: connect platform lighting and shore contact to the environment;
+final visual acceptance is pending.

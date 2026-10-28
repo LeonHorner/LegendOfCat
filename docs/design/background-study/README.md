@@ -38,6 +38,9 @@ above that row occupy only 0.6 world units, so flowers do not become tall obstac
 when the rock extends farther down. The lower portion stretches independently
 to the water; grounded bounds extend to y=-4.5, while suspended rocks retain
 compact undersides. Painted turf spans are registered to collider widths.
+Shader grading reduces isolated yellow saturation and shares restrained sage
+atmosphere with the banks. A cool damp zone at the lower rocks and a narrower,
+irregular water edge expose the boulder feet instead of a soft horizontal cut.
 Alpha clipping rejects the generated pillar's low-opacity outer haze without
 editing its original pixels. Decorative protrusions have no collision.
 
@@ -51,7 +54,7 @@ mirrored banks and near vegetation also remain visible style/reuse limitations.
 
 One river-and-bank painting contains waterfalls, distant water and near stones.
 Three background quads and three exactly registered foreground copies use the
-same texture, UVs, tint, scale and motion. The foreground mask below y=-3.2 draws
+same texture, UVs, tint, scale and motion. The foreground mask follows a narrow irregular edge around y=-3.32 and draws
 after near-bank vegetation and overlaps the rock feet. There is no separate
 foreground-water painting or scrolling factor. Corner plants frame the view.
 The river and all scenery are decorative and have no colliders.

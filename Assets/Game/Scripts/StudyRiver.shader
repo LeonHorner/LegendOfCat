@@ -30,8 +30,9 @@ Shader "LegendOfCat/StudyRiver"
                 c.rgb = lerp(dot(c.rgb, float3(0.2126, 0.7152, 0.0722)).xxx, c.rgb, _Saturation);
                 c.a = smoothstep(0.5, 0.95, c.a);
                 if (_Foreground > 0.5) {
-                    float shore = _Waterline + sin(i.world.x * 2.8) * 0.04;
-                    c.a *= 1 - smoothstep(shore - 0.07, shore + 0.07, i.world.y);
+                    float shore = _Waterline - 0.12 + sin(i.world.x * 2.8) * 0.065
+                        + sin(i.world.x * 6.1 + 0.7) * 0.025;
+                    c.a *= 1 - smoothstep(shore - 0.035, shore + 0.035, i.world.y);
                 }
                 return c;
             }
