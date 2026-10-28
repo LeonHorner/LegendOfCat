@@ -115,3 +115,13 @@ See ASSETS.md. Images were produced with the built-in OpenAI image generation to
 
 ## Historical boss artwork
 See the [legacy boss design archive](references/legacy-bosses/README.md) for original sprite sheets, animation metadata and generation records. These references are optional inspiration, not fixed Unity designs.
+
+### Terrain system correction — 2026-10-28
+
+The user rejected the latest tall-wall preview, especially its right platform,
+as too far from Golden River Ruins. The lab now replaces repeated surface
+textures and separate caps/leaves with complete painted pillar and wide-bank
+silhouettes. Contact registration is independent of decorative flowers and the
+submerged body; collision geometry is unchanged. See background-study/README.md
+and terrain-module-prompts.md for evidence, generation and limitations. This
+supersedes the textured-wall approach; it does not establish visual acceptance.

@@ -305,3 +305,21 @@ the incorrect multipass order. Grounded cliffs have subtly broadened submerged
 feet, and this bounded course keeps camera height fixed during jumps to retain
 the water. Collision contacts and the four intentional suspended rocks are
 unchanged. These are human-directed prototype refinements, pending visual review.
+
+## Painted terrain modules — 2026-10-28
+
+Sources: painted-pillar-v2.png and painted-bank-v2.png under
+Assets/Game/Resources/BackgroundStudy/. Original generated PNG pixels are
+preserved. Built-in OpenAI image generation; exact model ID not exposed.
+Reference: our archived Golden River Ruins v2, for palette, brushwork and lighting.
+License: ASSET-LICENSE.md where rights exist. Full prompts and output identifiers:
+docs/design/background-study/terrain-module-prompts.md.
+
+Human direction rejected the repeating rectangular-wall prototype, especially the
+right platform. The replacement uses whole painted rock silhouettes, integrated
+golden turf, asymmetric ivy, flowers and broad boulder feet. A wide bank painting
+serves broad ground; a compact pillar serves narrow supports. Code registers the
+painted landing row to collision independently of decorative crown and submerged
+body height. No change to Mika, collision layout or physics. Shader alpha clipping
+rejects generated outer haze; pixels remain unmodified. Two-source reuse and body
+stretching remain prototype limitations, with visual acceptance pending.

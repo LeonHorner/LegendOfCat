@@ -14,7 +14,6 @@ public sealed class BackgroundStudy : MonoBehaviour
     public const float CameraFloor = 1f;
     public const float CourseLeft = -5, CourseRight = 104;
     public const float TourDistance = 100;
-    public const float SurfaceFrontInset = 0.12f;
     // Keep the shared course untouched; this lab adds a second sequence for longer art review.
     public static readonly Vector3[] Platforms = {
         new Vector3(0, -0.75f, 10), new Vector3(9, -0.75f, 4),
@@ -30,7 +29,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     readonly Transform[] layers = new Transform[3];
     readonly Material[] materials = new Material[3];
     readonly System.Collections.Generic.List<Mesh> terrainMeshes = new System.Collections.Generic.List<Mesh>();
-    Material terrainMaterial, cornerMaterial, foliageMaterial, riverFrontMaterial;
+    Material terrainMaterial, cornerMaterial, riverFrontMaterial;
     Transform riverFront;
     Texture2D pixel;
     Sprite square;
@@ -98,12 +97,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         }
         // Reuse the approved motor and presentation, but own every object in this lab.
         terrainMaterial = new Material(Shader.Find("LegendOfCat/StudyTerrain"));
-        terrainMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/painted-terrain");
-        terrainMaterial.SetTexture("_TopTex", Resources.Load<Texture2D>("BackgroundStudy/meadow-surface"));
-        foliageMaterial = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
-        foliageMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/hanging-foliage");
-        foliageMaterial.SetFloat("_Cutout", 1); foliageMaterial.SetFloat("_Fog", 0.04f);
-        foliageMaterial.SetFloat("_AtlasCount", 3);
+        terrainMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/painted-pillar-v2");
         for (int index = 0; index < Platforms.Length; index++) {
             var p = Platforms[index];
             var ground = Block("World-space ground", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.19f, 0.23f, 0.2f));
@@ -147,66 +141,38 @@ public sealed class BackgroundStudy : MonoBehaviour
 
     void Terrain(Vector3 platform, bool floating, int variant)
     {
+        // Artwork owns its silhouette; the collider owns the exact standable span.
+        bool bank = platform.z >= 6;
         float contact = platform.y + 0.75f;
-        float top = contact - SurfaceFrontInset;
-        float depth = floating ? 1.8f + variant % 3 * 0.25f : top + 10;
-        // The exposed underside is irregular; the standable top remains flat and exact.
-        float foot = (-2.85f - (top - depth)) / depth;
-        float flare = (0.14f + variant % 3 * 0.03f) / platform.z;
-        var shape = floating ? new[] { new Vector2(0, 1), new Vector2(1, 1),
-            new Vector2(0.93f, 0.42f), new Vector2(0.72f, 0.18f),
-            new Vector2(0.38f + variant % 3 * 0.1f, 0), new Vector2(0.24f, 0.23f), new Vector2(0.06f, 0.48f) }
-            : new[] { new Vector2(0, 1), new Vector2(1, 1),
-                new Vector2(1 + flare, foot), new Vector2(1 + flare * 1.5f, 0),
-                new Vector2(-flare * 1.5f, 0), new Vector2(-flare, foot) };
-        var vertices = new Vector3[shape.Length];
-        var indices = new int[(shape.Length - 2) * 3];
-        for (int i = 0; i < shape.Length; i++)
-            vertices[i] = new Vector3((shape[i].x - 0.5f) * platform.z, top - depth + shape[i].y * depth, 2);
-        for (int i = 0; i < shape.Length - 2; i++) {
-            indices[i * 3] = 0; indices[i * 3 + 1] = i + 1; indices[i * 3 + 2] = i + 2;
-        }
+        float contactUV = bank ? 0.60f : 0.76f;
+        float landingFraction = bank ? 0.89f : 0.76f;
+        float width = platform.z / landingFraction;
+        float bottom = floating ? contact - 2.1f : -4.5f;
+        float crown = contact + 0.60f;
+        float half = width * 0.5f;
+        var vertices = new[] {
+            new Vector3(-half, bottom, 2), new Vector3(half, bottom, 2),
+            new Vector3(-half, contact, 2), new Vector3(half, contact, 2),
+            new Vector3(-half, crown, 2), new Vector3(half, crown, 2)
+        };
+        bool mirror = variant % 3 == 1;
+        float left = mirror ? 1 : 0, right = 1 - left;
         var mesh = new Mesh { name = floating ? "Painted floating rock" : "Painted grounded cliff" };
-        mesh.vertices = vertices; mesh.uv = shape; mesh.triangles = indices; mesh.RecalculateBounds();
-        terrainMeshes.Add(mesh);
+        mesh.vertices = vertices;
+        mesh.uv = new[] { new Vector2(left, 0), new Vector2(right, 0),
+            new Vector2(left, contactUV), new Vector2(right, contactUV),
+            new Vector2(left, 1), new Vector2(right, 1) };
+        mesh.triangles = new[] { 0, 2, 1, 1, 2, 3, 2, 4, 3, 3, 4, 5 };
+        mesh.RecalculateBounds(); terrainMeshes.Add(mesh);
         var visual = new GameObject(mesh.name); visual.transform.SetParent(transform, false);
         visual.transform.position = new Vector3(platform.x, 0, 0);
         visual.AddComponent<MeshFilter>().sharedMesh = mesh;
         var renderer = visual.AddComponent<MeshRenderer>(); renderer.sharedMaterial = terrainMaterial;
         var parameters = new MaterialPropertyBlock();
-        parameters.SetFloat("_Width", platform.z); parameters.SetFloat("_Depth", depth);
-        parameters.SetFloat("_Seed", variant * 0.37f);
-        parameters.SetColor("_Tint", variant % 3 == 0 ? new Color(1.02f, 1, 0.96f)
-            : variant % 3 == 1 ? new Color(0.96f, 1, 0.94f) : new Color(1, 0.97f, 0.91f));
+        parameters.SetTexture("_MainTex", Resources.Load<Texture2D>(
+            bank ? "BackgroundStudy/painted-bank-v2" : "BackgroundStudy/painted-pillar-v2"));
         renderer.SetPropertyBlock(parameters);
-        // The contact line sits inside a narrow painted grass band, like the concept.
-        // Keep the real collider unchanged and avoid broad trapezoids or box-like side faces.
-        float back = SurfaceFrontInset + 0.10f + variant % 3 * 0.015f;
-        var upper = new Mesh { name = "Painted upper surface" };
-        float half = platform.z * 0.5f;
-        upper.vertices = new[] { new Vector3(-half, top, 1.9f), new Vector3(half, top, 1.9f),
-            new Vector3(half - 0.04f, top + back, 2.1f), new Vector3(-half + 0.04f, top + back, 2.1f) };
-        upper.uv = new[] { Vector2.zero, Vector2.right, Vector2.one, Vector2.up };
-        upper.triangles = new[] { 0, 1, 2, 0, 2, 3 }; upper.RecalculateBounds(); terrainMeshes.Add(upper);
-        var topVisual = new GameObject(upper.name); topVisual.transform.SetParent(transform, false);
-        topVisual.transform.position = new Vector3(platform.x, 0, 0);
-        topVisual.AddComponent<MeshFilter>().sharedMesh = upper;
-        var topRenderer = topVisual.AddComponent<MeshRenderer>(); topRenderer.sharedMaterial = terrainMaterial;
-        parameters.SetFloat("_Surface", 1); topRenderer.SetPropertyBlock(parameters);
-        for (int patch = 0; patch <= variant % 3; patch++) {
-            float length = 1.3f + (variant + patch) % 4 * 0.45f;
-            float fraction = patch == 0 ? 0.06f : patch == 1 ? 0.38f : 0.8f;
-            var vine = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            DestroyImmediate(vine.GetComponent<Collider>());
-            vine.name = "Hanging platform foliage"; vine.transform.SetParent(transform, false);
-            vine.transform.position = new Vector3(platform.x - half + platform.z * fraction, top + 0.06f - length * 0.5f, 1.65f);
-            vine.transform.localScale = new Vector3(length * 0.5f * ((variant + patch) % 2 == 0 ? 1 : -1), length, 1);
-            var leaves = vine.GetComponent<MeshRenderer>(); leaves.sharedMaterial = foliageMaterial;
-            var leafParameters = new MaterialPropertyBlock(); leafParameters.SetFloat("_AtlasIndex", (variant + patch) % 3);
-            leaves.SetPropertyBlock(leafParameters);
-        }
     }
-
     GameObject Block(string label, Vector2 position, Vector2 size, Color color)
     {
         var item = new GameObject(label); item.transform.SetParent(transform, false);
@@ -295,7 +261,6 @@ public sealed class BackgroundStudy : MonoBehaviour
         foreach (var mesh in terrainMeshes) if (mesh) DestroyImmediate(mesh);
         if (terrainMaterial) DestroyImmediate(terrainMaterial);
         if (cornerMaterial) DestroyImmediate(cornerMaterial);
-        if (foliageMaterial) DestroyImmediate(foliageMaterial);
         if (riverFrontMaterial) DestroyImmediate(riverFrontMaterial);
         if (square) DestroyImmediate(square); if (pixel) DestroyImmediate(pixel);
     }

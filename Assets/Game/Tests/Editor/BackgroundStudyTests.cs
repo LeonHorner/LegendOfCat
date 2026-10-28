@@ -47,13 +47,8 @@ public sealed class BackgroundStudyTests
         Assert.That(colliders.Last().bounds.max.x - colliders.First().bounds.min.x, Is.GreaterThanOrEqualTo(104),
             "The review course must be at least twice the original 52-unit length.");
         var terrain = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.name.StartsWith("Painted grounded") || r.name.StartsWith("Painted floating")).ToArray();
-        var upperSurfaces = root.GetComponentsInChildren<MeshFilter>().Where(r => r.name == "Painted upper surface").ToArray();
-        Assert.That(upperSurfaces.Length, Is.EqualTo(colliders.Length));
-        var foliage = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.name == "Hanging platform foliage").ToArray();
-        Assert.That(foliage.Length, Is.GreaterThan(colliders.Length));
-        Assert.That(foliage.Select(r => r.bounds.size.y).Distinct().Count(), Is.GreaterThan(2),
-            "Hanging greenery must vary rather than repeat a single length.");
-        Assert.That(foliage.All(r => r.bounds.min.z > 0), Is.True, "Leaves render behind Mika's gameplay plane.");
+        Assert.That(root.GetComponentsInChildren<MeshFilter>().Any(r => r.name == "Painted upper surface"), Is.False,
+            "The integrated painting replaces the separate slab cap and repeated rock texture.");
         Assert.That(terrain.Length, Is.EqualTo(colliders.Length));
         Assert.That(root.GetComponentsInChildren<Collider>().Length, Is.Zero,
             "Terrain art and corner foliage must not introduce 3D collision.");
@@ -73,16 +68,20 @@ public sealed class BackgroundStudyTests
             "The superseded near/far water paintings must not be mixed into the connected river.");
         Assert.That(terrain.Count(r => r.name == "Painted grounded cliff"), Is.GreaterThan(terrain.Length / 2));
         for (int i = 0; i < terrain.Length; i++) {
-            Assert.That(terrain[i].bounds.max.y, Is.LessThan(colliders[i].bounds.max.y));
-            Assert.That(Mathf.Abs(terrain[i].GetComponent<MeshFilter>().sharedMesh.vertices[1].x -
-                terrain[i].GetComponent<MeshFilter>().sharedMesh.vertices[0].x), Is.EqualTo(colliders[i].bounds.size.x).Within(0.001f));
-            Assert.That(terrain[i].bounds.size.x, Is.InRange(colliders[i].bounds.size.x - 0.001f, colliders[i].bounds.size.x + 0.61f));
-            Assert.That(upperSurfaces[i].sharedMesh.bounds.min.y, Is.LessThan(colliders[i].bounds.max.y),
-                "Mika's contact line must sit inside the grass band rather than on its front rim.");
-            Assert.That(upperSurfaces[i].sharedMesh.bounds.max.y, Is.GreaterThan(colliders[i].bounds.max.y));
-            Assert.That(upperSurfaces[i].sharedMesh.bounds.size.y, Is.LessThan(0.3f),
-                "Keep the painted surface narrow rather than a broad 3D-looking slab.");
-            if (terrain[i].name == "Painted grounded cliff") Assert.That(terrain[i].bounds.min.y, Is.EqualTo(-10).Within(0.001f));
+            var mesh = terrain[i].GetComponent<MeshFilter>().sharedMesh;
+            Assert.That(mesh.vertices[2].y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f),
+                "The painted landing row must align with the unchanged collider.");
+            Assert.That(mesh.vertices[3].y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f));
+            Assert.That(terrain[i].bounds.max.y - colliders[i].bounds.max.y, Is.EqualTo(0.6f).Within(0.001f),
+                "Flowers above the contact row must stay bounded.");
+            var parameters = new MaterialPropertyBlock(); terrain[i].GetPropertyBlock(parameters);
+            var texture = parameters.GetTexture("_MainTex");
+            Assert.That(texture, Is.Not.Null);
+            Assert.That(texture.name, Is.EqualTo(colliders[i].bounds.size.x >= 6 ? "painted-bank-v2" : "painted-pillar-v2"));
+            Assert.That(mesh.uv.Min(uv => uv.y), Is.Zero);
+            Assert.That(mesh.uv.Max(uv => uv.y), Is.EqualTo(1), "Use one complete module without repeated UVs.");
+            if (terrain[i].name == "Painted grounded cliff")
+                Assert.That(terrain[i].bounds.min.y, Is.LessThan(-3.2f), "Grounded rocks must extend below the river overlap.");
             if (i > 0) {
                 Assert.That(colliders[i].bounds.min.x - colliders[i - 1].bounds.max.x, Is.InRange(1f, 4f));
                 Assert.That(colliders[i].bounds.max.y - colliders[i - 1].bounds.max.y, Is.LessThanOrEqualTo(1f));
