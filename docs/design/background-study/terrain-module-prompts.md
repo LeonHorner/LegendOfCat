@@ -26,3 +26,16 @@ Use case stylized-concept. Original production 2D side-view platformer terrain s
 Output review: landing line is approximately 40% from the top. The mesh maps this
 actual row to the collider and compresses the transparent/decorative crown rather
 than stretching flowers with body depth. Final visual acceptance remains pending.
+
+## Shore buttress — 2026-10-28
+
+Saved as Assets/Game/Resources/BackgroundStudy/painted-shore-v2.png.
+Generated output ID: exec-97771e58-ae55-4619-bfd9-371dd0b033fe.
+Built-in OpenAI image generation; exact model ID not exposed. Reference role:
+Golden River Ruins v2 for style/palette. Original PNG pixels are preserved.
+
+Original 2D game sprite for connecting the foot of a tall river rock platform on LEFT to a low natural riverbank on RIGHT. One isolated LOW mound of irregular rounded blue slate boulders with moss and small draping teal ivy and restrained sage ferns, hand painted storybook gouache, golden warm left light and cool blue shadows matching the reference concept. Reference is style/palette only. Genuine transparent background, no outside glow, no water, no scene, no text. Silhouette slopes down: highest crag at left 25% of image, stepping down toward tiny stones and reeds at the right edge. No vertical cliff face, no flat golden grass top or playable ledge, no tower, no masonry. LOW wide 3:1 formation, entire uneven silhouette within frame with transparent margins, flat-ish lowest foot. Designed as a decorative river shore buttress below gameplay: left overlaps/merges into an existing pillar, right thins into banks/water. Large broad painterly shapes, limited small detail. Bright edge light restrained rather than yellow neon.
+
+Five selected grounded banks use this decorative silhouette behind their cliff
+and in front of background foliage. It stays below landing surfaces and has no
+collision. This is a prototype bank connection, pending visual review.

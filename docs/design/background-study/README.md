@@ -33,7 +33,14 @@ is used for spans of six units and above; smaller spans use the pillar. Some
 instances are mirrored. No rock-face UV repetition, separate slab cap or separate
 platform-leaf overlay remains.
 
-The mesh has a horizontal registration row at the real collider contact. Pixels
+The mesh has a horizontal registration row at the real collider contact.
+The pillar uses UV y=0.748 and the bank y=0.587, sampled from the central grass
+rather than higher yellow leaves; this removes the apparent hover. Mika and
+physics are unchanged. The static exporter now uses the authored paw pivot rather
+than the padded Sprite bounds, fixing a separate hover in comparison pictures.
+Five grounded banks also have low painted boulder/fern
+buttresses behind their cliff, connecting their sides to the surrounding land.
+These decorative slopes have no collider and stay below y=-1.3. Pixels
 above that row occupy only 0.6 world units, so flowers do not become tall obstacles
 when the rock extends farther down. The lower portion stretches independently
 to the water; grounded bounds extend to y=-4.5, while suspended rocks retain
@@ -90,7 +97,8 @@ manual frames in this documentation folder are preserved.
 
 ![Same camera sweep, A/B/C](comparison.gif)
 
-[Highest-platform jump](play-jump.png) uses the actual motor and animation in Play
+[Raised-platform ground contact](play-ground-contact.png) checks the actual paw
+baseline. [Highest-platform jump](play-jump.png) uses the actual motor and animation in Play
 Mode; the EditMode test explicitly ticks camera LateUpdate after physics steps.
 Jump-framing stills are raised-camera stress views, not runtime jump recordings.
 Extended-course and wrap stills cover other portions and long/negative travel.
@@ -99,7 +107,8 @@ captures or recordings of complete player traversal.
 
 ## Validation and remaining work
 
-Eight focused Unity tests check ground contact and highest-platform jumps,
+Eight focused Unity tests check actual opaque paw pixels at raised ground,
+shore-footing clearance and highest-platform jumps,
 world-space collision stability through concept switches, route span, painted
 landing registration, complete nonrepeating module UVs, submerged grounded bounds,
 absence of accidental 3D colliders, river source/depth/registration, mirrored tile
@@ -108,8 +117,7 @@ coverage and reversal, and fixed 16:9 at four window shapes.
 Tests and graphics captures run in an ignored isolated project under artifacts/
 with its own Library while the working Editor is open. Logs remain under ignored
 Logs/. No player/launcher builds, install/update smoke tests, target GPU timings
-or full traversal claim is made. Alpha-tested terrain adds another two source
-textures and fourteen module draws; actual performance needs measurement.
+or full traversal claim is made. Alpha-tested terrain adds three source textures, fourteen platform draws and five decorative bank draws; actual performance needs measurement.
 
 ASSETS.md and terrain-module-prompts.md record source, tool, license and creative
 decisions. User visual review and A/B/C selection remain open. Keep PR #54 draft;

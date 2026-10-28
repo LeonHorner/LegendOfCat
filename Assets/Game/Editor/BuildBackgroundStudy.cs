@@ -22,7 +22,7 @@ public static class BuildBackgroundStudy
     [MenuItem("LegendOfCat/Background study/Import painted layers")]
     public static void ImportLayers()
     {
-        foreach (string name in new[] { "painted-atlas", "connected-river", "near-cutout", "painted-terrain", "foreground-corners", "meadow-surface", "hanging-foliage", "painted-pillar-v2", "painted-bank-v2" }) {
+        foreach (string name in new[] { "painted-atlas", "connected-river", "near-cutout", "painted-terrain", "foreground-corners", "meadow-surface", "hanging-foliage", "painted-pillar-v2", "painted-bank-v2", "painted-shore-v2" }) {
             var importer = (TextureImporter)AssetImporter.GetAtPath($"Assets/Game/Resources/BackgroundStudy/{name}.png");
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.mipmapEnabled = name == "meadow-surface" || name == "painted-terrain";
@@ -50,10 +50,10 @@ public static class BuildBackgroundStudy
             for (int mode = 0; mode < 3; mode++) {
                 study.concept = (BackgroundStudy.Concept)mode;
                 study.Cat.transform.position = new Vector3(15, 1.48f);
-                // Edit-mode capture has no presentation LateUpdate: register the existing idle
-                // sprite's paw baseline to the platform top without changing the prefab.
+                // Edit-mode capture has no presentation LateUpdate. Use the authored paw pivot;
+                // Sprite bounds include transparent padding and would lift the visible paws.
                 var catSprite = study.Cat.GetComponentInChildren<SpriteRenderer>();
-                catSprite.transform.position += Vector3.up * (1f - catSprite.bounds.min.y);
+                catSprite.transform.position += Vector3.up * (1f - catSprite.transform.position.y);
                 study.ApplyView(17, BackgroundStudy.CameraFloor);
                 Save(study.View, $"{Evidence}/candidate-{mode}.png", 1280, 720, false);
                 Save(study.View, $"{Evidence}/candidate-{mode}-small-grayscale.png", 640, 360, true);

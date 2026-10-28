@@ -136,3 +136,13 @@ and sits slightly lower, exposing more of the authored boulder feet instead of
 cutting them with a soft horizontal band. Landing silhouettes stay crisp.
 These are shader-only composition refinements; source artwork is unmodified.
 Visual coherence remains under user review.
+
+### Right bank and paw contact — 2026-10-28
+
+User feedback identified an abrupt right bank connection and a slight apparent
+hover. Low boulder/fern buttresses now join selected grounded formations to their
+surroundings below the playable plane. Painted contact UVs follow actual central
+grass rows rather than upper leaf highlights. Mika's presentation and collision
+geometry are unchanged. The actual raised-platform paw baseline is checked in
+Play Mode and recorded in background-study/play-ground-contact.png. See ASSETS.md
+and terrain-module-prompts.md for the new shore source. Visual review is pending.

@@ -144,7 +144,8 @@ public sealed class BackgroundStudy : MonoBehaviour
         // Artwork owns its silhouette; the collider owns the exact standable span.
         bool bank = platform.z >= 6;
         float contact = platform.y + 0.75f;
-        float contactUV = bank ? 0.60f : 0.76f;
+        // Register the load-bearing grass, not the brighter leaves above its edge.
+        float contactUV = bank ? 0.587f : 0.748f;
         float landingFraction = bank ? 0.89f : 0.76f;
         float width = platform.z / landingFraction;
         float bottom = floating ? contact - 2.1f : -4.5f;
@@ -171,6 +172,22 @@ public sealed class BackgroundStudy : MonoBehaviour
         var parameters = new MaterialPropertyBlock();
         parameters.SetTexture("_MainTex", Resources.Load<Texture2D>(
             bank ? "BackgroundStudy/painted-bank-v2" : "BackgroundStudy/painted-pillar-v2"));
+        renderer.SetPropertyBlock(parameters);
+        if (!floating && (variant == 0 || variant == 2 || variant == 6 || variant == 10 || variant == 13))
+            ShoreFoot(platform, variant == 0 || variant == 10 ? -1 : 1);
+    }
+
+    void ShoreFoot(Vector3 platform, int side)
+    {
+        // A low decorative buttress joins the cliff to its bank below the landing plane.
+        var foot = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        DestroyImmediate(foot.GetComponent<Collider>());
+        foot.name = "Painted shore footing"; foot.transform.SetParent(transform, false);
+        foot.transform.position = new Vector3(platform.x + side * (platform.z * 0.5f + 1.25f), -2.65f, 3);
+        foot.transform.localScale = new Vector3(4.8f * side, 2.6f, 1);
+        var renderer = foot.GetComponent<MeshRenderer>(); renderer.sharedMaterial = terrainMaterial;
+        var parameters = new MaterialPropertyBlock();
+        parameters.SetTexture("_MainTex", Resources.Load<Texture2D>("BackgroundStudy/painted-shore-v2"));
         renderer.SetPropertyBlock(parameters);
     }
     GameObject Block(string label, Vector2 position, Vector2 size, Color color)

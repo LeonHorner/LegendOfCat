@@ -50,6 +50,10 @@ public sealed class BackgroundStudyTests
         Assert.That(root.GetComponentsInChildren<MeshFilter>().Any(r => r.name == "Painted upper surface"), Is.False,
             "The integrated painting replaces the separate slab cap and repeated rock texture.");
         Assert.That(terrain.Length, Is.EqualTo(colliders.Length));
+        var shoreFeet = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.name == "Painted shore footing").ToArray();
+        Assert.That(shoreFeet.Length, Is.EqualTo(5));
+        Assert.That(shoreFeet.All(r => r.bounds.max.y < -1.3f && r.bounds.min.z > 2), Is.True,
+            "Bank connections stay behind terrain and well below playable landing edges.");
         Assert.That(root.GetComponentsInChildren<Collider>().Length, Is.Zero,
             "Terrain art and corner foliage must not introduce 3D collision.");
         var river = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.sharedMaterial.shader.name == "LegendOfCat/StudyRiver").ToArray();
@@ -119,6 +123,18 @@ public sealed class BackgroundStudyTests
         Assert.That(cat.GetComponentInChildren<SpriteRenderer>().sprite, Is.Not.Null);
         yield return new WaitForSeconds(0.25f);
         Assert.That(cat.transform.position.y, Is.InRange(0.4f, 0.6f), "Existing motor must settle onto world-space starting ground.");
+        // Verify the real presentation anchor at the raised bank platform as well as flat ground.
+        cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(15f, 1.48f) });
+        for (int frame = 0; frame < 30; frame++) yield return new WaitForFixedUpdate();
+        Assert.That(cat.GetType().GetProperty("Grounded").GetValue(cat), Is.True);
+        var presentation = cat.GetComponentsInChildren<Component>().First(c => c.GetType().Name == "MikaSpritePresentation");
+        presentation.GetType().GetMethod("RenderPose").Invoke(presentation, new object[] { 0.25f });
+        presentation.GetType().GetMethod("RenderPose").Invoke(presentation, new object[] { 0.25f });
+        Assert.That(VisiblePawBaseline(cat.GetComponentInChildren<SpriteRenderer>()), Is.EqualTo(1).Within(0.05f),
+            "Mika's rendered paw baseline must meet the raised bank's collision contact.");
+        Study.GetMethod("ApplyView").Invoke(study, new object[] { 10f, 1f });
+        if (Array.IndexOf(Environment.GetCommandLineArgs(), "-captureStudyJump") >= 0)
+            CaptureJump(view, "play-ground-contact.png");
         cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(28.5f, 2.48f) });
         yield return new WaitForSeconds(0.25f);
         Study.GetMethod("ApplyView").Invoke(study, new object[] { 28.5f, 1f });
@@ -143,7 +159,21 @@ public sealed class BackgroundStudyTests
         yield return new ExitPlayMode();
     }
 
-    static void CaptureJump(Camera view)
+    static float VisiblePawBaseline(SpriteRenderer renderer)
+    {
+        // Sprite bounds include transparent padding; inspect the drawn support pixels instead.
+        var sprite = renderer.sprite;
+        for (int y = 0; y < sprite.rect.height; y++)
+            for (int x = 0; x < sprite.rect.width; x++)
+                if (sprite.texture.GetPixel((int)sprite.rect.x + x, (int)sprite.rect.y + y).a > 0.95f)
+                    return renderer.transform.TransformPoint(new Vector3(
+                        (x + 0.5f - sprite.pivot.x) / sprite.pixelsPerUnit,
+                        (y + 0.5f - sprite.pivot.y) / sprite.pixelsPerUnit, 0)).y;
+        Assert.Fail("Mika must have visible support pixels.");
+        return float.NaN;
+    }
+
+    static void CaptureJump(Camera view, string filename = "play-jump.png")
     {
         // Optional graphics-device evidence of the actual motor/animation in Play mode.
         var target = new RenderTexture(1280, 720, 24);
@@ -152,7 +182,7 @@ public sealed class BackgroundStudyTests
         try {
             view.targetTexture = target; view.rect = new Rect(0, 0, 1, 1); view.Render();
             RenderTexture.active = target; pixels.ReadPixels(new Rect(0, 0, 1280, 720), 0, 0); pixels.Apply();
-            System.IO.File.WriteAllBytes("docs/design/background-study/play-jump.png", pixels.EncodeToPNG());
+            System.IO.File.WriteAllBytes("docs/design/background-study/" + filename, pixels.EncodeToPNG());
         } finally {
             RenderTexture.active = previous; view.targetTexture = previousTarget; view.rect = previousRect;
             target.Release(); UnityEngine.Object.DestroyImmediate(target); UnityEngine.Object.DestroyImmediate(pixels);

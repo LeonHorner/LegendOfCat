@@ -333,3 +333,19 @@ at grounded feet. A lower, narrowly irregular water mask reveals the boulder
 silhouettes. No painted fake foam or independent water texture was introduced.
 Human direction: connect platform lighting and shore contact to the environment;
 final visual acceptance is pending.
+
+## Shore connection and grass registration — 2026-10-28
+
+painted-shore-v2.png under Assets/Game/Resources/BackgroundStudy/ is an original
+transparent painting generated with the built-in OpenAI image tool; exact model
+ID not exposed. Style reference: our archived Golden River Ruins v2. License:
+ASSET-LICENSE.md where rights exist. Original generated pixels preserved. Full
+prompt/output identifier: docs/design/background-study/terrain-module-prompts.md.
+
+Human direction: join the right land-adjacent platform to surrounding banks and
+remove Mika's slight apparent hover. A low mossy boulder/fern buttress connects
+five selected banks below the playable plane, with no added collision. Existing
+pillar/bank paintings are unchanged; UV registration now uses the actual central
+load-bearing grass rows (pillar 0.748, bank 0.587), rather than brighter leaf tips.
+Mika's prefab, presentation and collision physics remain unchanged. Final visual
+acceptance remains pending.
