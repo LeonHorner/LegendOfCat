@@ -374,3 +374,22 @@ Human decisions: preserve atmospheric parallax at a distance, stop contact drift
 replace cut trees, keep suspended bodies shallow without changing collision tops.
 Two-point contact registration, existing paw alignment and separate shore
 buttresses remain; no Mika source or movement physics changes were introduced.
+
+## Separated valley and foreground test — 2026-10-29
+
+New original source: Assets/Game/Resources/BackgroundStudy/recessed-valley-v4.png.
+Built-in OpenAI image generation with transparent output; exact model ID not
+exposed. Reference: our Golden River Ruins v2 for style/palette/lighting. License:
+ASSET-LICENSE.md where rights exist. Original PNG pixels preserved. Full prompt
+and output identifier: docs/design/background-study/separated-depth-prompts.md.
+
+Human direction rejected the connected-river variants and explicitly requested
+testing separate background, gameplay scenery and foreground. The valley has
+recessed waterfalls terminating in mist and a forested lower edge, without a near
+river plane. Existing foreground-river.png is reused independently, with its
+original generation records above; no regeneration or pixel edit. Its earlier
+rejection concerned attempted connection to background water. It now uses its own
+material, world-space tiling and authored wave contour, with saturation/tint
+applied only in the shader. The connected-river painting and StudyRiver pass are
+archived and no longer loaded. Existing shelf/pillar/bank art, Mika and physics
+remain unchanged. This is an experimental composition pending visual acceptance.

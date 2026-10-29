@@ -15,7 +15,7 @@ public sealed class BackgroundStudyTests
     public void MirroredTilesCoverViewAcrossNegativeAndPositiveWraps(float speed)
     {
         // Both the sky and cutout tile families cover the fixed 16:9 viewport.
-        foreach (float width in new[] { 24f, 48f, 64f })
+        foreach (float width in new[] { 16f, 40f, 48f, 64f })
         for (int step = -2000; step <= 2000; step++) {
             float camera = step * 0.5f;
             float center = Call("Offset", camera, speed) + Call("TileCenter", camera, speed, width);
@@ -35,9 +35,10 @@ public sealed class BackgroundStudyTests
     }
     float InitialFor(float speed) => Call("Offset", 17f, speed);
 
-    [Test] public void DistantCanopyKeepsTransparentHeadroomAboveCompleteSilhouettes()
+    [TestCase("distant-canopy-v3")] [TestCase("recessed-valley-v4")]
+    public void DistantPaintingKeepsTransparentHeadroomAboveCompleteSilhouettes(string name)
     {
-        var source = Resources.Load<Texture2D>("BackgroundStudy/distant-canopy-v3");
+        var source = Resources.Load<Texture2D>("BackgroundStudy/" + name);
         Assert.That(source, Is.Not.Null);
         var pixels = new Texture2D(2, 2);
         try {
@@ -71,21 +72,21 @@ public sealed class BackgroundStudyTests
             "Bank connections stay behind terrain and well below playable landing edges.");
         Assert.That(root.GetComponentsInChildren<Collider>().Length, Is.Zero,
             "Terrain art and corner foliage must not introduce 3D collision.");
-        var river = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.sharedMaterial.shader.name == "LegendOfCat/StudyRiver").ToArray();
-        Assert.That(river.Length, Is.EqualTo(6), "Background and foreground must use aligned copies of one painting.");
-        Assert.That(river.Select(r => r.sharedMaterial.mainTexture).Distinct().Count(), Is.EqualTo(1));
-        var backWater = river.Where(r => r.sharedMaterial.GetFloat("_Foreground") == 0).ToArray();
-        var frontWater = river.Where(r => r.sharedMaterial.GetFloat("_Foreground") == 1).ToArray();
-        Assert.That(backWater.Length, Is.EqualTo(3)); Assert.That(frontWater.Length, Is.EqualTo(3));
-        Assert.That(frontWater.All(r => r.bounds.max.z < 0), Is.True,
-            "Water must draw in front of near-bank vegetation and cliff faces.");
-        Assert.That(river[0].sharedMaterial.mainTexture.name, Is.EqualTo("connected-river"));
-        Assert.That(root.GetComponentsInChildren<MeshRenderer>().Any(r => r.name == "Foreground river tile"), Is.False,
-            "Do not reintroduce an independent foreground-water graphic.");
+        var frontWater = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.name.StartsWith("Foreground water tile")).ToArray();
+        var valley = root.GetComponentsInChildren<MeshRenderer>().Where(r => r.transform.parent.name == "Painted depth 1").ToArray();
+        Assert.That(frontWater.Length, Is.EqualTo(3));
+        Assert.That(valley.Length, Is.EqualTo(3));
+        Assert.That(frontWater.All(r => r.bounds.max.z < 0), Is.True, "Foreground water draws before the cliff feet.");
+        Assert.That(valley.All(r => r.bounds.min.z > 10), Is.True, "The valley stays recessed behind the playable world.");
+        Assert.That(frontWater[0].sharedMaterial.mainTexture.name, Is.EqualTo("foreground-river"));
+        Assert.That(valley[0].sharedMaterial.mainTexture.name, Is.EqualTo("recessed-valley-v4"));
+        Assert.That(frontWater[0].sharedMaterial, Is.Not.SameAs(valley[0].sharedMaterial));
+        Assert.That(frontWater[0].sharedMaterial.mainTexture, Is.Not.SameAs(valley[0].sharedMaterial.mainTexture),
+            "Foreground and background must be independently authored sources, not copies of a connected river.");
         Assert.That(root.GetComponentsInChildren<Renderer>().Any(r => r.sharedMaterial && r.sharedMaterial.mainTexture &&
-            (r.sharedMaterial.mainTexture.name == "foreground-river" || r.sharedMaterial.mainTexture.name == "middle-cutout"
+            (r.sharedMaterial.mainTexture.name == "connected-river" || r.sharedMaterial.mainTexture.name == "middle-cutout"
                 || r.sharedMaterial.mainTexture.name == "near-cutout")), Is.False,
-            "Do not load the superseded independent water or clipped near-tree layers.");
+            "The rejected connected river and clipped near-tree layers must stay unloaded.");
         Assert.That(terrain.Count(r => r.name == "Painted grounded cliff"), Is.GreaterThan(terrain.Length / 2));
         for (int i = 0; i < terrain.Length; i++) {
             bool floating = terrain[i].name == "Painted floating rock";
@@ -113,25 +114,27 @@ public sealed class BackgroundStudyTests
         var positions = colliders.Select(c => c.transform.position).ToArray();
         for (int mode = 0; mode < 3; mode++) {
             Study.GetField("concept").SetValue(study, Enum.ToObject(Study.GetNestedType("Concept"), mode));
-            // Camera movement, reversals and recycled tiles must not slide river pixels under a fixed rock.
+            // Foreground water stays registered to the world; the independent valley may parallax behind it.
             foreach (float anchor in new[] { -24.123f, -0.123f, 23.877f, 48.123f }) {
                 Vector2? registered = null;
                 foreach (float camera in new[] { anchor - 6, anchor + 6, anchor - 2, anchor - 6 }) {
                     Study.GetMethod("ApplyView").Invoke(study, new object[] { camera, camera > anchor ? 3f : 1f });
-                    var panel = backWater.First(r => r.bounds.min.x <= anchor && r.bounds.max.x >= anchor);
+                    var panel = frontWater.First(r => r.bounds.min.x <= anchor && r.bounds.max.x >= anchor);
                     var uv = (Vector2)panel.transform.InverseTransformPoint(new Vector3(anchor, -3, panel.transform.position.z));
                     if (registered.HasValue) Assert.That(Vector2.Distance(uv, registered.Value), Is.LessThan(0.00001f),
-                        "The connected river and shore must remain registered to world-space platforms.");
+                        "The separate foreground water must remain stable at world-space cliff feet.");
                     else registered = uv;
                 }
             }
             foreach (float x in new[] { -120f, 57f, 59f, 240f, 17f })
                 Study.GetMethod("ApplyView").Invoke(study, new object[] { x, 3f });
-            for (int tile = 0; tile < 3; tile++) {
-                Assert.That((Vector2)backWater[tile].bounds.center, Is.EqualTo((Vector2)frontWater[tile].bounds.center));
-                Assert.That((Vector2)backWater[tile].bounds.size, Is.EqualTo((Vector2)frontWater[tile].bounds.size));
-                Assert.That(backWater[tile].transform.localScale, Is.EqualTo(frontWater[tile].transform.localScale));
-            }
+            Study.GetMethod("ApplyView").Invoke(study, new object[] { 17f, 1f });
+            var valleyPanel = valley.First(r => r.bounds.min.x < 17 && r.bounds.max.x > 17);
+            float before = valleyPanel.transform.InverseTransformPoint(new Vector3(17, 0, valleyPanel.transform.position.z)).x;
+            Study.GetMethod("ApplyView").Invoke(study, new object[] { 18f, 1f });
+            float after = valleyPanel.transform.InverseTransformPoint(new Vector3(17, 0, valleyPanel.transform.position.z)).x;
+            Assert.That(Mathf.Abs(after - before), Is.GreaterThan(0.005f),
+                "The valley must move independently rather than recreating a connected world-space river.");
             for (int i = 0; i < positions.Length; i++) Assert.That(colliders[i].transform.position, Is.EqualTo(positions[i]));
             foreach (float y in new[] { 1f, 3f }) {
                 Study.GetMethod("ApplyView").Invoke(study, new object[] { 17f, y });

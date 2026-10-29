@@ -165,3 +165,18 @@ This authorizes a prototype of the revised composition, not final production
 acceptance, a full five-minute layout, or final A/B/C parameters. See
 background-study/README.md, world-shore-prompts.md and ASSETS.md. The 2026-10-27/28
 all-depths-moving records above describe superseded experiments.
+
+### Separate foreground/background test — 2026-10-29
+
+The user rejected the world-space connected-river variant as unsuitable, proposed
+separating foreground from background, and explicitly authorized a test. The
+current lab replaces the connected-river artwork/pass with a recessed valley
+background and an independently authored foreground-water painting. Gameplay
+cliffs and their shore decoration remain world-space; distant waterfalls end
+inside mist rather than continuing into the nearby waves. Background presets
+control only independent scenery. No source/UV/geometry join is required between
+the two waters. The earlier connected-river records above are superseded.
+
+The short opening-section composition is the review target. This is authorization
+to test the separated approach, not final visuals or production selection.
+See background-study/README.md, separated-depth-prompts.md and ASSETS.md.

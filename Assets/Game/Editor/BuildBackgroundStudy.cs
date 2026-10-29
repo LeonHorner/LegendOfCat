@@ -22,7 +22,7 @@ public static class BuildBackgroundStudy
     [MenuItem("LegendOfCat/Background study/Import painted layers")]
     public static void ImportLayers()
     {
-        foreach (string name in new[] { "painted-atlas", "connected-river", "near-cutout", "painted-terrain", "foreground-corners", "meadow-surface", "hanging-foliage", "painted-pillar-v2", "painted-bank-v2", "painted-shore-v2", "painted-shelf-v3", "distant-canopy-v3" }) {
+        foreach (string name in new[] { "painted-atlas", "foreground-river", "recessed-valley-v4", "foreground-corners", "painted-pillar-v2", "painted-bank-v2", "painted-shore-v2", "painted-shelf-v3", "distant-canopy-v3" }) {
             var importer = (TextureImporter)AssetImporter.GetAtPath($"Assets/Game/Resources/BackgroundStudy/{name}.png");
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.mipmapEnabled = name == "meadow-surface" || name == "painted-terrain";
