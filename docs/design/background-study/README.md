@@ -1,124 +1,145 @@
-# Golden River background decision lab
+# Golden River world-shore decision lab
 
 Issue [#50](https://github.com/LeonHorner/LegendOfCat/issues/50).
-This is an isolated review prototype. Production direction and A/B/C selection
-remain pending user review.
+This remains a bounded art/technical experiment. Final visuals, production
+selection and A/B/C parameters are pending user review.
 
-## Run and scope
+## Run and review
 
-Open Assets/Game/Scenes/BackgroundStudy.unity with Unity 6000.3.27f1 and press
-Play. A/D/arrows move, Space jumps, R retries. Stop and restart Play after script
-changes. The route spans 109 world units, with ten grounded platforms and four
-stationary suspended jump rocks. The original collision layout and Mika motor
-remain unchanged. Fixed 16:9 framing follows horizontally at y=1, retaining
-foreground water during the highest jump. The optional camera tour moves at
-5 units/s, covering 100 units out and back in 40 seconds.
+Use Unity 6000.3.27f1. Open Assets/Game/Scenes/BackgroundStudy.unity and press Play.
+A/D/arrows move, Space jumps, R retries. Stop/restart Play after code changes.
 
-Ownership is limited to BackgroundStudy code, shaders, generator, isolated scene,
-prototype art, tests and evidence. No overlap with PR #51's Blender sources.
-Native relationships checked: #50 has none; #16 is blocked by #50. The working
-base includes main d01d470 and PR #45. The lab is excluded from release scenes.
+Start with the opening approximately 30 world units: a grounded bank, raised
+pillar, two shallow suspended shelves and another grounded formation. Move both
+ways and watch the shore contact. The existing 109-unit course is retained for
+reuse/wrap stress; this is not a five-minute production layout.
 
-## Terrain system replacement — 2026-10-28
+Fixed 16:9 framing follows horizontally at y=1. Collider tops, gaps, Mika and the
+motor are unchanged. The optional camera tour still covers 100 units out and back
+at 5 units/s. Turn it off to follow Mika.
 
-The user rejected the previous preview as far from the concept, especially the
-right platform. Repeating stone textures on tall polygon walls, separate narrow
-grass caps and attached foliage patches did not reproduce the concept's cohesive
-painted formations. That terrain system is superseded.
+## Structural correction — 2026-10-29
 
-Each platform now renders one complete original painting with its own alpha
-silhouette: a compact pillar or a broad riverbank module. Large asymmetric rocks,
-grass lips, flowers and hanging ivy belong to the same painting. The broad bank
-is used for spans of six units and above; smaller spans use the pillar. Some
-instances are mirrored. No rock-face UV repetition, separate slab cap or separate
-platform-leaf overlay remains.
+The user rejected the all-depths-moving prototype: shoreline slipped under grounded
+platforms, nearby trees exposed cut borders, and suspended platforms resembled
+short standing pillars. Those are composition/asset problems, not just color
+grading problems. The previous near-tree layer and moving shore contact are
+superseded.
 
-The mesh has a horizontal registration row at the real collider contact.
-The pillar uses UV y=0.748 and the bank y=0.587, sampled from the central grass
-rather than higher yellow leaves; this removes the apparent hover. Mika and
-physics are unchanged. The static exporter now uses the authored paw pivot rather
-than the padded Sprite bounds, fixing a separate hover in comparison pictures.
-Five grounded banks also have low painted boulder/fern
-buttresses behind their cliff, connecting their sides to the surrounding land.
-These decorative slopes have no collider and stay below y=-1.3. Pixels
-above that row occupy only 0.6 world units, so flowers do not become tall obstacles
-when the rock extends farther down. The lower portion stretches independently
-to the water; grounded bounds extend to y=-4.5, while suspended rocks retain
-compact undersides. Painted turf spans are registered to collider widths.
-Shader grading reduces isolated yellow saturation and shares restrained sage
-atmosphere with the banks. A cool damp zone at the lower rocks and a narrower,
-irregular water edge expose the boulder feet instead of a soft horizontal cut.
-Alpha clipping rejects the generated pillar's low-opacity outer haze without
-editing its original pixels. Decorative protrusions have no collision.
+The revised assembly has three depth families:
 
-This is a structural improvement under review, not a claim of matching or
-acceptance. Two paintings still repeat, floating instances compress the pillar
-vertically, and the nominal painted contact edge is not pixel-flat. More authored
-variants and local contact refinement may be required. The river's underlying
-mirrored banks and near vegetation also remain visible style/reuse limitations.
-
-## Connected water and framing
-
-One river-and-bank painting contains waterfalls, distant water and near stones.
-Three background quads and three exactly registered foreground copies use the
-same texture, UVs, tint, scale and motion. The foreground mask follows a narrow irregular edge around y=-3.32 and draws
-after near-bank vegetation and overlaps the rock feet. There is no separate
-foreground-water painting or scrolling factor. Corner plants frame the view.
-The river and all scenery are decorative and have no colliders.
-
-The old middle-cutout, foreground-river, meadow, terrain texture and hanging-leaf
-sources remain archived; the superseded terrain sources are not loaded.
-
-## Concepts
-
-| Candidate | Far / middle / near travel | Review tradeoff |
+| Family | Content | Relationship to platforms |
 | --- | --- | --- |
-| A: Three layers | 0.08 / 0.28 / 0.55 | Strong depth; nearest vegetation draws more attention. Adjustable sliders. |
-| B: Panorama | 0.08 / 0.08 / 0.08 | Quiet unified motion; less spatial separation. |
-| C: Subtle layers | 0.05 / 0.14 / 0.24 | Calmer motion with some separation. |
+| Sky | Painted sky strip | Very slow independent parallax |
+| Distant landscape | Complete tree/tower silhouettes and mountains | Independent parallax; no physical joins to playable ground |
+| Connected world | Riverbanks, water, grounded formations, nearby shore buttresses and suspended supports | Fixed world coordinates; no relative contact drift |
+
+The independent distant landscape replaces near-cutout entirely. Its complete
+upper silhouettes have transparent headroom; the lower edge stays below the
+normal view. Trees that visibly belong to the immediate riverbanks are part of
+the world-space river painting and cannot slide relative to the platforms.
+Camera-relative corner plants remain sparse framing decoration without apparent
+terrain joins.
+
+The river still uses one connected painting, with three background tiles and
+three registered foreground copies. Both copies share texture, UVs, tint, scale
+and world-space phase. The low foreground mask overlaps submerged rock feet.
+Recycling the mirrored tiles changes allocation, not the river pixels at a fixed
+world position. Vertical registration is fixed too, including raised-camera
+stress views. No independent foreground-water painting is introduced.
+
+Floating platforms use a new shallow jagged shelf with short hanging greenery,
+not compressed pillar art or broad standing boulder feet. Their body depth is
+0.9 units, plus at most 0.35 units for flowers/grass above the contact row. The
+visible opaque silhouette is smaller because source margins remain transparent.
+Their collider heights are unchanged; this revision makes their bodies thinner,
+not the jumps higher or lower.
+
+Grounded formations retain integrated pillar/bank paintings. The painted grass
+rows and Mika's authored paw pivot stay aligned to existing collision contacts.
+The static exporter uses that pivot rather than padded Sprite bounds. Actual
+opaque support pixels are also checked in Play Mode. Five low decorative shore
+buttresses have no collider and stay below y=-1.3.
+
+## Retained parallax comparison
+
+| Preset | Sky travel | Distant landscape travel | Connected world travel | Tradeoff |
+| --- | --- | --- | --- | --- |
+| A: Distant parallax | 0.08 adjustable | 0.28 adjustable | 1 fixed | Stronger depth behind stable ground |
+| B: Still distance | 0 | 0 | 1 fixed | Quiet screen-locked distant panorama |
+| C: Subtle distance | 0.05 | 0.14 | 1 fixed | Calmer depth behind stable ground |
 
 Travel is relative to the camera: 0 stays on screen, 1 stays in world space.
-Recommendation remains C for review, with authored variants and unique landmarks
-before production. No candidate or parameter set is approved yet.
+The A sliders affect only distant scenery. No slider can make connected terrain,
+banks or water drift. Recommendation for review remains C, but no final preset
+is chosen.
 
 ## Evidence and reproduction
 
 Use LegendOfCat > Background study > Capture comparison with a graphics device,
-then run pwsh -File tools/export-background-study.ps1 with FFmpeg available.
-Intermediate frames live under ignored Logs/background-study-motion/. Existing
-manual frames in this documentation folder are preserved.
+then pwsh -File tools/export-background-study.ps1 with FFmpeg available.
+Intermediate images are under ignored Logs/background-study-motion/. Existing
+manual captures in this documentation folder are preserved.
+
+[Opening shore/shelf review with reversal](world-shore-review.mp4): camera x=6
+to x=34 and back, sampled at 5 fps (57 frames, approximately 11.4 seconds).
+This is the primary bounded composition check.
 
 | Evidence | A | B | C |
 | --- | --- | --- | --- |
 | Color | [1280x720](candidate-0.png) | [1280x720](candidate-1.png) | [1280x720](candidate-2.png) |
 | Small grayscale | [640x360](candidate-0-small-grayscale.png) | [640x360](candidate-1-small-grayscale.png) | [640x360](candidate-2-small-grayscale.png) |
-| Camera sweep | [MP4](candidate-0.mp4) | [MP4](candidate-1.mp4) | [MP4](candidate-2.mp4) |
-| River contact | [PNG](river-contact-0.png) | [PNG](river-contact-1.png) | [PNG](river-contact-2.png) |
+| Long camera stress sweep | [MP4](candidate-0.mp4) | [MP4](candidate-1.mp4) | [MP4](candidate-2.mp4) |
+| Grounded shore | [PNG](river-contact-0.png) | [PNG](river-contact-1.png) | [PNG](river-contact-2.png) |
 
-![Same camera sweep, A/B/C](comparison.gif)
+![A/B/C, same fixed world and camera sweep](comparison.gif)
 
-[Raised-platform ground contact](play-ground-contact.png) checks the actual paw
-baseline. [Highest-platform jump](play-jump.png) uses the actual motor and animation in Play
-Mode; the EditMode test explicitly ticks camera LateUpdate after physics steps.
-Jump-framing stills are raised-camera stress views, not runtime jump recordings.
-Extended-course and wrap stills cover other portions and long/negative travel.
-Motion videos are deterministic 5 fps camera renders, not real-time performance
-captures or recordings of complete player traversal.
+[Actual raised ground contact](play-ground-contact.png) and
+[highest-platform jump](play-jump.png) exercise the existing motor/presentation.
+EditMode scheduling explicitly ticks camera LateUpdate after physics steps.
+Jump-framing images are raised-camera stress stills, not runtime jump captures.
+Extended-course and wrap images cover other route portions and long/negative
+travel. Videos are deterministic camera renders, not real-time performance
+recordings or complete player traversal evidence.
 
-## Validation and remaining work
+## Reuse, effort and limitations
 
-Eight focused Unity tests check actual opaque paw pixels at raised ground,
-shore-footing clearance and highest-platform jumps,
-world-space collision stability through concept switches, route span, painted
-landing registration, complete nonrepeating module UVs, submerged grounded bounds,
-absence of accidental 3D colliders, river source/depth/registration, mirrored tile
-coverage and reversal, and fixed 16:9 at four window shapes.
+For a 4–6-minute level, distant panorama modules can be reused behind authored
+world-space terrain modules. Connected shore transitions must be designed once
+per module family; they no longer need compensation for relative parallax.
+This prototype does not establish an asset count, production time estimate or
+measured five-minute route. Gameplay pace, stops, vertical travel and challenges
+will determine the layout and unique landmark needs under #16.
 
-Tests and graphics captures run in an ignored isolated project under artifacts/
-with its own Library while the working Editor is open. Logs remain under ignored
-Logs/. No player/launcher builds, install/update smoke tests, target GPU timings
-or full traversal claim is made. Alpha-tested terrain adds three source textures, fourteen platform draws and five decorative bank draws; actual performance needs measurement.
+The paintings still reveal mirrored clusters and repeated ruins. Grounded bodies
+stretch vertically and painted grass is not pixel-flat. Suspended art is currently
+one source. World-space riverbanks show more local repetition than distant
+parallax would; production needs matching-edge variants and occasional unique
+landmarks. Foliage/terrain palette and detailed composition remain under review.
+Changing the architecture does not itself establish concept-art fidelity.
 
-ASSETS.md and terrain-module-prompts.md record source, tool, license and creative
-decisions. User visual review and A/B/C selection remain open. Keep PR #54 draft;
-full exact-head merge validation follows completion of the decision gate.
+## Validation and coordination
+
+Nine focused Unity tests cover actual opaque paw contact, highest-platform jumps,
+world-space collision stability, route span, shallow shelf art/body bounds,
+decorative shore clearance, module contact rows, no accidental 3D colliders,
+fixed world-point river UVs through camera movement/reversal/tile recycling and
+all presets, matching front/back water, distant silhouette headroom, tile coverage
+and fixed 16:9 at four window shapes.
+
+Tests and renders use an ignored isolated Unity project under artifacts/ with its
+own Library while the working Editor is open. Source matches are verified. Logs
+stay under ignored Logs/. No player/launcher builds, install/update smoke test,
+GPU timings or full traversal claim is made. Transparent scenery and river
+overlap need target-device profiling.
+
+Ownership: BackgroundStudy code/shaders, Editor generator, prototype art, tests,
+isolated scene, capture exporter and documentation. No overlap with open PR #51's
+Blender work or #53's keepsake plan. Native relationships checked: #50 has no
+blockers, and #16 is blocked by #50. Existing local scene/importer edits are
+preserved. The lab is excluded from release build settings.
+
+ASSETS.md, world-shore-prompts.md and earlier prompt archives document provenance.
+Keep PR #54 draft until visual review and preset selection; current-main
+integration and exact-head full merge validation follow that gate. No merge or
+release is authorized.

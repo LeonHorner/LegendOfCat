@@ -349,3 +349,28 @@ pillar/bank paintings are unchanged; UV registration now uses the actual central
 load-bearing grass rows (pillar 0.748, bank 0.587), rather than brighter leaf tips.
 Mika's prefab, presentation and collision physics remain unchanged. Final visual
 acceptance remains pending.
+
+## World-space shore and distant parallax — 2026-10-29
+
+The user rejected the moving shore contact and clipped middle/near trees, and
+requested a more reliable layered composition. The lab now keeps connected river
+banks, water and platform contact in world coordinates in every preset. Only sky
+and an independent distant landscape parallax. The clipped near-cutout painting
+is archived and no longer loaded. This supersedes the all-depths-moving study;
+production direction and final visuals remain pending review.
+
+New original generated PNGs under Assets/Game/Resources/BackgroundStudy/:
+- painted-shelf-v3.png: shallow suspended fragment, jagged underside, no standing
+  boulder feet; replaces vertically compressed pillar art on floating platforms.
+- distant-canopy-v3.png: complete tree/tower silhouettes with transparent headroom,
+  no river or connected foreground, placed behind the fixed world-space banks.
+
+Generator: built-in OpenAI image generation, exact model ID not exposed.
+Date: 2026-10-29. Reference: our Golden River Ruins v2 for style/palette/lighting.
+License: ASSET-LICENSE.md where rights exist. Original pixels preserved.
+Full prompts, output identifiers and creative decisions:
+docs/design/background-study/world-shore-prompts.md.
+Human decisions: preserve atmospheric parallax at a distance, stop contact drift,
+replace cut trees, keep suspended bodies shallow without changing collision tops.
+Two-point contact registration, existing paw alignment and separate shore
+buttresses remain; no Mika source or movement physics changes were introduced.

@@ -146,3 +146,22 @@ grass rows rather than upper leaf highlights. Mika's presentation and collision
 geometry are unchanged. The actual raised-platform paw baseline is checked in
 Play Mode and recorded in background-study/play-ground-contact.png. See ASSETS.md
 and terrain-module-prompts.md for the new shore source. Visual review is pending.
+
+### World-space shore experiment — 2026-10-29
+
+The user rejected the moving background's contact with grounded platforms, clipped
+trees, and compressed standing-pillar artwork on suspended platforms. After
+discussing retained distant parallax and reuse for a five-minute level, the user
+asked to continue the bounded experiment.
+
+Connected riverbanks/water, terrain and nearby shore buttresses now belong to one
+world-space assembly. Sky and an independent complete distant canopy retain
+parallax. No nearby tree strip moves through ground contact. Floating supports
+use shallow jagged shelf artwork instead of boulder-foot pillars; their collision
+tops and jump heights remain unchanged. The opening approximately 30-unit segment
+is the review focus; the existing long route is retained for reuse stress.
+
+This authorizes a prototype of the revised composition, not final production
+acceptance, a full five-minute layout, or final A/B/C parameters. See
+background-study/README.md, world-shore-prompts.md and ASSETS.md. The 2026-10-27/28
+all-depths-moving records above describe superseded experiments.

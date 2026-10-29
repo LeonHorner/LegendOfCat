@@ -22,7 +22,7 @@ public static class BuildBackgroundStudy
     [MenuItem("LegendOfCat/Background study/Import painted layers")]
     public static void ImportLayers()
     {
-        foreach (string name in new[] { "painted-atlas", "connected-river", "near-cutout", "painted-terrain", "foreground-corners", "meadow-surface", "hanging-foliage", "painted-pillar-v2", "painted-bank-v2", "painted-shore-v2" }) {
+        foreach (string name in new[] { "painted-atlas", "connected-river", "near-cutout", "painted-terrain", "foreground-corners", "meadow-surface", "hanging-foliage", "painted-pillar-v2", "painted-bank-v2", "painted-shore-v2", "painted-shelf-v3", "distant-canopy-v3" }) {
             var importer = (TextureImporter)AssetImporter.GetAtPath($"Assets/Game/Resources/BackgroundStudy/{name}.png");
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.mipmapEnabled = name == "meadow-surface" || name == "painted-terrain";
@@ -59,6 +59,11 @@ public static class BuildBackgroundStudy
                 Save(study.View, $"{Evidence}/candidate-{mode}-small-grayscale.png", 640, 360, true);
                 study.ApplyView(10, BackgroundStudy.CameraFloor);
                 Save(study.View, $"{Evidence}/river-contact-{mode}.png", 1280, 720, false);
+                if (mode == 0 && !stillsOnly)
+                    for (int frame = 0; frame <= 56; frame++) {
+                        study.ApplyView(6 + Mathf.PingPong(frame, 28), BackgroundStudy.CameraFloor);
+                        Save(study.View, $"{Motion}/shore-review-{frame:000}.png", 640, 360, false);
+                    }
                 // 5 fps review recording: 5 world units/s, including a complete reversal.
                 for (int frame = 0; !stillsOnly && frame <= BackgroundStudy.TourDistance * 2; frame++) {
                     study.ApplyView(Mathf.PingPong(frame, BackgroundStudy.TourDistance) - 2, BackgroundStudy.CameraFloor);

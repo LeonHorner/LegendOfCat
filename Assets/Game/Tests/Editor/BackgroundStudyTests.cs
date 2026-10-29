@@ -15,7 +15,7 @@ public sealed class BackgroundStudyTests
     public void MirroredTilesCoverViewAcrossNegativeAndPositiveWraps(float speed)
     {
         // Both the sky and cutout tile families cover the fixed 16:9 viewport.
-        foreach (float width in new[] { 16f, 24f, 64f })
+        foreach (float width in new[] { 24f, 48f, 64f })
         for (int step = -2000; step <= 2000; step++) {
             float camera = step * 0.5f;
             float center = Call("Offset", camera, speed) + Call("TileCenter", camera, speed, width);
@@ -34,6 +34,21 @@ public sealed class BackgroundStudyTests
             Assert.That(1 - (Call("Offset", 18f, speed) - InitialFor(speed)), Is.EqualTo(speed).Within(0.00001));
     }
     float InitialFor(float speed) => Call("Offset", 17f, speed);
+
+    [Test] public void DistantCanopyKeepsTransparentHeadroomAboveCompleteSilhouettes()
+    {
+        var source = Resources.Load<Texture2D>("BackgroundStudy/distant-canopy-v3");
+        Assert.That(source, Is.Not.Null);
+        var pixels = new Texture2D(2, 2);
+        try {
+            pixels.LoadImage(System.IO.File.ReadAllBytes(UnityEditor.AssetDatabase.GetAssetPath(source)));
+            var data = pixels.GetPixels32();
+            for (int y = pixels.height - pixels.height / 20; y < pixels.height; y++)
+                for (int x = 0; x < pixels.width; x++)
+                    Assert.That(data[y * pixels.width + x].a, Is.LessThan(26),
+                        "No tree crown or tower may be cut by the top edge of the distant painting.");
+        } finally { UnityEngine.Object.DestroyImmediate(pixels); }
+    }
 
     [UnityTest] public IEnumerator ConceptSwitchAndCameraTravelNeverMoveCollisionGeometry()
     {
@@ -68,20 +83,24 @@ public sealed class BackgroundStudyTests
         Assert.That(root.GetComponentsInChildren<MeshRenderer>().Any(r => r.name == "Foreground river tile"), Is.False,
             "Do not reintroduce an independent foreground-water graphic.");
         Assert.That(root.GetComponentsInChildren<Renderer>().Any(r => r.sharedMaterial && r.sharedMaterial.mainTexture &&
-            (r.sharedMaterial.mainTexture.name == "foreground-river" || r.sharedMaterial.mainTexture.name == "middle-cutout")), Is.False,
-            "The superseded near/far water paintings must not be mixed into the connected river.");
+            (r.sharedMaterial.mainTexture.name == "foreground-river" || r.sharedMaterial.mainTexture.name == "middle-cutout"
+                || r.sharedMaterial.mainTexture.name == "near-cutout")), Is.False,
+            "Do not load the superseded independent water or clipped near-tree layers.");
         Assert.That(terrain.Count(r => r.name == "Painted grounded cliff"), Is.GreaterThan(terrain.Length / 2));
         for (int i = 0; i < terrain.Length; i++) {
+            bool floating = terrain[i].name == "Painted floating rock";
             var mesh = terrain[i].GetComponent<MeshFilter>().sharedMesh;
             Assert.That(mesh.vertices[2].y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f),
                 "The painted landing row must align with the unchanged collider.");
             Assert.That(mesh.vertices[3].y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f));
-            Assert.That(terrain[i].bounds.max.y - colliders[i].bounds.max.y, Is.EqualTo(0.6f).Within(0.001f),
+            Assert.That(terrain[i].bounds.max.y - colliders[i].bounds.max.y, Is.EqualTo(floating ? 0.35f : 0.6f).Within(0.001f),
                 "Flowers above the contact row must stay bounded.");
             var parameters = new MaterialPropertyBlock(); terrain[i].GetPropertyBlock(parameters);
             var texture = parameters.GetTexture("_MainTex");
             Assert.That(texture, Is.Not.Null);
-            Assert.That(texture.name, Is.EqualTo(colliders[i].bounds.size.x >= 6 ? "painted-bank-v2" : "painted-pillar-v2"));
+            Assert.That(texture.name, Is.EqualTo(floating ? "painted-shelf-v3" : colliders[i].bounds.size.x >= 6 ? "painted-bank-v2" : "painted-pillar-v2"));
+            if (floating) Assert.That(terrain[i].bounds.size.y, Is.LessThanOrEqualTo(1.251f),
+                "Suspended fragments need a shallow broken underside, not a compressed standing pillar.");
             Assert.That(mesh.uv.Min(uv => uv.y), Is.Zero);
             Assert.That(mesh.uv.Max(uv => uv.y), Is.EqualTo(1), "Use one complete module without repeated UVs.");
             if (terrain[i].name == "Painted grounded cliff")
@@ -94,6 +113,18 @@ public sealed class BackgroundStudyTests
         var positions = colliders.Select(c => c.transform.position).ToArray();
         for (int mode = 0; mode < 3; mode++) {
             Study.GetField("concept").SetValue(study, Enum.ToObject(Study.GetNestedType("Concept"), mode));
+            // Camera movement, reversals and recycled tiles must not slide river pixels under a fixed rock.
+            foreach (float anchor in new[] { -24.123f, -0.123f, 23.877f, 48.123f }) {
+                Vector2? registered = null;
+                foreach (float camera in new[] { anchor - 6, anchor + 6, anchor - 2, anchor - 6 }) {
+                    Study.GetMethod("ApplyView").Invoke(study, new object[] { camera, camera > anchor ? 3f : 1f });
+                    var panel = backWater.First(r => r.bounds.min.x <= anchor && r.bounds.max.x >= anchor);
+                    var uv = (Vector2)panel.transform.InverseTransformPoint(new Vector3(anchor, -3, panel.transform.position.z));
+                    if (registered.HasValue) Assert.That(Vector2.Distance(uv, registered.Value), Is.LessThan(0.00001f),
+                        "The connected river and shore must remain registered to world-space platforms.");
+                    else registered = uv;
+                }
+            }
             foreach (float x in new[] { -120f, 57f, 59f, 240f, 17f })
                 Study.GetMethod("ApplyView").Invoke(study, new object[] { x, 3f });
             for (int tile = 0; tile < 3; tile++) {

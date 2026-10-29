@@ -7,7 +7,6 @@ public sealed class BackgroundStudy : MonoBehaviour
     public Concept concept;
     [Range(0, 1)] public float farSpeed = 0.08f;
     [Range(0, 1)] public float middleSpeed = 0.28f;
-    [Range(0, 1)] public float nearSpeed = 0.55f;
     public bool tour;
     public bool showControls = true;
     public Camera View { get; private set; }
@@ -61,7 +60,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         bars.backgroundColor = Color.black; bars.cullingMask = 0;
         var atlas = Resources.Load<Texture2D>("BackgroundStudy/painted-atlas");
         var textures = new[] { atlas, Resources.Load<Texture2D>("BackgroundStudy/connected-river"),
-            Resources.Load<Texture2D>("BackgroundStudy/near-cutout") };
+            Resources.Load<Texture2D>("BackgroundStudy/distant-canopy-v3") };
         for (int i = 0; i < 3; i++) {
             layers[i] = new GameObject("Painted depth " + i).transform;
             layers[i].SetParent(transform, false);
@@ -69,15 +68,17 @@ public sealed class BackgroundStudy : MonoBehaviour
             materials[i].mainTexture = textures[i];
             materials[i].SetFloat("_Cutout", i == 0 ? 0 : 1);
             if (i == 1) materials[i].SetFloat("_Waterline", -3.2f);
-            float width = i == 0 ? 64 : 24;
+            if (i == 2) { materials[i].SetFloat("_Fog", 0.42f); materials[i].SetFloat("_Saturation", 0.75f); }
+            float width = LayerWidth(i);
             for (int tile = -1; tile <= 1; tile++) {
                 var panel = GameObject.CreatePrimitive(PrimitiveType.Quad);
                 DestroyImmediate(panel.GetComponent<Collider>());
                 panel.name = "Mirrored scenery tile " + tile;
                 panel.transform.SetParent(layers[i], false);
-                panel.transform.localPosition = new Vector3(tile * width, i == 0 ? 0 : i == 1 ? -1.5f : -2, 20 - i * 2);
+                panel.transform.localPosition = new Vector3(tile * width, i == 0 ? 0 : i == 1 ? -1.5f : -1,
+                    i == 0 ? 30 : i == 1 ? 16 : 24);
                 // Preserve the painting's proportions instead of stretching thin atlas strips.
-                panel.transform.localScale = new Vector3(width, i == 0 ? width / 4.5f : width / 1.5f, 1);
+                panel.transform.localScale = new Vector3(width, i == 0 ? width / 4.5f : i == 1 ? width / 1.5f : width / 3, 1);
                 panel.GetComponent<MeshRenderer>().sharedMaterial = materials[i];
             }
         }
@@ -145,11 +146,11 @@ public sealed class BackgroundStudy : MonoBehaviour
         bool bank = platform.z >= 6;
         float contact = platform.y + 0.75f;
         // Register the load-bearing grass, not the brighter leaves above its edge.
-        float contactUV = bank ? 0.587f : 0.748f;
-        float landingFraction = bank ? 0.89f : 0.76f;
+        float contactUV = floating ? 0.66f : bank ? 0.587f : 0.748f;
+        float landingFraction = floating ? 0.90f : bank ? 0.89f : 0.76f;
         float width = platform.z / landingFraction;
-        float bottom = floating ? contact - 2.1f : -4.5f;
-        float crown = contact + 0.60f;
+        float bottom = floating ? contact - 0.90f : -4.5f;
+        float crown = contact + (floating ? 0.35f : 0.60f);
         float half = width * 0.5f;
         var vertices = new[] {
             new Vector3(-half, bottom, 2), new Vector3(half, bottom, 2),
@@ -171,7 +172,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         var renderer = visual.AddComponent<MeshRenderer>(); renderer.sharedMaterial = terrainMaterial;
         var parameters = new MaterialPropertyBlock();
         parameters.SetTexture("_MainTex", Resources.Load<Texture2D>(
-            bank ? "BackgroundStudy/painted-bank-v2" : "BackgroundStudy/painted-pillar-v2"));
+            floating ? "BackgroundStudy/painted-shelf-v3" : bank ? "BackgroundStudy/painted-bank-v2" : "BackgroundStudy/painted-pillar-v2"));
         renderer.SetPropertyBlock(parameters);
         if (!floating && (variant == 0 || variant == 2 || variant == 6 || variant == 10 || variant == 13))
             ShoreFoot(platform, variant == 0 || variant == 10 ? -1 : 1);
@@ -198,17 +199,20 @@ public sealed class BackgroundStudy : MonoBehaviour
         renderer.sortingOrder = 1; return item;
     }
 
+    static float LayerWidth(int layer) => layer == 0 ? 64 : layer == 1 ? 24 : 48;
+
     public void ApplyView(float x, float y)
     {
         View.transform.position = new Vector3(x, y, -10);
-        float[] speeds = concept == Concept.Panorama ? new[] { 0.08f, 0.08f, 0.08f }
-            : concept == Concept.Subtle ? new[] { 0.05f, 0.14f, 0.24f } : new[] { farSpeed, middleSpeed, nearSpeed };
+        // Connected banks and water belong to the gameplay world in every comparison.
+        // Only independent distant scenery may move relative to the terrain.
+        float[] speeds = concept == Concept.Panorama ? new[] { 0f, 1f, 0f }
+            : concept == Concept.Subtle ? new[] { 0.05f, 1f, 0.14f } : new[] { farSpeed, 1f, middleSpeed };
         for (int i = 0; i < 3; i++) {
-            float width = i == 0 ? 64 : 24;
+            float width = LayerWidth(i);
             float center = TileCenter(x, speeds[i], width);
-            // Only horizontal parallax is under evaluation. Lock vertical registration
-            // to the camera so jump follow cannot reveal the outer panorama boundary.
-            layers[i].position = new Vector3(Offset(x, speeds[i]) + center, y, 0);
+            // River contact stays fixed vertically too; sky/distant canopy cover camera stress views.
+            layers[i].position = new Vector3(Offset(x, speeds[i]) + center, i == 1 ? CameraFloor : y, 0);
             int tileIndex = Mathf.RoundToInt(center / width);
             for (int j = 0; j < 3; j++) {
                 var panel = layers[i].GetChild(j);
@@ -257,13 +261,14 @@ public sealed class BackgroundStudy : MonoBehaviour
         GUILayout.Label("GOLDEN RIVER / BACKGROUND DECISION LAB");
         GUILayout.Label("A/D: move | Space: jump | R: retry. 109 m painted review course.");
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("A: Three layers")) concept = Concept.ThreeLayer;
-        if (GUILayout.Button("B: Panorama")) concept = Concept.Panorama;
-        if (GUILayout.Button("C: Subtle layers")) concept = Concept.Subtle;
+        if (GUILayout.Button("A: Distant parallax")) concept = Concept.ThreeLayer;
+        if (GUILayout.Button("B: Still distance")) concept = Concept.Panorama;
+        if (GUILayout.Button("C: Subtle distance")) concept = Concept.Subtle;
         GUILayout.EndHorizontal();
         tour = GUILayout.Toggle(tour, "Camera-only tour (includes reversal; return to play to follow Mika)");
         GUILayout.Label("Camera travel factors (0 = camera-locked, 1 = world-space)");
-        farSpeed = Slider("Far", farSpeed); middleSpeed = Slider("Middle", middleSpeed); nearSpeed = Slider("Near", nearSpeed);
+        farSpeed = Slider("Sky (A)", farSpeed); middleSpeed = Slider("Distant forest (A)", middleSpeed);
+        GUILayout.Label("Banks and river stay in world space. Review the opening 30 m first.");
         GUILayout.Label("Candidate: " + concept + " | Prototype only; production choice pending.");
         GUILayout.EndArea();
     }
