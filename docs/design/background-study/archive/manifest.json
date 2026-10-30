@@ -1,0 +1,1989 @@
+{
+  "archiveDate": "2026-10-30",
+  "policy": "Curated visual evidence, not complete historical project backups. Git media and feedback are byte-identical copies. Local capture videos are lossy derivatives; all 291 raw frames remain untouched locally.",
+  "artifacts": [
+    {
+      "path": "01-comparison/candidate-0.png",
+      "bytes": 797595,
+      "sha256": "f5f380bbbfc56114857e39292a7a7fa97ad80e35249bf3c94fc4aed448044fd1",
+      "origin": {
+        "type": "git",
+        "revision": "249b33b3ee0713c1d1965a89c59f98156d5ee839",
+        "sourcePath": "docs/design/background-study/candidate-0.png",
+        "commitDate": "2026-10-24"
+      }
+    },
+    {
+      "path": "01-comparison/candidate-1.png",
+      "bytes": 780544,
+      "sha256": "3d80ed6c93f3992041fb15998a6afbeb2cd1edee701a680e92d57942860e1e45",
+      "origin": {
+        "type": "git",
+        "revision": "249b33b3ee0713c1d1965a89c59f98156d5ee839",
+        "sourcePath": "docs/design/background-study/candidate-1.png",
+        "commitDate": "2026-10-24"
+      }
+    },
+    {
+      "path": "01-comparison/candidate-2.png",
+      "bytes": 784540,
+      "sha256": "7724730a28a069dc23d3049dce2311e05f2a3b3ca4c164a58583a94dafc52eae",
+      "origin": {
+        "type": "git",
+        "revision": "249b33b3ee0713c1d1965a89c59f98156d5ee839",
+        "sourcePath": "docs/design/background-study/candidate-2.png",
+        "commitDate": "2026-10-24"
+      }
+    },
+    {
+      "path": "01-comparison/candidate-0.mp4",
+      "bytes": 629001,
+      "sha256": "22b446a3416e481c533db2209f0d58911c394597064e79b0d366fbe4e9f75383",
+      "origin": {
+        "type": "git",
+        "revision": "249b33b3ee0713c1d1965a89c59f98156d5ee839",
+        "sourcePath": "docs/design/background-study/candidate-0.mp4",
+        "commitDate": "2026-10-24"
+      }
+    },
+    {
+      "path": "02-crisp-cutouts/candidate-0.png",
+      "bytes": 1171424,
+      "sha256": "a50217a76b6b5f2cbea7f8ff731252fe0925779b6965138dfbceb22c31134846",
+      "origin": {
+        "type": "git",
+        "revision": "0ba52f6ae51551ae236bad8aa765de5a7635bb28",
+        "sourcePath": "docs/design/background-study/candidate-0.png",
+        "commitDate": "2026-10-25"
+      }
+    },
+    {
+      "path": "02-crisp-cutouts/candidate-0-small-grayscale.png",
+      "bytes": 191082,
+      "sha256": "ac2a313819bba69872234c899bba0807ad7a417e74712838e7e3c6e02bf87492",
+      "origin": {
+        "type": "git",
+        "revision": "0ba52f6ae51551ae236bad8aa765de5a7635bb28",
+        "sourcePath": "docs/design/background-study/candidate-0-small-grayscale.png",
+        "commitDate": "2026-10-25"
+      }
+    },
+    {
+      "path": "03-extended-terrain/candidate-0.png",
+      "bytes": 1362741,
+      "sha256": "af269ab5a1ee55421e21da33c26bc83f246066d283233ebbb884ba09ef386e72",
+      "origin": {
+        "type": "git",
+        "revision": "14a097deac106b3eb1095e7ca5e5197b20aa4bc3",
+        "sourcePath": "docs/design/background-study/candidate-0.png",
+        "commitDate": "2026-10-25"
+      }
+    },
+    {
+      "path": "03-extended-terrain/extended-course-0.png",
+      "bytes": 1378547,
+      "sha256": "93c375a41de4eb38e92536f3e2de3e24c5fbb32d06a769558ea3e1c20dee794f",
+      "origin": {
+        "type": "git",
+        "revision": "14a097deac106b3eb1095e7ca5e5197b20aa4bc3",
+        "sourcePath": "docs/design/background-study/extended-course-0.png",
+        "commitDate": "2026-10-25"
+      }
+    },
+    {
+      "path": "04-flat-river-framing/candidate-0.png",
+      "bytes": 1329177,
+      "sha256": "f7cf18257b53be88c5cec7301786c186239ba3a6b20ced0dc01ca5fe3f10c0d8",
+      "origin": {
+        "type": "git",
+        "revision": "1ef808ea7007610be6ece89ab7fcf9b152d348ce",
+        "sourcePath": "docs/design/background-study/candidate-0.png",
+        "commitDate": "2026-10-27"
+      }
+    },
+    {
+      "path": "05-connected-river/candidate-0.png",
+      "bytes": 1311140,
+      "sha256": "0098de3e5276a7149695c295b3621483237b6f223b53d5c6dd245734ab18928a",
+      "origin": {
+        "type": "git",
+        "revision": "2503f5cb241fdc5f9adcc19278e74ca36c81a59e",
+        "sourcePath": "docs/design/background-study/candidate-0.png",
+        "commitDate": "2026-10-27"
+      }
+    },
+    {
+      "path": "05-connected-river/candidate-0.mp4",
+      "bytes": 2969903,
+      "sha256": "4ab863a77fd0a5828d82115610b8dfa61a2ee5673ac445727e6724604fd8e854",
+      "origin": {
+        "type": "git",
+        "revision": "2503f5cb241fdc5f9adcc19278e74ca36c81a59e",
+        "sourcePath": "docs/design/background-study/candidate-0.mp4",
+        "commitDate": "2026-10-27"
+      }
+    },
+    {
+      "path": "06-water-visibility/river-contact-0.png",
+      "bytes": 1279939,
+      "sha256": "b4f9f0cef6b182ad596412c275a4165234892d04132c165c5bb563cb950857db",
+      "origin": {
+        "type": "git",
+        "revision": "baf0c3e6a3d52acf34e77581f4a3cfd0a13a267a",
+        "sourcePath": "docs/design/background-study/river-contact-0.png",
+        "commitDate": "2026-10-28"
+      }
+    },
+    {
+      "path": "07-painted-formations/river-contact-0.png",
+      "bytes": 1334536,
+      "sha256": "b9102a57bbcaedea3f89b25e5d2fa54b42075a2f67f5e8464e4efbd64e1132e5",
+      "origin": {
+        "type": "git",
+        "revision": "b4c41903180d5bb19b3b5c2fd4a3c72f2b48319c",
+        "sourcePath": "docs/design/background-study/river-contact-0.png",
+        "commitDate": "2026-10-28"
+      }
+    },
+    {
+      "path": "07-painted-formations/play-jump.png",
+      "bytes": 1354766,
+      "sha256": "7fe29e6b000a1661bfcad8bacedd24de23267a486518a0c641e63c63a1f031a4",
+      "origin": {
+        "type": "git",
+        "revision": "b4c41903180d5bb19b3b5c2fd4a3c72f2b48319c",
+        "sourcePath": "docs/design/background-study/play-jump.png",
+        "commitDate": "2026-10-28"
+      }
+    },
+    {
+      "path": "08-ground-contact/river-contact-0.png",
+      "bytes": 1321242,
+      "sha256": "7cab2723e0c8a6e55cbcf3f4e01b8c2ada36b9cfa0625ad9af69fd2c6fbc95c4",
+      "origin": {
+        "type": "git",
+        "revision": "2d36f2c66816ddf22d0955ccf1e6dfca37d7327e",
+        "sourcePath": "docs/design/background-study/river-contact-0.png",
+        "commitDate": "2026-10-28"
+      }
+    },
+    {
+      "path": "08-ground-contact/play-ground-contact.png",
+      "bytes": 1322827,
+      "sha256": "3c905b56b21abb42813e9d6b64bb47b5f90eadab16a77251418886b99c0778ae",
+      "origin": {
+        "type": "git",
+        "revision": "2d36f2c66816ddf22d0955ccf1e6dfca37d7327e",
+        "sourcePath": "docs/design/background-study/play-ground-contact.png",
+        "commitDate": "2026-10-28"
+      }
+    },
+    {
+      "path": "09-world-shore/river-contact-0.png",
+      "bytes": 1336609,
+      "sha256": "722b9c34ffdaafcf3f4d45ab5501dfedb51045d842d61cb0c55f484a75457cbc",
+      "origin": {
+        "type": "git",
+        "revision": "ab8f2cefe146f89d2d7e6983559294b48d9a406a",
+        "sourcePath": "docs/design/background-study/river-contact-0.png",
+        "commitDate": "2026-10-29"
+      }
+    },
+    {
+      "path": "09-world-shore/play-jump.png",
+      "bytes": 1400155,
+      "sha256": "283893aa1bccab90f35405f01e8406dd6414cdd2d43991617d85677275f24a5c",
+      "origin": {
+        "type": "git",
+        "revision": "ab8f2cefe146f89d2d7e6983559294b48d9a406a",
+        "sourcePath": "docs/design/background-study/play-jump.png",
+        "commitDate": "2026-10-29"
+      }
+    },
+    {
+      "path": "09-world-shore/world-shore-review.mp4",
+      "bytes": 1007072,
+      "sha256": "4b9c5cecbb4c87e8ab2e0d2538d7073fbd69d2e41badc6e39dd0398c44405364",
+      "origin": {
+        "type": "git",
+        "revision": "ab8f2cefe146f89d2d7e6983559294b48d9a406a",
+        "sourcePath": "docs/design/background-study/world-shore-review.mp4",
+        "commitDate": "2026-10-29"
+      }
+    },
+    {
+      "path": "10-separated-depth/candidate-0.png",
+      "bytes": 1298016,
+      "sha256": "8c8f6a925c2407cca7b00e13f4025e33075211c1c8d49bc32ba5107d1b22e2c5",
+      "origin": {
+        "type": "git",
+        "revision": "5d26c1bf4a05180d85e0135a9f92c318f992d3f5",
+        "sourcePath": "docs/design/background-study/candidate-0.png",
+        "commitDate": "2026-10-29"
+      }
+    },
+    {
+      "path": "10-separated-depth/candidate-1.png",
+      "bytes": 1272744,
+      "sha256": "679e3241d3eb44afe2ee672e6c6276326b44faf81ad17b369774e49c01c5c1d4",
+      "origin": {
+        "type": "git",
+        "revision": "5d26c1bf4a05180d85e0135a9f92c318f992d3f5",
+        "sourcePath": "docs/design/background-study/candidate-1.png",
+        "commitDate": "2026-10-29"
+      }
+    },
+    {
+      "path": "10-separated-depth/candidate-2.png",
+      "bytes": 1282603,
+      "sha256": "eb2dc59c4fb16d3050482ada408e0d15e5c436ee4b7ecbe61e4c638260f00d49",
+      "origin": {
+        "type": "git",
+        "revision": "5d26c1bf4a05180d85e0135a9f92c318f992d3f5",
+        "sourcePath": "docs/design/background-study/candidate-2.png",
+        "commitDate": "2026-10-29"
+      }
+    },
+    {
+      "path": "10-separated-depth/separated-depth-review.mp4",
+      "bytes": 960561,
+      "sha256": "a7692ec96e16b0a3b56ce1e87e222e1c42dcccea8142ce289dd1140f42f2543b",
+      "origin": {
+        "type": "git",
+        "revision": "5d26c1bf4a05180d85e0135a9f92c318f992d3f5",
+        "sourcePath": "docs/design/background-study/separated-depth-review.mp4",
+        "commitDate": "2026-10-29"
+      }
+    },
+    {
+      "path": "11-fixed-subtle/subtle-distance.png",
+      "bytes": 1284089,
+      "sha256": "349dc0b6085c501d490bc9ecfb43382b52b58de990df434b96b8a94ad83ee89d",
+      "origin": {
+        "type": "git",
+        "revision": "4e0424214def2123f90527638c7e18d467219813",
+        "sourcePath": "docs/design/background-study/subtle-distance.png",
+        "commitDate": "2026-10-30"
+      }
+    },
+    {
+      "path": "11-fixed-subtle/water-animation.mp4",
+      "bytes": 141985,
+      "sha256": "f269a709e2ff6c590de92567890428c3773461b42ba33ff0315a3772fd1ed5c0",
+      "origin": {
+        "type": "git",
+        "revision": "4e0424214def2123f90527638c7e18d467219813",
+        "sourcePath": "docs/design/background-study/water-animation.mp4",
+        "commitDate": "2026-10-30"
+      }
+    },
+    {
+      "path": "12-visible-flow/subtle-distance.png",
+      "bytes": 1285088,
+      "sha256": "177bc6a76ebaf17efa73c6793d2095fc1ac02ba60613b9fa2cc0c3a747276c4d",
+      "origin": {
+        "type": "git",
+        "revision": "c02493de322a1ef83e306c822d5f45a00d3562e5",
+        "sourcePath": "docs/design/background-study/subtle-distance.png",
+        "commitDate": "2026-10-30"
+      }
+    },
+    {
+      "path": "12-visible-flow/water-flow.mp4",
+      "bytes": 269832,
+      "sha256": "0ca411ba4c54847636490cf9f5ebd0095b886c230ffd2ac479ee44ec2c8bbc98",
+      "origin": {
+        "type": "git",
+        "revision": "c02493de322a1ef83e306c822d5f45a00d3562e5",
+        "sourcePath": "docs/design/background-study/water-flow.mp4",
+        "commitDate": "2026-10-30"
+      }
+    },
+    {
+      "path": "13-running-waves/water-running.mp4",
+      "bytes": 404660,
+      "sha256": "fb82f10f9c0826b32489bc77e2e7d9d5cd304030c64c9d85e2c0d618ed4d209c",
+      "origin": {
+        "type": "git",
+        "revision": "405cd62c111651dd2225640fc4d4f9d12fff72aa",
+        "sourcePath": "docs/design/background-study/water-running.mp4",
+        "commitDate": "2026-10-30"
+      }
+    },
+    {
+      "path": "feedback/01-concept-reference.png",
+      "bytes": 3072022,
+      "sha256": "42c879c859737977a41d8983f02ce8437fab89105c9217ca67d276acd4743a22",
+      "origin": {
+        "type": "user-upload",
+        "originalFilename": "codex-clipboard-958c8c5d-e218-4b93-a63f-64a681b6cdf6.png",
+        "captureDate": null,
+        "caption": "Concept reference reposted while discussing high water, excessive depth and Mika placement."
+      }
+    },
+    {
+      "path": "feedback/02-disconnected-water.png",
+      "bytes": 1073085,
+      "sha256": "c9704d193c20c40585cd3819a17d82a7bb99d1cc119dcc256acfadab2ec3a4e2",
+      "origin": {
+        "type": "user-upload",
+        "originalFilename": "codex-clipboard-f7b708af-8066-41f4-b233-c4ccd42857f4.png",
+        "captureDate": null,
+        "caption": "Foreground and background water look separate."
+      }
+    },
+    {
+      "path": "feedback/03-disconnected-water-jump.png",
+      "bytes": 970935,
+      "sha256": "ac634c2c5ecf23b411b3003a83d65cfa42ed092eea8412dd7865943bb01ed7ff",
+      "origin": {
+        "type": "user-upload",
+        "originalFilename": "codex-clipboard-8bf9dbf2-e5c1-4359-a0c5-1836cc2e7268.png",
+        "captureDate": null,
+        "caption": "Second view of disconnected water during a jump."
+      }
+    },
+    {
+      "path": "feedback/04-floating-bases.png",
+      "bytes": 886570,
+      "sha256": "d13e5649a3790ea957f74cd7e75a779005c0aa8c69dffde42e9500fa4b9628bf",
+      "origin": {
+        "type": "user-upload",
+        "originalFilename": "codex-clipboard-6d25a351-901b-4845-9c1b-8ab1d14d51e4.png",
+        "captureDate": null,
+        "caption": "Platforms appear to float and foreground water is missing."
+      }
+    },
+    {
+      "path": "feedback/05-shader-line-endings.png",
+      "bytes": 19022,
+      "sha256": "515331b2f44358ecda22999249fb54a85dfa343fb9d03b9a9c072399e72c7923",
+      "origin": {
+        "type": "user-upload",
+        "originalFilename": "codex-clipboard-684cb4c6-c10b-4229-945e-d7b726818cd6.png",
+        "captureDate": null,
+        "caption": "Unity reports mixed line endings in StudyRiver.shader."
+      }
+    },
+    {
+      "path": "feedback/06-grounded-parallax-conflict.png",
+      "bytes": 1429147,
+      "sha256": "44bdcfdc3746dfc107c8df958ec29c0e2c3444dc3bc269bd978e5ebd2c675ea9",
+      "origin": {
+        "type": "user-upload",
+        "originalFilename": "codex-clipboard-16beb2b3-7fa1-49c5-904f-5be0a742c579.png",
+        "captureDate": null,
+        "caption": "Grounded bases conflict with moving background scenery; clipped secondary trees."
+      }
+    },
+    {
+      "path": "feedback/07-suspended-platform-shape.png",
+      "bytes": 1398475,
+      "sha256": "4b617cf9aa41ffa4b52c84c54422381ad2a80f53d4a4eada879557da54092757",
+      "origin": {
+        "type": "user-upload",
+        "originalFilename": "codex-clipboard-3ac9cee0-5746-4513-b469-41d695d07a53.png",
+        "captureDate": null,
+        "caption": "Suspended platforms are too tall and need distinct undersides; architecture questioned."
+      }
+    },
+    {
+      "path": "local-capture/motion-0-00.png",
+      "bytes": 366495,
+      "sha256": "6fba68b322610bdddca02ad75e57fbe31db2f52b021aa471b0b160d7436b33af",
+      "origin": {
+        "type": "local-keyframe",
+        "sourcePath": "docs/design/background-study/motion-0-00.png",
+        "captureDate": null,
+        "revision": null
+      }
+    },
+    {
+      "path": "local-capture/motion-0-48.png",
+      "bytes": 375242,
+      "sha256": "b6b7a09a9f7aa11e02550c49a58c9e115424c8562d9aa5b1497492c821eded14",
+      "origin": {
+        "type": "local-keyframe",
+        "sourcePath": "docs/design/background-study/motion-0-48.png",
+        "captureDate": null,
+        "revision": null
+      }
+    },
+    {
+      "path": "local-capture/motion-0-96.png",
+      "bytes": 366495,
+      "sha256": "6fba68b322610bdddca02ad75e57fbe31db2f52b021aa471b0b160d7436b33af",
+      "origin": {
+        "type": "local-keyframe",
+        "sourcePath": "docs/design/background-study/motion-0-96.png",
+        "captureDate": null,
+        "revision": null
+      }
+    },
+    {
+      "path": "local-capture/motion-0.mp4",
+      "bytes": 1845682,
+      "sha256": "edc120e0b614e59481282a14291f0505f7cb89efd55dd1486c2e0ea297998106",
+      "origin": {
+        "type": "derived-video",
+        "sourcePattern": "motion-0-%02d.png",
+        "frames": 97,
+        "playbackFps": 5,
+        "captureDate": null,
+        "revision": null,
+        "encoding": "ffmpeg libx264 CRF 20 yuv420p"
+      }
+    },
+    {
+      "path": "local-capture/motion-1-00.png",
+      "bytes": 365775,
+      "sha256": "c28992c748acb64e75be72b11b4ecb253009ae5e1b5363a51ece31006d49ded5",
+      "origin": {
+        "type": "local-keyframe",
+        "sourcePath": "docs/design/background-study/motion-1-00.png",
+        "captureDate": null,
+        "revision": null
+      }
+    },
+    {
+      "path": "local-capture/motion-1-48.png",
+      "bytes": 364063,
+      "sha256": "816768111e2f18c667343e43ca459deae37c8f47f2416b094a83b7b67dbdd05b",
+      "origin": {
+        "type": "local-keyframe",
+        "sourcePath": "docs/design/background-study/motion-1-48.png",
+        "captureDate": null,
+        "revision": null
+      }
+    },
+    {
+      "path": "local-capture/motion-1-96.png",
+      "bytes": 365775,
+      "sha256": "c28992c748acb64e75be72b11b4ecb253009ae5e1b5363a51ece31006d49ded5",
+      "origin": {
+        "type": "local-keyframe",
+        "sourcePath": "docs/design/background-study/motion-1-96.png",
+        "captureDate": null,
+        "revision": null
+      }
+    },
+    {
+      "path": "local-capture/motion-1.mp4",
+      "bytes": 976620,
+      "sha256": "45a818f8eaf22027dcdef7cdda8d80d2d731194e90ebe3bd0fa48e4973f032ad",
+      "origin": {
+        "type": "derived-video",
+        "sourcePattern": "motion-1-%02d.png",
+        "frames": 97,
+        "playbackFps": 5,
+        "captureDate": null,
+        "revision": null,
+        "encoding": "ffmpeg libx264 CRF 20 yuv420p"
+      }
+    },
+    {
+      "path": "local-capture/motion-2-00.png",
+      "bytes": 365721,
+      "sha256": "c236de30f035bb24482f6cc98a8ada40f40f512d440ff21010e5411f7f8ca93d",
+      "origin": {
+        "type": "local-keyframe",
+        "sourcePath": "docs/design/background-study/motion-2-00.png",
+        "captureDate": null,
+        "revision": null
+      }
+    },
+    {
+      "path": "local-capture/motion-2-48.png",
+      "bytes": 363468,
+      "sha256": "6da99e50be973312cb0f525d7845172dae86ca9bf4db4849d2a2f024e1ada31a",
+      "origin": {
+        "type": "local-keyframe",
+        "sourcePath": "docs/design/background-study/motion-2-48.png",
+        "captureDate": null,
+        "revision": null
+      }
+    },
+    {
+      "path": "local-capture/motion-2-96.png",
+      "bytes": 365721,
+      "sha256": "c236de30f035bb24482f6cc98a8ada40f40f512d440ff21010e5411f7f8ca93d",
+      "origin": {
+        "type": "local-keyframe",
+        "sourcePath": "docs/design/background-study/motion-2-96.png",
+        "captureDate": null,
+        "revision": null
+      }
+    },
+    {
+      "path": "local-capture/motion-2.mp4",
+      "bytes": 1632397,
+      "sha256": "2d2541ee6aa353b30bb444fac8cd482b5b675b4e2cd1f47e1f96557e0dc2895f",
+      "origin": {
+        "type": "derived-video",
+        "sourcePattern": "motion-2-%02d.png",
+        "frames": 97,
+        "playbackFps": 5,
+        "captureDate": null,
+        "revision": null,
+        "encoding": "ffmpeg libx264 CRF 20 yuv420p"
+      }
+    }
+  ],
+  "localFrames": [
+    {
+      "sourcePath": "docs/design/background-study/motion-0-00.png",
+      "bytes": 366495,
+      "sha256": "6fba68b322610bdddca02ad75e57fbe31db2f52b021aa471b0b160d7436b33af"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-01.png",
+      "bytes": 362171,
+      "sha256": "896fcb528f388c113e4c9b98de8665c024d605405dd36a2e8e9b9e0333fbf644"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-02.png",
+      "bytes": 358277,
+      "sha256": "59979410575071d5ce6eb62e4d53f2a8b790c488557d1181423dfcb3ed557c83"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-03.png",
+      "bytes": 354825,
+      "sha256": "4ba1c441f3f36333f32268868b13586f48fc46423e786f2153f989a5a9ef3744"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-04.png",
+      "bytes": 354313,
+      "sha256": "b982d6313e01d803c1219204787567acf18b80c64ff23566810a17e1135114ce"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-05.png",
+      "bytes": 353463,
+      "sha256": "91e2d9e4eeb431939aee4f78c9b4aa33d487e44d1f085514633f2add47210e12"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-06.png",
+      "bytes": 351809,
+      "sha256": "2e46392872bc674eecc6a380f29bed921b45522d5d34da222e6dd2c6b51ca609"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-07.png",
+      "bytes": 348577,
+      "sha256": "56b32be47291017fac29b7e97480fe2aa09ebd78a69382a3b4b6a3c6893d5b1a"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-08.png",
+      "bytes": 350111,
+      "sha256": "a01d5fbaf6be2395e47414b671ba6ea805f1dffe9940229ea8cb7cf4a06631cc"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-09.png",
+      "bytes": 350158,
+      "sha256": "9a7e1aba58429020743680020e677903b9234f88dc79272b0b24e79b9ef14546"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-10.png",
+      "bytes": 352514,
+      "sha256": "80cdf9bd91050b7179ed3eb96cfa65dec827fd80bebe4fcb8a7946632123b1ee"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-11.png",
+      "bytes": 354961,
+      "sha256": "d357de71d3c9553f780c5ed730792a30d95d48e7683bd8e01a4f1b4c1a539309"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-12.png",
+      "bytes": 357706,
+      "sha256": "237d7eccf048512cc609159ff28228f160dab161c17ddfa6916dc4a0d7b939e4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-13.png",
+      "bytes": 360585,
+      "sha256": "9bf7ed789654d8db3134ec3000bbc3b3595d20235d9a376334a21dc0fdc27136"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-14.png",
+      "bytes": 362434,
+      "sha256": "0e5c8c9c169584678c35bea866ef5cbefc32a683cece4810c1065d655bb120a5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-15.png",
+      "bytes": 363091,
+      "sha256": "f2d32de583e6f4fa3b6b806befbf730be44a87d15cce7461950d2c4dd6981832"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-16.png",
+      "bytes": 364538,
+      "sha256": "3ee2a3810802fe280aef0d15c004493b3248bcac33177c1fa0e9d178342386aa"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-17.png",
+      "bytes": 366744,
+      "sha256": "2c0d7ca8fe575bfe3cc1a0536f906dcf03eb5b920b6df29f5891469c8f4c4989"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-18.png",
+      "bytes": 366055,
+      "sha256": "730c7cbd24cddb14e86e387be33bb912425bd1458add7f45c902c454e737906c"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-19.png",
+      "bytes": 365885,
+      "sha256": "ad36948001711133c19d96794fc70506a199cde45e2515f9c1707de95102ca48"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-20.png",
+      "bytes": 366419,
+      "sha256": "e5f23aa3bacd41f47ef8157f78346b6d689418f4ee701209891551200aa8a5e3"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-21.png",
+      "bytes": 366670,
+      "sha256": "2771fa5716db939ffc99c0ca7a3f31d46d35fb1c83658c70dbe802cb495f8fae"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-22.png",
+      "bytes": 367993,
+      "sha256": "fb57ce53b20e5ee6ef884196e0b024d3f9e65fc33eceb25ab37b146219bfc0cc"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-23.png",
+      "bytes": 370691,
+      "sha256": "db89477da08b84a7b6feef51fd963d9c6041b9f76b6286cf4d4894d0dd13f8a1"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-24.png",
+      "bytes": 371504,
+      "sha256": "f6838f2b1b194201266f8dbdd88169e3b26837410f0dbe8ebcee5ab9d5d2bd50"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-25.png",
+      "bytes": 370087,
+      "sha256": "cf43004055e89c5156ea5cc28aec756d73a6552d920cbc1479bd383a6e422e36"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-26.png",
+      "bytes": 369697,
+      "sha256": "6abeb126dee22024eb7580343c03841707e5faf401138b68c289a3574c758330"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-27.png",
+      "bytes": 369114,
+      "sha256": "577d21e988f384cdb69e28d7138506e8d58a490c90d97e52a2baaaae4ca9b756"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-28.png",
+      "bytes": 367980,
+      "sha256": "87891f94c8bdbf988a2a9ef0c40dd4c3cf722c118737083f78e9a320b0ffd86f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-29.png",
+      "bytes": 370422,
+      "sha256": "c037e22dedbd32f8d83375784304152065f03ca4baf7f4a9ff3d2a60ae77bfd2"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-30.png",
+      "bytes": 369131,
+      "sha256": "01eb9f9e1225d2707f6b4a7885ade99ce7e053e6195fae9bbb60eac310e34abb"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-31.png",
+      "bytes": 366297,
+      "sha256": "f05dd8c41036bcaefee7f4c86e055384d268aa7c1c150821d88e0ac6925c04df"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-32.png",
+      "bytes": 364402,
+      "sha256": "9d6fb18d9f826e17ec9f1c5f98d0ee374d9aaaad2841a0b24dab6b30aaf39cfd"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-33.png",
+      "bytes": 362651,
+      "sha256": "f491b2585e079832291d93a2904730b1598dc1b10c228662c6de72980738228c"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-34.png",
+      "bytes": 363636,
+      "sha256": "1e6af864686483cc5889a8f30b40d7c0500782b1c81ba01caf77d03b497c7fc6"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-35.png",
+      "bytes": 364088,
+      "sha256": "7f5ab88b3a343b8a64e4dff74da5160d0c4f0c772ee0fdbc93d0635363be6d93"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-36.png",
+      "bytes": 362624,
+      "sha256": "88dcebde58ef6fbc406c871360983426b1ece5d531bd72f841e35b44967e6ed6"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-37.png",
+      "bytes": 358709,
+      "sha256": "5b967a6b414f2c483493cfad05e1c8a7db12cdb412bcc2f92d5c4239831bf4aa"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-38.png",
+      "bytes": 355990,
+      "sha256": "495a7a6835043406348404f775a8cc12585a3b9f1d7f239e181f85e649afecfa"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-39.png",
+      "bytes": 353152,
+      "sha256": "a02ac3e1c1bd5e51ab1b552bca5e80bdc9ec0015db36a48f5dce1564b3b170e0"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-40.png",
+      "bytes": 355651,
+      "sha256": "0b78519dd1ffc5c6f83dd8130338ea47ac32c7ea71392d5c9ee6a4bc2ff44323"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-41.png",
+      "bytes": 358854,
+      "sha256": "757dc0d19431d54e8489ab4a8c6d55113a07876fbc11edfcddf259d71a583cc4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-42.png",
+      "bytes": 360962,
+      "sha256": "9b64466a62d4c79e912992085a1295c3e1a7ad7175bd138fb53a48b1557c25c0"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-43.png",
+      "bytes": 361687,
+      "sha256": "a000be92a7e553f216c17863e378509f28785cd7e0b12c9ef7e8cd2d5fc12356"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-44.png",
+      "bytes": 363170,
+      "sha256": "2f1fb9e34f34e92a69437feaeda0bce236ac14aa50d031a1b359925010b68ce3"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-45.png",
+      "bytes": 366362,
+      "sha256": "da98ddba51fff1b4ef58f55f1e7cb41a47af813efdfa647db855b6a1f77dbbc8"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-46.png",
+      "bytes": 369992,
+      "sha256": "1872669d20af8afe5b0106c280e4e93314df27853e8d6f074ac3128ec0f46d72"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-47.png",
+      "bytes": 372999,
+      "sha256": "4541d612d0dccdb10d87ec8e36ef9d7b66aa5f17ccce44d0c95abd88c876b2b0"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-48.png",
+      "bytes": 375242,
+      "sha256": "b6b7a09a9f7aa11e02550c49a58c9e115424c8562d9aa5b1497492c821eded14"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-49.png",
+      "bytes": 372999,
+      "sha256": "4541d612d0dccdb10d87ec8e36ef9d7b66aa5f17ccce44d0c95abd88c876b2b0"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-50.png",
+      "bytes": 369992,
+      "sha256": "1872669d20af8afe5b0106c280e4e93314df27853e8d6f074ac3128ec0f46d72"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-51.png",
+      "bytes": 366362,
+      "sha256": "da98ddba51fff1b4ef58f55f1e7cb41a47af813efdfa647db855b6a1f77dbbc8"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-52.png",
+      "bytes": 363170,
+      "sha256": "2f1fb9e34f34e92a69437feaeda0bce236ac14aa50d031a1b359925010b68ce3"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-53.png",
+      "bytes": 361687,
+      "sha256": "a000be92a7e553f216c17863e378509f28785cd7e0b12c9ef7e8cd2d5fc12356"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-54.png",
+      "bytes": 360962,
+      "sha256": "9b64466a62d4c79e912992085a1295c3e1a7ad7175bd138fb53a48b1557c25c0"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-55.png",
+      "bytes": 358854,
+      "sha256": "757dc0d19431d54e8489ab4a8c6d55113a07876fbc11edfcddf259d71a583cc4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-56.png",
+      "bytes": 355651,
+      "sha256": "0b78519dd1ffc5c6f83dd8130338ea47ac32c7ea71392d5c9ee6a4bc2ff44323"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-57.png",
+      "bytes": 353152,
+      "sha256": "a02ac3e1c1bd5e51ab1b552bca5e80bdc9ec0015db36a48f5dce1564b3b170e0"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-58.png",
+      "bytes": 355990,
+      "sha256": "495a7a6835043406348404f775a8cc12585a3b9f1d7f239e181f85e649afecfa"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-59.png",
+      "bytes": 358709,
+      "sha256": "5b967a6b414f2c483493cfad05e1c8a7db12cdb412bcc2f92d5c4239831bf4aa"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-60.png",
+      "bytes": 362624,
+      "sha256": "88dcebde58ef6fbc406c871360983426b1ece5d531bd72f841e35b44967e6ed6"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-61.png",
+      "bytes": 364088,
+      "sha256": "7f5ab88b3a343b8a64e4dff74da5160d0c4f0c772ee0fdbc93d0635363be6d93"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-62.png",
+      "bytes": 363636,
+      "sha256": "1e6af864686483cc5889a8f30b40d7c0500782b1c81ba01caf77d03b497c7fc6"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-63.png",
+      "bytes": 362651,
+      "sha256": "f491b2585e079832291d93a2904730b1598dc1b10c228662c6de72980738228c"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-64.png",
+      "bytes": 364402,
+      "sha256": "9d6fb18d9f826e17ec9f1c5f98d0ee374d9aaaad2841a0b24dab6b30aaf39cfd"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-65.png",
+      "bytes": 366297,
+      "sha256": "f05dd8c41036bcaefee7f4c86e055384d268aa7c1c150821d88e0ac6925c04df"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-66.png",
+      "bytes": 369131,
+      "sha256": "01eb9f9e1225d2707f6b4a7885ade99ce7e053e6195fae9bbb60eac310e34abb"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-67.png",
+      "bytes": 370422,
+      "sha256": "c037e22dedbd32f8d83375784304152065f03ca4baf7f4a9ff3d2a60ae77bfd2"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-68.png",
+      "bytes": 367980,
+      "sha256": "87891f94c8bdbf988a2a9ef0c40dd4c3cf722c118737083f78e9a320b0ffd86f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-69.png",
+      "bytes": 369114,
+      "sha256": "577d21e988f384cdb69e28d7138506e8d58a490c90d97e52a2baaaae4ca9b756"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-70.png",
+      "bytes": 369697,
+      "sha256": "6abeb126dee22024eb7580343c03841707e5faf401138b68c289a3574c758330"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-71.png",
+      "bytes": 370087,
+      "sha256": "cf43004055e89c5156ea5cc28aec756d73a6552d920cbc1479bd383a6e422e36"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-72.png",
+      "bytes": 371504,
+      "sha256": "f6838f2b1b194201266f8dbdd88169e3b26837410f0dbe8ebcee5ab9d5d2bd50"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-73.png",
+      "bytes": 370691,
+      "sha256": "db89477da08b84a7b6feef51fd963d9c6041b9f76b6286cf4d4894d0dd13f8a1"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-74.png",
+      "bytes": 367993,
+      "sha256": "fb57ce53b20e5ee6ef884196e0b024d3f9e65fc33eceb25ab37b146219bfc0cc"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-75.png",
+      "bytes": 366670,
+      "sha256": "2771fa5716db939ffc99c0ca7a3f31d46d35fb1c83658c70dbe802cb495f8fae"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-76.png",
+      "bytes": 366419,
+      "sha256": "e5f23aa3bacd41f47ef8157f78346b6d689418f4ee701209891551200aa8a5e3"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-77.png",
+      "bytes": 365885,
+      "sha256": "ad36948001711133c19d96794fc70506a199cde45e2515f9c1707de95102ca48"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-78.png",
+      "bytes": 366055,
+      "sha256": "730c7cbd24cddb14e86e387be33bb912425bd1458add7f45c902c454e737906c"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-79.png",
+      "bytes": 366744,
+      "sha256": "2c0d7ca8fe575bfe3cc1a0536f906dcf03eb5b920b6df29f5891469c8f4c4989"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-80.png",
+      "bytes": 364538,
+      "sha256": "3ee2a3810802fe280aef0d15c004493b3248bcac33177c1fa0e9d178342386aa"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-81.png",
+      "bytes": 363091,
+      "sha256": "f2d32de583e6f4fa3b6b806befbf730be44a87d15cce7461950d2c4dd6981832"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-82.png",
+      "bytes": 362434,
+      "sha256": "0e5c8c9c169584678c35bea866ef5cbefc32a683cece4810c1065d655bb120a5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-83.png",
+      "bytes": 360585,
+      "sha256": "9bf7ed789654d8db3134ec3000bbc3b3595d20235d9a376334a21dc0fdc27136"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-84.png",
+      "bytes": 357706,
+      "sha256": "237d7eccf048512cc609159ff28228f160dab161c17ddfa6916dc4a0d7b939e4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-85.png",
+      "bytes": 354961,
+      "sha256": "d357de71d3c9553f780c5ed730792a30d95d48e7683bd8e01a4f1b4c1a539309"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-86.png",
+      "bytes": 352514,
+      "sha256": "80cdf9bd91050b7179ed3eb96cfa65dec827fd80bebe4fcb8a7946632123b1ee"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-87.png",
+      "bytes": 350158,
+      "sha256": "9a7e1aba58429020743680020e677903b9234f88dc79272b0b24e79b9ef14546"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-88.png",
+      "bytes": 350111,
+      "sha256": "a01d5fbaf6be2395e47414b671ba6ea805f1dffe9940229ea8cb7cf4a06631cc"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-89.png",
+      "bytes": 348577,
+      "sha256": "56b32be47291017fac29b7e97480fe2aa09ebd78a69382a3b4b6a3c6893d5b1a"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-90.png",
+      "bytes": 351809,
+      "sha256": "2e46392872bc674eecc6a380f29bed921b45522d5d34da222e6dd2c6b51ca609"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-91.png",
+      "bytes": 353463,
+      "sha256": "91e2d9e4eeb431939aee4f78c9b4aa33d487e44d1f085514633f2add47210e12"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-92.png",
+      "bytes": 354313,
+      "sha256": "b982d6313e01d803c1219204787567acf18b80c64ff23566810a17e1135114ce"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-93.png",
+      "bytes": 354825,
+      "sha256": "4ba1c441f3f36333f32268868b13586f48fc46423e786f2153f989a5a9ef3744"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-94.png",
+      "bytes": 358277,
+      "sha256": "59979410575071d5ce6eb62e4d53f2a8b790c488557d1181423dfcb3ed557c83"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-95.png",
+      "bytes": 362171,
+      "sha256": "896fcb528f388c113e4c9b98de8665c024d605405dd36a2e8e9b9e0333fbf644"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-0-96.png",
+      "bytes": 366495,
+      "sha256": "6fba68b322610bdddca02ad75e57fbe31db2f52b021aa471b0b160d7436b33af"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-00.png",
+      "bytes": 365775,
+      "sha256": "c28992c748acb64e75be72b11b4ecb253009ae5e1b5363a51ece31006d49ded5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-01.png",
+      "bytes": 362323,
+      "sha256": "467cc435377283a0e264c1fe4c5794c5eef92fbf4283a64481d6b133c983b744"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-02.png",
+      "bytes": 358277,
+      "sha256": "59979410575071d5ce6eb62e4d53f2a8b790c488557d1181423dfcb3ed557c83"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-03.png",
+      "bytes": 355021,
+      "sha256": "8c2fa7fe294d6d94dcccd8aebb86804ca5c2f399d92a514de34894b67e207060"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-04.png",
+      "bytes": 354600,
+      "sha256": "70eac0dca70678dcab4bda1f08e6f9d5d15ff76a3ba513e3766246fe71135607"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-05.png",
+      "bytes": 354328,
+      "sha256": "d4839e52f09ff0877728736c4f4f7d234ab02cdea143174ee248ceafb41377b9"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-06.png",
+      "bytes": 351768,
+      "sha256": "757704f9450a4fd7a8896773701dbf766e6118d4903be20dfdf6c8094b1ad529"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-07.png",
+      "bytes": 349242,
+      "sha256": "9793101fdb815ee052b4dda953633548e4e779cfbed7b39b4d3fd71b3d99f58a"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-08.png",
+      "bytes": 350312,
+      "sha256": "93f2265ae62c8608833dfdbfbaf7fb221bd9b4e26cd3c78ffc67f4dae769ff48"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-09.png",
+      "bytes": 350030,
+      "sha256": "305af054704789f9b58da0643cdb7e0b86cf6d684548ef0368c38e8e92b63ad3"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-10.png",
+      "bytes": 352945,
+      "sha256": "8419d35b57fb64326f098cc5c98ff316949c4dfd24e665c3b551563d5dfa1572"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-11.png",
+      "bytes": 356273,
+      "sha256": "0861e6636f33203a658138c5d5039116ce42e34a8b19d1d023b4cade9facf54e"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-12.png",
+      "bytes": 359735,
+      "sha256": "b031b467598fdaa77996f13d5de25556b934d7f937e074d95f600a3e9618e738"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-13.png",
+      "bytes": 363119,
+      "sha256": "6624e7410c160b7324319659f4761b08d428e23fe38e6749a7dbaba804841ef5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-14.png",
+      "bytes": 364981,
+      "sha256": "1f67a7f5a39db1364b124a33890b4e8011ab893a839629b64dc9297a2fd4d9c8"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-15.png",
+      "bytes": 364674,
+      "sha256": "98091d9723ac786405cd1d2e6c00b46a0e6297ffb9f92b8870ea9e01c7cfa3c5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-16.png",
+      "bytes": 365416,
+      "sha256": "02d915955dbb8d042534e3c2a45acd958e66cfe928fc280cd075b5f19a2e5f57"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-17.png",
+      "bytes": 367917,
+      "sha256": "ab75e933d1d538ab591feb4144a1933b037d51ab112727dc9e1a9ff97131a859"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-18.png",
+      "bytes": 367349,
+      "sha256": "14ed80a5a31e2f7573ed4476efacd3fc71cd10f07f541b424c7d774bb56c808b"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-19.png",
+      "bytes": 368184,
+      "sha256": "db4823116e41f3ce8492a8a747cb344f8051e5e85892d3c93323fa877795fa1a"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-20.png",
+      "bytes": 370260,
+      "sha256": "3149fa357660a667f884985cd232a23ec00f260aa9c56db12d09f8d3ddc13c8d"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-21.png",
+      "bytes": 370684,
+      "sha256": "1d2ebff6259597ec7a1c9572e142e20485d5fc72cd1de82f4ba5b6eccc3be4a5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-22.png",
+      "bytes": 371451,
+      "sha256": "0f2c30eeaf9d64eb3b6760783a459077870599f72c4dfbf621b914bc989cc4a3"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-23.png",
+      "bytes": 372064,
+      "sha256": "96b6da54b5e98c24029ef8b8f98dd78d48fb4fc0893a390b42a8e6ec85de3da6"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-24.png",
+      "bytes": 370587,
+      "sha256": "cab62f693de2aa6a2a550599144da280838ff3ff46f3da7364bec7f88280d740"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-25.png",
+      "bytes": 368464,
+      "sha256": "c9c4dbbae519ac770c2313f4b9422ca57467040a47519b4e3514a3b585021817"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-26.png",
+      "bytes": 368072,
+      "sha256": "199ca241bb81a8b9d5d7122c473be03f036350d2af4c9ee5799de80517f5871b"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-27.png",
+      "bytes": 368569,
+      "sha256": "42bcc655ec68403f48d49d79e893433e486caa8d3bd222ac3228fdb51f299ac5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-28.png",
+      "bytes": 368592,
+      "sha256": "cb263b9d6147a6e1a7f503690ac1be501bcb97a448d5a057e02a414c5aa30a98"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-29.png",
+      "bytes": 369742,
+      "sha256": "6213f48eee02bce6b2174ad7a6a616aee335c36ad068cbc22da377c1ca2b3879"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-30.png",
+      "bytes": 367196,
+      "sha256": "011b6b0b8d37afe9135b2a9ba4ac40a90e71b37cac0f4dfe2f88d41f45650610"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-31.png",
+      "bytes": 363964,
+      "sha256": "e5f1d052e75298ce8319c055cf7e8634016e29ce64f3b2572a251461f4c35db4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-32.png",
+      "bytes": 361178,
+      "sha256": "1a783f6446b9c6023853cdd63705afa94f12b6d562de088e3ec3cd13e49b9da2"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-33.png",
+      "bytes": 358747,
+      "sha256": "87eebac68ecf0247a883cf742df4f57c38829a3ddbcf399d0b0fc4ec72b4f9ac"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-34.png",
+      "bytes": 358501,
+      "sha256": "dfb9800f8a558a33ccf17d9a35b903f28499e7d608cf2e14d03984f9c64f2cec"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-35.png",
+      "bytes": 358721,
+      "sha256": "ca4e17db0ff69ebdcb1546c5b59e18eaa66e19bc870299941f159417a87f8895"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-36.png",
+      "bytes": 356708,
+      "sha256": "258020cd285a21de3b6a41940b6752024c0ac5278b98922ac37669f4d8d005b1"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-37.png",
+      "bytes": 352027,
+      "sha256": "3768415e8f7b4c28ef7e1904b46bb206506e1183f48ab8843da6503052138423"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-38.png",
+      "bytes": 347893,
+      "sha256": "09771344a2e6a2a786c0e80f62a672a420b90329302e34947164d873a5647ec2"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-39.png",
+      "bytes": 344883,
+      "sha256": "ef492562df9919881b998c3cd195ea8cc5b56bee72c8ed55b3a1bf7a9c4fbb52"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-40.png",
+      "bytes": 347261,
+      "sha256": "6aaa311bbbf10970a665a1b4beca0e9d2e47868ce132c619139a5209d345b253"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-41.png",
+      "bytes": 349643,
+      "sha256": "ffcdfe87d0fcd5f603d09d072cdbdf640590abb01d11dceb60ec10beab79fa0b"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-42.png",
+      "bytes": 351018,
+      "sha256": "31217c8aac5ec5e0303c145aabf050fcbc104342e98bcce7309fb75dff211167"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-43.png",
+      "bytes": 351279,
+      "sha256": "35b30b30a0e3b4d77812069c454c209f754737ca7f44db75f0f6f02d2786fdc8"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-44.png",
+      "bytes": 351729,
+      "sha256": "07ade2d7c3bc0df67457c27f9fb5702c68ca5c9d48995147818c6f7ac2f262a5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-45.png",
+      "bytes": 354740,
+      "sha256": "3229bcb64ba7bd34c31492a2d90f7875a8e044135db7e40c748e831bd4f70800"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-46.png",
+      "bytes": 358252,
+      "sha256": "c55ffd85a38c686caf01f1bedaf419f3c5f1ae61ed51b86dfaf6354e42f20222"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-47.png",
+      "bytes": 361484,
+      "sha256": "f11fb93a5b373b5192c93b8a61757d80a340ac2a206f1dc7cbd93dfed40aa6d5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-48.png",
+      "bytes": 364063,
+      "sha256": "816768111e2f18c667343e43ca459deae37c8f47f2416b094a83b7b67dbdd05b"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-49.png",
+      "bytes": 361484,
+      "sha256": "f11fb93a5b373b5192c93b8a61757d80a340ac2a206f1dc7cbd93dfed40aa6d5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-50.png",
+      "bytes": 358252,
+      "sha256": "c55ffd85a38c686caf01f1bedaf419f3c5f1ae61ed51b86dfaf6354e42f20222"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-51.png",
+      "bytes": 354740,
+      "sha256": "3229bcb64ba7bd34c31492a2d90f7875a8e044135db7e40c748e831bd4f70800"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-52.png",
+      "bytes": 351729,
+      "sha256": "07ade2d7c3bc0df67457c27f9fb5702c68ca5c9d48995147818c6f7ac2f262a5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-53.png",
+      "bytes": 351279,
+      "sha256": "35b30b30a0e3b4d77812069c454c209f754737ca7f44db75f0f6f02d2786fdc8"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-54.png",
+      "bytes": 351018,
+      "sha256": "31217c8aac5ec5e0303c145aabf050fcbc104342e98bcce7309fb75dff211167"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-55.png",
+      "bytes": 349643,
+      "sha256": "ffcdfe87d0fcd5f603d09d072cdbdf640590abb01d11dceb60ec10beab79fa0b"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-56.png",
+      "bytes": 347261,
+      "sha256": "6aaa311bbbf10970a665a1b4beca0e9d2e47868ce132c619139a5209d345b253"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-57.png",
+      "bytes": 344883,
+      "sha256": "ef492562df9919881b998c3cd195ea8cc5b56bee72c8ed55b3a1bf7a9c4fbb52"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-58.png",
+      "bytes": 347893,
+      "sha256": "09771344a2e6a2a786c0e80f62a672a420b90329302e34947164d873a5647ec2"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-59.png",
+      "bytes": 352027,
+      "sha256": "3768415e8f7b4c28ef7e1904b46bb206506e1183f48ab8843da6503052138423"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-60.png",
+      "bytes": 356708,
+      "sha256": "258020cd285a21de3b6a41940b6752024c0ac5278b98922ac37669f4d8d005b1"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-61.png",
+      "bytes": 358721,
+      "sha256": "ca4e17db0ff69ebdcb1546c5b59e18eaa66e19bc870299941f159417a87f8895"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-62.png",
+      "bytes": 358501,
+      "sha256": "dfb9800f8a558a33ccf17d9a35b903f28499e7d608cf2e14d03984f9c64f2cec"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-63.png",
+      "bytes": 358747,
+      "sha256": "87eebac68ecf0247a883cf742df4f57c38829a3ddbcf399d0b0fc4ec72b4f9ac"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-64.png",
+      "bytes": 361178,
+      "sha256": "1a783f6446b9c6023853cdd63705afa94f12b6d562de088e3ec3cd13e49b9da2"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-65.png",
+      "bytes": 363964,
+      "sha256": "e5f1d052e75298ce8319c055cf7e8634016e29ce64f3b2572a251461f4c35db4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-66.png",
+      "bytes": 367196,
+      "sha256": "011b6b0b8d37afe9135b2a9ba4ac40a90e71b37cac0f4dfe2f88d41f45650610"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-67.png",
+      "bytes": 369742,
+      "sha256": "6213f48eee02bce6b2174ad7a6a616aee335c36ad068cbc22da377c1ca2b3879"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-68.png",
+      "bytes": 368592,
+      "sha256": "cb263b9d6147a6e1a7f503690ac1be501bcb97a448d5a057e02a414c5aa30a98"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-69.png",
+      "bytes": 368569,
+      "sha256": "42bcc655ec68403f48d49d79e893433e486caa8d3bd222ac3228fdb51f299ac5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-70.png",
+      "bytes": 368072,
+      "sha256": "199ca241bb81a8b9d5d7122c473be03f036350d2af4c9ee5799de80517f5871b"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-71.png",
+      "bytes": 368464,
+      "sha256": "c9c4dbbae519ac770c2313f4b9422ca57467040a47519b4e3514a3b585021817"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-72.png",
+      "bytes": 370587,
+      "sha256": "cab62f693de2aa6a2a550599144da280838ff3ff46f3da7364bec7f88280d740"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-73.png",
+      "bytes": 372064,
+      "sha256": "96b6da54b5e98c24029ef8b8f98dd78d48fb4fc0893a390b42a8e6ec85de3da6"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-74.png",
+      "bytes": 371451,
+      "sha256": "0f2c30eeaf9d64eb3b6760783a459077870599f72c4dfbf621b914bc989cc4a3"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-75.png",
+      "bytes": 370684,
+      "sha256": "1d2ebff6259597ec7a1c9572e142e20485d5fc72cd1de82f4ba5b6eccc3be4a5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-76.png",
+      "bytes": 370260,
+      "sha256": "3149fa357660a667f884985cd232a23ec00f260aa9c56db12d09f8d3ddc13c8d"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-77.png",
+      "bytes": 368184,
+      "sha256": "db4823116e41f3ce8492a8a747cb344f8051e5e85892d3c93323fa877795fa1a"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-78.png",
+      "bytes": 367349,
+      "sha256": "14ed80a5a31e2f7573ed4476efacd3fc71cd10f07f541b424c7d774bb56c808b"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-79.png",
+      "bytes": 367917,
+      "sha256": "ab75e933d1d538ab591feb4144a1933b037d51ab112727dc9e1a9ff97131a859"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-80.png",
+      "bytes": 365416,
+      "sha256": "02d915955dbb8d042534e3c2a45acd958e66cfe928fc280cd075b5f19a2e5f57"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-81.png",
+      "bytes": 364674,
+      "sha256": "98091d9723ac786405cd1d2e6c00b46a0e6297ffb9f92b8870ea9e01c7cfa3c5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-82.png",
+      "bytes": 364981,
+      "sha256": "1f67a7f5a39db1364b124a33890b4e8011ab893a839629b64dc9297a2fd4d9c8"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-83.png",
+      "bytes": 363119,
+      "sha256": "6624e7410c160b7324319659f4761b08d428e23fe38e6749a7dbaba804841ef5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-84.png",
+      "bytes": 359735,
+      "sha256": "b031b467598fdaa77996f13d5de25556b934d7f937e074d95f600a3e9618e738"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-85.png",
+      "bytes": 356273,
+      "sha256": "0861e6636f33203a658138c5d5039116ce42e34a8b19d1d023b4cade9facf54e"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-86.png",
+      "bytes": 352945,
+      "sha256": "8419d35b57fb64326f098cc5c98ff316949c4dfd24e665c3b551563d5dfa1572"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-87.png",
+      "bytes": 350030,
+      "sha256": "305af054704789f9b58da0643cdb7e0b86cf6d684548ef0368c38e8e92b63ad3"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-88.png",
+      "bytes": 350312,
+      "sha256": "93f2265ae62c8608833dfdbfbaf7fb221bd9b4e26cd3c78ffc67f4dae769ff48"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-89.png",
+      "bytes": 349242,
+      "sha256": "9793101fdb815ee052b4dda953633548e4e779cfbed7b39b4d3fd71b3d99f58a"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-90.png",
+      "bytes": 351768,
+      "sha256": "757704f9450a4fd7a8896773701dbf766e6118d4903be20dfdf6c8094b1ad529"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-91.png",
+      "bytes": 354328,
+      "sha256": "d4839e52f09ff0877728736c4f4f7d234ab02cdea143174ee248ceafb41377b9"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-92.png",
+      "bytes": 354600,
+      "sha256": "70eac0dca70678dcab4bda1f08e6f9d5d15ff76a3ba513e3766246fe71135607"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-93.png",
+      "bytes": 355021,
+      "sha256": "8c2fa7fe294d6d94dcccd8aebb86804ca5c2f399d92a514de34894b67e207060"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-94.png",
+      "bytes": 358277,
+      "sha256": "59979410575071d5ce6eb62e4d53f2a8b790c488557d1181423dfcb3ed557c83"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-95.png",
+      "bytes": 362323,
+      "sha256": "467cc435377283a0e264c1fe4c5794c5eef92fbf4283a64481d6b133c983b744"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-1-96.png",
+      "bytes": 365775,
+      "sha256": "c28992c748acb64e75be72b11b4ecb253009ae5e1b5363a51ece31006d49ded5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-00.png",
+      "bytes": 365721,
+      "sha256": "c236de30f035bb24482f6cc98a8ada40f40f512d440ff21010e5411f7f8ca93d"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-01.png",
+      "bytes": 362204,
+      "sha256": "f852e3cd2c1cc8f693036fe097213cc459cfc92978231734891bd7e01a93c084"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-02.png",
+      "bytes": 358277,
+      "sha256": "59979410575071d5ce6eb62e4d53f2a8b790c488557d1181423dfcb3ed557c83"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-03.png",
+      "bytes": 354849,
+      "sha256": "4e180c8e217f204060f1ab7a6118c06d3abb131668503b0a46adcea3698e577f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-04.png",
+      "bytes": 354921,
+      "sha256": "c748d07fb17f9a7fbb18e681f4d7c6d044056045a4093dbf18295fd4c9befdda"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-05.png",
+      "bytes": 354681,
+      "sha256": "2ca679de5f5533d2c27e84d465ff0c983174990db22b207cc4f50d093549e830"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-06.png",
+      "bytes": 352296,
+      "sha256": "589e0257d6f55b1bff6782fbc12cd83b455973cd02d33c1d7ebb719cab73293f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-07.png",
+      "bytes": 349195,
+      "sha256": "41a4b6522caa21ba765b7f72e1daca62964e0546894caf2c1b685ccfcf9eac7c"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-08.png",
+      "bytes": 350416,
+      "sha256": "4fdfb55a57d79c12fbd78f0d083d3dc4423763733a43cbc02a86729fe3132f31"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-09.png",
+      "bytes": 349952,
+      "sha256": "52d1010ef26f78220335407b44c8afbf8fc6596cb119a84469af4bd032ac0765"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-10.png",
+      "bytes": 352593,
+      "sha256": "00e665cedc613120b2ba49e717ed8b60692500b5cdae7eb6b4adf38fb2bba442"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-11.png",
+      "bytes": 355923,
+      "sha256": "addf1d19975bc83a43104fe1c6d7d6c9e5a406c0f5dff520e71d63a9f3b8e3ea"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-12.png",
+      "bytes": 359243,
+      "sha256": "f617d3e8c835033fb6b2ab300499a2013a76b0fa3ff4fbd9a8916d6541d8b658"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-13.png",
+      "bytes": 362494,
+      "sha256": "5bb739eeb7b1f426754b0441f2c2b815745f08322c20076c0eb048513fb0799c"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-14.png",
+      "bytes": 363804,
+      "sha256": "caeafbf29c7d63c49405d0b00174945dcd2f22540beef4f30974f15c7bf51313"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-15.png",
+      "bytes": 364092,
+      "sha256": "7f3b922b0a883f1f13c4edacd0df48e1a2d2438c610c27009782cf225ea49a91"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-16.png",
+      "bytes": 363753,
+      "sha256": "34d82595a297b65fa0fd61cf61f5f22209de58b9f86c380558e6fadd1ab65300"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-17.png",
+      "bytes": 365264,
+      "sha256": "03774c990cc1abea5e90315285acf67dd196e90d879e715888e089e9f526973d"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-18.png",
+      "bytes": 365441,
+      "sha256": "0f046c96eddd5aa8b3dfceebff64dcded9bdffc9b5c6c00e680c409a584554e6"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-19.png",
+      "bytes": 365917,
+      "sha256": "0a00fd6e211a87643b27aa2c8baba5bbde9a4f4bbd2db96fbadad63c27d4a1fb"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-20.png",
+      "bytes": 368229,
+      "sha256": "b2df3839d810d53b55772250adaaf729432c3b2647fa7fd6e255d266c0a581fc"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-21.png",
+      "bytes": 369592,
+      "sha256": "c4b261521be9d87da51c11e37c89fb4404e3c665e2e56bef789ba63f1c639450"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-22.png",
+      "bytes": 370538,
+      "sha256": "05f964fac6da4014fed8ebd9ca7b991cacadc6d33cd9dc617dc1eca7ac9955f5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-23.png",
+      "bytes": 371831,
+      "sha256": "6001fd9b08a33cd7a0cd8d03a01a9025df3c72de0ea9d44dc8c8f0e59b644f24"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-24.png",
+      "bytes": 369765,
+      "sha256": "7d4d93cd39435dcf4f264a250e17fbe4c1e7d0847e4f63d3a434d3e5a4406e4f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-25.png",
+      "bytes": 367431,
+      "sha256": "32aec4e77574f7bf1ae2d1408a99c7aa5df5c78868b5c254b473f1d2fd8332f9"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-26.png",
+      "bytes": 367118,
+      "sha256": "a37a7b59408eaca555c504f69b267ccb7f22c28c016dc59628341e15cbcd0c57"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-27.png",
+      "bytes": 366290,
+      "sha256": "cf5089603de9b1123bf5ec9985276d1f9f9d39bc5aeafdb7345942c65289c476"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-28.png",
+      "bytes": 365992,
+      "sha256": "28d4f7488fa2ef76b3fa75f3027fcde6e3c4bea08b955cc8b97c8bd3fa4ef9e4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-29.png",
+      "bytes": 368247,
+      "sha256": "debe23d402ec787ea5a95b214fbf99efed163f2d2009a7737153cd7f4780b4cb"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-30.png",
+      "bytes": 365841,
+      "sha256": "28bfb3d1d7eabbd01ed7a38c67d100b688982b05b3e66ef031c014abbdf44660"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-31.png",
+      "bytes": 361856,
+      "sha256": "fb843228984793ce691026f90db28d5b46f1857b533f9880d59d0398900b5648"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-32.png",
+      "bytes": 358207,
+      "sha256": "fba1e516186c395cf06d2b7be95ae3f79e686da9a5e13ee6e91c1ee12d91c4aa"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-33.png",
+      "bytes": 355823,
+      "sha256": "2faf879be4553e234eba089ccbdc7e5787d7cd4d7b685e71f7d00f46c79f22cf"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-34.png",
+      "bytes": 356007,
+      "sha256": "5fcb94c308f2a2dbb2f2c73f6b8c2a7ce47a2398b253f30acf712289c92fe356"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-35.png",
+      "bytes": 356769,
+      "sha256": "0a86a9112f7f0036d96cfca6f8d7dc866c4c07946ff5eb2cb07b0cfcb900d73f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-36.png",
+      "bytes": 356220,
+      "sha256": "a9cac7fffe2dca5f2f33d9db1ba57ade9ad9a2b3624d9f8b090e50c941e14b78"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-37.png",
+      "bytes": 354021,
+      "sha256": "8d6ac567d40be47b9451dd3f685975290e8da95bfb0fd41243c7fbae4ee867b4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-38.png",
+      "bytes": 349902,
+      "sha256": "2dc51d5ae6aed181f1b960d58f4eeed010dd69dc91c838b21dcf3dfabd3c0174"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-39.png",
+      "bytes": 345566,
+      "sha256": "befb342ca2e2fd9253f3c1205508c6495962e4c8f57403eb484748dbfd7f70f1"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-40.png",
+      "bytes": 346882,
+      "sha256": "25f62560c209c9a005577cdea8618535894ddd48a19eb2cf91fa6f591ee2254b"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-41.png",
+      "bytes": 348880,
+      "sha256": "e0d26958ebbddc71feb536adb07e204193a0c50b2c4a2ff30ed83050273fcb43"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-42.png",
+      "bytes": 351613,
+      "sha256": "38774c71fe504dec2834b2698853b20bd596789698df3761a9c94f9eb6055dde"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-43.png",
+      "bytes": 351701,
+      "sha256": "e99e0c27aec6f8496a1c283bba35dfdea8879279d8b2cfaa4fc81b9c2d351141"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-44.png",
+      "bytes": 352306,
+      "sha256": "db7d1b3442e84bd96a830a409a43eb82c80515c1fda4bc4d5a6edcf1d1e4bfb7"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-45.png",
+      "bytes": 355559,
+      "sha256": "2776e67d9036e36695d808dd7fb5756b8e08702939f92f7a72ccf40b91ab4bd8"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-46.png",
+      "bytes": 357994,
+      "sha256": "274b377a631513222dc3116620f82110e7f621166dee8ee3a93a5e7d15adfa90"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-47.png",
+      "bytes": 361340,
+      "sha256": "830201eabf49ecb0ce86aabb537bc0dc30fc71d0fda0ae91dd0fb363c4e3d506"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-48.png",
+      "bytes": 363468,
+      "sha256": "6da99e50be973312cb0f525d7845172dae86ca9bf4db4849d2a2f024e1ada31a"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-49.png",
+      "bytes": 361340,
+      "sha256": "830201eabf49ecb0ce86aabb537bc0dc30fc71d0fda0ae91dd0fb363c4e3d506"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-50.png",
+      "bytes": 357994,
+      "sha256": "274b377a631513222dc3116620f82110e7f621166dee8ee3a93a5e7d15adfa90"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-51.png",
+      "bytes": 355559,
+      "sha256": "2776e67d9036e36695d808dd7fb5756b8e08702939f92f7a72ccf40b91ab4bd8"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-52.png",
+      "bytes": 352306,
+      "sha256": "db7d1b3442e84bd96a830a409a43eb82c80515c1fda4bc4d5a6edcf1d1e4bfb7"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-53.png",
+      "bytes": 351701,
+      "sha256": "e99e0c27aec6f8496a1c283bba35dfdea8879279d8b2cfaa4fc81b9c2d351141"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-54.png",
+      "bytes": 351613,
+      "sha256": "38774c71fe504dec2834b2698853b20bd596789698df3761a9c94f9eb6055dde"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-55.png",
+      "bytes": 348880,
+      "sha256": "e0d26958ebbddc71feb536adb07e204193a0c50b2c4a2ff30ed83050273fcb43"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-56.png",
+      "bytes": 346882,
+      "sha256": "25f62560c209c9a005577cdea8618535894ddd48a19eb2cf91fa6f591ee2254b"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-57.png",
+      "bytes": 345566,
+      "sha256": "befb342ca2e2fd9253f3c1205508c6495962e4c8f57403eb484748dbfd7f70f1"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-58.png",
+      "bytes": 349902,
+      "sha256": "2dc51d5ae6aed181f1b960d58f4eeed010dd69dc91c838b21dcf3dfabd3c0174"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-59.png",
+      "bytes": 354021,
+      "sha256": "8d6ac567d40be47b9451dd3f685975290e8da95bfb0fd41243c7fbae4ee867b4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-60.png",
+      "bytes": 356220,
+      "sha256": "a9cac7fffe2dca5f2f33d9db1ba57ade9ad9a2b3624d9f8b090e50c941e14b78"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-61.png",
+      "bytes": 356769,
+      "sha256": "0a86a9112f7f0036d96cfca6f8d7dc866c4c07946ff5eb2cb07b0cfcb900d73f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-62.png",
+      "bytes": 356007,
+      "sha256": "5fcb94c308f2a2dbb2f2c73f6b8c2a7ce47a2398b253f30acf712289c92fe356"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-63.png",
+      "bytes": 355823,
+      "sha256": "2faf879be4553e234eba089ccbdc7e5787d7cd4d7b685e71f7d00f46c79f22cf"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-64.png",
+      "bytes": 358207,
+      "sha256": "fba1e516186c395cf06d2b7be95ae3f79e686da9a5e13ee6e91c1ee12d91c4aa"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-65.png",
+      "bytes": 361856,
+      "sha256": "fb843228984793ce691026f90db28d5b46f1857b533f9880d59d0398900b5648"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-66.png",
+      "bytes": 365841,
+      "sha256": "28bfb3d1d7eabbd01ed7a38c67d100b688982b05b3e66ef031c014abbdf44660"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-67.png",
+      "bytes": 368247,
+      "sha256": "debe23d402ec787ea5a95b214fbf99efed163f2d2009a7737153cd7f4780b4cb"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-68.png",
+      "bytes": 365992,
+      "sha256": "28d4f7488fa2ef76b3fa75f3027fcde6e3c4bea08b955cc8b97c8bd3fa4ef9e4"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-69.png",
+      "bytes": 366290,
+      "sha256": "cf5089603de9b1123bf5ec9985276d1f9f9d39bc5aeafdb7345942c65289c476"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-70.png",
+      "bytes": 367118,
+      "sha256": "a37a7b59408eaca555c504f69b267ccb7f22c28c016dc59628341e15cbcd0c57"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-71.png",
+      "bytes": 367431,
+      "sha256": "32aec4e77574f7bf1ae2d1408a99c7aa5df5c78868b5c254b473f1d2fd8332f9"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-72.png",
+      "bytes": 369765,
+      "sha256": "7d4d93cd39435dcf4f264a250e17fbe4c1e7d0847e4f63d3a434d3e5a4406e4f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-73.png",
+      "bytes": 371831,
+      "sha256": "6001fd9b08a33cd7a0cd8d03a01a9025df3c72de0ea9d44dc8c8f0e59b644f24"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-74.png",
+      "bytes": 370538,
+      "sha256": "05f964fac6da4014fed8ebd9ca7b991cacadc6d33cd9dc617dc1eca7ac9955f5"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-75.png",
+      "bytes": 369592,
+      "sha256": "c4b261521be9d87da51c11e37c89fb4404e3c665e2e56bef789ba63f1c639450"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-76.png",
+      "bytes": 368229,
+      "sha256": "b2df3839d810d53b55772250adaaf729432c3b2647fa7fd6e255d266c0a581fc"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-77.png",
+      "bytes": 365917,
+      "sha256": "0a00fd6e211a87643b27aa2c8baba5bbde9a4f4bbd2db96fbadad63c27d4a1fb"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-78.png",
+      "bytes": 365441,
+      "sha256": "0f046c96eddd5aa8b3dfceebff64dcded9bdffc9b5c6c00e680c409a584554e6"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-79.png",
+      "bytes": 365264,
+      "sha256": "03774c990cc1abea5e90315285acf67dd196e90d879e715888e089e9f526973d"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-80.png",
+      "bytes": 363753,
+      "sha256": "34d82595a297b65fa0fd61cf61f5f22209de58b9f86c380558e6fadd1ab65300"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-81.png",
+      "bytes": 364092,
+      "sha256": "7f3b922b0a883f1f13c4edacd0df48e1a2d2438c610c27009782cf225ea49a91"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-82.png",
+      "bytes": 363804,
+      "sha256": "caeafbf29c7d63c49405d0b00174945dcd2f22540beef4f30974f15c7bf51313"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-83.png",
+      "bytes": 362494,
+      "sha256": "5bb739eeb7b1f426754b0441f2c2b815745f08322c20076c0eb048513fb0799c"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-84.png",
+      "bytes": 359243,
+      "sha256": "f617d3e8c835033fb6b2ab300499a2013a76b0fa3ff4fbd9a8916d6541d8b658"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-85.png",
+      "bytes": 355923,
+      "sha256": "addf1d19975bc83a43104fe1c6d7d6c9e5a406c0f5dff520e71d63a9f3b8e3ea"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-86.png",
+      "bytes": 352593,
+      "sha256": "00e665cedc613120b2ba49e717ed8b60692500b5cdae7eb6b4adf38fb2bba442"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-87.png",
+      "bytes": 349952,
+      "sha256": "52d1010ef26f78220335407b44c8afbf8fc6596cb119a84469af4bd032ac0765"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-88.png",
+      "bytes": 350416,
+      "sha256": "4fdfb55a57d79c12fbd78f0d083d3dc4423763733a43cbc02a86729fe3132f31"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-89.png",
+      "bytes": 349195,
+      "sha256": "41a4b6522caa21ba765b7f72e1daca62964e0546894caf2c1b685ccfcf9eac7c"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-90.png",
+      "bytes": 352296,
+      "sha256": "589e0257d6f55b1bff6782fbc12cd83b455973cd02d33c1d7ebb719cab73293f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-91.png",
+      "bytes": 354681,
+      "sha256": "2ca679de5f5533d2c27e84d465ff0c983174990db22b207cc4f50d093549e830"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-92.png",
+      "bytes": 354921,
+      "sha256": "c748d07fb17f9a7fbb18e681f4d7c6d044056045a4093dbf18295fd4c9befdda"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-93.png",
+      "bytes": 354849,
+      "sha256": "4e180c8e217f204060f1ab7a6118c06d3abb131668503b0a46adcea3698e577f"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-94.png",
+      "bytes": 358277,
+      "sha256": "59979410575071d5ce6eb62e4d53f2a8b790c488557d1181423dfcb3ed557c83"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-95.png",
+      "bytes": 362204,
+      "sha256": "f852e3cd2c1cc8f693036fe097213cc459cfc92978231734891bd7e01a93c084"
+    },
+    {
+      "sourcePath": "docs/design/background-study/motion-2-96.png",
+      "bytes": 365721,
+      "sha256": "c236de30f035bb24482f6cc98a8ada40f40f512d440ff21010e5411f7f8ca93d"
+    }
+  ]
+}

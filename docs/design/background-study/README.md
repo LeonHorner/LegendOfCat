@@ -5,6 +5,11 @@ On 2026-10-30 the user selected Subtle distance, requested removal of the choose
 and asked for animated foreground water. The runtime now has one fixed direction.
 Earlier A/B/C and connected-river studies remain archived evidence.
 
+The [curated review archive](archive/README.md) preserves thirteen major stages,
+the seven original feedback uploads, and compact versions of the local motion
+captures independently of feature-branch history. Its manifest records source
+revisions, checksums and known provenance limits.
+
 ## Run
 
 Use Unity 6000.3.27f1. Open Assets/Game/Scenes/BackgroundStudy.unity and press Play.

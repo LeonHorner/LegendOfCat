@@ -145,7 +145,7 @@ integration after comparing animated loops. `Assets/Game/Art/Mika/Original/`
 contains Editor-created sprite metadata referencing the unchanged original
 `mika-movement-candidate.png`; `Assets/Game/Resources/MikaOriginal.prefab` is
 the corresponding cosmetic presentation. No new generated artwork is involved.
-Human decisions: preserve original run poses 4–7 and substantial paws, remove
+Human decisions: preserve original run poses 4â€“7 and substantial paws, remove
 inbetweens, register visible sole pivots and retain physics/input timing.
 Other original poses remain temporary; this does not accept the full movement set.
 The apex transition reuses original tucked pose 6 as sprite slot 16 with the
@@ -193,7 +193,7 @@ Generation prompt (built-in tool):
 
 > Use case: stylized-concept. Asset type: original 2D game main-menu background, landscape 1536x1024. A charming hand-painted forest river valley at warm golden hour, soft atmospheric blue-green distant hills and old mossy stone ruins, amber foliage framing the far edges, winding glimmering stream toward the distance. Painterly gouache brushwork, entirely 2D, warm adventure mood. Composition: left half tranquil low-detail deep teal woodland shadow to support a separate opaque UI panel, right half luminous misty valley vista; no sharp foreground platforms or apparent gameplay routes. Natural lighting, restrained contrast, soft edges. No characters, animals, text, logos, UI, buttons, buildings with recognizable brands, or watermark. This is decorative menu scenery, not a level layout.
 
-## Mika apex atlas-edge correction — 2026-10-24
+## Mika apex atlas-edge correction â€” 2026-10-24
 
 `Assets/Game/Art/Mika/Original/original-apex-isolated.png` is a local Unity
 Editor-derived copy of the existing apex atlas cell with a two-pixel transparent
@@ -204,7 +204,7 @@ neighboring atlas speck and retain the accepted apex alignment (-2, -14 source
 pixels). The user accepted the in-game result after playtesting. Original visible
 RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
 
-## Golden River background study — 2026-10-24
+## Golden River background study â€” 2026-10-24
 
 `Assets/Game/Resources/BackgroundStudy/painted-atlas.png` is original generated
 prototype scenery, made with the built-in OpenAI image generation tool. Exact
@@ -221,7 +221,7 @@ Built-in generation prompt:
 
 > Use case: stylized-concept. Create a single 1536x1024 background layer ATLAS for a warm hand-painted 2D side-scrolling Golden River Path game prototype. Reference image is STYLE AND PALETTE ONLY. No cat, owl, characters, gameplay platforms, foreground, text or borders. Atlas has precisely THREE equal horizontal strips stacked vertically, each its own very wide panoramic landscape, no margin. TOP third: ONLY warm pale golden sunset sky, soft clouds and extremely distant lavender hills, no trees/buildings. MIDDLE third: atmospheric blue sage distant riverside forest, small recessed ruined tower silhouettes, river mist; fill entire strip with pale atmospheric sky above and soft river below. BOTTOM third: closer soft sage and muted ochre riverside trees and vegetation with open gaps, fill strip with pale atmospheric sky above and mist below. All three strips low contrast, painterly brush texture, no dark outlines, no horizontal walkable ledges or bridges. In EACH strip left and right edges have identical low-detail mist colors and landscape heights for horizontal reuse; broad subtle forms rather than obvious repeating landmarks. The result must be beautiful painted scenery, separated into the specified three strip regions for runtime composition, not a screenshot of a game.
 
-## Golden River transparent replacement layers — 2026-10-25
+## Golden River transparent replacement layers â€” 2026-10-25
 
 `Assets/Game/Resources/BackgroundStudy/middle-cutout.png` and `near-cutout.png`
 are original RGBA paintings generated with the built-in OpenAI image tool; exact
@@ -236,7 +236,7 @@ strip crossfades, retain image proportions, reject low-alpha halos at runtime an
 place smaller near vegetation below the gameplay plane. This feedback does not
 select A/B/C or approve final production backgrounds.
 
-## Golden River painted terrain and corner framing — 2026-10-25
+## Golden River painted terrain and corner framing â€” 2026-10-25
 
 `Assets/Game/Resources/BackgroundStudy/painted-terrain.png` and
 `foreground-corners.png` were generated with the built-in OpenAI image tool;
@@ -253,7 +253,7 @@ flat collision-aligned grass tops, and sparse dark lower-corner foliage outside
 the landing plane. This remains prototype art and does not approve a final
 background concept, level layout or campaign expansion.
 
-## Golden River painted depth and hanging foliage — 2026-10-25
+## Golden River painted depth and hanging foliage â€” 2026-10-25
 
 `Assets/Game/Resources/BackgroundStudy/foreground-river.png`, `meadow-surface.png`
 and `hanging-foliage.png` are original generations from the built-in OpenAI image
@@ -270,7 +270,7 @@ sides, and a separate foreground river overlaps the lower cliff bases. This is
 painted depth within the 2D prototype, with no new swimming, moving-platform or
 3D gameplay behavior. No final production art or A/B/C selection is implied.
 
-## Golden River composition refinement — 2026-10-27
+## Golden River composition refinement â€” 2026-10-27
 
 No new images or generators were used. Existing documented PNGs remain unchanged.
 Human feedback rejected the high water, exaggerated platform perspective and
@@ -281,7 +281,7 @@ line, restrained side shading, larger rock motifs and mipmapped ground textures.
 The original movement/collision geometry and Mika artwork are preserved. This
 records a revision target, not user acceptance of final artwork or an A/B/C choice.
 
-## Connected Golden River painting — 2026-10-27
+## Connected Golden River painting â€” 2026-10-27
 
 `Assets/Game/Resources/BackgroundStudy/connected-river.png` is an original RGBA
 painting generated with the built-in OpenAI image tool; exact model ID was not
@@ -296,7 +296,7 @@ registered background/foreground quads, with shared tint, scale and movement. Sk
 terrain remain separate. Superseded paintings are retained but not loaded by
 this lab. No final production or A/B/C selection is implied.
 
-## River composition correction — 2026-10-28
+## River composition correction â€” 2026-10-28
 
 User review showed floating-looking cliff bases and missing foreground water.
 No new pixels or external assets were introduced. The same river painting now
@@ -306,7 +306,7 @@ feet, and this bounded course keeps camera height fixed during jumps to retain
 the water. Collision contacts and the four intentional suspended rocks are
 unchanged. These are human-directed prototype refinements, pending visual review.
 
-## Painted terrain modules — 2026-10-28
+## Painted terrain modules â€” 2026-10-28
 
 Sources: painted-pillar-v2.png and painted-bank-v2.png under
 Assets/Game/Resources/BackgroundStudy/. Original generated PNG pixels are
@@ -324,7 +324,7 @@ body height. No change to Mika, collision layout or physics. Shader alpha clippi
 rejects generated outer haze; pixels remain unmodified. Two-source reuse and body
 stretching remain prototype limitations, with visual acceptance pending.
 
-## Terrain integration grading — 2026-10-28
+## Terrain integration grading â€” 2026-10-28
 
 No new generated assets. The original pillar/bank PNGs are unchanged. In response
 to feedback about detached-looking platforms, shader grading reduces yellow
@@ -334,7 +334,7 @@ silhouettes. No painted fake foam or independent water texture was introduced.
 Human direction: connect platform lighting and shore contact to the environment;
 final visual acceptance is pending.
 
-## Shore connection and grass registration — 2026-10-28
+## Shore connection and grass registration â€” 2026-10-28
 
 painted-shore-v2.png under Assets/Game/Resources/BackgroundStudy/ is an original
 transparent painting generated with the built-in OpenAI image tool; exact model
@@ -350,7 +350,7 @@ load-bearing grass rows (pillar 0.748, bank 0.587), rather than brighter leaf ti
 Mika's prefab, presentation and collision physics remain unchanged. Final visual
 acceptance remains pending.
 
-## World-space shore and distant parallax — 2026-10-29
+## World-space shore and distant parallax â€” 2026-10-29
 
 The user rejected the moving shore contact and clipped middle/near trees, and
 requested a more reliable layered composition. The lab now keeps connected river
@@ -375,7 +375,7 @@ replace cut trees, keep suspended bodies shallow without changing collision tops
 Two-point contact registration, existing paw alignment and separate shore
 buttresses remain; no Mika source or movement physics changes were introduced.
 
-## Separated valley and foreground test — 2026-10-29
+## Separated valley and foreground test â€” 2026-10-29
 
 New original source: Assets/Game/Resources/BackgroundStudy/recessed-valley-v4.png.
 Built-in OpenAI image generation with transparent output; exact model ID not
@@ -394,7 +394,7 @@ applied only in the shader. The connected-river painting and StudyRiver pass are
 archived and no longer loaded. Existing shelf/pillar/bank art, Mika and physics
 remain unchanged. This is an experimental composition pending visual acceptance.
 
-## Foreground water motion — 2026-10-30
+## Foreground water motion â€” 2026-10-30
 
 No new bitmap assets or image generation. Existing foreground-river.png pixels
 remain unchanged. Human direction selected Subtle distance, removed comparison
@@ -405,7 +405,7 @@ world-space and driven by explicit time for reproducible captures. Source,
 generator and license records for the painting remain above. The selected
 background factors are sky 0.05, valley 0.14 and canopy 0.08.
 
-## Visible water flow revision — 2026-10-30
+## Visible water flow revision â€” 2026-10-30
 
 No new source artwork or generation. In response to invisible-looking motion,
 StudyWater increases water/neutral-foam refraction and adds moving light streaks.
@@ -414,7 +414,7 @@ Normal animation uses the shader game clock; explicit time is opt-in for capture
 Original source pixels, warm/dark rocks, alpha wave contour and terrain are
 unchanged. Previous subpixel shimmer is superseded.
 
-## Running water activity — 2026-10-30
+## Running water activity â€” 2026-10-30
 
 No source pixels or generator changes. Human direction requested stronger water
 motion and more waves during running. Grounded body speed drives a smoothly
@@ -423,3 +423,18 @@ crests. Full running gives approximately 2.2 times baseline flow and 35% more
 refraction; rock colors and authored alpha remain fixed. The dedicated
 water-running.mp4 is an explicit full-activity render for visual comparison;
 actual body-driven transitions are covered by motor/physics tests.
+
+## Background study review archive (2026-10-30)
+
+The curated evidence in `docs/design/background-study/archive/` contains exact
+copies of historical repository media and seven user-provided feedback uploads,
+plus H.264 review derivatives of existing local capture frames. No new artwork
+was generated or retouched. Original paintings retain the source, generator and
+license records elsewhere in this document; user screenshots document this project's Unity review,
+and the reposted concept retains its existing generated-reference provenance.
+Human curation selected thirteen major iterations, representative stills and
+clips, and start/midpoint/end keyframes. The archive README records decisions;
+`manifest.json` records source revisions, original upload names, SHA-256 hashes
+and encoding details. Unknown capture dates/revisions are explicitly recorded.
+All 291 raw capture frames remain untouched locally; the committed videos are
+lossy review copies, not lossless backups of those frames.
