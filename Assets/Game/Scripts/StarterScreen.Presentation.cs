@@ -135,7 +135,7 @@ public sealed partial class StarterScreen
             if (Button("Quit")) Application.Quit();
         } else if (page == "play") {
             Label("Movement lab prototype", headingStyle);
-            Label("Run and jump through a painted river course with two checkpoints. Mika's campaign is still in development; this is a movement prototype.");
+            Label("Run and jump through a longer painted river course with four checkpoints. Mika's campaign is still in development; this is a movement prototype.");
             GUILayout.Space(16);
             if (Button("Enter movement lab")) OpenCourse();
             if (Button("Back to menu")) page = "menu";

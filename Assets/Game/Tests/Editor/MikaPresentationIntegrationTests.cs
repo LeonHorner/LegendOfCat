@@ -115,8 +115,8 @@ public class MikaPresentationIntegrationTests
         Assert.That(scenery, Is.Not.Null);
         Assert.That(Read(scenery, "Cat"), Is.SameAs(controller), "Scenery must reuse the checkpoint player.");
         Assert.That(course.GetComponentsInChildren(Runtime("CatController")), Has.Length.EqualTo(1));
-        Assert.That(course.GetComponentsInChildren<BoxCollider2D>(), Has.Length.EqualTo(8),
-            "Seven original platforms and one player; decoration must not add collision.");
+        Assert.That(course.GetComponentsInChildren<BoxCollider2D>(), Has.Length.EqualTo(15),
+            "Fourteen platforms and one player; decoration must not add collision.");
         var camera = (Camera)Read(scenery, "View");
         Assert.That(camera.orthographicSize, Is.EqualTo(5.5f));
         var water = course.GetComponentsInChildren<MeshRenderer>().First(r => r.name == "Foreground water tile 0");
@@ -124,12 +124,16 @@ public class MikaPresentationIntegrationTests
         Assert.That(Resources.Load<Material>("BackgroundStudy/water-material"), Is.Not.Null,
             "A Resources material must retain the water shader in standalone builds.");
         var run = Read(component, "Run");
-        foreach (var spawnPoint in new[] { new Vector2(9, 0.52f), new Vector2(34, 1.52f) }) {
+        int expected = 0;
+        foreach (var spawnPoint in new[] {
+            new Vector2(9, 0.52f), new Vector2(34, 1.52f),
+            new Vector2(65, 1.52f), new Vector2(83, 0.52f)
+        }) {
             controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { spawnPoint });
             Physics2D.SyncTransforms(); Tick(15);
             Assert.That(Grounded, Is.True);
             component.SendMessage("Update");
-            int expected = spawnPoint.x < 10 ? 1 : 2;
+            expected++;
             Assert.That(Read(run, "Checkpoint"), Is.EqualTo(expected));
             component.GetType().GetMethod("TogglePause").Invoke(component, null);
             Assert.That(body.simulated, Is.False);
@@ -149,6 +153,52 @@ public class MikaPresentationIntegrationTests
         Assert.That(Read(run, "Checkpoint"), Is.EqualTo(0));
         Assert.That(Read(run, "Retries"), Is.EqualTo(0));
         Assert.That(Vector2.Distance(body.position, spawn), Is.LessThan(0.001f));
+        yield break;
+    }
+
+    [UnityTest]
+    public IEnumerator GroundedJumpShowsTakeoffBeforeTheNextPhysicsStep()
+    {
+        Input("SetMove", 1f);
+        controller.GetType().GetMethod("PressJump").Invoke(controller, null);
+        Render();
+        Assert.That(Grounded, Is.False);
+        Assert.That(Frame, Is.EqualTo(10), "The same render frame must show the takeoff drawing.");
+        Tick();
+        Assert.That(body.linearVelocity.x, Is.GreaterThan(1));
+        Assert.That(body.linearVelocity.y, Is.GreaterThan(10));
+        Input("ReleaseJump"); Tick();
+        Assert.That(body.linearVelocity.y, Is.LessThan(5));
+        yield break;
+    }
+
+    [UnityTest]
+    public IEnumerator ExtendedCourseGapsAreTraversableAndCameraReachesTheFinish()
+    {
+        var platforms = (Vector3[])Runtime("MovementCourse").GetField("Platforms").GetValue(null);
+        Assert.That(platforms, Has.Length.EqualTo(14));
+        for (int i = 0; i < platforms.Length - 1; i++) {
+            var from = platforms[i];
+            var to = platforms[i + 1];
+            var start = new Vector2(from.x + from.z * 0.5f - 1.5f, from.y + 1.23f);
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { start });
+            Physics2D.SyncTransforms(); Tick(15);
+            Input("SetMove", 1f); Tick(8);
+            Input("PressJump"); Tick();
+            bool landed = false;
+            for (int step = 0; step < 65; step++) {
+                Tick();
+                if (Grounded && body.position.x >= to.x - to.z * 0.5f && body.position.x <= to.x + to.z * 0.5f) {
+                    landed = true; break;
+                }
+            }
+            Assert.That(landed, Is.True, "Gap " + i + " must work with the existing motor and held jump.");
+            Input("ReleaseJump");
+        }
+        var camera = course.GetComponentsInChildren<Camera>().First(c => c.name == "Course camera");
+        camera.GetComponent(Runtime("CatCamera")).SendMessage("LateUpdate");
+        Assert.That(camera.transform.position.x, Is.GreaterThan(90), "Camera must follow beyond the old x=48 boundary.");
+        Assert.That(camera.WorldToViewportPoint(body.position).x, Is.InRange(0.1f, 0.9f));
         yield break;
     }
 

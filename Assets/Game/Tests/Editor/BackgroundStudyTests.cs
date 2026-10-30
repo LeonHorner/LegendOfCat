@@ -261,6 +261,14 @@ public sealed class BackgroundStudyTests
         var panels = study.GetComponentsInChildren<MeshRenderer>().Where(r => r.name.StartsWith("Foreground water tile")).ToArray();
         var source = new Texture2D(2, 2);
         source.LoadImage(System.IO.File.ReadAllBytes(UnityEditor.AssetDatabase.GetAssetPath(panels[0].sharedMaterial.mainTexture)));
+        float topV = panels[0].GetComponent<MeshFilter>().sharedMesh.uv.Max(uv => uv.y);
+        var authored = source.GetPixels32();
+        int maxExcludedAlpha = 0;
+        // Keep a bilinear margin above every visible source pixel when trimming empty geometry.
+        for (int y = Mathf.CeilToInt(topV * source.height) - 2; y < source.height; y++)
+            for (int x = 0; x < source.width; x++)
+                maxExcludedAlpha = Mathf.Max(maxExcludedAlpha, authored[y * source.width + x].a);
+        Assert.That(maxExcludedAlpha, Is.LessThanOrEqualTo(127), "Water crop must not cut authored waves, stones or their filtered edge.");
         source.wrapMode = TextureWrapMode.Clamp;
         try {
         for (int i = 0; i < before.Length; i++) {

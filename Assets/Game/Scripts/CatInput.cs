@@ -34,7 +34,7 @@ public sealed class CatInput : MonoBehaviour
         menu.AddBinding("<Gamepad>/start");
         move.performed += c => controller.Motion.SetMove(c.ReadValue<float>());
         move.canceled += c => controller.Motion.SetMove(0);
-        jump.performed += c => controller.Motion.PressJump();
+        jump.performed += c => controller.PressJump();
         jump.canceled += c => controller.Motion.ReleaseJump();
         restart.performed += c => { if (RetryCheckpoint != null) RetryCheckpoint(); else controller.ReturnToStart(); };
         fullRestart.performed += c => RestartRun?.Invoke();

@@ -456,3 +456,20 @@ place Mika at each checkpoint, induce falls, pause/retry and restart. The record
 is reproducible with BuildBackgroundStudy.RecordCheckpointPrototype; it is not a
 claim of a continuous manually played traversal. No imported artwork or new license
 is involved. Existing generator and license records still apply.
+
+## Extended checkpoint prototype and trimmed water geometry - 2026-10-30
+
+Existing paintings are reused unchanged for a 109-unit, fourteen-platform course
+with four checkpoints. No new images, source-pixel edits or licensed assets were
+introduced. Human choices: preserve the opening route, extend using existing
+grounded and shallow suspended modules, reduce the default overlay to 350x52
+pixels, and keep detailed controls behind Controls/pause.
+
+The foreground water source's opaque content ends below v=0.242. A mesh covering
+v=0..0.25 preserves world/UV registration and a filtering margin while omitting
+75% empty quad area. The wave shader and source images are unchanged. The existing
+takeoff drawing is selected immediately on grounded jump input; no character art
+or jump-force constants changed. Actual Windows preview screenshots, the render
+comparison and measurement limitations are recorded in
+docs/design/background-study/extended-prototype/README.md. The earlier shader
+branch experiment was discarded after showing no measured benefit.

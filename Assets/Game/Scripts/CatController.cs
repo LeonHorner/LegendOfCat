@@ -17,6 +17,17 @@ public sealed class CatController : MonoBehaviour
     public event System.Action FellOutOfBounds;
     public bool Paused { get; private set; }
 
+    public void PressJump()
+    {
+        Motion.PressJump();
+        // Give the current render frame the takeoff state, without advancing physics.
+        // Airborne requests keep the existing coyote/buffer rules in FixedUpdate.
+        if (Paused || !Grounded || !Motion.StartBufferedJump(true, body.linearVelocity)) return;
+        body.linearVelocity = Motion.Velocity;
+        Grounded = false;
+        leaveGroundSteps = 2;
+    }
+
     void Awake()
     {
         body = GetComponent<Rigidbody2D>();

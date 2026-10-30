@@ -245,7 +245,16 @@ public sealed partial class StarterScreen : MonoBehaviour
         }
         string view = Argument("--preview-view");
         yield return null;
-        if (view == "menu" || view == "settings" || view == "play") page = view;
+        if (view == "course" || view == "course-end" || view == "course-paused") {
+            page = "play";
+            OpenCourse();
+            if (view == "course-end") course.Cat.RespawnAt(new Vector2(100, 0.52f));
+            if (view == "course-paused") {
+                yield return new WaitForSecondsRealtime(0.3f);
+                course.TogglePause();
+            }
+        }
+        else if (view == "menu" || view == "settings" || view == "play") page = view;
         else if (!string.IsNullOrEmpty(view)) {
             page = "updates";
             state = view;

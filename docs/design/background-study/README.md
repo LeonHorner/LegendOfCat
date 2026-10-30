@@ -15,14 +15,18 @@ revisions, checksums and known provenance limits.
 The selected scenery also runs in the existing checkpoint prototype: open
 `Assets/Game/Scenes/Main.unity`, press Play, then choose **Movement lab (prototype)**
 and **Enter movement lab**.
-This reuses the original seven-platform movement course and its two checkpoints
-at x=9 and x=34. Cross a gold marker on safe ground to activate it. R or a fall
+The course now spans 109 world units with fourteen platforms and four checkpoints
+at x=9, x=34, x=65 and x=83. The original opening seven platforms are preserved.
+Cross a gold marker on safe ground to activate it. R or a fall
 retries that checkpoint; Backspace restarts the whole run; P pauses; Esc returns
 to the existing menu. The selected art does not replace the checkpoint lifecycle.
 The camera stays at y=1 so foreground water remains visible during jumps.
 The separate 109-unit art lab below remains available for scenery stress review.
 See the [integrated checkpoint evidence](checkpoint-prototype/README.md) for
 screenshots, a short recording, lifecycle data and reproduction instructions.
+The [extended prototype review](extended-prototype/README.md) records the current
+compact overlay, longer route, input-response change and performance limits.
+The normal HUD is 350x52 pixels; Controls or pause reveals help, actions and fps.
 
 Resources material assets hold references to the three scenery shaders so player
 builds retain them. Regenerate missing materials with

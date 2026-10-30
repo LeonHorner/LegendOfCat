@@ -16,6 +16,16 @@ public sealed class CatMotion
     public void ReleaseJump() => held = false;
     public void Reset() { Velocity = Vector2.zero; move = pulse = grace = buffer = 0; held = false; }
 
+    public bool StartBufferedJump(bool grounded, Vector2 actualVelocity)
+    {
+        if (buffer <= 0 || !grounded && grace <= 0) return false;
+        actualVelocity.y = JumpSpeed;
+        Velocity = actualVelocity;
+        buffer = grace = 0;
+        Jumped = true;
+        return true;
+    }
+
     public Vector2 Step(float dt, bool grounded, Vector2 actualVelocity)
     {
         Jumped = false;
@@ -26,11 +36,7 @@ public sealed class CatMotion
         velocity.x = Mathf.MoveTowards(velocity.x, axis * Speed,
             (Mathf.Abs(axis) < 0.01f || axis * velocity.x < 0 ? Braking : Acceleration) * dt);
         if (grounded && velocity.y < 0) velocity.y = 0;
-        if (buffer > 0 && grace > 0) {
-            velocity.y = JumpSpeed;
-            buffer = grace = 0;
-            Jumped = true;
-        }
+        if (StartBufferedJump(grounded, velocity)) velocity = Velocity;
         if (!held && velocity.y > ReleaseSpeed) velocity.y = ReleaseSpeed;
         velocity.y = Mathf.Max(velocity.y - Gravity * dt, -FallSpeed);
         buffer = Mathf.Max(0, buffer - dt);

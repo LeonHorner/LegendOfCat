@@ -241,3 +241,20 @@ scenery attachment follows the existing course camera and player rather than
 creating duplicate gameplay objects. The camera holds the selected lower framing.
 This integrates prototype presentation, not a finished five-minute Level 1.
 See background-study/README.md for entry points, evidence and reproduction.
+
+### Longer course, compact overlay and early takeoff feedback - 2026-10-30
+
+The user requested a longer playable prototype and a smaller, quieter overlay,
+then reported about 26 fps in the Editor and perceived delay especially in Mika's
+jump. The course now spans 109 units with fourteen platforms and checkpoints at
+x=9/34/65/83. Original opening geometry and the existing run lifecycle are retained.
+The normal overlay is a small translucent strip; Controls/pause reveals detail.
+
+Grounded input now exposes the existing takeoff state/drawing before the next
+physics step. The body is not moved or simulated by the callback; the next fixed
+step follows the existing trajectory and release rules. No new animation artwork
+or movement ability is introduced. Airborne coyote/buffering remains fixed-step.
+Water geometry omits empty source space without changing its authored mapping or
+animation. Measurements do not establish an FPS gain or explain the user's low
+Editor frame rate. See background-study/extended-prototype/README.md for evidence,
+regressions and limits. The earlier seven-platform integration record is historical.

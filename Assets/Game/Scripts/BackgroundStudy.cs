@@ -11,7 +11,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     public const float CameraFloor = 1f;
     public const float CourseLeft = -5, CourseRight = 104;
     public const float TourDistance = 100;
-    // Keep the shared course untouched; this lab adds a second sequence for longer art review.
+    // Long scenery route; the menu prototype uses this layout with checkpoint recovery.
     public static readonly Vector3[] Platforms = {
         new Vector3(0, -0.75f, 10), new Vector3(9, -0.75f, 4),
         new Vector3(15, 0.25f, 4), new Vector3(22.5f, 0.25f, 3),
@@ -36,6 +36,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     Vector3 cameraVelocity;
     bool initialized, attachedToCourse;
     Vector3[] coursePlatforms;
+    static readonly float[] TravelFactors = { SkyTravel, ValleyTravel, CanopyTravel };
 
     public void InitializeForCourse(Camera camera, CatController cat, Vector3[] platforms)
     {
@@ -111,6 +112,14 @@ public sealed class BackgroundStudy : MonoBehaviour
         riverFrontMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-river");
         riverFrontMaterial.SetFloat("_Fog", 0.20f);
         riverFrontMaterial.SetFloat("_Saturation", 0.70f);
+        // All authored opaque pixels lie below v=0.242; retain a bilinear margin.
+        // Preserve the original world/UV mapping while avoiding 75% empty overdraw.
+        var waterMesh = new Mesh { name = "Visible foreground water" };
+        waterMesh.vertices = new[] { new Vector3(-0.5f, -0.5f), new Vector3(0.5f, -0.5f),
+            new Vector3(-0.5f, -0.25f), new Vector3(0.5f, -0.25f) };
+        waterMesh.uv = new[] { Vector2.zero, Vector2.right, new Vector2(0, 0.25f), new Vector2(1, 0.25f) };
+        waterMesh.triangles = new[] { 0, 2, 1, 1, 2, 3 };
+        waterMesh.RecalculateBounds(); terrainMeshes.Add(waterMesh);
         for (int tile = 0; tile < 3; tile++) {
             var front = GameObject.CreatePrimitive(PrimitiveType.Quad);
             DestroyImmediate(front.GetComponent<Collider>());
@@ -119,6 +128,7 @@ public sealed class BackgroundStudy : MonoBehaviour
             front.transform.localPosition = new Vector3((tile - 1) * 16, -0.32f, -2);
             front.transform.localScale = new Vector3(16, 16 / 1.5f, 1);
             front.GetComponent<MeshRenderer>().sharedMaterial = riverFrontMaterial;
+            front.GetComponent<MeshFilter>().sharedMesh = waterMesh;
         }
         terrainMaterial = PaintedMaterial("terrain-material", "LegendOfCat/StudyTerrain");
         terrainMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/painted-pillar-v2");
@@ -233,11 +243,10 @@ public sealed class BackgroundStudy : MonoBehaviour
     {
         View.transform.position = new Vector3(x, y, -10);
         // Distant scenery has no physical join to the world-space terrain or foreground water.
-        float[] speeds = { SkyTravel, ValleyTravel, CanopyTravel };
         for (int i = 0; i < 3; i++) {
             float width = LayerWidth(i);
-            float center = TileCenter(x, speeds[i], width);
-            layers[i].position = new Vector3(Offset(x, speeds[i]) + center, y, 0);
+            float center = TileCenter(x, TravelFactors[i], width);
+            layers[i].position = new Vector3(Offset(x, TravelFactors[i]) + center, y, 0);
             int tileIndex = Mathf.RoundToInt(center / width);
             for (int j = 0; j < 3; j++) {
                 var panel = layers[i].GetChild(j);
