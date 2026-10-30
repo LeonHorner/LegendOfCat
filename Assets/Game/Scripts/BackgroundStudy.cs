@@ -3,10 +3,7 @@ using UnityEngine;
 // Bounded art decision lab; never loaded by the campaign or the release menu.
 public sealed class BackgroundStudy : MonoBehaviour
 {
-    public enum Concept { ThreeLayer, Panorama, Subtle }
-    public Concept concept;
-    [Range(0, 1)] public float farSpeed = 0.08f;
-    [Range(0, 1)] public float middleSpeed = 0.28f;
+    public const float SkyTravel = 0.05f, ValleyTravel = 0.14f, CanopyTravel = 0.08f;
     public bool tour;
     public bool showControls = true;
     public Camera View { get; private set; }
@@ -85,9 +82,9 @@ public sealed class BackgroundStudy : MonoBehaviour
         // Independent foreground water: no texture, geometry or perspective join to the valley.
         riverFront = new GameObject("Foreground water").transform;
         riverFront.SetParent(transform, false);
-        riverFrontMaterial = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
+        riverFrontMaterial = new Material(Shader.Find("LegendOfCat/StudyWater"));
         riverFrontMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-river");
-        riverFrontMaterial.SetFloat("_Cutout", 1); riverFrontMaterial.SetFloat("_Fog", 0.20f);
+        riverFrontMaterial.SetFloat("_Fog", 0.20f);
         riverFrontMaterial.SetFloat("_Saturation", 0.70f);
         for (int tile = 0; tile < 3; tile++) {
             var front = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -207,8 +204,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     {
         View.transform.position = new Vector3(x, y, -10);
         // Distant scenery has no physical join to the world-space terrain or foreground water.
-        float[] speeds = concept == Concept.Panorama ? new[] { 0f, 0f, 0f }
-            : concept == Concept.Subtle ? new[] { 0.05f, 0.14f, 0.08f } : new[] { farSpeed, middleSpeed, middleSpeed * 0.5f };
+        float[] speeds = { SkyTravel, ValleyTravel, CanopyTravel };
         for (int i = 0; i < 3; i++) {
             float width = LayerWidth(i);
             float center = TileCenter(x, speeds[i], width);
@@ -236,6 +232,8 @@ public sealed class BackgroundStudy : MonoBehaviour
         }
     }
 
+    public void SetWaterTime(float seconds) => riverFrontMaterial.SetFloat("_WaterTime", seconds);
+
     public void ApplyViewport(int width, int height)
     {
         View.rect = MenuLayout.Letterbox16By9(width, height);
@@ -245,6 +243,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     void LateUpdate()
     {
         if (!View) return;
+        SetWaterTime(Time.time);
         ApplyViewport(Screen.width, Screen.height);
         if (tour) {
             tourTime += Time.deltaTime;
@@ -262,25 +261,10 @@ public sealed class BackgroundStudy : MonoBehaviour
     void OnGUI()
     {
         if (!showControls) return;
-        GUILayout.BeginArea(new Rect(10, 10, Mathf.Min(Screen.width - 20, 620), 215), GUI.skin.box);
-        GUILayout.Label("GOLDEN RIVER / BACKGROUND DECISION LAB");
-        GUILayout.Label("A/D: move | Space: jump | R: retry. 109 m painted review course.");
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("A: Distant parallax")) concept = Concept.ThreeLayer;
-        if (GUILayout.Button("B: Still distance")) concept = Concept.Panorama;
-        if (GUILayout.Button("C: Subtle distance")) concept = Concept.Subtle;
-        GUILayout.EndHorizontal();
-        tour = GUILayout.Toggle(tour, "Camera-only tour (includes reversal; return to play to follow Mika)");
-        GUILayout.Label("Camera travel factors (0 = camera-locked, 1 = world-space)");
-        farSpeed = Slider("Sky (A)", farSpeed); middleSpeed = Slider("Valley (A)", middleSpeed);
-        GUILayout.Label("Distant valley / playable cliffs / independent foreground water.");
-        GUILayout.Label("Candidate: " + concept + " | Prototype only; production choice pending.");
+        GUILayout.BeginArea(new Rect(10, 10, Mathf.Min(Screen.width - 20, 460), 74), GUI.skin.box);
+        GUILayout.Label("A/D: move | Space: jump | R: retry");
+        tour = GUILayout.Toggle(tour, "Camera tour (disable to follow Mika)");
         GUILayout.EndArea();
-    }
-    static float Slider(string label, float value)
-    {
-        GUILayout.BeginHorizontal(); GUILayout.Label(label + " " + value.ToString("F2"), GUILayout.Width(95));
-        value = GUILayout.HorizontalSlider(value, 0, 1); GUILayout.EndHorizontal(); return value;
     }
     void OnDestroy()
     {

@@ -51,7 +51,7 @@ public sealed class BackgroundStudyTests
         } finally { UnityEngine.Object.DestroyImmediate(pixels); }
     }
 
-    [UnityTest] public IEnumerator ConceptSwitchAndCameraTravelNeverMoveCollisionGeometry()
+    [UnityTest] public IEnumerator SelectedParallaxAndWaterPreserveTerrainAndContact()
     {
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         yield return new EnterPlayMode();
@@ -112,8 +112,7 @@ public sealed class BackgroundStudyTests
             }
         }
         var positions = colliders.Select(c => c.transform.position).ToArray();
-        for (int mode = 0; mode < 3; mode++) {
-            Study.GetField("concept").SetValue(study, Enum.ToObject(Study.GetNestedType("Concept"), mode));
+        {
             // Foreground water stays registered to the world; the independent valley may parallax behind it.
             foreach (float anchor in new[] { -24.123f, -0.123f, 23.877f, 48.123f }) {
                 Vector2? registered = null;
@@ -133,8 +132,8 @@ public sealed class BackgroundStudyTests
             float before = valleyPanel.transform.InverseTransformPoint(new Vector3(17, 0, valleyPanel.transform.position.z)).x;
             Study.GetMethod("ApplyView").Invoke(study, new object[] { 18f, 1f });
             float after = valleyPanel.transform.InverseTransformPoint(new Vector3(17, 0, valleyPanel.transform.position.z)).x;
-            Assert.That(Mathf.Abs(after - before), Is.GreaterThan(0.005f),
-                "The valley must move independently rather than recreating a connected world-space river.");
+            Assert.That(Mathf.Abs(after - before), Is.EqualTo((1 - 0.14f) / 40).Within(0.00001f),
+                "The selected subtle valley factor must stay fixed at 0.14.");
             for (int i = 0; i < positions.Length; i++) Assert.That(colliders[i].transform.position, Is.EqualTo(positions[i]));
             foreach (float y in new[] { 1f, 3f }) {
                 Study.GetMethod("ApplyView").Invoke(study, new object[] { 17f, y });
@@ -145,6 +144,8 @@ public sealed class BackgroundStudyTests
         }
         var cat = (Component)Study.GetProperty("Cat").GetValue(study);
         var view = (Camera)Study.GetProperty("View").GetValue(study);
+        if (SystemInfo.graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.Null)
+            AssertAnimatedWater(study, view);
         foreach (var size in new[] { new Vector2Int(1280, 720), new Vector2Int(640, 360),
             new Vector2Int(1024, 768), new Vector2Int(2560, 1080) }) {
             Study.GetMethod("ApplyViewport").Invoke(study, new object[] { size.x, size.y });
@@ -191,6 +192,57 @@ public sealed class BackgroundStudyTests
         UnityEngine.Object.Destroy(root);
         yield return null;
         yield return new ExitPlayMode();
+    }
+
+    void AssertAnimatedWater(Component study, Camera view)
+    {
+        Study.GetMethod("ApplyView").Invoke(study, new object[] { 17f, 1f });
+        Study.GetMethod("SetWaterTime").Invoke(study, new object[] { 0f });
+        var before = Snapshot(view);
+        Study.GetMethod("SetWaterTime").Invoke(study, new object[] { 1.7f });
+        var after = Snapshot(view);
+        int flowing = 0, warmStonePixels = 0;
+        var panels = study.GetComponentsInChildren<MeshRenderer>().Where(r => r.name.StartsWith("Foreground water tile")).ToArray();
+        var source = new Texture2D(2, 2);
+        source.LoadImage(System.IO.File.ReadAllBytes(UnityEditor.AssetDatabase.GetAssetPath(panels[0].sharedMaterial.mainTexture)));
+        source.wrapMode = TextureWrapMode.Clamp;
+        try {
+        for (int i = 0; i < before.Length; i++) {
+            int y = i / 640;
+            int difference = Mathf.Abs(before[i].r - after[i].r) + Mathf.Abs(before[i].g - after[i].g)
+                + Mathf.Abs(before[i].b - after[i].b);
+            if (y > 90) Assert.That(difference, Is.Zero, "Water animation must leave distant scenery and terrain unchanged.");
+            else {
+                if (difference > 3) flowing++;
+                // Classify the original painting, not a warm reflection refracted from nearby water.
+                var point = view.ViewportToWorldPoint(new Vector3((i % 640 + 0.5f) / 640, (y + 0.5f) / 360, 8));
+                var panel = panels.First(r => r.bounds.min.x <= point.x && r.bounds.max.x >= point.x);
+                var local = panel.transform.InverseTransformPoint(point);
+                var original = source.GetPixelBilinear(local.x + 0.5f, local.y + 0.5f);
+                if (original.a > 0.99f && original.r > original.g + 0.05f && original.b < original.g) {
+                    warmStonePixels++;
+                    Assert.That(difference, Is.LessThanOrEqualTo(1), "Warm rocks and shoreline colors must not ripple.");
+                }
+            }
+        }
+        Assert.That(flowing, Is.GreaterThan(100), "The foreground water must visibly change with time at a fixed camera.");
+        Assert.That(warmStonePixels, Is.GreaterThan(20), "The fixed-color check needs visible rock/shore samples.");
+        } finally { UnityEngine.Object.DestroyImmediate(source); }
+    }
+
+    static Color32[] Snapshot(Camera view)
+    {
+        var target = new RenderTexture(640, 360, 24);
+        var pixels = new Texture2D(640, 360, TextureFormat.RGB24, false);
+        var previous = RenderTexture.active; var previousTarget = view.targetTexture; var previousRect = view.rect;
+        try {
+            view.targetTexture = target; view.rect = new Rect(0, 0, 1, 1); view.Render();
+            RenderTexture.active = target; pixels.ReadPixels(new Rect(0, 0, 640, 360), 0, 0); pixels.Apply();
+            return pixels.GetPixels32();
+        } finally {
+            RenderTexture.active = previous; view.targetTexture = previousTarget; view.rect = previousRect;
+            target.Release(); UnityEngine.Object.DestroyImmediate(target); UnityEngine.Object.DestroyImmediate(pixels);
+        }
     }
 
     static float VisiblePawBaseline(SpriteRenderer renderer)

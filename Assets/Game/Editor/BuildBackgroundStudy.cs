@@ -47,36 +47,32 @@ public static class BuildBackgroundStudy
         var study = root.AddComponent<BackgroundStudy>(); study.Initialize(); study.showControls = false;
         study.View.scene = scene;
         try {
-            for (int mode = 0; mode < 3; mode++) {
-                study.concept = (BackgroundStudy.Concept)mode;
-                study.Cat.transform.position = new Vector3(15, 1.48f);
-                // Edit-mode capture has no presentation LateUpdate. Use the authored paw pivot;
-                // Sprite bounds include transparent padding and would lift the visible paws.
-                var catSprite = study.Cat.GetComponentInChildren<SpriteRenderer>();
-                catSprite.transform.position += Vector3.up * (1f - catSprite.transform.position.y);
-                study.ApplyView(17, BackgroundStudy.CameraFloor);
-                Save(study.View, $"{Evidence}/candidate-{mode}.png", 1280, 720, false);
-                Save(study.View, $"{Evidence}/candidate-{mode}-small-grayscale.png", 640, 360, true);
-                study.ApplyView(10, BackgroundStudy.CameraFloor);
-                Save(study.View, $"{Evidence}/river-contact-{mode}.png", 1280, 720, false);
-                if (mode == 0 && !stillsOnly)
-                    for (int frame = 0; frame <= 56; frame++) {
-                        study.ApplyView(6 + Mathf.PingPong(frame, 28), BackgroundStudy.CameraFloor);
-                        Save(study.View, $"{Motion}/shore-review-{frame:000}.png", 640, 360, false);
-                    }
-                // 5 fps review recording: 5 world units/s, including a complete reversal.
-                for (int frame = 0; !stillsOnly && frame <= BackgroundStudy.TourDistance * 2; frame++) {
-                    study.ApplyView(Mathf.PingPong(frame, BackgroundStudy.TourDistance) - 2, BackgroundStudy.CameraFloor);
-                    Save(study.View, $"{Motion}/motion-{mode}-{frame:000}.png", 640, 360, false);
-                }
-                study.ApplyView(83, BackgroundStudy.CameraFloor);
-                Save(study.View, $"{Evidence}/extended-course-{mode}.png", 1280, 720, false);
-                study.ApplyView(17, 3);
-                Save(study.View, $"{Evidence}/jump-framing-{mode}.png", 640, 360, true);
-                foreach (float x in new[] { -120f, 57f, 59f, 240f }) {
-                    study.ApplyView(x, BackgroundStudy.CameraFloor);
-                    Save(study.View, $"{Evidence}/wrap-{mode}-{x}.png", 640, 360, false);
-                }
+            study.Cat.transform.position = new Vector3(15, 1.48f);
+            var catSprite = study.Cat.GetComponentInChildren<SpriteRenderer>();
+            catSprite.transform.position += Vector3.up * (1f - catSprite.transform.position.y);
+            study.SetWaterTime(0);
+            study.ApplyView(17, BackgroundStudy.CameraFloor);
+            Save(study.View, $"{Evidence}/subtle-distance.png", 1280, 720, false);
+            Save(study.View, $"{Evidence}/subtle-distance-small-grayscale.png", 640, 360, true);
+            study.ApplyView(10, BackgroundStudy.CameraFloor);
+            Save(study.View, $"{Evidence}/subtle-ground.png", 1280, 720, false);
+            study.ApplyView(83, BackgroundStudy.CameraFloor);
+            Save(study.View, $"{Evidence}/subtle-extended.png", 1280, 720, false);
+            study.ApplyView(17, 3);
+            Save(study.View, $"{Evidence}/subtle-jump-stress.png", 640, 360, true);
+            foreach (float x in new[] { -120f, 57f, 59f, 240f }) {
+                study.ApplyView(x, BackgroundStudy.CameraFloor);
+                Save(study.View, $"{Evidence}/subtle-wrap-{x}.png", 640, 360, false);
+            }
+            // 25 fps evidence: fixed-camera water first, then the opening route and reversal.
+            for (int frame = 0; !stillsOnly && frame < 150; frame++) {
+                study.ApplyView(17, BackgroundStudy.CameraFloor); study.SetWaterTime(frame / 25f);
+                Save(study.View, $"{Motion}/water-review-{frame:000}.png", 640, 360, false);
+            }
+            for (int frame = 0; !stillsOnly && frame <= 280; frame++) {
+                study.ApplyView(6 + Mathf.PingPong(frame * 0.2f, 28), BackgroundStudy.CameraFloor);
+                study.SetWaterTime(frame / 25f);
+                Save(study.View, $"{Motion}/subtle-review-{frame:000}.png", 640, 360, false);
             }
         } finally { EditorSceneManager.ClosePreviewScene(scene); }
         AssetDatabase.Refresh();

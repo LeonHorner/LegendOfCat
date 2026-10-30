@@ -393,3 +393,14 @@ material, world-space tiling and authored wave contour, with saturation/tint
 applied only in the shader. The connected-river painting and StudyRiver pass are
 archived and no longer loaded. Existing shelf/pillar/bank art, Mika and physics
 remain unchanged. This is an experimental composition pending visual acceptance.
+
+## Foreground water motion — 2026-10-30
+
+No new bitmap assets or image generation. Existing foreground-river.png pixels
+remain unchanged. Human direction selected Subtle distance, removed comparison
+controls and requested animated near water. The StudyWater shader introduces
+small color-masked refraction and moving highlights in bright cyan water while
+retaining the original alpha shoreline and fixed warm/dark rocks. Its phase is
+world-space and driven by explicit time for reproducible captures. Source,
+generator and license records for the painting remain above. The selected
+background factors are sky 0.05, valley 0.14 and canopy 0.08.

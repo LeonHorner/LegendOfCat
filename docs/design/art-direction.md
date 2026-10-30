@@ -180,3 +180,23 @@ the two waters. The earlier connected-river records above are superseded.
 The short opening-section composition is the review target. This is authorization
 to test the separated approach, not final visuals or production selection.
 See background-study/README.md, separated-depth-prompts.md and ASSETS.md.
+
+### Selected subtle distance and water motion — 2026-10-30
+
+The user selected Subtle distance as the fixed direction, requested removal of
+the chooser, and asked for animated foreground water. This resolves the preset
+selection gate for #50. The separated background/gameplay/foreground composition
+remains the selected prototype basis; final production assets/layout remain #16.
+
+Travel factors are fixed: sky 0.05, recessed valley 0.14 and distant canopy 0.08.
+The foreground water and gameplay scenery stay world-space. The A/B/C chooser
+and tuning sliders are removed. Earlier comparison captures remain historical
+evidence, not alternative runtime settings.
+
+Foreground water now has subtle procedural refraction and moving light modulation.
+Only bright cyan water colors participate; warm/dark stones and plants retain
+their positions, and the authored alpha shoreline is unchanged. Animation uses
+world-space phase to remain stable through camera reversals and tile recycling.
+No new source pixels or generated art were introduced. See background-study/
+README.md for current evidence and validation. Selecting the direction does not
+establish measured production performance or a complete five-minute level.
