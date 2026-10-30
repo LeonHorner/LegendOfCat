@@ -200,3 +200,17 @@ world-space phase to remain stable through camera reversals and tile recycling.
 No new source pixels or generated art were introduced. See background-study/
 README.md for current evidence and validation. Selecting the direction does not
 establish measured production performance or a complete five-minute level.
+
+### Visible water-flow correction — 2026-10-30
+
+The user reported no visible water movement. The previous refraction was below
+one pixel in the small view and left bright foam largely stationary. The shader
+now refracts cyan water and neutral foam more clearly and adds travelling light
+streaks. Original warm/dark rock colors and authored alpha stay fixed. Normal
+Play uses the shader game clock directly; explicit time is a separate opt-in
+capture override, preventing stale scripted time from freezing normal animation.
+
+Graphics regression checks now require a perceptible average change over 0.4
+seconds and verify animation with the scene updater disabled and no capture-time
+override. This supersedes the earlier barely visible shimmer, retaining the
+selected subtle-distance factors and separated composition.

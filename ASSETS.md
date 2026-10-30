@@ -404,3 +404,12 @@ retaining the original alpha shoreline and fixed warm/dark rocks. Its phase is
 world-space and driven by explicit time for reproducible captures. Source,
 generator and license records for the painting remain above. The selected
 background factors are sky 0.05, valley 0.14 and canopy 0.08.
+
+## Visible water flow revision — 2026-10-30
+
+No new source artwork or generation. In response to invisible-looking motion,
+StudyWater increases water/neutral-foam refraction and adds moving light streaks.
+A second source-color mask prevents pulling rock colors into nearby water.
+Normal animation uses the shader game clock; explicit time is opt-in for capture.
+Original source pixels, warm/dark rocks, alpha wave contour and terrain are
+unchanged. Previous subpixel shimmer is superseded.

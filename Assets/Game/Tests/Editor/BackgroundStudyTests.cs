@@ -206,6 +206,21 @@ public sealed class BackgroundStudyTests
                 CaptureJump(view);
         }
         Assert.That(highest, Is.GreaterThan(3));
+        if (SystemInfo.graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.Null) {
+            // Normal water must animate even without a script feeding its capture-time property.
+            ((Behaviour)study).enabled = false;
+            Study.GetMethod("ApplyView").Invoke(study, new object[] { 17f, 1f });
+            Study.GetMethod("SetWaterTime").Invoke(study, new object[] { -1f });
+            var start = Snapshot(view);
+            yield return new WaitForSeconds(0.4f);
+            var finish = Snapshot(view);
+            long difference = 0;
+            for (int i = 0; i < 640 * 60; i++)
+                difference += Mathf.Abs(start[i].r - finish[i].r) + Mathf.Abs(start[i].g - finish[i].g)
+                    + Mathf.Abs(start[i].b - finish[i].b);
+            Assert.That(difference / (640f * 60), Is.GreaterThan(12),
+                "The game clock must produce visible water flow without any per-frame script update.");
+        }
         UnityEngine.Object.Destroy(root);
         yield return null;
         UnityEngine.SceneManagement.SceneManager.SetActiveScene(previousScene);
@@ -218,9 +233,10 @@ public sealed class BackgroundStudyTests
         Study.GetMethod("ApplyView").Invoke(study, new object[] { 17f, 1f });
         Study.GetMethod("SetWaterTime").Invoke(study, new object[] { 0f });
         var before = Snapshot(view);
-        Study.GetMethod("SetWaterTime").Invoke(study, new object[] { 1.7f });
+        Study.GetMethod("SetWaterTime").Invoke(study, new object[] { 0.4f });
         var after = Snapshot(view);
         int flowing = 0, warmStonePixels = 0;
+        long visibleChange = 0;
         var panels = study.GetComponentsInChildren<MeshRenderer>().Where(r => r.name.StartsWith("Foreground water tile")).ToArray();
         var source = new Texture2D(2, 2);
         source.LoadImage(System.IO.File.ReadAllBytes(UnityEditor.AssetDatabase.GetAssetPath(panels[0].sharedMaterial.mainTexture)));
@@ -232,6 +248,7 @@ public sealed class BackgroundStudyTests
                 + Mathf.Abs(before[i].b - after[i].b);
             if (y > 90) Assert.That(difference, Is.Zero, "Water animation must leave distant scenery and terrain unchanged.");
             else {
+                if (y < 60) visibleChange += difference;
                 if (difference > 3) flowing++;
                 // Classify the original painting, not a warm reflection refracted from nearby water.
                 var point = view.ViewportToWorldPoint(new Vector3((i % 640 + 0.5f) / 640, (y + 0.5f) / 360, 8));
@@ -245,6 +262,8 @@ public sealed class BackgroundStudyTests
             }
         }
         Assert.That(flowing, Is.GreaterThan(100), "The foreground water must visibly change with time at a fixed camera.");
+        Assert.That(visibleChange / (640f * 60), Is.GreaterThan(12),
+            "Flow over 0.4 seconds must exceed the old barely visible subpixel shimmer.");
         Assert.That(warmStonePixels, Is.GreaterThan(20), "The fixed-color check needs visible rock/shore samples.");
         } finally { UnityEngine.Object.DestroyImmediate(source); }
     }

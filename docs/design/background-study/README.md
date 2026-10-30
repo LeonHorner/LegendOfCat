@@ -27,11 +27,12 @@ painting. Grounded pillars/banks and shallow jagged suspended shelves form the
 gameplay plane. Independent foreground waves/stones and sparse corner plants
 frame the lower view. The rejected connected-river painting remains unloaded.
 
-Water motion uses small refraction and moving light modulation inside bright
-cyan water pixels. Warm/dark rocks and plants remain fixed. The original alpha
+Water motion uses visible refraction, travelling light streaks and moving foam
+inside bright cyan/white water pixels. Warm/dark rocks and plants remain fixed. The original alpha
 wave edge stays fixed at cliff feet. World-space phase and fading UV displacement
-at tile edges avoid camera-relative swimming and seam jumps. Explicit animation
-time supports deterministic graphics checks/captures; normal Play uses game time.
+at tile edges avoid camera-relative swimming and seam jumps. Normal Play advances directly from the shader game clock, without a script
+feeding a time property. Explicit capture time is enabled only for deterministic
+renders/tests.
 
 This is deliberately restrained movement of the existing painting. It is not a
 fluid simulation, animated rock layer, moving collider or new water mechanic.
@@ -40,7 +41,7 @@ Terrain and opaque paw support remain registered to the existing collision tops.
 ## Current evidence
 
 - [Selected view](subtle-distance.png) and [small grayscale](subtle-distance-small-grayscale.png).
-- [Foreground water, fixed camera](water-animation.mp4): six seconds at 25 fps.
+- [Visible foreground flow, fixed camera](water-flow.mp4): six seconds at 25 fps.
 - [Opening route with camera reversal](subtle-animation.mp4): approximately 11.24 seconds at 25 fps.
 - [Grounded shore](subtle-ground.png), [extended route](subtle-extended.png), [raised-camera stress](subtle-jump-stress.png).
 - [Actual raised ground contact](play-ground-contact.png) and [highest-platform jump](play-jump.png).
@@ -60,7 +61,9 @@ not real-time performance or complete player-input traversal recordings.
 | Quiet distant panorama | Least distant motion, flatter spatial separation | [B still](candidate-1.png), [video](candidate-1.mp4) |
 | Subtle distance, selected | Retains atmospheric separation with calmer motion behind landing edges | [C still](candidate-2.png), [video](candidate-2.mp4) |
 
-These captures predate the new water animation. The [separated-depth reversal](separated-depth-review.mp4)
+The [superseded subpixel water clip](water-animation.mp4) is retained as a record
+of the motion the user found imperceptible.
+These A/B/C captures predate the water animation. The [separated-depth reversal](separated-depth-review.mp4)
 and [A/B/C comparison](comparison.gif) preserve the earlier comparison. The old
 world-shore-review.mp4 records a rejected connected-world experiment. None of the
 old studies is exposed by the current runtime.
@@ -78,8 +81,7 @@ depths, fixed 0.14 valley travel, stable foreground registration through reversa
 and recycling, complete distant silhouettes, shallow shelf bounds, collision and
 opaque paw contact, highest jumps, shore clearance, route span and fixed 16:9.
 With a graphics device the integration test renders two explicit water times:
-water pixels must change while upper scenery and warm rock/shore pixels remain
-unchanged. The pixel check is omitted on a null graphics backend; local validation
+water pixels must change visibly over 0.4 seconds while upper scenery and warm rock/shore pixels remain unchanged. A second check disables the scene updater and capture clock and verifies motion from the native game clock alone. The pixel check is omitted on a null graphics backend; local validation
 uses the actual graphics path.
 
 Motor/jump checks use isolated, explicitly stepped 2D physics with live input

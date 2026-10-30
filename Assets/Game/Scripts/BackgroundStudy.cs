@@ -232,7 +232,11 @@ public sealed class BackgroundStudy : MonoBehaviour
         }
     }
 
-    public void SetWaterTime(float seconds) => riverFrontMaterial.SetFloat("_WaterTime", seconds);
+    public void SetWaterTime(float seconds)
+    {
+        riverFrontMaterial.SetFloat("_WaterTime", seconds);
+        riverFrontMaterial.SetFloat("_UseCaptureTime", seconds >= 0 ? 1 : 0);
+    }
 
     public void ApplyViewport(int width, int height)
     {
@@ -243,7 +247,6 @@ public sealed class BackgroundStudy : MonoBehaviour
     void LateUpdate()
     {
         if (!View) return;
-        SetWaterTime(Time.time);
         ApplyViewport(Screen.width, Screen.height);
         if (tour) {
             tourTime += Time.deltaTime;
