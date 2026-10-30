@@ -8,6 +8,102 @@ public static class BuildBackgroundStudy
     const string ScenePath = "Assets/Game/Scenes/BackgroundStudy.unity";
     const string Evidence = "docs/design/background-study";
 
+    // Resources materials retain shader references in player builds; Shader.Find alone does not.
+    [MenuItem("LegendOfCat/Background study/Prepare runtime materials")]
+    public static void PrepareRuntimeMaterials()
+    {
+        foreach (var pair in new[] {
+            new[] { "background-material", "LegendOfCat/BackgroundStudy" },
+            new[] { "terrain-material", "LegendOfCat/StudyTerrain" },
+            new[] { "water-material", "LegendOfCat/StudyWater" }
+        }) {
+            string path = "Assets/Game/Resources/BackgroundStudy/" + pair[0] + ".mat";
+            if (AssetDatabase.LoadAssetAtPath<Material>(path)) continue;
+            var shader = Shader.Find(pair[1]);
+            if (!shader) throw new System.InvalidOperationException("Missing scenery shader: " + pair[1]);
+            AssetDatabase.CreateAsset(new Material(shader), path);
+        }
+        AssetDatabase.SaveAssets();
+    }
+
+    [MenuItem("LegendOfCat/Background study/Record checkpoint prototype")]
+    public static void RecordCheckpointPrototype()
+    {
+        SessionState.SetBool("GoldenRiverCheckpointReview", true);
+        InstallPrototypeReview();
+        EditorApplication.EnterPlaymode();
+    }
+
+    [InitializeOnLoadMethod]
+    static void InstallPrototypeReview()
+    {
+        EditorApplication.playModeStateChanged -= PrototypeReviewState;
+        EditorApplication.playModeStateChanged += PrototypeReviewState;
+    }
+
+    static void PrototypeReviewState(PlayModeStateChange state)
+    {
+        if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool("GoldenRiverCheckpointReview", false)) return;
+        SessionState.SetBool("GoldenRiverCheckpointReview", false);
+        int exitCode = 0;
+        try { CaptureCheckpointPrototype(); }
+        catch (System.Exception error) { Debug.LogException(error); exitCode = 1; }
+        if (Application.isBatchMode) EditorApplication.Exit(exitCode);
+        else EditorApplication.ExitPlaymode();
+    }
+
+    static void CaptureCheckpointPrototype()
+    {
+        const string output = "Logs/checkpoint-scenery-review";
+        Directory.CreateDirectory(output);
+        var previous = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        var scene = UnityEngine.SceneManagement.SceneManager.CreateScene("Checkpoint scenery review",
+            new UnityEngine.SceneManagement.CreateSceneParameters(UnityEngine.SceneManagement.LocalPhysicsMode.Physics2D));
+        UnityEngine.SceneManagement.SceneManager.SetActiveScene(scene);
+        var root = Object.Instantiate(Resources.Load<GameObject>("MovementCourse"));
+        var course = root.GetComponent<MovementCourse>();
+        var cat = course.Cat;
+        var body = cat.GetComponent<Rigidbody2D>();
+        body.interpolation = RigidbodyInterpolation2D.None;
+        cat.GetComponent<CatInput>().enabled = false;
+        var scenery = root.GetComponentInChildren<BackgroundStudy>();
+        var follow = scenery.View.GetComponent<CatCamera>();
+        var presentation = cat.GetComponentInChildren<MikaSpritePresentation>();
+        var csv = new System.Text.StringBuilder("frame,checkpoint,retries,paused,x,y\n");
+        try {
+            for (int frame = 0; frame < 200; frame++) {
+                // Scripted review fixtures reach both existing checkpoints without changing the route.
+                if (frame == 25) cat.RespawnAt(new Vector2(9, 0.52f));
+                if (frame == 120) cat.RespawnAt(new Vector2(34, 1.52f));
+                if (frame == 60 || frame == 145) body.position = new Vector2(19, -8);
+                if (frame == 90) course.TogglePause();
+                if (frame == 100) course.RetryCheckpoint();
+                if (frame == 175) course.RestartRun();
+                cat.Motion.SetMove(frame >= 35 && frame < 55 ? 1 : 0);
+                for (int step = 0; step < 2; step++) {
+                    cat.SendMessage("FixedUpdate");
+                    scene.GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);
+                    scenery.SendMessage("FixedUpdate");
+                }
+                course.SendMessage("Update");
+                presentation.RenderPose(1f / 25);
+                follow.SendMessage("LateUpdate");
+                scenery.SendMessage("LateUpdate");
+                scenery.SetWaterTime(frame / 25f);
+                Save(scenery.View, $"{output}/frame-{frame:000}.png", 960, 540, false);
+                if (frame == 15 || frame == 45 || frame == 75 || frame == 135 || frame == 160 || frame == 190)
+                    Save(scenery.View, $"{output}/checkpoint-{frame:000}.png", 1280, 720, false);
+                csv.AppendFormat(System.Globalization.CultureInfo.InvariantCulture,
+                    "{0},{1},{2},{3},{4:F3},{5:F3}\n", frame, course.Run.Checkpoint, course.Run.Retries,
+                    course.Run.Paused, body.position.x, body.position.y);
+            }
+            File.WriteAllText(output + "/playback.csv", csv.ToString());
+        } finally {
+            UnityEngine.SceneManagement.SceneManager.SetActiveScene(previous);
+            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
+        }
+    }
+
     [MenuItem("LegendOfCat/Background study/Create isolated scene")]
     public static void Create()
     {

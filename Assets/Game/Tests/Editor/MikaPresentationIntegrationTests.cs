@@ -108,6 +108,51 @@ public class MikaPresentationIntegrationTests
     }
 
     [UnityTest]
+    public IEnumerator PaintedCourseKeepsCheckpointsFallsPauseAndFullRestart()
+    {
+        var component = course.GetComponent(Runtime("MovementCourse"));
+        var scenery = course.GetComponentInChildren(Runtime("BackgroundStudy"));
+        Assert.That(scenery, Is.Not.Null);
+        Assert.That(Read(scenery, "Cat"), Is.SameAs(controller), "Scenery must reuse the checkpoint player.");
+        Assert.That(course.GetComponentsInChildren(Runtime("CatController")), Has.Length.EqualTo(1));
+        Assert.That(course.GetComponentsInChildren<BoxCollider2D>(), Has.Length.EqualTo(8),
+            "Seven original platforms and one player; decoration must not add collision.");
+        var camera = (Camera)Read(scenery, "View");
+        Assert.That(camera.orthographicSize, Is.EqualTo(5.5f));
+        var water = course.GetComponentsInChildren<MeshRenderer>().First(r => r.name == "Foreground water tile 0");
+        Assert.That(water.sharedMaterial.shader.isSupported, Is.True);
+        Assert.That(Resources.Load<Material>("BackgroundStudy/water-material"), Is.Not.Null,
+            "A Resources material must retain the water shader in standalone builds.");
+        var run = Read(component, "Run");
+        foreach (var spawnPoint in new[] { new Vector2(9, 0.52f), new Vector2(34, 1.52f) }) {
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { spawnPoint });
+            Physics2D.SyncTransforms(); Tick(15);
+            Assert.That(Grounded, Is.True);
+            component.SendMessage("Update");
+            int expected = spawnPoint.x < 10 ? 1 : 2;
+            Assert.That(Read(run, "Checkpoint"), Is.EqualTo(expected));
+            component.GetType().GetMethod("TogglePause").Invoke(component, null);
+            Assert.That(body.simulated, Is.False);
+            component.GetType().GetMethod("RetryCheckpoint").Invoke(component, null);
+            Assert.That(body.simulated, Is.True);
+            Assert.That(Vector2.Distance(body.position, spawnPoint), Is.LessThan(0.001f));
+            Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero));
+            body.position = new Vector2(19, -8);
+            controller.SendMessage("FixedUpdate");
+            Assert.That(Vector2.Distance(body.position, spawnPoint), Is.LessThan(0.001f),
+                "Falling must restore the active checkpoint, not the art lab's opening spawn.");
+            camera.GetComponent(Runtime("CatCamera")).SendMessage("LateUpdate");
+            scenery.SendMessage("LateUpdate");
+            Assert.That(camera.transform.position.y, Is.EqualTo(1).Within(0.001f));
+        }
+        component.GetType().GetMethod("RestartRun").Invoke(component, null);
+        Assert.That(Read(run, "Checkpoint"), Is.EqualTo(0));
+        Assert.That(Read(run, "Retries"), Is.EqualTo(0));
+        Assert.That(Vector2.Distance(body.position, spawn), Is.LessThan(0.001f));
+        yield break;
+    }
+
+    [UnityTest]
     public IEnumerator ActualCourseRunsBlocksTurnsAndRetries()
     {
         Vector2 start = body.position;

@@ -1,6 +1,7 @@
 using UnityEngine;
 
-// Bounded art decision lab; never loaded by the campaign or the release menu.
+// Selected scenery, shared by the comparison lab and the checkpoint prototype.
+[DefaultExecutionOrder(100)]
 public sealed class BackgroundStudy : MonoBehaviour
 {
     public const float SkyTravel = 0.05f, ValleyTravel = 0.14f, CanopyTravel = 0.08f;
@@ -33,6 +34,25 @@ public sealed class BackgroundStudy : MonoBehaviour
     float tourTime;
     float waterRunAmount, waterRunOffset;
     Vector3 cameraVelocity;
+    bool initialized, attachedToCourse;
+    Vector3[] coursePlatforms;
+
+    public void InitializeForCourse(Camera camera, CatController cat, Vector3[] platforms)
+    {
+        attachedToCourse = true;
+        showControls = false;
+        View = camera;
+        Cat = cat;
+        catBody = cat.GetComponent<Rigidbody2D>();
+        coursePlatforms = platforms;
+        Initialize();
+    }
+
+    static Material PaintedMaterial(string name, string shader)
+    {
+        var source = Resources.Load<Material>("BackgroundStudy/" + name);
+        return source ? new Material(source) : new Material(Shader.Find(shader));
+    }
 
     // Camera-relative travel, calculated absolutely: reversals and teleports cannot accumulate drift.
     public static float Offset(float cameraX, float speed) => cameraX * (1 - speed);
@@ -42,28 +62,31 @@ public sealed class BackgroundStudy : MonoBehaviour
     void Start() => Initialize();
     public void Initialize()
     {
-        if (View) return;
+        if (initialized) return;
+        initialized = true;
         pixel = new Texture2D(1, 1);
         pixel.SetPixel(0, 0, Color.white); pixel.Apply();
         square = Sprite.Create(pixel, new Rect(0, 0, 1, 1), Vector2.one * 0.5f, 1);
-        View = new GameObject("Study camera").AddComponent<Camera>();
-        View.transform.SetParent(transform, false);
-        View.orthographic = true; View.orthographicSize = 5.5f;
-        View.transform.position = new Vector3(6, CameraFloor, -10);
-        View.depth = 1;
-        View.clearFlags = CameraClearFlags.SolidColor;
-        View.backgroundColor = new Color(0.8f, 0.79f, 0.7f);
-        var bars = new GameObject("Study viewport bars").AddComponent<Camera>();
-        bars.transform.SetParent(transform, false);
-        bars.depth = 0; bars.clearFlags = CameraClearFlags.SolidColor;
-        bars.backgroundColor = Color.black; bars.cullingMask = 0;
+        if (!attachedToCourse) {
+            View = new GameObject("Study camera").AddComponent<Camera>();
+            View.transform.SetParent(transform, false);
+            View.orthographic = true; View.orthographicSize = 5.5f;
+            View.transform.position = new Vector3(6, CameraFloor, -10);
+            View.depth = 1;
+            View.clearFlags = CameraClearFlags.SolidColor;
+            View.backgroundColor = new Color(0.8f, 0.79f, 0.7f);
+            var bars = new GameObject("Study viewport bars").AddComponent<Camera>();
+            bars.transform.SetParent(transform, false);
+            bars.depth = 0; bars.clearFlags = CameraClearFlags.SolidColor;
+            bars.backgroundColor = Color.black; bars.cullingMask = 0;
+        }
         var atlas = Resources.Load<Texture2D>("BackgroundStudy/painted-atlas");
         var textures = new[] { atlas, Resources.Load<Texture2D>("BackgroundStudy/recessed-valley-v4"),
             Resources.Load<Texture2D>("BackgroundStudy/distant-canopy-v3") };
         for (int i = 0; i < 3; i++) {
             layers[i] = new GameObject("Painted depth " + i).transform;
             layers[i].SetParent(transform, false);
-            materials[i] = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
+            materials[i] = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
             materials[i].mainTexture = textures[i];
             materials[i].SetFloat("_Cutout", i == 0 ? 0 : 1);
             if (i == 1) { materials[i].SetFloat("_Fog", 0.32f); materials[i].SetFloat("_Saturation", 0.8f); }
@@ -84,7 +107,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         // Independent foreground water: no texture, geometry or perspective join to the valley.
         riverFront = new GameObject("Foreground water").transform;
         riverFront.SetParent(transform, false);
-        riverFrontMaterial = new Material(Shader.Find("LegendOfCat/StudyWater"));
+        riverFrontMaterial = PaintedMaterial("water-material", "LegendOfCat/StudyWater");
         riverFrontMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-river");
         riverFrontMaterial.SetFloat("_Fog", 0.20f);
         riverFrontMaterial.SetFloat("_Saturation", 0.70f);
@@ -97,17 +120,19 @@ public sealed class BackgroundStudy : MonoBehaviour
             front.transform.localScale = new Vector3(16, 16 / 1.5f, 1);
             front.GetComponent<MeshRenderer>().sharedMaterial = riverFrontMaterial;
         }
-        // Reuse the approved motor and presentation, but own every object in this lab.
-        terrainMaterial = new Material(Shader.Find("LegendOfCat/StudyTerrain"));
+        terrainMaterial = PaintedMaterial("terrain-material", "LegendOfCat/StudyTerrain");
         terrainMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/painted-pillar-v2");
-        for (int index = 0; index < Platforms.Length; index++) {
-            var p = Platforms[index];
-            var ground = Block("World-space ground", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.19f, 0.23f, 0.2f));
-            ground.GetComponent<SpriteRenderer>().enabled = false;
-            ground.AddComponent<BoxCollider2D>();
+        var platforms = coursePlatforms ?? Platforms;
+        for (int index = 0; index < platforms.Length; index++) {
+            var p = platforms[index];
+            if (!attachedToCourse) {
+                var ground = Block("World-space ground", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.19f, 0.23f, 0.2f));
+                ground.GetComponent<SpriteRenderer>().enabled = false;
+                ground.AddComponent<BoxCollider2D>();
+            }
             Terrain(p, IsFloating(index), index);
         }
-        cornerMaterial = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
+        cornerMaterial = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
         cornerMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-corners");
         cornerMaterial.SetFloat("_Cutout", 1); cornerMaterial.SetFloat("_Fog", 0);
         cornerMaterial.SetFloat("_Corner", 1);
@@ -126,17 +151,19 @@ public sealed class BackgroundStudy : MonoBehaviour
             var parameters = new MaterialPropertyBlock(); parameters.SetFloat("_CornerSide", side);
             renderer.SetPropertyBlock(parameters);
         }
-        var player = new GameObject("Mika existing prototype");
-        player.transform.SetParent(transform, false); player.transform.position = new Vector3(-3, 0.48f);
-        catBody = player.AddComponent<Rigidbody2D>();
-        player.AddComponent<BoxCollider2D>().size = new Vector2(0.9f, 0.9f);
-        Cat = player.AddComponent<CatController>();
-        var input = player.AddComponent<CatInput>(); input.controller = Cat;
-        input.RetryCheckpoint = () => Cat.ReturnToStart();
-        input.RestartRun = () => Cat.ReturnToStart();
-        var original = Resources.Load<GameObject>("MikaOriginal");
-        if (original) Instantiate(original, player.transform).GetComponent<MikaSpritePresentation>().controller = Cat;
-        else Debug.LogError("Background study requires the existing MikaOriginal prefab.");
+        if (!attachedToCourse) {
+            var player = new GameObject("Mika existing prototype");
+            player.transform.SetParent(transform, false); player.transform.position = new Vector3(-3, 0.48f);
+            catBody = player.AddComponent<Rigidbody2D>();
+            player.AddComponent<BoxCollider2D>().size = new Vector2(0.9f, 0.9f);
+            Cat = player.AddComponent<CatController>();
+            var input = player.AddComponent<CatInput>(); input.controller = Cat;
+            input.RetryCheckpoint = () => Cat.ReturnToStart();
+            input.RestartRun = () => Cat.ReturnToStart();
+            var original = Resources.Load<GameObject>("MikaOriginal");
+            if (original) Instantiate(original, player.transform).GetComponent<MikaSpritePresentation>().controller = Cat;
+            else Debug.LogError("Background study requires the existing MikaOriginal prefab.");
+        }
         ApplyViewport(Screen.width, Screen.height);
         ApplyView(6, CameraFloor);
     }
@@ -262,6 +289,10 @@ public sealed class BackgroundStudy : MonoBehaviour
     {
         if (!View) return;
         ApplyViewport(Screen.width, Screen.height);
+        if (attachedToCourse) {
+            ApplyView(View.transform.position.x, View.transform.position.y);
+            return;
+        }
         if (tour) {
             tourTime += Time.deltaTime;
             ApplyView(Mathf.PingPong(tourTime * 5, TourDistance) - 2, CameraFloor);

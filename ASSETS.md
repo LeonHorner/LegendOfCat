@@ -438,3 +438,21 @@ clips, and start/midpoint/end keyframes. The archive README records decisions;
 and encoding details. Unknown capture dates/revisions are explicitly recorded.
 All 291 raw capture frames remain untouched locally; the committed videos are
 lossy review copies, not lossless backups of those frames.
+
+## Golden River checkpoint prototype integration - 2026-10-30
+
+The existing selected BackgroundStudy paintings now also dress the menu's
+MovementCourse prototype. No new generated images or modified source pixels are
+introduced. Human decisions: reuse fixed Subtle distance, painted ground/shelves,
+separate foreground water and running-responsive waves; preserve the original
+seven-platform layout and both checkpoint positions. The course camera holds
+y=1 with a 5.5-unit orthographic half-height to retain the river during jumps.
+Three Unity Editor-created Resources materials retain references to the original
+scenery shaders in standalone builds. Their metadata is preserved.
+
+The checkpoint-prototype evidence uses the actual Resources course, controller,
+presentation and lifecycle in an isolated Unity physics scene. Scripted fixtures
+place Mika at each checkpoint, induce falls, pause/retry and restart. The recording
+is reproducible with BuildBackgroundStudy.RecordCheckpointPrototype; it is not a
+claim of a continuous manually played traversal. No imported artwork or new license
+is involved. Existing generator and license records still apply.

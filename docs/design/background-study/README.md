@@ -12,6 +12,22 @@ revisions, checksums and known provenance limits.
 
 ## Run
 
+The selected scenery also runs in the existing checkpoint prototype: open
+`Assets/Game/Scenes/Main.unity`, press Play, then choose **Movement lab (prototype)**
+and **Enter movement lab**.
+This reuses the original seven-platform movement course and its two checkpoints
+at x=9 and x=34. Cross a gold marker on safe ground to activate it. R or a fall
+retries that checkpoint; Backspace restarts the whole run; P pauses; Esc returns
+to the existing menu. The selected art does not replace the checkpoint lifecycle.
+The camera stays at y=1 so foreground water remains visible during jumps.
+The separate 109-unit art lab below remains available for scenery stress review.
+See the [integrated checkpoint evidence](checkpoint-prototype/README.md) for
+screenshots, a short recording, lifecycle data and reproduction instructions.
+
+Resources material assets hold references to the three scenery shaders so player
+builds retain them. Regenerate missing materials with
+`LegendOfCat/Background study/Prepare runtime materials`.
+
 Use Unity 6000.3.27f1. Open Assets/Game/Scenes/BackgroundStudy.unity and press Play.
 A/D/arrows move, Space jumps, R retries. Stop/restart Play after code changes.
 The small help panel has movement instructions and an optional camera tour;

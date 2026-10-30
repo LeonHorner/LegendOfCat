@@ -228,3 +228,16 @@ A body removed from physics simulation cannot trigger running activity.
 The fixed Subtle distance factors, cliff/stone positions, alpha waterline and
 gameplay physics are unchanged. Tests exercise actual motor movement in both
 directions, slowing back to calm water and monotonic flow phase.
+
+### Checkpoint prototype scenery integration - 2026-10-30
+
+The user requested merging current main into the feature branch and applying the
+selected graphics to the existing checkpoint prototype. Main cb524b0 was already
+an ancestor of the branch; the normal merge reported already up to date.
+The menu's MovementCourse now reuses the fixed subtle-distance scenery, painted
+terrain and animated foreground water. Its seven platforms, collision spans,
+two checkpoints, player animation and run lifecycle remain unchanged. A shared
+scenery attachment follows the existing course camera and player rather than
+creating duplicate gameplay objects. The camera holds the selected lower framing.
+This integrates prototype presentation, not a finished five-minute Level 1.
+See background-study/README.md for entry points, evidence and reproduction.

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// A self-contained greybox: reusable from any menu, with no campaign/save dependencies.
+// A painted checkpoint prototype, reusable from the menu without campaign/save dependencies.
 public sealed class MovementCourse : MonoBehaviour
 {
     public static readonly Vector3[] Platforms = {
@@ -31,12 +31,7 @@ public sealed class MovementCourse : MonoBehaviour
         foreach (var p in Platforms) {
             var platform = Block("Standable platform", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.22f, 0.28f, 0.28f));
             platform.AddComponent<BoxCollider2D>();
-            Block("Continuous landing edge", new Vector2(p.x, p.y + 0.72f), new Vector2(p.z, 0.06f), new Color(0.78f, 0.8f, 0.66f));
-        }
-        // Low-contrast background shapes never intersect or bridge playable edges.
-        for (int i = 0; i < 10; i++) {
-            var hill = Block("Background silhouette", new Vector2(i * 7 - 7, -2), new Vector2(5, 8 + i % 3), new Color(0.13f, 0.18f, 0.23f));
-            hill.GetComponent<SpriteRenderer>().sortingOrder = -10;
+            platform.GetComponent<SpriteRenderer>().enabled = false;
         }
         var player = new GameObject("Mika prototype");
         player.transform.SetParent(transform, false);
@@ -74,7 +69,7 @@ public sealed class MovementCourse : MonoBehaviour
         courseCamera = new GameObject("Course camera").AddComponent<Camera>();
         courseCamera.transform.SetParent(transform, false);
         courseCamera.orthographic = true;
-        courseCamera.orthographicSize = 5;
+        courseCamera.orthographicSize = 5.5f;
         courseCamera.clearFlags = CameraClearFlags.SolidColor;
         courseCamera.backgroundColor = new Color(0.09f, 0.13f, 0.18f);
         courseCamera.depth = 1;
@@ -87,17 +82,17 @@ public sealed class MovementCourse : MonoBehaviour
         bars.cullingMask = 0;
         var follow = courseCamera.gameObject.AddComponent<CatCamera>();
         follow.target = player.transform;
+        follow.fixedHeight = true;
         Cat.ReturnedToStart += follow.Snap;
+        var scenery = new GameObject("Golden River scenery");
+        scenery.transform.SetParent(transform, false);
+        scenery.AddComponent<BackgroundStudy>().InitializeForCourse(courseCamera, Cat, Platforms);
         for (int i = 0; i < CheckpointSpawns.Length; i++) {
             var point = CheckpointSpawns[i];
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
                 new Vector2(0.14f, 0.9f), new Color(0.95f, 0.75f, 0.36f));
             Label("CHECKPOINT " + (i + 1), new Vector2(point.x, point.y + 1.2f));
         }
-        Label("EASY / 2 m gap", new Vector2(4, -2));
-        Label("RISE / 2 m + 1 m up", new Vector2(11, -2));
-        Label("PRECISION / 4 m gap", new Vector2(19, -2));
-        Label("RISE / 3 m + 1 m up", new Vector2(25, -2));
         Label("FINISH / return or retry", new Vector2(42, 1));
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
