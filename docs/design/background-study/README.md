@@ -82,6 +82,8 @@ water pixels must change while upper scenery and warm rock/shore pixels remain
 unchanged. The pixel check is omitted on a null graphics backend; local validation
 uses the actual graphics path.
 
+Motor/jump checks use isolated, explicitly stepped 2D physics with live input
+disabled, so headless scheduling cannot shorten a scripted held jump.
 Tests and captures run in an ignored isolated project with its own Library.
 Source matches and committed whitespace checks are inspected. Logs stay under
 ignored Logs/. Recorded renders do not establish frame pacing, measured GPU cost

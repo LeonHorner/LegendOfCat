@@ -55,9 +55,30 @@ public sealed class BackgroundStudyTests
     {
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         yield return new EnterPlayMode();
+        var previousScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        var scene = UnityEngine.SceneManagement.SceneManager.CreateScene("Background physics test",
+            new UnityEngine.SceneManagement.CreateSceneParameters(UnityEngine.SceneManagement.LocalPhysicsMode.Physics2D));
+        UnityEngine.SceneManagement.SceneManager.SetActiveScene(scene);
         var root = new GameObject("Background study integration test");
         var study = root.AddComponent(Study);
         yield return null;
+        // Drive the motor directly; live keyboard polling would release the scripted held jump.
+        var liveInput = root.GetComponentsInChildren<MonoBehaviour>().First(c => c.GetType().Name == "CatInput");
+        liveInput.enabled = false;
+        var cat = (Component)Study.GetProperty("Cat").GetValue(study);
+        var view = (Camera)Study.GetProperty("View").GetValue(study);
+        var presentation = cat.GetComponentsInChildren<Component>().First(c => c.GetType().Name == "MikaSpritePresentation");
+        cat.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.None;
+        var physics = scene.GetPhysicsScene2D();
+        void Tick(int count) {
+            Physics2D.SyncTransforms();
+            for (int step = 0; step < count; step++) {
+                cat.SendMessage("FixedUpdate"); physics.Simulate(Time.fixedDeltaTime);
+                presentation.GetType().GetMethod("RenderPose").Invoke(presentation, new object[] { Time.fixedDeltaTime });
+                study.SendMessage("LateUpdate");
+            }
+        }
+        Physics2D.SyncTransforms();
         var colliders = root.GetComponentsInChildren<BoxCollider2D>().Where(c => !c.GetComponent<Rigidbody2D>()).ToArray();
         Assert.That(colliders.Length, Is.EqualTo(14));
         Assert.That(colliders.Last().bounds.max.x - colliders.First().bounds.min.x, Is.GreaterThanOrEqualTo(104),
@@ -142,8 +163,6 @@ public sealed class BackgroundStudyTests
                 Assert.That(sky.bounds.max.y, Is.GreaterThan(y + 5.5f));
             }
         }
-        var cat = (Component)Study.GetProperty("Cat").GetValue(study);
-        var view = (Camera)Study.GetProperty("View").GetValue(study);
         if (SystemInfo.graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.Null)
             AssertAnimatedWater(study, view);
         foreach (var size in new[] { new Vector2Int(1280, 720), new Vector2Int(640, 360),
@@ -156,13 +175,12 @@ public sealed class BackgroundStudyTests
         Assert.That(view.WorldToViewportPoint(new Vector3(15, 1)).y, Is.GreaterThanOrEqualTo(0.5f),
             "The raised landing should leave at least half the view for the lower river scenery.");
         Assert.That(cat.GetComponentInChildren<SpriteRenderer>().sprite, Is.Not.Null);
-        yield return new WaitForSeconds(0.25f);
+        Tick(30);
         Assert.That(cat.transform.position.y, Is.InRange(0.4f, 0.6f), "Existing motor must settle onto world-space starting ground.");
         // Verify the real presentation anchor at the raised bank platform as well as flat ground.
         cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(15f, 1.48f) });
-        for (int frame = 0; frame < 30; frame++) yield return new WaitForFixedUpdate();
+        Tick(30);
         Assert.That(cat.GetType().GetProperty("Grounded").GetValue(cat), Is.True);
-        var presentation = cat.GetComponentsInChildren<Component>().First(c => c.GetType().Name == "MikaSpritePresentation");
         presentation.GetType().GetMethod("RenderPose").Invoke(presentation, new object[] { 0.25f });
         presentation.GetType().GetMethod("RenderPose").Invoke(presentation, new object[] { 0.25f });
         Assert.That(VisiblePawBaseline(cat.GetComponentInChildren<SpriteRenderer>()), Is.EqualTo(1).Within(0.05f),
@@ -171,15 +189,14 @@ public sealed class BackgroundStudyTests
         if (Array.IndexOf(Environment.GetCommandLineArgs(), "-captureStudyJump") >= 0)
             CaptureJump(view, "play-ground-contact.png");
         cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(28.5f, 2.48f) });
-        yield return new WaitForSeconds(0.25f);
+        Tick(30);
+        Assert.That(cat.GetType().GetProperty("Grounded").GetValue(cat), Is.True);
         Study.GetMethod("ApplyView").Invoke(study, new object[] { 28.5f, 1f });
         var motion = cat.GetType().GetField("Motion").GetValue(cat);
         motion.GetType().GetMethod("PressJump").Invoke(motion, null);
         float highest = cat.transform.position.y;
         for (int frame = 0; frame < 25; frame++) {
-            yield return new WaitForFixedUpdate();
-            // EditMode coroutine scheduling does not guarantee a LateUpdate per physics step.
-            Study.GetMethod("LateUpdate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(study, null);
+            Tick(1);
             highest = Mathf.Max(highest, cat.transform.position.y);
             Assert.That(view.transform.position.y, Is.EqualTo(1).Within(0.01f), "Keep foreground water framed during jumps.");
             Assert.That(cat.GetComponentInChildren<SpriteRenderer>().bounds.max.y,
@@ -191,6 +208,8 @@ public sealed class BackgroundStudyTests
         Assert.That(highest, Is.GreaterThan(3));
         UnityEngine.Object.Destroy(root);
         yield return null;
+        UnityEngine.SceneManagement.SceneManager.SetActiveScene(previousScene);
+        yield return UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
         yield return new ExitPlayMode();
     }
 
