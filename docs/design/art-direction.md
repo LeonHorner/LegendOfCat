@@ -214,3 +214,17 @@ Graphics regression checks now require a perceptible average change over 0.4
 seconds and verify animation with the scene updater disabled and no capture-time
 override. This supersedes the earlier barely visible shimmer, retaining the
 selected subtle-distance factors and separated composition.
+
+### Water response while running — 2026-10-30
+
+The user requested faster animation and more waves while running. Actual grounded
+horizontal body velocity now smoothly increases water activity in either
+direction. At full run speed, extra integrated flow time adds 1.2 to the native
+clock rate (approximately 2.2 times total), with denser fine crests and 35% stronger
+water refraction. Starting/stopping blends over approximately 0.4 seconds without
+resetting phase. Standing or leaving the ground returns toward calm water.
+A body removed from physics simulation cannot trigger running activity.
+
+The fixed Subtle distance factors, cliff/stone positions, alpha waterline and
+gameplay physics are unchanged. Tests exercise actual motor movement in both
+directions, slowing back to calm water and monotonic flow phase.

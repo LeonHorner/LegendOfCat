@@ -69,6 +69,15 @@ public static class BuildBackgroundStudy
                 study.ApplyView(17, BackgroundStudy.CameraFloor); study.SetWaterTime(frame / 25f);
                 Save(study.View, $"{Motion}/water-review-{frame:000}.png", 640, 360, false);
             }
+            var water = System.Array.Find(study.GetComponentsInChildren<MeshRenderer>(),
+                r => r.name.StartsWith("Foreground water tile")).sharedMaterial;
+            for (int frame = 0; !stillsOnly && frame < 150; frame++) {
+                study.ApplyView(17, BackgroundStudy.CameraFloor); study.SetWaterTime(frame / 25f);
+                // Isolated full-running water preview; the motor-driven transition is covered in Play tests.
+                water.SetFloat("_RunAmount", 1); water.SetFloat("_RunTimeOffset", frame / 25f * 1.2f);
+                Save(study.View, $"{Motion}/water-running-review-{frame:000}.png", 640, 360, false);
+            }
+            water.SetFloat("_RunAmount", 0); water.SetFloat("_RunTimeOffset", 0);
             for (int frame = 0; !stillsOnly && frame <= 280; frame++) {
                 study.ApplyView(6 + Mathf.PingPong(frame * 0.2f, 28), BackgroundStudy.CameraFloor);
                 study.SetWaterTime(frame / 25f);

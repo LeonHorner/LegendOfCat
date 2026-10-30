@@ -22,6 +22,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     };
     public static bool IsFloating(int index) => index == 3 || index == 4 || index == 8 || index == 12;
     public CatController Cat { get; private set; }
+    Rigidbody2D catBody;
     readonly Transform[] layers = new Transform[3];
     readonly Material[] materials = new Material[3];
     readonly System.Collections.Generic.List<Mesh> terrainMeshes = new System.Collections.Generic.List<Mesh>();
@@ -30,6 +31,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     Texture2D pixel;
     Sprite square;
     float tourTime;
+    float waterRunAmount, waterRunOffset;
     Vector3 cameraVelocity;
 
     // Camera-relative travel, calculated absolutely: reversals and teleports cannot accumulate drift.
@@ -126,7 +128,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         }
         var player = new GameObject("Mika existing prototype");
         player.transform.SetParent(transform, false); player.transform.position = new Vector3(-3, 0.48f);
-        player.AddComponent<Rigidbody2D>();
+        catBody = player.AddComponent<Rigidbody2D>();
         player.AddComponent<BoxCollider2D>().size = new Vector2(0.9f, 0.9f);
         Cat = player.AddComponent<CatController>();
         var input = player.AddComponent<CatInput>(); input.controller = Cat;
@@ -242,6 +244,18 @@ public sealed class BackgroundStudy : MonoBehaviour
     {
         View.rect = MenuLayout.Letterbox16By9(width, height);
         View.aspect = 16f / 9f;
+    }
+
+    void FixedUpdate()
+    {
+        if (!Cat || !catBody || !riverFrontMaterial) return;
+        float target = Cat.Grounded && catBody.simulated
+            ? Mathf.Clamp01(Mathf.Abs(catBody.linearVelocity.x) / CatMotion.Speed) : 0;
+        waterRunAmount = Mathf.MoveTowards(waterRunAmount, target, 2.5f * Time.fixedDeltaTime);
+        // Add travel time rather than multiplying the clock, avoiding phase jumps on start/stop.
+        waterRunOffset += waterRunAmount * 1.2f * Time.fixedDeltaTime;
+        riverFrontMaterial.SetFloat("_RunAmount", waterRunAmount);
+        riverFrontMaterial.SetFloat("_RunTimeOffset", waterRunOffset);
     }
 
     void LateUpdate()

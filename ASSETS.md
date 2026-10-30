@@ -413,3 +413,13 @@ A second source-color mask prevents pulling rock colors into nearby water.
 Normal animation uses the shader game clock; explicit time is opt-in for capture.
 Original source pixels, warm/dark rocks, alpha wave contour and terrain are
 unchanged. Previous subpixel shimmer is superseded.
+
+## Running water activity — 2026-10-30
+
+No source pixels or generator changes. Human direction requested stronger water
+motion and more waves during running. Grounded body speed drives a smoothly
+blended shader activity value, extra accumulated flow phase and additional fine
+crests. Full running gives approximately 2.2 times baseline flow and 35% more
+refraction; rock colors and authored alpha remain fixed. The dedicated
+water-running.mp4 is an explicit full-activity render for visual comparison;
+actual body-driven transitions are covered by motor/physics tests.

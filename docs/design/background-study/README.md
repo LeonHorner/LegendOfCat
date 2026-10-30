@@ -38,10 +38,20 @@ This is deliberately restrained movement of the existing painting. It is not a
 fluid simulation, animated rock layer, moving collider or new water mechanic.
 Terrain and opaque paw support remain registered to the existing collision tops.
 
+While Mika runs on the ground, actual horizontal body velocity smoothly raises
+the water activity. At full running speed, accumulated extra flow time gives
+approximately 2.2 times the standing flow rate. Additional fine wave crests and
+35% stronger refraction make the water denser and livelier. Starting/stopping
+blends over approximately 0.4 seconds; accumulated phase is never reset.
+The response uses speed magnitude, so both run directions behave alike. Standing,
+jumping and a suspended physics body return toward the calm state. This is visual
+water activity only; movement and collision are unchanged.
+
 ## Current evidence
 
 - [Selected view](subtle-distance.png) and [small grayscale](subtle-distance-small-grayscale.png).
-- [Visible foreground flow, fixed camera](water-flow.mp4): six seconds at 25 fps.
+- [Standing water, fixed camera](water-flow.mp4): six seconds at 25 fps.
+- [Full running water activity](water-running.mp4): six seconds at 25 fps; an isolated water-state preview, not a player-input recording.
 - [Opening route with camera reversal](subtle-animation.mp4): approximately 11.24 seconds at 25 fps.
 - [Grounded shore](subtle-ground.png), [extended route](subtle-extended.png), [raised-camera stress](subtle-jump-stress.png).
 - [Actual raised ground contact](play-ground-contact.png) and [highest-platform jump](play-jump.png).
@@ -77,7 +87,7 @@ for a 4–6-minute level has been established.
 ## Validation and limits
 
 Ten focused Unity tests cover independent foreground/background sources and
-depths, fixed 0.14 valley travel, stable foreground registration through reversal
+depths, fixed 0.14 valley travel, run/stop response in both directions with continuous phase, stable foreground registration through reversal
 and recycling, complete distant silhouettes, shallow shelf bounds, collision and
 opaque paw contact, highest jumps, shore clearance, route span and fixed 16:9.
 With a graphics device the integration test renders two explicit water times:
