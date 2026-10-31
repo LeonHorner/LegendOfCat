@@ -60,6 +60,13 @@ public sealed class CatController : MonoBehaviour
             else ReturnToStart();
         }
     }
+    public void Launch(Vector2 velocity)
+    {
+        body.linearVelocity = Motion.Launch(velocity);
+        Grounded = false;
+        leaveGroundSteps = 2;
+    }
+
     public void ReturnToStart() => RespawnAt(spawn);
 
     // The course chooses the spawn; the controller always resets motor and physics.
@@ -90,5 +97,10 @@ public sealed class CatController : MonoBehaviour
         if (body) { body.linearVelocity = Vector2.zero; body.simulated = true; }
         Paused = false;
     }
-    void OnDestroy() { if (material) Destroy(material); }
+    void OnDestroy()
+    {
+        if (!material) return;
+        if (Application.isPlaying) Destroy(material);
+        else DestroyImmediate(material);
+    }
 }
