@@ -11,7 +11,7 @@ export function downloadNotes(tag) {
     '- **Linux x64:** [Download AppImage](' + base + DOWNLOADS.linux + ')',
     '- **Windows x64 (portable, optional):** [Download Portable.zip](' + base + DOWNLOADS.portable + ')',
     '',
-    '> Early development build. The complete adventure is not available yet. Windows and Linux installation and in-app updates still require real-device verification.'
+    '> Early development build. The complete adventure is not available yet. See [current installation and update test status](https://github.com/LeonHorner/LegendOfCat/blob/main/RELEASE-TEST.md).'
   ].join('\n');
 }
 
