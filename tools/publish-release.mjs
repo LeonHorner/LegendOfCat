@@ -30,17 +30,27 @@ const temporary = mkdtempSync(join(tmpdir(), 'legendofcat-release-'));
 try {
   const notes = join(temporary, 'notes.md');
   writeFileSync(notes, downloadNotes(release.gitTag) + '\n\n' + release.notes);
-  // gh release create makes a tag at --target when none exists. Never target a
-  // mutable branch name, and verify the remote tag before publishing the draft.
+  // Draft releases may not create Git tag refs until publication. Explicitly
+  // create a lightweight tag at the frozen SHA first; never fall back to main.
+  // POST is create-only: an existing tag fails rather than being moved/reused.
+  execFileSync('gh', ['api', '--method', 'POST',
+    'repos/LeonHorner/LegendOfCat/git/refs',
+    '-f', 'ref=refs/tags/' + release.gitTag,
+    '-f', 'sha=' + sha], { stdio: 'inherit' });
+  const tagRef = 'repos/LeonHorner/LegendOfCat/git/ref/tags/' + release.gitTag;
+  const readTagSha = () => execFileSync('gh', ['api', tagRef, '--jq', '.object.sha'],
+    { encoding: 'utf8' }).trim();
+  if (readTagSha() !== sha)
+    throw new Error('Release tag does not match workflow github.sha.');
   execFileSync('gh', ['release', 'create', release.gitTag, ...assets,
-    '--repo', 'LeonHorner/LegendOfCat', '--target', sha,
+    '--repo', 'LeonHorner/LegendOfCat', '--verify-tag', '--target', sha,
     '--title', release.gitTag, '--notes-file', notes, '--draft'], { stdio: 'inherit' });
-  const tagSha = execFileSync('gh', ['api', 'repos/LeonHorner/LegendOfCat/git/ref/tags/' +
-    release.gitTag, '--jq', '.object.sha'], { encoding: 'utf8' }).trim();
-  if (tagSha !== sha)
-    throw new Error('Published draft tag does not point to workflow github.sha: ' + tagSha);
+  if (readTagSha() !== sha)
+    throw new Error('Draft release tag differs from workflow github.sha.');
   execFileSync('gh', ['release', 'edit', release.gitTag, '--repo',
     'LeonHorner/LegendOfCat', '--draft=false', '--latest'], { stdio: 'inherit' });
+  if (readTagSha() !== sha)
+    throw new Error('Published release tag differs from workflow github.sha.');
 } finally {
   rmSync(temporary, { recursive: true, force: true });
 }
