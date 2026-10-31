@@ -317,8 +317,8 @@ test('manual release requires exact version and separate major approval', () => 
     releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit')
   ]) {
     assert.ok(step, 'Release approval check missing');
-    assert.equal(step.env.EXPECTED_VERSION, '{{ inputs.expected_version }}');
-    assert.equal(step.env.ALLOW_MAJOR, '{{ inputs.allow_major }}');
+    assert.equal(step.env.EXPECTED_VERSION, '${{ inputs.expected_version }}');
+    assert.equal(step.env.ALLOW_MAJOR, '${{ inputs.allow_major }}');
   }
   for (const job of [
     prWorkflow.jobs.preflight,
