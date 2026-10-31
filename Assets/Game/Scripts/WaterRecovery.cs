@@ -25,7 +25,7 @@ public sealed class WaterRecovery : MonoBehaviour
     GameObject effects;
     readonly LineRenderer[] rings = new LineRenderer[2];
     readonly LineRenderer[] droplets = new LineRenderer[12];
-    LineRenderer splash;
+    LineRenderer splash, neckFoam;
     Vector3 impactPosition;
     Vector3 cameraStart, entry;
     float cameraSize, scale, facing;
@@ -96,6 +96,7 @@ public sealed class WaterRecovery : MonoBehaviour
         for (int i = 0; i < rings.Length; i++) rings[i] = Line("Expanding surface ripple", 49, true);
         for (int i = 0; i < droplets.Length; i++) droplets[i] = Line("Splash droplet", 2, false);
         splash = Line("Breaking shoulder splash", 33, false);
+        neckFoam = Line("Water washing over neck", 25, false);
     }
 
     LineRenderer Line(string name, int points, bool loop)
@@ -151,10 +152,24 @@ public sealed class WaterRecovery : MonoBehaviour
             impactBody.transform.position = impactPosition + foregroundShift - Vector3.up * (Elapsed * 2.3f) * scale;
         }
         submerge.SetFloat("_Surface", visualEntry.y);
+        submerge.SetFloat("_SurfaceScale", scale);
         view.orthographicSize = Mathf.Lerp(cameraSize, 1.65f * scale, zoom);
         // Follow the face only slightly as it sinks; keep the surface in the close view.
         Vector3 close = entry + new Vector3(facing * 0.12f * scale, (0.28f - ForegroundInset) * scale, -10);
         view.transform.position = Vector3.Lerp(cameraStart, close, zoom);
+        // A small foreground wash overlaps the softened neck edge; the wider
+        // expanding rings alone leave the drawing looking detached from the water.
+        float wash = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(0.12f, 0.24f, Elapsed))
+            * (1 - Mathf.InverseLerp(1.0f, 1.35f, Elapsed));
+        neckFoam.enabled = wash > 0;
+        neckFoam.startWidth = neckFoam.endWidth = 0.028f * scale;
+        neckFoam.startColor = neckFoam.endColor = new Color(0.74f, 0.90f, 0.86f, wash * 0.7f);
+        for (int p = 0; p < 25; p++) {
+            float angle = p * Mathf.PI / 24;
+            float x = facing * 0.30f + Mathf.Cos(angle) * 0.29f;
+            float y = -Mathf.Sin(angle) * 0.035f + Mathf.Sin(x * 19 + Elapsed * 5) * 0.01f;
+            neckFoam.SetPosition(p, visualEntry + new Vector3(x, y, -0.13f) * scale);
+        }
         float breakAmount = Mathf.Sin(Mathf.Clamp01(Elapsed / 0.4f) * Mathf.PI);
         splash.enabled = Elapsed < 0.4f;
         splash.startWidth = splash.endWidth = (0.035f + breakAmount * 0.11f) * scale;

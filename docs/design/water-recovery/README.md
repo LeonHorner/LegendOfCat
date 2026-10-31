@@ -13,6 +13,12 @@ the far-bank water edge as the zoom approaches. Her head, splash, ripples and
 submersion mask share this presentation offset; the physical entry threshold and
 checkpoint behavior are unchanged. Camera close framing follows that offset.
 
+Follow-up feedback identified a flat neck cutoff in the opening frames. The
+contact now uses a shallow water-tinted alpha transition, fading from 0.045 units
+below to 0.11 units above the local waterline. A small animated foreground wash
+overlaps the neck edge and clears as she sinks. Both scale with the course;
+the head artwork, expression timing and foreground placement are retained.
+
 [Normal-speed Unity preview](recovery.mp4) · [Half-speed preview](recovery-slow.mp4)
 
 ![Face close-up](face-closeup.png)
@@ -102,6 +108,11 @@ editing is needed; runtime course construction attaches the behavior.
   and ripple alignment in a scaled/translated course, with full submersion measured
   against that local presentation surface. This scoped run passed 16/16 tests
   with zero failures/skips.
+- The softened contact band and foreground wash were inspected in the opening
+  Unity-rendered frames. This is a compositing refinement using existing source
+  pixels, not a new full-body drawing or a change to gameplay physics. All five
+  focused WaterRecoveryTests passed after the change, with zero failures/skips;
+  broader movement/checkpoint tests were not repeated for this contact refinement.
 - Revised Unity-rendered review frames were inspected for impact continuity,
   neck immersion, three-quarter gaze and visible blink before the ears disappear.
   Both source rows use one scale with a registered baseline. Camera/fade timing

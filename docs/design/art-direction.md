@@ -290,3 +290,9 @@ Her local submersion mask follows the same shift so the face remains readable
 within the water. Physical entry, artwork, expression timing, zoom scale and fade
 remain unchanged. Updated review frames/clips are in the water-recovery folder;
 the placement refinement remains subject to in-game review.
+
+Further feedback identified a detached-looking neck cutoff in the early frames.
+A shallow water-tinted alpha transition and small foreground wash now blend the
+neck into the river. Contact dimensions follow course scale. Source artwork,
+head-turn timing, foreground position, camera and fade are retained; refreshed
+normal/slowed review captures show the compositing adjustment.
