@@ -62,13 +62,26 @@ public static class StompReview
                 File.WriteAllBytes("docs/design/stomp-prototype/" + phase + ".png", pixels.EncodeToPNG());
                 arena.Combat.Advance(phase == "anticipation" ? StompCombat.Anticipation : StompCombat.Active);
             }
-            foreach (var scenario in new[] { "left", "right", "closed-head", "ground", "moving-head", "run-right", "run-left", "signals" }) {
+            var scenarios = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-stompReviewHitsOnly") >= 0
+                ? new[] { "moving-head", "player-hit", "enemy-hit", "enemy-final", "player-final" }
+                : new[] { "left", "right", "closed-head", "ground", "moving-head", "run-right", "run-left", "signals", "player-hit", "enemy-hit", "enemy-final", "player-final" };
+            foreach (var scenario in scenarios) {
                 arena.Retry();
                 arena.Cat.GetComponent<CatInput>().enabled = false;
                 var body = arena.Cat.GetComponent<Rigidbody2D>();
                 body.interpolation = RigidbodyInterpolation2D.None;
-                if (scenario == "moving-head") arena.Combat.Advance(1.56f);
-                body.position = scenario == "signals" ? new Vector2(-5, .5f) : scenario == "moving-head" ? new Vector2(arena.Combat.TargetX, 3.4f) : (scenario == "right" || scenario == "run-left") ? new Vector2(1.1f, .5f)
+                if (scenario == "enemy-final") {
+                    arena.Combat.Advance(1.56f); arena.Combat.TryStomp(true);
+                    arena.Combat.Advance(1.56f); arena.Combat.TryStomp(true);
+                }
+                if (scenario == "moving-head" || scenario == "enemy-hit" || scenario == "enemy-final") arena.Combat.Advance(1.56f);
+                if (scenario == "player-final") {
+                    arena.Combat.TryDamage(); arena.Combat.Advance(1.26f);
+                    arena.Combat.TryDamage(); arena.Combat.Advance(1.26f);
+                    arena.Combat.Advance(1f);
+                }
+                body.position = (scenario == "enemy-hit" || scenario == "enemy-final" || scenario == "player-hit" || scenario == "player-final")
+                    ? new Vector2(arena.Combat.TargetX, 1.7f) : scenario == "signals" ? new Vector2(-5, .5f) : scenario == "moving-head" ? new Vector2(arena.Combat.TargetX, 3.4f) : (scenario == "right" || scenario == "run-left") ? new Vector2(1.1f, .5f)
                     : scenario == "closed-head" ? new Vector2(-.2f, 1.7f)
                     : scenario == "ground" ? new Vector2(-2, .5f) : new Vector2(-1.1f, .5f);
                 if (scenario == "run-right" || scenario == "run-left") {
@@ -82,14 +95,16 @@ public static class StompReview
                 }
                 arena.Cat.transform.position = body.position;
                 var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
-                typeof(StompArena).GetField("previous", flags).SetValue(arena, scenario == "closed-head" ? new Vector2(-.2f, 2) : body.position);
+                typeof(StompArena).GetField("previous", flags).SetValue(arena, scenario == "closed-head" ? new Vector2(-.2f, 2)
+                    : (scenario == "enemy-hit" || scenario == "enemy-final" || scenario == "player-hit" || scenario == "player-final") ? new Vector2(body.position.x, 2) : body.position);
                 typeof(StompArena).GetField("previousTargetX", flags).SetValue(arena, arena.Combat.TargetX);
+                Physics2D.SyncTransforms();
                 var motorStep = typeof(CatController).GetMethod("FixedUpdate", flags);
                 var combatStep = typeof(StompArena).GetMethod("FixedUpdate", flags);
                 var presentation = arena.Cat.GetComponentInChildren<MikaSpritePresentation>();
                 string frames = "Logs/stomp-damage-frames/" + scenario;
                 Directory.CreateDirectory(frames);
-                var csv = new System.Text.StringBuilder("frame,time,x,y,targetX,bossHealth,health,protection,alpha,velocityX,velocityY,burstTime,contactX,contactY\n");
+                var csv = new System.Text.StringBuilder("frame,time,x,y,targetX,bossHealth,health,protection,alpha,velocityX,velocityY,burstTime,contactX,contactY,enemyRingTime,enemyHeadFlashTime,enemyRingX,enemyHeadX,audioPlaying\n");
                 for (int frame = 0; frame < (scenario == "signals" ? 180 : scenario == "moving-head" ? 150 : 80); frame++) {
                     if (frame > 0) {
                         motorStep.Invoke(arena.Cat, null);
@@ -101,7 +116,7 @@ public static class StompReview
                     RenderTexture.active = target;
                     pixels.ReadPixels(new Rect(0, 0, 960, 540), 0, 0); pixels.Apply();
                     File.WriteAllBytes(frames + "/" + frame.ToString("D3") + ".png", pixels.EncodeToPNG());
-                    csv.AppendLine(System.FormattableString.Invariant($"{frame},{frame * Time.fixedDeltaTime},{body.position.x},{body.position.y},{arena.Combat.TargetX},{arena.Combat.BossHealth},{arena.Combat.PlayerHealth},{arena.Combat.Invulnerability},{presentation.GetComponent<SpriteRenderer>().color.a},{body.linearVelocity.x},{body.linearVelocity.y},{typeof(StompArena).GetField("burstTime", flags).GetValue(arena)},{((Transform)typeof(StompArena).GetField("damageBurst", flags).GetValue(arena)).localPosition.x},{((Transform)typeof(StompArena).GetField("damageBurst", flags).GetValue(arena)).localPosition.y}"));
+                    csv.AppendLine(System.FormattableString.Invariant($"{frame},{frame * Time.fixedDeltaTime},{body.position.x},{body.position.y},{arena.Combat.TargetX},{arena.Combat.BossHealth},{arena.Combat.PlayerHealth},{arena.Combat.Invulnerability},{presentation.GetComponent<SpriteRenderer>().color.a},{body.linearVelocity.x},{body.linearVelocity.y},{typeof(StompArena).GetField("burstTime", flags).GetValue(arena)},{((Transform)typeof(StompArena).GetField("damageBurst", flags).GetValue(arena)).localPosition.x},{((Transform)typeof(StompArena).GetField("damageBurst", flags).GetValue(arena)).localPosition.y},{typeof(StompArena).GetField("flash", flags).GetValue(arena)},{typeof(StompArena).GetField("enemyHeadFlashTime", flags).GetValue(arena)},{((MeshRenderer)typeof(StompArena).GetField("impact", flags).GetValue(arena)).transform.localPosition.x},{((SpriteRenderer)typeof(StompArena).GetField("enemyHeadFlash", flags).GetValue(arena)).transform.localPosition.x},{arena.Cat.GetComponent<AudioSource>().isPlaying}"));
                 }
                 File.WriteAllText("docs/design/stomp-prototype/damage-" + scenario + ".csv", csv.ToString());
             }

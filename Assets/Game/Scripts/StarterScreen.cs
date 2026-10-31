@@ -94,7 +94,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     void OpenStompArena()
     {
         if (course != null || stompArena != null || popup || applying) return;
-        stompArena = new GameObject("Stomp lab").AddComponent<StompArena>();
+        stompArena = new GameObject("Simple combat lab").AddComponent<StompArena>();
         stompArena.BackToMenu = CloseStompArena;
     }
 

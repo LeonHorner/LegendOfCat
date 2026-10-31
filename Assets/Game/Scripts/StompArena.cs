@@ -14,6 +14,10 @@ public sealed class StompArena : MonoBehaviour
     SpriteRenderer boss, head, warning;
     MeshRenderer impact;
     Material successCream;
+    Mesh enemyImpactMesh;
+    SpriteRenderer enemyHeadFlash;
+    float enemyHeadFlashTime;
+    public const float EnemyImpactDuration = .18f, EnemyHeadFlashDuration = .08f;
     SpriteRenderer playerSprite;
     Color playerColor;
     TextMesh phaseLabel;
@@ -93,8 +97,9 @@ public sealed class StompArena : MonoBehaviour
         damageAudio.volume = .5f;
         damageAudio.clip = Resources.Load<AudioClip>("StompDamageVoice");
         CreateDamageBurst();
+        CreateEnemyImpact();
         Run = new RunLifecycle(new Vector2(-4, .5f));
-        Run.ResetTransientState += () => { Combat.Reset(); flash = damageFlash = burstTime = previousTargetX = 0; damageAudio.Stop(); };
+        Run.ResetTransientState += () => { Combat.Reset(); flash = damageFlash = burstTime = enemyHeadFlashTime = previousTargetX = 0; damageAudio.Stop(); };
         Cat.FellOutOfBounds += Retry;
         var input = player.AddComponent<CatInput>();
         input.controller = Cat;
@@ -151,6 +156,7 @@ public sealed class StompArena : MonoBehaviour
     {
         if (Run.Paused) return;
         flash = Mathf.Max(0, flash - Time.fixedDeltaTime);
+        enemyHeadFlashTime = Mathf.Max(0, enemyHeadFlashTime - Time.fixedDeltaTime);
         damageFlash = Mathf.Max(0, damageFlash - Time.fixedDeltaTime);
         burstTime = Mathf.Max(0, burstTime - Time.fixedDeltaTime);
         if (Combat.Finished) { Present(); return; }
@@ -161,8 +167,10 @@ public sealed class StompArena : MonoBehaviour
             current.y = BossBounds.yMax + Half.y + .02f;
             body.position = transform.TransformPoint(current);
             Cat.Launch(new Vector2(body.linearVelocity.x, 10));
-            impact.transform.localPosition = new Vector3(current.x, BossBounds.yMax);
-            flash = .16f;
+            float crossing = (previous.y - Half.y - BossBounds.yMax) / (previous.y - current.y);
+            impact.transform.localPosition = new Vector3(Mathf.Lerp(previous.x, current.x, crossing), BossBounds.yMax);
+            flash = EnemyImpactDuration;
+            enemyHeadFlashTime = EnemyHeadFlashDuration;
         } else {
             bool bodyHit = SweptContact(BossBounds, current, out Vector2 contact);
             bool groundHit = false;
@@ -217,15 +225,20 @@ public sealed class StompArena : MonoBehaviour
         warning.color = active ? new Color(1, .35f, .2f) : new Color(.7f, .65f, .4f, .35f);
         PresentCombatSignals(open, active);
         impact.enabled = flash > 0;
-        impact.transform.localScale = new Vector3(Mathf.Lerp(.8f, .38f, flash / .16f), .35f, 1);
-        successCream.color = new Color(1, .95f, .74f, Mathf.Clamp01(flash / .1f));
+        float ringProgress = 1 - Mathf.Clamp01(flash / EnemyImpactDuration);
+        impact.transform.localScale = new Vector3(Mathf.Lerp(.3f, 1.1f, ringProgress), Mathf.Lerp(.1f, .24f, ringProgress), 1);
+        successCream.color = new Color(.8f, .94f, 1, 1 - ringProgress);
+        // A separate narrow overlay never replaces the newly closed cap or its crosses.
+        enemyHeadFlash.enabled = enemyHeadFlashTime > 0;
+        enemyHeadFlash.transform.localPosition = new Vector3(x, BossBounds.yMax);
+        enemyHeadFlash.color = new Color(.8f, .94f, 1, Mathf.Clamp01(enemyHeadFlashTime / EnemyHeadFlashDuration));
         phaseLabel.text = Combat.Finished ? (Combat.BossHealth == 0 ? "TARGET DEFEATED" : "TRY AGAIN")
             : open ? "OPEN HEAD / JUMP NOW" : active ? "ATTACK / GROUND UNSAFE" : "WARNING / GROUND ATTACK";
     }
     void OnGUI()
     {
         GUILayout.BeginArea(new Rect(12, 12, Mathf.Min(620, Screen.width - 24), 175), GUI.skin.box);
-        GUILayout.Label("STOMP LAB / provisional rules for review");
+        GUILayout.Label("SIMPLE COMBAT LAB / provisional rules for review");
         GUILayout.Label("Move and jump with the shared controls. Descend onto the white head during recovery.");
         GUILayout.Label("Dark head and sides hurt. Striped ground warning becomes a solid active attack.");
         GUILayout.Label("Mika " + Combat.PlayerHealth + "/3 | Target " + Combat.BossHealth + "/3" +
@@ -275,10 +288,43 @@ public sealed class StompArena : MonoBehaviour
         burstOutline.transform.localScale = Vector3.one * 1.12f;
         burstFill = BurstPart("Cream impact brush", 7);
         for (int i = 0; i < sparks.Length; i++) sparks[i] = BurstPart("Short impact brush stroke", 7);
-        impact = BurstPart("Successful head impact brush", 5);
-        impact.transform.SetParent(transform, false);
-        successCream = new Material(burstCream);
+    }
+    void CreateEnemyImpact()
+    {
+        const int segments = 40;
+        var vertices = new Vector3[segments * 4];
+        var colors = new Color[vertices.Length];
+        var triangles = new int[segments * 18];
+        float[] radii = { .5f, .48f, .27f, .24f };
+        for (int ring = 0; ring < 4; ring++)
+            for (int i = 0; i < segments; i++) {
+                float angle = i * Mathf.PI * 2 / segments;
+                int index = ring * segments + i;
+                vertices[index] = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle)) * radii[ring];
+                colors[index] = new Color(1, 1, 1, ring == 0 || ring == 3 ? 0 : 1);
+            }
+        for (int ring = 0; ring < 3; ring++)
+            for (int i = 0; i < segments; i++) {
+                int a = ring * segments + i, b = ring * segments + (i + 1) % segments;
+                int t = (ring * segments + i) * 6;
+                triangles[t] = a; triangles[t + 1] = b; triangles[t + 2] = a + segments;
+                triangles[t + 3] = b; triangles[t + 4] = b + segments; triangles[t + 5] = a + segments;
+            }
+        enemyImpactMesh = new Mesh { name = "Enemy head impact ring" };
+        enemyImpactMesh.vertices = vertices;
+        enemyImpactMesh.colors = colors;
+        enemyImpactMesh.triangles = triangles;
+        enemyImpactMesh.uv = new Vector2[vertices.Length];
+        enemyImpactMesh.RecalculateBounds();
+        var item = new GameObject("Enemy damage ring");
+        item.transform.SetParent(transform, false);
+        item.AddComponent<MeshFilter>().sharedMesh = enemyImpactMesh;
+        impact = item.AddComponent<MeshRenderer>();
+        impact.sortingOrder = 6;
+        successCream = new Material(Shader.Find("Sprites/Default"));
         impact.sharedMaterial = successCream;
+        enemyHeadFlash = Block("Enemy head damage edge", Vector2.zero, new Vector2(1.7f, .04f), Color.white);
+        enemyHeadFlash.sortingOrder = 5;
     }
     MeshRenderer BurstPart(string name, int order)
     {
@@ -358,7 +404,7 @@ public sealed class StompArena : MonoBehaviour
     }
     void OnDestroy()
     {
-        if (Application.isPlaying) { Destroy(square); Destroy(texture); Destroy(damageMaterial); Destroy(burstMesh); Destroy(burstCream); Destroy(burstBrown); Destroy(successCream); }
-        else { DestroyImmediate(square); DestroyImmediate(texture); DestroyImmediate(damageMaterial); DestroyImmediate(burstMesh); DestroyImmediate(burstCream); DestroyImmediate(burstBrown); DestroyImmediate(successCream); }
+        if (Application.isPlaying) { Destroy(square); Destroy(texture); Destroy(damageMaterial); Destroy(burstMesh); Destroy(burstCream); Destroy(burstBrown); Destroy(successCream); Destroy(enemyImpactMesh); }
+        else { DestroyImmediate(square); DestroyImmediate(texture); DestroyImmediate(damageMaterial); DestroyImmediate(burstMesh); DestroyImmediate(burstCream); DestroyImmediate(burstBrown); DestroyImmediate(successCream); DestroyImmediate(enemyImpactMesh); }
     }
 }

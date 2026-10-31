@@ -121,6 +121,8 @@ public class StompCombatTests
             Vector3 contact = burst.localPosition;
             float burstBefore = (float)arenaType.GetField("burstTime", flags).GetValue(arena);
             Assert.That(burst.gameObject.activeSelf, Is.True);
+            Assert.That(arenaType.GetField("flash", flags).GetValue(arena), Is.EqualTo(0));
+            Assert.That(arenaType.GetField("enemyHeadFlashTime", flags).GetValue(arena), Is.EqualTo(0));
             var audio = cat.GetComponent<AudioSource>();
             Assert.That(audio.clip, Is.Not.Null);
             Assert.That(audio.clip.name, Is.EqualTo("StompDamageVoice"));
@@ -246,6 +248,66 @@ public class StompCombatTests
             arenaType.GetMethod("Retry").Invoke(arena, null);
             Assert.That(locks.All(r => r.enabled), Is.True);
             Assert.That(arrows.Any(r => r.enabled), Is.False);
+        } finally { UnityEngine.Object.DestroyImmediate(root); }
+    }
+
+    [TestCase(true, false)] [TestCase(false, false)]
+    [TestCase(true, true)] [TestCase(false, true)]
+    public void AcceptedHitsHaveDistinctFeedbackAndTerminalEffectsFinish(bool enemyHit, bool finalHit)
+    {
+        var root = new GameObject("Distinct hit feedback test");
+        try {
+            var arenaType = type.Assembly.GetType("StompArena");
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            var arena = root.AddComponent(arenaType);
+            arenaType.GetMethod("Awake", flags).Invoke(arena, null);
+            var cat = (Component)arenaType.GetProperty("Cat").GetValue(arena);
+            cat.GetType().GetMethod("Awake", flags).Invoke(cat, null);
+            var input = cat.GetComponent(type.Assembly.GetType("CatInput"));
+            input.GetType().GetMethod("Awake", flags).Invoke(input, null);
+            var state = arenaType.GetField("Combat").GetValue(arena);
+            Action<float> advance = dt => type.GetMethod("Advance").Invoke(state, new object[] { dt });
+            if (finalHit) {
+                for (int i = 0; i < 2; i++) {
+                    if (enemyHit) { advance(1.56f); type.GetMethod("TryStomp").Invoke(state, new object[] { true }); }
+                    else { type.GetMethod("TryDamage").Invoke(state, null); advance(1.26f); }
+                }
+                if (!enemyHit) advance(1f);
+            }
+            if (enemyHit) advance(1.56f);
+            float targetX = (float)type.GetProperty("TargetX").GetValue(state);
+            var body = cat.GetComponent<Rigidbody2D>();
+            body.position = new Vector2(targetX, 1.7f);
+            body.linearVelocity = new Vector2(0, -2);
+            arenaType.GetField("previous", flags).SetValue(arena, new Vector2(targetX, 2));
+            arenaType.GetField("previousTargetX", flags).SetValue(arena, targetX);
+            var fixedStep = arenaType.GetMethod("FixedUpdate", flags);
+            fixedStep.Invoke(arena, null);
+            var ring = (MeshRenderer)arenaType.GetField("impact", flags).GetValue(arena);
+            var headFlash = (SpriteRenderer)arenaType.GetField("enemyHeadFlash", flags).GetValue(arena);
+            var burst = (Transform)arenaType.GetField("damageBurst", flags).GetValue(arena);
+            Assert.That(ring.enabled, Is.EqualTo(enemyHit));
+            Assert.That(headFlash.enabled, Is.EqualTo(enemyHit));
+            Assert.That(burst.gameObject.activeSelf, Is.EqualTo(!enemyHit));
+            Assert.That(type.GetProperty("BossHealth").GetValue(state), Is.EqualTo(enemyHit ? finalHit ? 0 : 2 : 3));
+            Assert.That(type.GetProperty("PlayerHealth").GetValue(state), Is.EqualTo(enemyHit ? 3 : finalHit ? 0 : 2));
+            Vector3 ringPosition = ring.transform.localPosition;
+            float ringTime = (float)arenaType.GetField("flash", flags).GetValue(arena);
+            if (!finalHit) {
+                arenaType.GetMethod("TogglePause").Invoke(arena, null);
+                fixedStep.Invoke(arena, null);
+                Assert.That(arenaType.GetField("flash", flags).GetValue(arena), Is.EqualTo(ringTime));
+                arenaType.GetMethod("TogglePause").Invoke(arena, null);
+            }
+            for (int i = 0; i < 12; i++) {
+                // Move away to inspect decay without introducing a second contact.
+                body.position = new Vector2(-5, 3);
+                fixedStep.Invoke(arena, null);
+            }
+            Assert.That(ring.transform.localPosition, Is.EqualTo(ringPosition));
+            Assert.That(ring.enabled || headFlash.enabled || burst.gameObject.activeSelf, Is.False);
+            arenaType.GetMethod("Retry").Invoke(arena, null);
+            Assert.That(ring.enabled || headFlash.enabled || burst.gameObject.activeSelf, Is.False);
         } finally { UnityEngine.Object.DestroyImmediate(root); }
     }
 

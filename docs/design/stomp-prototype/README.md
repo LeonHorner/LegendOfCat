@@ -1,6 +1,6 @@
 # Stomp encounter prototype
 
-Issue #12. Enter **Stomp lab (prototype)** from the main menu. The isolated greybox reuses CatController, CatMotion, CatInput, RunLifecycle and MikaOriginal. It adds no campaign, save format, new health UI or traversal ability.
+Issue #12. Enter **Simple combat lab** from the main menu. The main menu lists Movement lab first and Simple combat lab second. The isolated greybox reuses CatController, CatMotion, CatInput, RunLifecycle and MikaOriginal. It adds no campaign, save format, new health UI or traversal ability.
 
 ## Current encounter
 
@@ -50,7 +50,7 @@ These three rejected original unpitched noise-based proposals have comparable RM
 
 Warning uses diagonal hatching, a low footprint edge and increasingly close pulses. The closed head has two small cross marks in addition to its dark cap. The active ground attack replaces hatching with a solid band and short upright strike marks; every strike mark stays inside the actual 0..0.35-high hazard. Recovery removes the ground warning and replaces head crosses with two downward chevrons over the existing white contact edge. Marks track the moving target; their visibility changes directly with combat phase, including the exact open/closed transition. Pause freezes their animation because it uses combat time. No health UI or collision geometry was added.
 
-Successful head hits use the same softly feathered brush shape in a short restrained landing accent rather than the former white square. Damage keeps its separate warm burst, selected cat voice and protection feedback.
+Successful head hits use a distinct flat expanding ring at the head contact and a separate brief edge flash on the moving head. They do not start Mikas damage burst, flash or cat voice. Damage keeps its separate warm burst, selected cat voice and protection feedback.
 
 ![Warning, attack and open-head cycle](damage-signals.gif)
 ![Small grayscale signal review](signals-small-grayscale.gif)
@@ -63,9 +63,9 @@ Move/jump use the existing shared keyboard/controller actions, without a stomp b
 
 ## Evidence and validation
 
-Run `StompReview.Record` in Unity 6000.3.27f2 to reproduce camera captures and CSVs. Phase screenshots explicitly advance state; eight motion sequences advance the real motor, isolated local 2D physics scene and combat. The running sequences feed shared motion values and preserve held direction through contact. CSVs record player/target position, health, protection, opacity, velocity and effect lifetime/contact position. The moving-head sequence starts above an open target to isolate hit detection and bounce. Camera captures exclude the GUI; GIF loops restart the demonstration and are not in-game teleports.
+Run `StompReview.Record` in Unity 6000.3.27f2 to reproduce camera captures and CSVs. Phase screenshots explicitly advance state; twelve motion sequences advance the real motor, isolated local 2D physics scene and combat. The running sequences feed shared motion values and preserve held direction through contact. CSVs record player/target position, health, protection, opacity, velocity and effect lifetime/contact position. The moving-head sequence starts above an open target to isolate hit detection and bounce. Camera captures exclude the GUI; GIF loops restart the demonstration and are not in-game teleports.
 
-Compilation of runtime and regression sources plus the eight Play Mode captures completed with exit code 0 in an isolated review project with its own Library. The right-running trace starts at x=-1.1 with velocity (7,7) on damage, then x=-0.96 with velocity (7,6.4); left-running mirrors this without a direction reversal. The star remains at x=-0.85/+0.85 while its timer decreases. Captured contact-star rendering was visually inspected. The sound previews were checked for PCM format, duration, RMS and peak levels; subjective listening remains a user decision.
+Compilation of runtime and regression sources plus the Play Mode captures completed with exit code 0 in an isolated review project with its own Library. The right-running trace starts at x=-1.1 with velocity (7,7) on damage, then x=-0.96 with velocity (7,6.4); left-running mirrors this without a direction reversal. The star remains at x=-0.85/+0.85 while its timer decreases. Captured contact-star rendering was visually inspected. The sound previews were checked for PCM format, duration, RMS and peak levels; subjective listening remains a user decision.
 
 Regression sources cover top/side/closed windows, moving-head sweeps, protection expiry, preserved horizontal velocity, held run direction, hop release behavior, effect placement without retrigger, pause and retry cleanup. Automated tests and Windows/Linux player/launcher builds have not been run and remain part of final Prepare merge. Manual gameplay, small-window/grayscale review, integrated audio playback and overall encounter acceptance remain pending. Keep PR #62 draft and #12 open until review and final exact-head validation complete.
 
@@ -78,3 +78,22 @@ User decisions on 2026-10-31: reject damage teleport; select short protection wi
 ### Selected-audio integration
 
 The selected clip is nonspatial and non-looping, plays only inside the accepted-damage branch, and shares encounter pause/reset cleanup. An AudioListener is created only if the scene has none. `Assets/StreamingAssets/THIRD-PARTY-NOTICES.txt` accompanies player builds with the creator, source, CC BY 4.0 link and edit disclosure. Regression sources verify the selected 0.9-second resource and source configuration alongside existing protected-contact/reset behavior. Unity import/compilation is checked in the isolated review project; automated tests and both platform builds remain deferred to final Prepare merge. In-game listening with the chosen playback volume remains part of user playtesting.
+
+## Separate player and enemy damage feedback
+
+Mika damage retains the irregular warm burst, brush strokes, restrained sprite flash, vertical damage hop, selected cat voice and protection pulse. An accepted enemy head hit instead emits a hollow pale ring: width grows from 0.3 to 1.1 units over 0.18 seconds while fading, with a flat 0.10-to-0.24-unit height. The ring has its own native mesh and stays at the swept landing contact point. A separate 0.08-second narrow head-edge overlay follows target position and leaves the newly closed dark cap and crosses visible. Its brightness is cosmetic and does not reopen vulnerability. No enemy-hit cat voice or damage sparks are started.
+
+Effects start only after accepted damage. Pause freezes both sets; retry/restart clear their timers and visibility. Terminal effects keep fading after combat stops. Existing movement, health, damage windows, protection and retry rules are unchanged. The current lab name is Simple combat lab; Movement lab precedes it in the main menu.
+
+### Distinct-hit verification
+
+The full capture now includes player-hit/enemy-hit and terminal player/enemy cases. `StompReview.Record -stompReviewHitsOnly` refreshes those focused cases and moving-head landing. The capture synchronizes deliberately placed fixture transforms before the first physics step. This corrects review setup synchronization without changing runtime movement.
+
+Unity 6000.3.27f2 compiled current runtime and regression sources, including the menu rename/order, and completed the focused captures with exit code 0. The enemy-hit trace starts with boss health 2, player health 3, ring time 0.18, edge-flash time 0.08, player-burst time 0 and audioPlaying false. The player-hit trace instead records boss health 3, player health 2, player-burst time 0.15, enemy timers 0 and audioPlaying true. The ring X stays fixed while the head-edge X follows patrol. Both terminal traces end with all visual-effect timers at zero. Audio playback flags use real DSP time; fixed-step capture time is not a wall-clock audio-duration test.
+
+Below: **left Mika takes damage; right the enemy takes damage**. Both comparisons use equivalent crops of actual runtime camera frames and play at **half speed** to show the brief shapes. The grayscale comparison is additionally scaled to 320x180 per panel, not a live small-window input test. The hollow ring, solid irregular player burst and actor reactions remain distinguishable without hue. Original full-frame recordings retain normal timing.
+
+![Player damage left, enemy damage right; half speed](hit-types-comparison.gif)
+![Small grayscale comparison; half speed](hit-types-small-grayscale.gif)
+
+Regression sources cover separate triggers, no enemy effects on player damage, no player burst on enemy damage, protected contacts without effect restart, pause/reset, fixed ring position and terminal fade. They are compiled but have not been executed; final Prepare merge must still run the suite and both platform builds. No ready status, merge or release is claimed by this review pass.
