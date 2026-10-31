@@ -330,3 +330,21 @@ test('release dispatch has only allow_minor (default on) and allow_major (defaul
   assert.ok(releaseWorkflow.jobs.publish.steps.some(s =>
     s.run?.includes('tools/release-analyzer.test.mjs')));
 });
+
+test('release checkouts are pinned to workflow github.sha across all jobs', () => {
+  for (const [jobName, job] of Object.entries(releaseWorkflow.jobs)) {
+    const checkouts = job.steps.filter(step => step.uses?.startsWith('actions/checkout@'));
+    assert.equal(checkouts.length, 1, 'Expected one checkout in ' + jobName);
+    assert.equal(checkouts[0].with?.ref, '${{ github.sha }}', 'Unpinned checkout in ' + jobName);
+  }
+  assert.equal(releaseWorkflow.jobs.plan.if, "github.ref == 'refs/heads/main'");
+  const plan = releaseWorkflow.jobs.plan.steps.find(s => s.id === 'plan');
+  const publish = releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit');
+  assert.equal(plan.run, 'npm run release:plan');
+  assert.ok(publish.run.includes('test "$EXPECTED" = "$ACTUAL"'));
+  assert.ok(publish.run.includes('npm run release'));
+  for (const step of [plan, releaseWorkflow.jobs.publish.steps.find(s => s.id === 'final-plan'), publish]) {
+    assert.equal(step.env.ALLOW_MINOR, '${{ inputs.allow_minor }}');
+    assert.equal(step.env.ALLOW_MAJOR, '${{ inputs.allow_major }}');
+  }
+});
