@@ -15,10 +15,10 @@ jobs:
     outputs:
       version: ${{ steps.plan.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -27,15 +27,14 @@ jobs:
         run: npm run release:plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check Unity activation secrets
+      - name: Check Unity account credentials
         if: steps.plan.outputs.version != ''
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         run: |
-          test -n "$UNITY_LICENSE" && test -n "$UNITY_EMAIL" && test -n "$UNITY_PASSWORD" || {
-            echo "::error::Configure GameCI Unity activation secrets before releasing."
+          test -n "$UNITY_EMAIL" && test -n "$UNITY_PASSWORD" || {
+            echo "::error::Configure UNITY_EMAIL and UNITY_PASSWORD for GameCI account activation before releasing."
             exit 1
           }
   test:
@@ -43,17 +42,16 @@ jobs:
     if: needs.plan.outputs.version != ''
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         with:
           path: Library
           key: unity-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ github.sha }}
           restore-keys: |
             unity-test-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
-      - uses: game-ci/unity-test-runner@v4
+      - uses: game-ci/unity-test-runner@v4.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
@@ -61,7 +59,7 @@ jobs:
           artifactsPath: artifacts/tests
           # The Unity job and XML artifacts carry the results; omit the neutral check.
           githubToken: ''
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results
@@ -82,17 +80,16 @@ jobs:
             platform: linux
             player: LegendOfCat
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
+      - uses: actions/checkout@v7
+      - uses: actions/cache@v6
         with:
           path: Library
           key: unity-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ github.sha }}
           restore-keys: |
             unity-${{ matrix.platform }}-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
-      - uses: game-ci/unity-builder@v4
+      - uses: game-ci/unity-builder@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
@@ -101,7 +98,7 @@ jobs:
           versioning: Custom
           version: ${{ needs.plan.outputs.version }}
           customParameters: -releaseVersion ${{ needs.plan.outputs.version }} -releaseOutput build/${{ matrix.platform }}/Game/${{ matrix.player }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: player-${{ matrix.platform }}
           path: build/${{ matrix.platform }}/Game
@@ -125,15 +122,15 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 8.0.x
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - run: dotnet tool restore
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: player-${{ matrix.platform }}
           path: publish/Game
@@ -155,7 +152,7 @@ jobs:
           ./tools/smoke-test.ps1 -Executable 'publish/${{ matrix.executable }}' -LogPath 'artifacts/smoke/${{ matrix.platform }}.log' -VirtualDisplay:($IsLinux)
       - name: Preserve startup diagnostics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: smoke-${{ matrix.platform }}
           path: artifacts/smoke
@@ -179,7 +176,7 @@ jobs:
         run: ./tools/check-package-icons.ps1 -PackageDirectory 'artifacts/releases/${{ matrix.platform }}'
       - name: Verify Delta reconstruction and release feed
         run: node tools/delta-release.mjs finalize ${{ matrix.platform }} ${{ needs.plan.outputs.version }} artifacts/releases/${{ matrix.platform }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: release-${{ matrix.platform }}
           path: artifacts/releases
@@ -192,15 +189,15 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
       - run: npm ci
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: release-*
           merge-multiple: true
