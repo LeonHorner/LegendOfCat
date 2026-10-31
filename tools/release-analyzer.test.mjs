@@ -57,7 +57,7 @@ test('explicit breaking footers and bang headers still produce major releases', 
 });
 
 test('real breaking notes remain visible in the generated changelog', async () => {
-  const message = 'fix: change save format\\n\\nBREAKING CHANGE: old saves are incompatible';
+  const message = 'fix: change save format\n\nBREAKING CHANGE: old saves are incompatible';
   const notes = await generateNotes(notesOptions, {
     commits: [{ hash: 'abc123', message }],
     lastRelease: { version: '0.7.0', gitTag: 'v0.7.0' },
