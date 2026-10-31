@@ -7,7 +7,7 @@
 - Squash PR titles must be Conventional Commits. Do not require external review approval for this solo workflow.
 - Run automatic merge validation for open, ready-for-review PRs; each update to a ready PR revalidates its exact head. Draft PRs skip full validation. A manual Prepare merge dispatch remains available as fallback. Releases run only with explicit user authorization. Always require the merge-ready status before squash merge.
 - Compilation and static inspection are allowed during development. Do not claim unrun checks passed.
-- Do not trigger or publish a release unless the user explicitly requests it.
+- Do not trigger or publish a release unless the user explicitly requests it. Preview the next semantic-release version first; manual Release requires an exact `expected_version`, and an intentional major also requires `allow_major`. Never approve a surprising major version without inspecting the commit messages.
 - Preserve all Unity .meta files; never hand-edit serialized scenes when Editor tooling is available.
 - Keep Unity MCP local, editor-only, and pinned to a reviewed revision before adding it.
 - Generated scenes and asset metadata must be committed after the first Editor import.
