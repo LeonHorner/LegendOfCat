@@ -11,10 +11,16 @@ public sealed class StompArena : MonoBehaviour
     public Camera ArenaCamera { get; private set; }
     Sprite square;
     Texture2D texture;
-    SpriteRenderer boss, head, warning, impact;
+    SpriteRenderer boss, head, warning;
+    MeshRenderer impact;
+    Material successCream;
     SpriteRenderer playerSprite;
     Color playerColor;
     TextMesh phaseLabel;
+    readonly SpriteRenderer[] headArrows = new SpriteRenderer[4];
+    readonly SpriteRenderer[] headLocks = new SpriteRenderer[4];
+    readonly SpriteRenderer[] attackMarks = new SpriteRenderer[10];
+    SpriteRenderer warningEdge;
     readonly System.Collections.Generic.List<SpriteRenderer> stripes = new System.Collections.Generic.List<SpriteRenderer>();
     Rigidbody2D body;
     Vector2 previous;
@@ -50,8 +56,18 @@ public sealed class StompArena : MonoBehaviour
             stripe.sortingOrder = 3;
             stripes.Add(stripe);
         }
-        impact = Block("Impact flash", Vector2.zero, Vector2.one * .3f, Color.white);
-        impact.sortingOrder = 5;
+        warningEdge = Block("Attack footprint edge", new Vector2(0, .035f), new Vector2(5.6f, .07f), Color.white);
+        warningEdge.sortingOrder = 4;
+        for (int i = 0; i < attackMarks.Length; i++) {
+            attackMarks[i] = Block("Active ground strike", Vector2.zero, Vector2.one, Color.white);
+            attackMarks[i].sortingOrder = 4;
+        }
+        for (int i = 0; i < 4; i++) {
+            headArrows[i] = Block("Open head chevron", Vector2.zero, new Vector2(.22f, .055f), Color.white);
+            headArrows[i].sortingOrder = 4;
+            headLocks[i] = Block("Closed head cross", Vector2.zero, new Vector2(.2f, .045f), Color.white);
+            headLocks[i].sortingOrder = 4;
+        }
         phaseLabel = new GameObject("Phase label").AddComponent<TextMesh>();
         phaseLabel.transform.SetParent(transform, false);
         phaseLabel.transform.localPosition = new Vector3(0, 2.1f);
@@ -134,6 +150,7 @@ public sealed class StompArena : MonoBehaviour
     void FixedUpdate()
     {
         if (Run.Paused) return;
+        flash = Mathf.Max(0, flash - Time.fixedDeltaTime);
         damageFlash = Mathf.Max(0, damageFlash - Time.fixedDeltaTime);
         burstTime = Mathf.Max(0, burstTime - Time.fixedDeltaTime);
         if (Combat.Finished) { Present(); return; }
@@ -164,7 +181,6 @@ public sealed class StompArena : MonoBehaviour
         previousTargetX = Combat.TargetX;
         Combat.Advance(Time.fixedDeltaTime);
         Run.Advance(Time.fixedDeltaTime);
-        flash = Mathf.Max(0, flash - Time.fixedDeltaTime);
         Present();
     }
     public void Retry() { Cat.RespawnAt(transform.TransformPoint(Run.Retry())); previous = transform.InverseTransformPoint(body.position); Present(); }
@@ -199,8 +215,10 @@ public sealed class StompArena : MonoBehaviour
         head.color = open ? Color.white : new Color(.2f, .23f, .25f);
         warning.enabled = !Combat.Finished && !open;
         warning.color = active ? new Color(1, .35f, .2f) : new Color(.7f, .65f, .4f, .35f);
-        foreach (var stripe in stripes) stripe.enabled = warning.enabled && !active;
+        PresentCombatSignals(open, active);
         impact.enabled = flash > 0;
+        impact.transform.localScale = new Vector3(Mathf.Lerp(.8f, .38f, flash / .16f), .35f, 1);
+        successCream.color = new Color(1, .95f, .74f, Mathf.Clamp01(flash / .1f));
         phaseLabel.text = Combat.Finished ? (Combat.BossHealth == 0 ? "TARGET DEFEATED" : "TRY AGAIN")
             : open ? "OPEN HEAD / JUMP NOW" : active ? "ATTACK / GROUND UNSAFE" : "WARNING / GROUND ATTACK";
     }
@@ -221,31 +239,46 @@ public sealed class StompArena : MonoBehaviour
     }
     void CreateDamageBurst()
     {
-        burstMesh = new Mesh { name = "Original six-point contact star" };
+        burstMesh = new Mesh { name = "Original soft irregular impact brush" };
         burstCream = new Material(Shader.Find("Sprites/Default"));
         burstBrown = new Material(Shader.Find("Sprites/Default"));
-        var vertices = new Vector3[13];
-        var triangles = new int[36];
-        // Uneven six-point outline: original geometry, not a borrowed explosion sprite.
-        for (int i = 0; i < 12; i++) {
-            float angle = (i * 30 + 9) * Mathf.Deg2Rad;
-            float radius = i % 2 == 0 ? .48f - (i % 3) * .025f : .19f;
-            vertices[i + 1] = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
-            triangles[i * 3] = 0;
-            triangles[i * 3 + 1] = (i + 1);
-            triangles[i * 3 + 2] = ((i + 1) % 12 + 1);
+        const int segments = 32;
+        var vertices = new Vector3[1 + segments * 2];
+        var colors = new Color[vertices.Length];
+        var triangles = new int[segments * 9];
+        colors[0] = Color.white;
+        // Opaque irregular center with a feathered rim; no repeated geometric star tips.
+        for (int i = 0; i < segments; i++) {
+            float angle = i * Mathf.PI * 2 / segments;
+            float radius = .24f + .17f * Mathf.Pow(Mathf.Abs(Mathf.Cos(2 * angle + .2f)), 5)
+                + .025f * Mathf.Sin(7 * angle);
+            Vector3 direction = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle));
+            vertices[1 + i] = direction * radius;
+            vertices[1 + segments + i] = direction * (radius + .085f);
+            colors[1 + i] = new Color(1, .96f, .84f, .92f);
+            colors[1 + segments + i] = new Color(1, .88f, .65f, 0);
+            int next = (i + 1) % segments;
+            int t = i * 9;
+            triangles[t] = 0; triangles[t + 1] = 1 + i; triangles[t + 2] = 1 + next;
+            triangles[t + 3] = 1 + i; triangles[t + 4] = 1 + segments + i; triangles[t + 5] = 1 + next;
+            triangles[t + 6] = 1 + next; triangles[t + 7] = 1 + segments + i; triangles[t + 8] = 1 + segments + next;
         }
         burstMesh.vertices = vertices;
+        burstMesh.colors = colors;
         burstMesh.triangles = triangles;
         burstMesh.uv = new Vector2[vertices.Length];
         burstMesh.RecalculateBounds();
-        damageBurst = new GameObject("Damage contact star").transform;
+        damageBurst = new GameObject("Soft damage contact burst").transform;
         damageBurst.SetParent(transform, false);
-        burstOutline = BurstPart("Warm outline", 6);
+        burstOutline = BurstPart("Warm impact rim", 6);
         burstOutline.sharedMaterial = burstBrown;
         burstOutline.transform.localScale = Vector3.one * 1.12f;
-        burstFill = BurstPart("Cream impact star", 7);
-        for (int i = 0; i < sparks.Length; i++) sparks[i] = BurstPart("Small impact spark", 7);
+        burstFill = BurstPart("Cream impact brush", 7);
+        for (int i = 0; i < sparks.Length; i++) sparks[i] = BurstPart("Short impact brush stroke", 7);
+        impact = BurstPart("Successful head impact brush", 5);
+        impact.transform.SetParent(transform, false);
+        successCream = new Material(burstCream);
+        impact.sharedMaterial = successCream;
     }
     MeshRenderer BurstPart(string name, int order)
     {
@@ -263,13 +296,60 @@ public sealed class StompArena : MonoBehaviour
         if (burstTime <= 0) return;
         float t = 1 - burstTime / DamageBurstDuration;
         float alpha = 1 - t * t;
-        damageBurst.localScale = Vector3.one * Mathf.Lerp(.38f, .66f, Mathf.Sqrt(t));
+        float opening = Mathf.SmoothStep(0, 1, Mathf.Clamp01(t / .3f));
+        damageBurst.localScale = new Vector3(Mathf.Lerp(.34f, .76f, opening), Mathf.Lerp(.48f, .58f, opening), 1);
+        damageBurst.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(-12, 7, t));
         burstCream.color = new Color(1, .91f, .68f, alpha);
-        burstBrown.color = new Color(.48f, .31f, .16f, alpha * .8f);
+        burstBrown.color = new Color(.48f, .31f, .16f, alpha * .45f);
         for (int i = 0; i < sparks.Length; i++) {
             float angle = (i * 125 + 25) * Mathf.Deg2Rad;
-            sparks[i].transform.localPosition = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * Mathf.Lerp(.34f, .68f, t);
-            sparks[i].transform.localScale = Vector3.one * Mathf.Lerp(.14f, .04f, t);
+            sparks[i].transform.localPosition = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * Mathf.Lerp(.26f, .66f, t);
+            sparks[i].transform.localScale = new Vector3(Mathf.Lerp(.09f, .025f, t), Mathf.Lerp(.4f - i * .06f, .12f, t), 1);
+            sparks[i].transform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg - 90);
+        }
+    }
+    void PresentCombatSignals(bool open, bool active)
+    {
+        float x = Combat.TargetX;
+        bool live = !Combat.Finished;
+        float progress = Mathf.Clamp01(Combat.PhaseTime / Combat.Duration);
+        // The integrated phase clock accelerates warning pulses without a phase reset.
+        float pulse = .5f + .5f * Mathf.Sin(Mathf.PI * 2 * (2 * Combat.PhaseTime + 3 * Combat.PhaseTime * progress));
+        warning.color = active ? new Color(.95f, .44f, .22f, .85f)
+            : new Color(.73f, .64f, .39f, .15f + pulse * .24f);
+        warningEdge.enabled = live && !open;
+        warningEdge.transform.localPosition = new Vector3(x, .035f);
+        warningEdge.color = active ? new Color(1, .9f, .64f) : new Color(.92f, .8f, .52f, .3f + .5f * pulse);
+        for (int i = 0; i < stripes.Count; i++) {
+            var stripe = stripes[i];
+            stripe.enabled = live && !open && !active;
+            stripe.transform.localPosition = new Vector3(x - 2.6f + i * .47f, .175f);
+            stripe.transform.localScale = new Vector3(.07f + .035f * progress, .3f, 1);
+            stripe.transform.localRotation = Quaternion.Euler(0, 0, -18);
+            stripe.color = new Color(.95f, .84f, .59f, .35f + .6f * pulse);
+        }
+        for (int i = 0; i < attackMarks.Length; i++) {
+            var mark = attackMarks[i];
+            mark.enabled = live && active;
+            // Entire stroke stays inside the actual 0..0.35-high collision band.
+            float height = Mathf.Lerp(.32f, .12f, progress) * (i % 2 == 0 ? 1 : .75f);
+            mark.transform.localPosition = new Vector3(x - 2.5f + i * .55f, height * .5f);
+            mark.transform.localScale = new Vector3(.055f, height, 1);
+            mark.color = new Color(1, .91f, .7f, 1 - .3f * progress);
+        }
+        for (int i = 0; i < 4; i++) {
+            var arrow = headArrows[i];
+            arrow.enabled = live && open;
+            int pair = i / 2;
+            float bob = .035f * Mathf.Sin(Combat.PhaseTime * 9);
+            arrow.transform.localPosition = new Vector3(x + (pair == 0 ? -.4f : .4f) + (i % 2 == 0 ? -.075f : .075f), 1.7f + bob);
+            arrow.transform.localRotation = Quaternion.Euler(0, 0, i % 2 == 0 ? -35 : 35);
+            arrow.color = new Color(1, .92f, .7f);
+            var cross = headLocks[i];
+            cross.enabled = live && !open;
+            cross.transform.localPosition = new Vector3(x + (pair == 0 ? -.4f : .4f), 1.48f);
+            cross.transform.localRotation = Quaternion.Euler(0, 0, i % 2 == 0 ? -45 : 45);
+            cross.color = new Color(.78f, .78f, .7f);
         }
     }
     void OnDisable()
@@ -278,7 +358,7 @@ public sealed class StompArena : MonoBehaviour
     }
     void OnDestroy()
     {
-        if (Application.isPlaying) { Destroy(square); Destroy(texture); Destroy(damageMaterial); Destroy(burstMesh); Destroy(burstCream); Destroy(burstBrown); }
-        else { DestroyImmediate(square); DestroyImmediate(texture); DestroyImmediate(damageMaterial); DestroyImmediate(burstMesh); DestroyImmediate(burstCream); DestroyImmediate(burstBrown); }
+        if (Application.isPlaying) { Destroy(square); Destroy(texture); Destroy(damageMaterial); Destroy(burstMesh); Destroy(burstCream); Destroy(burstBrown); Destroy(successCream); }
+        else { DestroyImmediate(square); DestroyImmediate(texture); DestroyImmediate(damageMaterial); DestroyImmediate(burstMesh); DestroyImmediate(burstCream); DestroyImmediate(burstBrown); DestroyImmediate(successCream); }
     }
 }

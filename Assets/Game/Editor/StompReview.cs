@@ -62,13 +62,13 @@ public static class StompReview
                 File.WriteAllBytes("docs/design/stomp-prototype/" + phase + ".png", pixels.EncodeToPNG());
                 arena.Combat.Advance(phase == "anticipation" ? StompCombat.Anticipation : StompCombat.Active);
             }
-            foreach (var scenario in new[] { "left", "right", "closed-head", "ground", "moving-head", "run-right", "run-left" }) {
+            foreach (var scenario in new[] { "left", "right", "closed-head", "ground", "moving-head", "run-right", "run-left", "signals" }) {
                 arena.Retry();
                 arena.Cat.GetComponent<CatInput>().enabled = false;
                 var body = arena.Cat.GetComponent<Rigidbody2D>();
                 body.interpolation = RigidbodyInterpolation2D.None;
                 if (scenario == "moving-head") arena.Combat.Advance(1.56f);
-                body.position = scenario == "moving-head" ? new Vector2(arena.Combat.TargetX, 3.4f) : (scenario == "right" || scenario == "run-left") ? new Vector2(1.1f, .5f)
+                body.position = scenario == "signals" ? new Vector2(-5, .5f) : scenario == "moving-head" ? new Vector2(arena.Combat.TargetX, 3.4f) : (scenario == "right" || scenario == "run-left") ? new Vector2(1.1f, .5f)
                     : scenario == "closed-head" ? new Vector2(-.2f, 1.7f)
                     : scenario == "ground" ? new Vector2(-2, .5f) : new Vector2(-1.1f, .5f);
                 if (scenario == "run-right" || scenario == "run-left") {
@@ -90,7 +90,7 @@ public static class StompReview
                 string frames = "Logs/stomp-damage-frames/" + scenario;
                 Directory.CreateDirectory(frames);
                 var csv = new System.Text.StringBuilder("frame,time,x,y,targetX,bossHealth,health,protection,alpha,velocityX,velocityY,burstTime,contactX,contactY\n");
-                for (int frame = 0; frame < (scenario == "moving-head" ? 150 : 80); frame++) {
+                for (int frame = 0; frame < (scenario == "signals" ? 180 : scenario == "moving-head" ? 150 : 80); frame++) {
                     if (frame > 0) {
                         motorStep.Invoke(arena.Cat, null);
                         scene.GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);

@@ -212,4 +212,41 @@ public class StompCombatTests
             previousX = x;
         }
     }
+    [Test] public void SignalsFollowTheExactAttackAndRecoveryState()
+    {
+        var root = new GameObject("Stomp signal state test");
+        try {
+            var arenaType = type.Assembly.GetType("StompArena");
+            var arena = root.AddComponent(arenaType);
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            arenaType.GetMethod("Awake", flags).Invoke(arena, null);
+            var cat = (Component)arenaType.GetProperty("Cat").GetValue(arena);
+            cat.GetType().GetMethod("Awake", flags).Invoke(cat, null);
+            var input = cat.GetComponent(type.Assembly.GetType("CatInput"));
+            input.GetType().GetMethod("Awake", flags).Invoke(input, null);
+            var state = arenaType.GetField("Combat").GetValue(arena);
+            var present = arenaType.GetMethod("Present", flags);
+            var arrows = (SpriteRenderer[])arenaType.GetField("headArrows", flags).GetValue(arena);
+            var locks = (SpriteRenderer[])arenaType.GetField("headLocks", flags).GetValue(arena);
+            var marks = (SpriteRenderer[])arenaType.GetField("attackMarks", flags).GetValue(arena);
+            Assert.That(locks.All(r => r.enabled), Is.True);
+            Assert.That(arrows.Any(r => r.enabled) || marks.Any(r => r.enabled), Is.False);
+            type.GetMethod("Advance").Invoke(state, new object[] { 1.2f });
+            present.Invoke(arena, null);
+            Assert.That(marks.All(r => r.enabled), Is.True);
+            foreach (var mark in marks) {
+                float half = mark.transform.localScale.y * .5f;
+                Assert.That(mark.transform.localPosition.y - half, Is.GreaterThanOrEqualTo(0));
+                Assert.That(mark.transform.localPosition.y + half, Is.LessThanOrEqualTo(.35f));
+            }
+            type.GetMethod("Advance").Invoke(state, new object[] { .351f });
+            present.Invoke(arena, null);
+            Assert.That(arrows.All(r => r.enabled), Is.True);
+            Assert.That(locks.Any(r => r.enabled) || marks.Any(r => r.enabled), Is.False);
+            arenaType.GetMethod("Retry").Invoke(arena, null);
+            Assert.That(locks.All(r => r.enabled), Is.True);
+            Assert.That(arrows.Any(r => r.enabled), Is.False);
+        } finally { UnityEngine.Object.DestroyImmediate(root); }
+    }
+
 }
