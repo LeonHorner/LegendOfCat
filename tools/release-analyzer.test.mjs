@@ -59,5 +59,5 @@ test('explicit breaking footers and bang headers still produce major releases', 
 test('normal fix, feature and refactor commits retain expected types', async () => {
   assert.equal(await analyze('fix: disable Unity splash screen'), 'patch');
   assert.equal(await analyze('feat: add movement tutorial'), 'minor');
-  assert.equal(await analyze('refactor: rename internal renderer'), undefined);
+  assert.ok((await analyze('refactor: rename internal renderer')) == null);
 });
