@@ -3,6 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 public sealed class CatController : MonoBehaviour
 {
+    // Optional placement frame for the course's fall boundary; motor units stay world-space.
+    public Transform fallReference;
     public readonly CatMotion Motion = new CatMotion();
     public bool Grounded { get; private set; }
     public string Pose => Grounded ? (Mathf.Abs(body.linearVelocity.x) > 0.1f ? "Run" : "Idle")
@@ -52,7 +54,8 @@ public sealed class CatController : MonoBehaviour
         if (leaveGroundSteps > 0) leaveGroundSteps--;
         body.linearVelocity = Motion.Step(Time.fixedDeltaTime, Grounded, body.linearVelocity);
         if (Motion.Jumped) { Grounded = false; leaveGroundSteps = 2; }
-        if (body.position.y < -7) {
+        float fallY = fallReference ? fallReference.InverseTransformPoint(body.position).y : body.position.y;
+        if (fallY < -7) {
             if (FellOutOfBounds != null) FellOutOfBounds();
             else ReturnToStart();
         }

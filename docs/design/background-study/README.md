@@ -25,6 +25,12 @@ Cross a gold marker on safe ground to activate it. R or a fall
 retries that checkpoint; Backspace restarts the whole run; P pauses; Esc returns
 to the existing menu. The selected art does not replace the checkpoint lifecycle.
 The camera stays at y=1 so foreground water remains visible during jumps.
+Start/checkpoint recovery coordinates are course-local and are converted using
+the current root transform on Retry/Restart, including after runtime placement
+changes. Supported transforms are translation and positive uniform scaling;
+rotation, mirroring, zero scale and nonuniform scaling are unsupported.
+The course's fall boundary is local Y < -7, so valid placements below world Y=-7
+do not create a repeated fall/retry loop.
 The separate 109-unit art lab below remains available for scenery stress review.
 See the [integrated checkpoint evidence](checkpoint-prototype/README.md) for
 screenshots, a short recording, lifecycle data and reproduction instructions.
@@ -36,7 +42,8 @@ Resources material assets hold references to the three scenery shaders so player
 builds retain them. Regenerate missing materials with
 `LegendOfCat/Background study/Prepare runtime materials`.
 
-Use Unity 6000.3.27f1. Open Assets/Game/Scenes/BackgroundStudy.unity and press Play.
+Use Unity 6000.3.27f2, as pinned in ProjectSettings/ProjectVersion.txt.
+Open Assets/Game/Scenes/BackgroundStudy.unity and press Play.
 A/D/arrows move, Space jumps, R retries. Stop/restart Play after code changes.
 The small help panel has movement instructions and an optional camera tour;
 there are no concept buttons or parallax sliders.

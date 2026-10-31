@@ -49,7 +49,9 @@ public sealed class MovementCourse : MonoBehaviour
         player.AddComponent<Rigidbody2D>();
         player.AddComponent<BoxCollider2D>().size = new Vector2(0.9f, 0.9f);
         Cat = player.AddComponent<CatController>();
-        Run = new RunLifecycle(player.transform.position);
+        Cat.fallReference = transform;
+        // Session spawn coordinates belong to this course, not its current world placement.
+        Run = new RunLifecycle(player.transform.localPosition);
         Cat.FellOutOfBounds += RetryCheckpoint;
         var input = player.AddComponent<CatInput>();
         input.controller = Cat;
@@ -144,9 +146,9 @@ public sealed class MovementCourse : MonoBehaviour
         }
         Run.Advance(Time.deltaTime);
         if (Run.Paused || !Cat.Grounded) return;
-        var position = Cat.GetComponent<Rigidbody2D>().position;
+        Vector2 position = transform.InverseTransformPoint(Cat.GetComponent<Rigidbody2D>().position);
         for (int i = 0; i < CheckpointSpawns.Length; i++) {
-            Vector2 point = transform.TransformPoint(CheckpointSpawns[i]);
+            Vector2 point = CheckpointSpawns[i];
             // Marker/spawn follow the course transform when reused in another scene.
             // Only grounded main-route positions may activate a checkpoint.
             if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f)
@@ -154,8 +156,8 @@ public sealed class MovementCourse : MonoBehaviour
         }
     }
 
-    public void RetryCheckpoint() => Cat.RespawnAt(Run.Retry());
-    public void RestartRun() => Cat.RespawnAt(Run.Restart());
+    public void RetryCheckpoint() => Cat.RespawnAt(transform.TransformPoint(Run.Retry()));
+    public void RestartRun() => Cat.RespawnAt(transform.TransformPoint(Run.Restart()));
     public void TogglePause() => Cat.SetPaused(Run.TogglePause());
 
     void LateUpdate()

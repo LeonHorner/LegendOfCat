@@ -2,6 +2,8 @@
 
 Historical first integration: seven platforms and two checkpoints. The
 [extended prototype](../extended-prototype/README.md) supersedes this route/HUD.
+For current reproduction use the project's pinned Unity 6000.3.27f2. The capture
+version below records the historical run and is intentionally retained.
 
 Captured in Unity 6000.3.27f1 on 2026-10-30 using the actual menu Resources
 MovementCourse prefab, CatController, Mika presentation and RunLifecycle.

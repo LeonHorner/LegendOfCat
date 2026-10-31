@@ -197,6 +197,74 @@ public class MikaPresentationIntegrationTests
     }
 
     [UnityTest]
+    public IEnumerator RecoveryFollowsRuntimeCourseTransformsAfterCheckpointActivation()
+    {
+        var component = course.GetComponent(Runtime("MovementCourse"));
+        var run = Read(component, "Run");
+        var checkpoints = new[] { new Vector2(9, 0.52f), new Vector2(34, 1.52f), new Vector2(65, 1.52f) };
+        void AtCheckpoint(int index) {
+            var world = (Vector2)course.transform.TransformPoint(checkpoints[index]);
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { world });
+            Physics2D.SyncTransforms(); Tick(25);
+            Assert.That(Grounded, Is.True);
+            component.SendMessage("Update");
+        }
+        void Action(string name) => component.GetType().GetMethod(name).Invoke(component, null);
+        void AssertSpawn(Vector2 local) {
+            var expected = (Vector2)course.transform.TransformPoint(local);
+            Assert.That(Vector2.Distance(body.position, expected), Is.LessThan(0.001f));
+            Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero));
+            Assert.That(body.simulated, Is.True);
+            Assert.That(Read(run, "Paused"), Is.False);
+        }
+        AtCheckpoint(1);
+        Assert.That(Read(run, "Checkpoint"), Is.EqualTo(2));
+        run.GetType().GetMethod("Advance").Invoke(run, new object[] { 5f });
+        float elapsed = (float)Read(run, "ElapsedSeconds");
+        Action("TogglePause");
+        course.transform.position = new Vector3(30, 5);
+        course.transform.localScale = Vector3.one * 1.5f;
+        Physics2D.SyncTransforms();
+        run.GetType().GetMethod("Advance").Invoke(run, new object[] { 3f });
+        Assert.That(Read(run, "ElapsedSeconds"), Is.EqualTo(elapsed));
+        Action("RetryCheckpoint");
+        AssertSpawn(checkpoints[1]);
+        Assert.That(Read(run, "Retries"), Is.EqualTo(1));
+        Assert.That(Read(run, "Checkpoint"), Is.EqualTo(2));
+        Assert.That(Read(run, "ElapsedSeconds"), Is.EqualTo(elapsed));
+        body.position = course.transform.TransformPoint(new Vector2(checkpoints[1].x, -8));
+        controller.SendMessage("FixedUpdate");
+        AssertSpawn(checkpoints[1]);
+        Assert.That(Read(run, "Retries"), Is.EqualTo(2));
+        AtCheckpoint(0);
+        Assert.That(Read(run, "Checkpoint"), Is.EqualTo(2), "Revisiting an earlier transformed marker must not regress progression.");
+        AtCheckpoint(2);
+        Assert.That(Read(run, "Checkpoint"), Is.EqualTo(3), "New checkpoints must activate after transforming the course.");
+        Action("TogglePause");
+        course.transform.position = new Vector3(-20, -12);
+        course.transform.localScale = Vector3.one * 0.75f;
+        Physics2D.SyncTransforms();
+        Action("RetryCheckpoint");
+        AssertSpawn(checkpoints[2]);
+        Assert.That(Read(run, "Retries"), Is.EqualTo(3));
+        Assert.That(Read(run, "Checkpoint"), Is.EqualTo(3));
+        Action("TogglePause"); Action("RestartRun");
+        AssertSpawn(new Vector2(-3, 0.48f));
+        Assert.That(Read(run, "Checkpoint"), Is.EqualTo(0));
+        Assert.That(Read(run, "Retries"), Is.EqualTo(0));
+        Assert.That(Read(run, "ElapsedSeconds"), Is.EqualTo(0f));
+        Physics2D.SyncTransforms(); Tick(25);
+        Assert.That(Grounded, Is.True);
+        Assert.That(Read(run, "Retries"), Is.EqualTo(0), "A valid course below world y=-7 must not repeatedly fall/retry.");
+        body.position = course.transform.TransformPoint(new Vector2(-3, -8));
+        controller.SendMessage("FixedUpdate");
+        AssertSpawn(new Vector2(-3, 0.48f));
+        Assert.That(Read(run, "Checkpoint"), Is.EqualTo(0));
+        Assert.That(Read(run, "Retries"), Is.EqualTo(1));
+        yield break;
+    }
+
+    [UnityTest]
     public IEnumerator PaintedCourseKeepsCheckpointsFallsPauseAndFullRestart()
     {
         var component = course.GetComponent(Runtime("MovementCourse"));
