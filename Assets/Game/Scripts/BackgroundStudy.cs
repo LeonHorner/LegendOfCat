@@ -31,6 +31,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     Transform riverFront;
     Texture2D pixel;
     Sprite square;
+    Mesh quadMesh;
     float tourTime;
     float waterRunAmount, waterRunOffset;
     Vector3 cameraVelocity;
@@ -68,6 +69,13 @@ public sealed class BackgroundStudy : MonoBehaviour
         pixel = new Texture2D(1, 1);
         pixel.SetPixel(0, 0, Color.white); pixel.Apply();
         square = Sprite.Create(pixel, new Rect(0, 0, 1, 1), Vector2.one * 0.5f, 1);
+        // Render-only unit quad: never create a primitive's temporary MeshCollider.
+        quadMesh = new Mesh { name = "Scenery unit quad" };
+        quadMesh.vertices = new[] { new Vector3(-0.5f, -0.5f), new Vector3(0.5f, -0.5f),
+            new Vector3(-0.5f, 0.5f), new Vector3(0.5f, 0.5f) };
+        quadMesh.uv = new[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one };
+        quadMesh.triangles = new[] { 0, 2, 1, 1, 2, 3 };
+        quadMesh.RecalculateBounds();
         if (!attachedToCourse) {
             View = new GameObject("Study camera").AddComponent<Camera>();
             View.transform.SetParent(transform, false);
@@ -94,8 +102,7 @@ public sealed class BackgroundStudy : MonoBehaviour
             if (i == 2) { materials[i].SetFloat("_Fog", 0.42f); materials[i].SetFloat("_Saturation", 0.75f); }
             float width = LayerWidth(i);
             for (int tile = -1; tile <= 1; tile++) {
-                var panel = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                DestroyImmediate(panel.GetComponent<Collider>());
+                var panel = Quad();
                 panel.name = "Mirrored scenery tile " + tile;
                 panel.transform.SetParent(layers[i], false);
                 panel.transform.localPosition = new Vector3(tile * width, i == 0 ? 0 : -1,
@@ -121,8 +128,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         waterMesh.triangles = new[] { 0, 2, 1, 1, 2, 3 };
         waterMesh.RecalculateBounds(); terrainMeshes.Add(waterMesh);
         for (int tile = 0; tile < 3; tile++) {
-            var front = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            DestroyImmediate(front.GetComponent<Collider>());
+            var front = Quad();
             front.name = "Foreground water tile " + tile;
             front.transform.SetParent(riverFront, false);
             front.transform.localPosition = new Vector3((tile - 1) * 16, -0.32f, -2);
@@ -148,8 +154,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         cornerMaterial.SetFloat("_Corner", 1);
         float halfView = View.orthographicSize * 16 / 9;
         for (int side = 0; side < 2; side++) {
-            var corners = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            DestroyImmediate(corners.GetComponent<Collider>());
+            var corners = Quad();
             corners.name = "Foreground corner foliage " + side;
             corners.transform.SetParent(View.transform, false);
             // Each half of the source retains its aspect ratio. Scaling the entire
@@ -219,8 +224,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     void ShoreFoot(Vector3 platform, int side)
     {
         // A low decorative buttress joins the cliff to its bank below the landing plane.
-        var foot = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        DestroyImmediate(foot.GetComponent<Collider>());
+        var foot = Quad();
         foot.name = "Painted shore footing"; foot.transform.SetParent(transform, false);
         foot.transform.localPosition = new Vector3(platform.x + side * (platform.z * 0.5f + 1.25f), -2.65f, 3);
         foot.transform.localScale = new Vector3(4.8f * side, 2.6f, 1);
@@ -229,6 +233,13 @@ public sealed class BackgroundStudy : MonoBehaviour
         parameters.SetTexture("_MainTex", Resources.Load<Texture2D>("BackgroundStudy/painted-shore-v2"));
         renderer.SetPropertyBlock(parameters);
     }
+    GameObject Quad()
+    {
+        var item = new GameObject("Scenery quad", typeof(MeshFilter), typeof(MeshRenderer));
+        item.GetComponent<MeshFilter>().sharedMesh = quadMesh;
+        return item;
+    }
+
     GameObject Block(string label, Vector2 position, Vector2 size, Color color)
     {
         var item = new GameObject(label); item.transform.SetParent(transform, false);
@@ -329,11 +340,17 @@ public sealed class BackgroundStudy : MonoBehaviour
     }
     void OnDestroy()
     {
-        foreach (var material in materials) if (material) DestroyImmediate(material);
-        foreach (var mesh in terrainMeshes) if (mesh) DestroyImmediate(mesh);
-        if (terrainMaterial) DestroyImmediate(terrainMaterial);
-        if (cornerMaterial) DestroyImmediate(cornerMaterial);
-        if (riverFrontMaterial) DestroyImmediate(riverFrontMaterial);
-        if (square) DestroyImmediate(square); if (pixel) DestroyImmediate(pixel);
+        foreach (var material in materials) Release(material);
+        foreach (var mesh in terrainMeshes) Release(mesh);
+        Release(quadMesh);
+        Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial);
+        Release(square); Release(pixel);
+    }
+
+    static void Release(Object owned)
+    {
+        if (!owned) return;
+        if (Application.isPlaying) Destroy(owned);
+        else DestroyImmediate(owned); // Edit-mode previews have no deferred destruction loop.
     }
 }

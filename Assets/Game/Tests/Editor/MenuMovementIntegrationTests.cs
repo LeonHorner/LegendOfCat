@@ -20,6 +20,34 @@ public class MenuMovementIntegrationTests
     static void Call(object target, string name) => target.GetType()
         .GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, null);
 
+    static UnityEngine.Object[] SceneryResources(Component course)
+    {
+        var study = course.GetComponentInChildren(RuntimeType("BackgroundStudy"));
+        Assert.That(study, Is.Not.Null);
+        // Check synchronously after OpenCourse, before deferred destruction could hide a collider.
+        Assert.That(course.GetComponentsInChildren<Collider>(true), Is.Empty);
+        var filters = course.GetComponentsInChildren<MeshFilter>(true);
+        Assert.That(filters.Length, Is.GreaterThan(0));
+        foreach (var filter in filters) {
+            Assert.That(filter.GetComponent<Collider2D>(), Is.Null, filter.name);
+            Assert.That(filter.sharedMesh, Is.Not.Null, filter.name);
+            Assert.That(filter.GetComponent<MeshRenderer>().sharedMaterial, Is.Not.Null, filter.name);
+        }
+        Assert.That(course.GetComponentsInChildren<Collider2D>(true), Has.Length.EqualTo(15),
+            "Only fourteen gameplay platforms and Mika may have colliders.");
+        var quad = filters.First(f => f.name.StartsWith("Mirrored scenery tile")).sharedMesh;
+        Assert.That(quad.bounds.center, Is.EqualTo(Vector3.zero));
+        Assert.That(quad.bounds.size, Is.EqualTo(new Vector3(1, 1, 0)));
+        Assert.That(quad.uv, Is.EqualTo(new[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one }));
+        var owned = filters.Select(f => (UnityEngine.Object)f.sharedMesh)
+            .Concat(filters.Select(f => (UnityEngine.Object)f.GetComponent<MeshRenderer>().sharedMaterial))
+            .Concat(new[] { (UnityEngine.Object)Field(study, "square"), (UnityEngine.Object)Field(study, "pixel") })
+            .Distinct().ToArray();
+        Assert.That(owned.All(o => o && !AssetDatabase.Contains(o)), Is.True,
+            "Track generated resources, never imported artwork or shader-reference materials.");
+        return owned;
+    }
+
     [UnityTest]
     public IEnumerator MenuRoundTripPreservesUpdatesAndDisablesTheOldCourse()
     {
@@ -33,6 +61,8 @@ public class MenuMovementIntegrationTests
         Call(screen, "OpenCourse");
         var course = (Component)Field(screen, "course");
         Assert.That(course, Is.Not.Null);
+        var scenery = SceneryResources(course);
+        var sourceArt = Resources.LoadAll<UnityEngine.Object>("BackgroundStudy");
         Call(screen, "OpenCourse");
         Assert.That(Field(screen, "course"), Is.SameAs(course), "Repeated entry must not create another course.");
         var cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
@@ -92,15 +122,22 @@ public class MenuMovementIntegrationTests
         Assert.That(Field(screen, "warning"), Is.EqualTo("Preserve this notice"));
         yield return null;
         Assert.That(course == null, Is.True);
+        yield return null; // Also allow resources queued by OnDestroy to finish destruction.
+        Assert.That(scenery.All(o => !o), Is.True, "Closing the course must release every generated scenery resource.");
+        Assert.That(sourceArt.All(o => o), Is.True, "Imported artwork/materials must survive closing.");
         Call(screen, "OpenCourse");
         var next = (Component)Field(screen, "course");
         Assert.That(next, Is.Not.Null);
         Assert.That(next, Is.Not.SameAs(course), "Re-entry must create a new course.");
+        var nextScenery = SceneryResources(next);
         var nextCat = (Component)next.GetType().GetProperty("Cat").GetValue(next);
         Assert.That(nextCat.GetComponent<Rigidbody2D>().position.x, Is.EqualTo(spawnX).Within(0.01f),
             "Re-entry must start at the original spawn.");
         Call(screen, "CloseCourse");
         yield return null;
+        yield return null;
+        Assert.That(nextScenery.All(o => !o), Is.True, "Reopened scenery must clean up too.");
+        Assert.That(sourceArt.All(o => o), Is.True);
     }
 
     [UnityTearDown]

@@ -31,6 +31,10 @@ noticeable in Mika's jump. At that rate a render frame lasts about 38.5 ms;
 dynamic input followed by fixed physics and interpolation can add visible delay.
 This does not establish why that particular Editor runs at 26 fps.
 
+Update (2026-10-31): the user now observes approximately 300–400 FPS in the
+Unity Editor. This supersedes the earlier observation; no controlled comparison
+or measured improvement caused by this PR is claimed.
+
 A grounded jump now consumes the buffered request in the input callback, updates
 takeoff velocity/state and displays the existing takeoff drawing in the current
 render frame. It does not move the body or simulate an extra physics step.
