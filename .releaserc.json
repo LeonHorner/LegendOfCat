@@ -7,14 +7,26 @@
     [
       "@semantic-release/commit-analyzer",
       {
-        "preset": "conventionalcommits"
+        "preset": "conventionalcommits",
+        "parserOpts": {
+          "noteKeywords": [
+            "BREAKING CHANGE:",
+            "BREAKING-CHANGE:"
+          ]
+        }
       }
     ],
     "./tools/release-notes.mjs",
     [
       "@semantic-release/release-notes-generator",
       {
-        "preset": "conventionalcommits"
+        "preset": "conventionalcommits",
+        "parserOpts": {
+          "noteKeywords": [
+            "BREAKING CHANGE:",
+            "BREAKING-CHANGE:"
+          ]
+        }
       }
     ],
     [
