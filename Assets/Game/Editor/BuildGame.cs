@@ -63,10 +63,12 @@ public static class BuildGame
             scenes = new[] { ScenePath },
             target = EditorUserBuildSettings.activeBuildTarget,
             locationPathName = output,
-            options = BuildOptions.None
+            // A fresh asset pack makes the packed-art audit complete, including cached resources.
+            options = BuildOptions.CleanBuildCache | BuildOptions.DetailedBuildReport
         });
         if (report.summary.result != BuildResult.Succeeded)
             throw new BuildFailedException("Unity player build failed.");
+        BuildBackgroundStudy.ValidatePackedArt(report);
     }
 
     // Local UI inspection only. No installer, update feed or release publication is produced.
@@ -93,11 +95,12 @@ public static class BuildGame
                 scenes = new[] { ScenePath },
                 target = BuildTarget.StandaloneWindows64,
                 locationPathName = output,
-                options = BuildOptions.Development,
+                options = BuildOptions.Development | BuildOptions.CleanBuildCache | BuildOptions.DetailedBuildReport,
                 extraScriptingDefines = new[] { "LEGEND_OF_CAT_PREVIEW" }
             });
             if (report.summary.result != BuildResult.Succeeded)
                 throw new BuildFailedException("Windows preview build failed.");
+            BuildBackgroundStudy.ValidatePackedArt(report);
         }
         finally {
             PlayerSettings.companyName = company;

@@ -203,3 +203,292 @@ ASSET-LICENSE.md terms apply where rights exist. Human direction: remove the
 neighboring atlas speck and retain the accepted apex alignment (-2, -14 source
 pixels). The user accepted the in-game result after playtesting. Original visible
 RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
+
+## Golden River background study — 2026-10-24
+
+`Assets/Game/Resources/BackgroundStudy/painted-atlas.png` is original generated
+prototype scenery, made with the built-in OpenAI image generation tool. Exact
+model ID was not exposed. License: ASSET-LICENSE.md where rights exist. Source
+reference: our archived `docs/design/references/golden-river-ruins-v2.png`, used
+only for palette and painterly style. No external assets or fonts were imported.
+Human direction: compare approximately three depth layers with a calm panorama;
+retain warm painted 2D art, softer backgrounds and unambiguous gameplay edges.
+Implementation decisions: three equal panoramic strips, runtime UV composition,
+atmospheric fades and mirrored reuse; no character art changes. This atlas is
+prototype artwork, with no user approval of final production background direction.
+
+Built-in generation prompt:
+
+> Use case: stylized-concept. Create a single 1536x1024 background layer ATLAS for a warm hand-painted 2D side-scrolling Golden River Path game prototype. Reference image is STYLE AND PALETTE ONLY. No cat, owl, characters, gameplay platforms, foreground, text or borders. Atlas has precisely THREE equal horizontal strips stacked vertically, each its own very wide panoramic landscape, no margin. TOP third: ONLY warm pale golden sunset sky, soft clouds and extremely distant lavender hills, no trees/buildings. MIDDLE third: atmospheric blue sage distant riverside forest, small recessed ruined tower silhouettes, river mist; fill entire strip with pale atmospheric sky above and soft river below. BOTTOM third: closer soft sage and muted ochre riverside trees and vegetation with open gaps, fill strip with pale atmospheric sky above and mist below. All three strips low contrast, painterly brush texture, no dark outlines, no horizontal walkable ledges or bridges. In EACH strip left and right edges have identical low-detail mist colors and landscape heights for horizontal reuse; broad subtle forms rather than obvious repeating landmarks. The result must be beautiful painted scenery, separated into the specified three strip regions for runtime composition, not a screenshot of a game.
+
+## Golden River transparent replacement layers — 2026-10-25
+
+`Assets/Game/Art/BackgroundStudyArchive/middle-cutout.png` and `near-cutout.png`
+are original RGBA paintings generated with the built-in OpenAI image tool; exact
+model ID was not exposed. Source reference: our archived Golden River Ruins v2,
+used for palette/style. License: ASSET-LICENSE.md where rights exist. No third-party
+asset or font was added. Original generated pixels are preserved. Prompts and
+composition constraints: docs/design/background-study/cutout-prompts.md.
+Human decision: the user identified insufficient lower scenery and blurry layer
+transitions in Unity. Implementation: enforce the existing 16:9 presentation,
+lower camera framing, use independent transparent silhouettes rather than broad
+strip crossfades, retain image proportions, reject low-alpha halos at runtime and
+place smaller near vegetation below the gameplay plane. This feedback does not
+select A/B/C or approve final production backgrounds.
+
+## Golden River painted terrain and corner framing — 2026-10-25
+
+`Assets/Game/Art/BackgroundStudyArchive/painted-terrain.png` and
+`foreground-corners.png` were generated with the built-in OpenAI image tool;
+exact model ID was not exposed. Source reference: our Golden River Ruins v2
+archive for style/palette only. License: ASSET-LICENSE.md where rights exist.
+No external assets/fonts were added. Original PNG pixels are preserved; runtime
+sampling separates the turf cap from repeatable stone fill and rejects corner
+alpha halos. Full prompts: docs/design/background-study/terrain-and-corner-prompts.md.
+Human direction: add foreground accents in the corners, at least double the test
+length, and make platforms look grounded and fit the reference; some suspended
+jump platforms are also acceptable. Implementation: a 109-unit lab with ten
+massive stone/earth fronts and four tapered stationary floating rocks, clear
+flat collision-aligned grass tops, and sparse dark lower-corner foliage outside
+the landing plane. This remains prototype art and does not approve a final
+background concept, level layout or campaign expansion.
+
+## Golden River painted depth and hanging foliage — 2026-10-25
+
+`Assets/Game/Resources/BackgroundStudy/foreground-river.png`, `meadow-surface.png`
+and `hanging-foliage.png` are original generations from the built-in OpenAI image
+tool, exact model ID not exposed. Source: our Golden River Ruins v2 archive for
+style/palette. License: ASSET-LICENSE.md where rights exist. Original PNG pixels
+are preserved; the renderer samples foliage atlas columns and rejects low-alpha
+halos. Full prompts: docs/design/background-study/depth-and-foliage-prompts.md.
+Human direction: visible spatial depth like the reference, small stones/water in
+front, varied platforms behind them and backgrounds farther back; hanging leaves
+and greenery with differing shapes/lengths are important. Implementation: a shallow
+painted meadow face recedes behind each exact collision lip, different rock tints
+and registration break repetition, ivy/moss/fern patches hang across fronts and
+sides, and a separate foreground river overlaps the lower cliff bases. This is
+painted depth within the 2D prototype, with no new swimming, moving-platform or
+3D gameplay behavior. No final production art or A/B/C selection is implied.
+
+## Golden River composition refinement — 2026-10-27
+
+No new images or generators were used. Existing documented PNGs remain unchanged.
+Human feedback rejected the high water, exaggerated platform perspective and
+front-rim stance, requesting foreground/background coherence like the concept.
+Rendering decisions: smaller lower river motifs aligned to world-space platforms,
+quieter water saturation, narrow grass bands surrounding the unchanged contact
+line, restrained side shading, larger rock motifs and mipmapped ground textures.
+The original movement/collision geometry and Mika artwork are preserved. This
+records a revision target, not user acceptance of final artwork or an A/B/C choice.
+
+## Connected Golden River painting — 2026-10-27
+
+`Assets/Game/Art/BackgroundStudyArchive/connected-river.png` is an original RGBA
+painting generated with the built-in OpenAI image tool; exact model ID was not
+exposed. Source reference: our Golden River Ruins v2 archive for palette/style.
+License: ASSET-LICENSE.md where rights exist. Original generated pixels are
+preserved. Full prompt: docs/design/background-study/connected-river-prompt.md.
+Human direction: foreground water must connect to background water, potentially
+using one image. Implementation: replace the separate foreground-river and
+middle-cutout water paintings with a single river/bank/waterfall composition.
+The full scene and lower cliff-base overlap sample the same texture and UVs on
+registered background/foreground quads, with shared tint, scale and movement. Sky, foliage and playable
+terrain remain separate. Superseded paintings are retained but not loaded by
+this lab. No final production or A/B/C selection is implied.
+
+## River composition correction — 2026-10-28
+
+User review showed floating-looking cliff bases and missing foreground water.
+No new pixels or external assets were introduced. The same river painting now
+uses registered foreground copies drawn after nearby bank vegetation, replacing
+the incorrect multipass order. Grounded cliffs have subtly broadened submerged
+feet, and this bounded course keeps camera height fixed during jumps to retain
+the water. Collision contacts and the four intentional suspended rocks are
+unchanged. These are human-directed prototype refinements, pending visual review.
+
+## Painted terrain modules — 2026-10-28
+
+Sources: painted-pillar-v2.png and painted-bank-v2.png under
+Assets/Game/Resources/BackgroundStudy/. Original generated PNG pixels are
+preserved. Built-in OpenAI image generation; exact model ID not exposed.
+Reference: our archived Golden River Ruins v2, for palette, brushwork and lighting.
+License: ASSET-LICENSE.md where rights exist. Full prompts and output identifiers:
+docs/design/background-study/terrain-module-prompts.md.
+
+Human direction rejected the repeating rectangular-wall prototype, especially the
+right platform. The replacement uses whole painted rock silhouettes, integrated
+golden turf, asymmetric ivy, flowers and broad boulder feet. A wide bank painting
+serves broad ground; a compact pillar serves narrow supports. Code registers the
+painted landing row to collision independently of decorative crown and submerged
+body height. No change to Mika, collision layout or physics. Shader alpha clipping
+rejects generated outer haze; pixels remain unmodified. Two-source reuse and body
+stretching remain prototype limitations, with visual acceptance pending.
+
+## Terrain integration grading — 2026-10-28
+
+No new generated assets. The original pillar/bank PNGs are unchanged. In response
+to feedback about detached-looking platforms, shader grading reduces yellow
+saturation, introduces restrained shared sage atmosphere and cool wet coloration
+at grounded feet. A lower, narrowly irregular water mask reveals the boulder
+silhouettes. No painted fake foam or independent water texture was introduced.
+Human direction: connect platform lighting and shore contact to the environment;
+final visual acceptance is pending.
+
+## Shore connection and grass registration — 2026-10-28
+
+painted-shore-v2.png under Assets/Game/Resources/BackgroundStudy/ is an original
+transparent painting generated with the built-in OpenAI image tool; exact model
+ID not exposed. Style reference: our archived Golden River Ruins v2. License:
+ASSET-LICENSE.md where rights exist. Original generated pixels preserved. Full
+prompt/output identifier: docs/design/background-study/terrain-module-prompts.md.
+
+Human direction: join the right land-adjacent platform to surrounding banks and
+remove Mika's slight apparent hover. A low mossy boulder/fern buttress connects
+five selected banks below the playable plane, with no added collision. Existing
+pillar/bank paintings are unchanged; UV registration now uses the actual central
+load-bearing grass rows (pillar 0.748, bank 0.587), rather than brighter leaf tips.
+Mika's prefab, presentation and collision physics remain unchanged. Final visual
+acceptance remains pending.
+
+## World-space shore and distant parallax — 2026-10-29
+
+The user rejected the moving shore contact and clipped middle/near trees, and
+requested a more reliable layered composition. The lab now keeps connected river
+banks, water and platform contact in world coordinates in every preset. Only sky
+and an independent distant landscape parallax. The clipped near-cutout painting
+is archived and no longer loaded. This supersedes the all-depths-moving study;
+production direction and final visuals remain pending review.
+
+New original generated PNGs under Assets/Game/Resources/BackgroundStudy/:
+- painted-shelf-v3.png: shallow suspended fragment, jagged underside, no standing
+  boulder feet; replaces vertically compressed pillar art on floating platforms.
+- distant-canopy-v3.png: complete tree/tower silhouettes with transparent headroom,
+  no river or connected foreground, placed behind the fixed world-space banks.
+
+Generator: built-in OpenAI image generation, exact model ID not exposed.
+Date: 2026-10-29. Reference: our Golden River Ruins v2 for style/palette/lighting.
+License: ASSET-LICENSE.md where rights exist. Original pixels preserved.
+Full prompts, output identifiers and creative decisions:
+docs/design/background-study/world-shore-prompts.md.
+Human decisions: preserve atmospheric parallax at a distance, stop contact drift,
+replace cut trees, keep suspended bodies shallow without changing collision tops.
+Two-point contact registration, existing paw alignment and separate shore
+buttresses remain; no Mika source or movement physics changes were introduced.
+
+## Separated valley and foreground test — 2026-10-29
+
+New original source: Assets/Game/Resources/BackgroundStudy/recessed-valley-v4.png.
+Built-in OpenAI image generation with transparent output; exact model ID not
+exposed. Reference: our Golden River Ruins v2 for style/palette/lighting. License:
+ASSET-LICENSE.md where rights exist. Original PNG pixels preserved. Full prompt
+and output identifier: docs/design/background-study/separated-depth-prompts.md.
+
+Human direction rejected the connected-river variants and explicitly requested
+testing separate background, gameplay scenery and foreground. The valley has
+recessed waterfalls terminating in mist and a forested lower edge, without a near
+river plane. Existing foreground-river.png is reused independently, with its
+original generation records above; no regeneration or pixel edit. Its earlier
+rejection concerned attempted connection to background water. It now uses its own
+material, world-space tiling and authored wave contour, with saturation/tint
+applied only in the shader. The connected-river painting and StudyRiver pass are
+archived and no longer loaded. Existing shelf/pillar/bank art, Mika and physics
+remain unchanged. This is an experimental composition pending visual acceptance.
+
+## Foreground water motion — 2026-10-30
+
+No new bitmap assets or image generation. Existing foreground-river.png pixels
+remain unchanged. Human direction selected Subtle distance, removed comparison
+controls and requested animated near water. The StudyWater shader introduces
+small color-masked refraction and moving highlights in bright cyan water while
+retaining the original alpha shoreline and fixed warm/dark rocks. Its phase is
+world-space and driven by explicit time for reproducible captures. Source,
+generator and license records for the painting remain above. The selected
+background factors are sky 0.05, valley 0.14 and canopy 0.08.
+
+## Visible water flow revision — 2026-10-30
+
+No new source artwork or generation. In response to invisible-looking motion,
+StudyWater increases water/neutral-foam refraction and adds moving light streaks.
+A second source-color mask prevents pulling rock colors into nearby water.
+Normal animation uses the shader game clock; explicit time is opt-in for capture.
+Original source pixels, warm/dark rocks, alpha wave contour and terrain are
+unchanged. Previous subpixel shimmer is superseded.
+
+## Running water activity — 2026-10-30
+
+No source pixels or generator changes. Human direction requested stronger water
+motion and more waves during running. Grounded body speed drives a smoothly
+blended shader activity value, extra accumulated flow phase and additional fine
+crests. Full running gives approximately 2.2 times baseline flow and 35% more
+refraction; rock colors and authored alpha remain fixed. The dedicated
+water-running.mp4 is an explicit full-activity render for visual comparison;
+actual body-driven transitions are covered by motor/physics tests.
+
+## Background study review archive (2026-10-30)
+
+The curated evidence in `docs/design/background-study/archive/` contains exact
+copies of historical repository media and seven user-provided feedback uploads,
+plus H.264 review derivatives of existing local capture frames. No new artwork
+was generated or retouched. Original paintings retain the source, generator and
+license records elsewhere in this document; user screenshots document this project's Unity review,
+and the reposted concept retains its existing generated-reference provenance.
+Human curation selected thirteen major iterations, representative stills and
+clips, and start/midpoint/end keyframes. The archive README records decisions;
+`manifest.json` records source revisions, original upload names, SHA-256 hashes
+and encoding details. Unknown capture dates/revisions are explicitly recorded.
+All 291 raw capture frames remain untouched locally; the committed videos are
+lossy review copies, not lossless backups of those frames.
+
+## Golden River checkpoint prototype integration - 2026-10-30
+
+The existing selected BackgroundStudy paintings now also dress the menu's
+MovementCourse prototype. No new generated images or modified source pixels are
+introduced. Human decisions: reuse fixed Subtle distance, painted ground/shelves,
+separate foreground water and running-responsive waves; preserve the original
+seven-platform layout and both checkpoint positions. The course camera holds
+y=1 with a 5.5-unit orthographic half-height to retain the river during jumps.
+Three Unity Editor-created Resources materials retain references to the original
+scenery shaders in standalone builds. Their metadata is preserved.
+
+The checkpoint-prototype evidence uses the actual Resources course, controller,
+presentation and lifecycle in an isolated Unity physics scene. Scripted fixtures
+place Mika at each checkpoint, induce falls, pause/retry and restart. The recording
+is reproducible with BuildBackgroundStudy.RecordCheckpointPrototype; it is not a
+claim of a continuous manually played traversal. No imported artwork or new license
+is involved. Existing generator and license records still apply.
+
+## Extended checkpoint prototype and trimmed water geometry - 2026-10-30
+
+Existing paintings are reused unchanged for a 109-unit, fourteen-platform course
+with four checkpoints. No new images, source-pixel edits or licensed assets were
+introduced. Human choices: preserve the opening route, extend using existing
+grounded and shallow suspended modules, reduce the default overlay to 350x52
+pixels, and keep detailed controls behind Controls/pause.
+
+The foreground water source's opaque content ends below v=0.242. A mesh covering
+v=0..0.25 preserves world/UV registration and a filtering margin while omitting
+75% empty quad area. The wave shader and source images are unchanged. The existing
+takeoff drawing is selected immediately on grounded jump input; no character art
+or jump-force constants changed. Actual Windows preview screenshots, the render
+comparison and measurement limitations are recorded in
+docs/design/background-study/extended-prototype/README.md. The earlier shader
+branch experiment was discarded after showing no measured benefit.
+
+## Background study review corrections - 2026-10-31
+
+Six unused historical paintings (connected-river, middle-cutout, near-cutout,
+painted-terrain, meadow-surface and hanging-foliage) now live under
+Assets/Game/Art/BackgroundStudyArchive/ rather than Resources. Images, original
+GUIDs, metadata and generation/license records are preserved. Current locations
+and SHA-256 hashes are indexed in docs/design/background-study/historical-asset-locations.json.
+The earlier grouped meadow/foliage generation records remain historical; only
+foreground-river from that group is part of the selected runtime.
+
+Active artwork and texture importer settings are unchanged. Mipmaps remain off
+for the fixed orthographic alpha-cutout art pending a separate coverage-aware
+minification review. This avoids changing grass/leaf contours and adding mip
+storage in this correction; it is not a measured performance improvement.
+Geometry/camera/parallax now use the placed course coordinate frame so translated
+and uniformly scaled courses retain visual/collider contact and stable water UVs.
+No new artwork, animation, traversal mechanic or source-pixel edit was introduced.
+See docs/design/background-study/review-2026-10-31.md for tests and limitations.

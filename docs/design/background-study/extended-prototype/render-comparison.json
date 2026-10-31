@@ -1,0 +1,6 @@
+{
+    "baselineMedianMs": 33.315650000000008,
+    "optimizedMedianMs": 33.9778,
+    "meanChannelDifference": 0.0016420717592592594,
+    "maxRgbSumDifference": 8
+}
