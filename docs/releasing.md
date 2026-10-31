@@ -3,7 +3,7 @@
 Maintainer documentation. Do not trigger or publish a release without an explicit user request. See [Development](development.md) for merge preparation.
 
 ## Release
-Configure Actions secrets UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD (GameCI activation).
+Configure GitHub Actions secrets `UNITY_EMAIL` and `UNITY_PASSWORD` for Unity Personal account activation in GameCI. No machine-bound `UNITY_LICENSE` file is required or passed to the workflows. GameCI uses account activation when only these credentials are provided. Ensure each CI job releases its temporary Unity activation normally; do not suppress activation or license return.
 Run **Actions > Release** on main. No mode or version input is needed.
 Conventional Commits since the last release determine the version: fix/perf = patch, feat = minor, !/BREAKING CHANGE = major.
 Docs/chore/test alone produce no release. The first release is 0.1.0. Later releases follow Conventional Commits; a breaking change can promote 0.x to 1.0.0.
@@ -137,7 +137,7 @@ Actual installation and N -> N+1 updates on Windows/Linux still require verifica
 Follow [the first release test runbook](../RELEASE-TEST.md) and record both platforms' actual results.
 
 ## Setup status
-Unity activation secrets are configured. The setup PR tracks final Windows/Linux validation.
+Unity Personal account credentials (`UNITY_EMAIL`, `UNITY_PASSWORD`) are configured. The old `UNITY_LICENSE` secret is unused and may be removed after successful account-only CI validation. The setup PR tracks final Windows/Linux validation.
 Ready PRs automatically trigger Prepare merge checks; Draft PRs skip them. Release remains separately and manually triggered.
 Release tooling audit reports transitive braces/micromatch and npm/ip-address advisories even with current direct dependencies. Recheck before the first release.
 
