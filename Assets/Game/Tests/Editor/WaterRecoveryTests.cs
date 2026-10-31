@@ -105,4 +105,40 @@ public class WaterRecoveryTests
         Position(-3.1f, 2); Assert.That((bool)Call(recovery, "TryEnter"), Is.False);
         Assert.That(body.simulated, Is.True);
     }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void SplashBridgesOriginalFallToDescendingHeadTurnInBothDirections(bool faceLeft)
+    {
+        var renderer = new GameObject("Original falling drawing").AddComponent<SpriteRenderer>();
+        renderer.transform.SetParent(player.transform, false);
+        renderer.sprite = Resources.Load<GameObject>("MikaOriginal").GetComponent<SpriteRenderer>().sprite;
+        renderer.flipX = faceLeft;
+        recovery.GetType().GetField("originalRenderer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(recovery, renderer);
+        Position(-3.1f);
+        Assert.That((bool)Call(recovery, "TryEnter"), Is.True);
+        var impact = root.GetComponentsInChildren<SpriteRenderer>().Single(r => r.name == "Original fall through impact");
+        var head = root.GetComponentsInChildren<SpriteRenderer>().Single(r => r.name == "Mika facial reaction");
+        Assert.That(impact.enabled, Is.True, "Keep the real falling drawing at initial contact.");
+        Assert.That(head.enabled, Is.False, "Reveal the head through the early splash instead of popping it in at contact.");
+
+        Call(recovery, "Advance", 0.2f); Call(recovery, "LateUpdate");
+        Assert.That(impact.enabled, Is.False);
+        Assert.That(head.enabled, Is.True);
+        Assert.That(head.flipX, Is.EqualTo(faceLeft));
+        var initialDrawing = head.sprite;
+        float initialHeight = head.transform.position.y;
+        float surface = root.transform.TransformPoint(new Vector3(0, -3.25f)).y;
+        Assert.That(head.bounds.max.y - surface, Is.LessThan(0.9f * root.transform.lossyScale.y),
+            "The close-up must not expose a full airborne body above the water.");
+        Call(recovery, "Advance", 0.5f); Call(recovery, "LateUpdate");
+        Assert.That(head.sprite, Is.Not.EqualTo(initialDrawing), "The head should turn toward the viewer.");
+        Assert.That(head.transform.position.y, Is.LessThan(initialHeight), "Mika must keep descending during the turn.");
+        float turningHeight = head.transform.position.y;
+        Call(recovery, "Advance", 0.9f); Call(recovery, "LateUpdate");
+        Assert.That(head.transform.position.y, Is.LessThan(turningHeight));
+        Assert.That(head.bounds.max.y, Is.LessThan(surface), "Even the ears should be under water before the fade.");
+        Call(cat, "RespawnAt", checkpoint);
+        Assert.That(renderer.enabled, Is.True, "Retry restores the original character drawing.");
+    }
 }

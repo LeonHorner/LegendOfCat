@@ -18,12 +18,14 @@ public sealed class WaterRecovery : MonoBehaviour
     Rigidbody2D body;
     System.Action retry;
     MikaSpritePresentation original;
-    SpriteRenderer originalRenderer, reaction;
+    SpriteRenderer originalRenderer, reaction, impactBody;
     Sprite[] drawings;
     Material submerge, foamMaterial;
     GameObject effects;
     readonly LineRenderer[] rings = new LineRenderer[2];
     readonly LineRenderer[] droplets = new LineRenderer[12];
+    LineRenderer splash;
+    Vector3 impactPosition;
     Vector3 cameraStart, entry;
     float cameraSize, scale, facing;
     bool respawned, internalRespawn;
@@ -56,6 +58,12 @@ public sealed class WaterRecovery : MonoBehaviour
         entry = new Vector3(body.position.x, course.TransformPoint(new Vector3(0, SurfaceY)).y, 0);
         cat.SetRecovering(true);
         PrepareEffects();
+        if (impactBody) {
+            impactBody.sprite = originalRenderer.sprite;
+            impactBody.flipX = originalRenderer.flipX;
+            impactPosition = originalRenderer.transform.position;
+            impactBody.transform.localScale = originalRenderer.transform.lossyScale / scale;
+        }
         if (original) original.enabled = false;
         if (originalRenderer) originalRenderer.enabled = false;
         effects.SetActive(true);
@@ -67,19 +75,26 @@ public sealed class WaterRecovery : MonoBehaviour
         if (effects) return;
         effects = new GameObject("Mika water reaction and splash");
         effects.transform.SetParent(course, false);
-        var texture = Resources.Load<Texture2D>("WaterRecovery/reactions");
-        drawings = new Sprite[4];
-        float width = texture.width / 4f;
-        for (int i = 0; i < 4; i++)
-            drawings[i] = Sprite.Create(texture, new Rect(i * width, 0, width, texture.height),
-                new Vector2(0.72f, 0.40f), width / 1.8f, 0, SpriteMeshType.FullRect);
+        var texture = Resources.Load<Texture2D>("WaterRecovery/turn-reactions");
+        drawings = new Sprite[8];
+        float width = texture.width / 4f, height = texture.height / 2f;
+        for (int i = 0; i < drawings.Length; i++)
+            drawings[i] = Sprite.Create(texture, new Rect(i % 4 * width, (1 - i / 4) * height, width, height),
+                // Register the lower row's higher source baseline; keep one scale for all drawings.
+                new Vector2(0.5f, i < 4 ? 0.5f : 0.588f), width / 0.9f, 0, SpriteMeshType.FullRect);
         reaction = new GameObject("Mika facial reaction").AddComponent<SpriteRenderer>();
         reaction.transform.SetParent(effects.transform, false);
         submerge = new Material(Resources.Load<Shader>("WaterRecovery/Submerge"));
         reaction.sharedMaterial = submerge; reaction.sortingOrder = 4;
+        if (originalRenderer) {
+            impactBody = new GameObject("Original fall through impact").AddComponent<SpriteRenderer>();
+            impactBody.transform.SetParent(effects.transform, false);
+            impactBody.sharedMaterial = submerge; impactBody.sortingOrder = 4;
+        }
         foamMaterial = new Material(Shader.Find("Sprites/Default"));
         for (int i = 0; i < rings.Length; i++) rings[i] = Line("Expanding surface ripple", 49, true);
         for (int i = 0; i < droplets.Length; i++) droplets[i] = Line("Splash droplet", 2, false);
+        splash = Line("Breaking shoulder splash", 33, false);
     }
 
     LineRenderer Line(string name, int points, bool loop)
@@ -115,19 +130,36 @@ public sealed class WaterRecovery : MonoBehaviour
 
     void Present()
     {
-        // Fixed waterline, rigid complete drawings: the surface occludes the sinking cat.
-        float sink = Mathf.SmoothStep(0, 1.15f, Mathf.InverseLerp(0.65f, 1.65f, Elapsed));
-        reaction.transform.position = entry + Vector3.up * (0.05f - sink) * scale;
+        // Continue the existing fall through impact, then reveal a submerged neck.
+        // The head keeps descending during its authored turn; there is no floating hold.
+        float sink = Elapsed * 0.1f + 0.65f * Mathf.Pow(Mathf.InverseLerp(0.9f, 1.6f, Elapsed), 1.5f);
+        reaction.transform.position = entry + new Vector3(facing * 0.30f, 0.40f - sink, 0) * scale;
         reaction.transform.localScale = Vector3.one;
         reaction.flipX = facing < 0;
-        int frame = Elapsed < 0.35f ? 0 : Elapsed < 0.80f ? 1 : Elapsed < 1.05f ? 2 : 3;
+        int frame = Elapsed < 0.25f ? 0 : Elapsed < 0.34f ? 1 : Elapsed < 0.43f ? 2
+            : Elapsed < 0.52f ? 3 : Elapsed < 0.61f ? 4 : Elapsed < 0.85f ? 5 : Elapsed < 0.98f ? 6 : 7;
         reaction.sprite = drawings[frame];
+        reaction.enabled = !impactBody || Elapsed >= 0.14f;
+        if (impactBody) {
+            impactBody.enabled = Elapsed < 0.14f;
+            impactBody.transform.position = impactPosition - Vector3.up * (Elapsed * 2.3f) * scale;
+        }
         submerge.SetFloat("_Surface", entry.y);
         float zoom = Mathf.SmoothStep(0, 1, Mathf.Clamp01(Elapsed / 0.55f));
         view.orthographicSize = Mathf.Lerp(cameraSize, 1.65f * scale, zoom);
         // Follow the face only slightly as it sinks; keep the surface in the close view.
         Vector3 close = entry + new Vector3(facing * 0.12f * scale, 0.28f * scale, -10);
         view.transform.position = Vector3.Lerp(cameraStart, close, zoom);
+        float breakAmount = Mathf.Sin(Mathf.Clamp01(Elapsed / 0.4f) * Mathf.PI);
+        splash.enabled = Elapsed < 0.4f;
+        splash.startWidth = splash.endWidth = (0.035f + breakAmount * 0.11f) * scale;
+        splash.startColor = splash.endColor = new Color(0.8f, 0.94f, 0.91f, 1 - Mathf.Clamp01(Elapsed / 0.4f));
+        for (int p = 0; p < 33; p++) {
+            float x = (p / 32f - 0.5f) * (0.9f + Elapsed * 1.2f);
+            float envelope = Mathf.Sin(p / 32f * Mathf.PI);
+            float crest = envelope * (0.10f + Mathf.Abs(Mathf.Sin(p * 1.7f)) * 0.22f) * breakAmount;
+            splash.SetPosition(p, entry + new Vector3(x, crest, -0.12f) * scale);
+        }
         float alpha = 1 - Mathf.Clamp01(Elapsed / 1.75f);
         for (int r = 0; r < rings.Length; r++) {
             float radius = (0.25f + Elapsed * (0.7f + r * 0.25f)) * scale;

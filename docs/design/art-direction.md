@@ -269,3 +269,16 @@ reviewing the bounded effect in-game. It does not accept the reaction artwork or
 replace the existing Mika animation review decisions. See
 [water-recovery review](water-recovery/README.md) and ASSETS.md for provenance,
 playback, implementation limits and outstanding review.
+
+### Approved water-entry storyboard — 2026-10-31
+
+The user liked the first water prototype's zoom/fade but rejected the cat's
+above-water pose and disconnected animation. After reviewing the six-panel
+storyboard, the user approved implementation of its three-quarter glance toward
+the camera, connected head/neck motion, submerged shoulders and early splash
+overlap. The revised sequence continues the real falling drawing briefly through
+impact, then uses eight registered head-turn/blink drawings while sinking. This
+supersedes the first version's four complete-body water reaction frames. Existing
+locomotion artwork and accepted zoom/fade remain unchanged. Concept approval is
+not final in-game acceptance. See [water recovery](water-recovery/README.md), its
+approved storyboard, source prompt and normal/slowed Unity-rendered previews.

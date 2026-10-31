@@ -9,7 +9,12 @@ public static class WaterRecoveryPreview
     [MenuItem("LegendOfCat/Water recovery/Prepare reaction texture")]
     public static void Prepare()
     {
-        var importer = (TextureImporter)AssetImporter.GetAtPath("Assets/Game/Resources/WaterRecovery/reactions.png");
+        PrepareTexture("Assets/Game/Resources/WaterRecovery/turn-reactions.png");
+    }
+
+    static void PrepareTexture(string path)
+    {
+        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
         importer.textureType = TextureImporterType.Default;
         importer.alphaIsTransparency = true; importer.mipmapEnabled = false;
         importer.textureCompression = TextureImporterCompression.Uncompressed;
@@ -47,8 +52,12 @@ public static class WaterRecoveryPreview
         view.aspect = 16f / 9f;
         var water = course.Cat.GetComponent<WaterRecovery>();
         var body = course.Cat.GetComponent<Rigidbody2D>();
-        body.position = new Vector2(6, -3);
+        body.position = new Vector2(6, -2.82f);
         course.Cat.transform.position = body.position;
+        // Reproduce an actual descending drawing before its feet touch the river.
+        var presentation = course.Cat.GetComponentInChildren<MikaSpritePresentation>();
+        presentation.GetComponent<SpriteRenderer>().sprite = presentation.frames[11];
+        presentation.transform.position = new Vector3(6, -3.27f);
         Physics2D.SyncTransforms();
         water.TryEnter();
         var render = new RenderTexture(960, 540, 24);
