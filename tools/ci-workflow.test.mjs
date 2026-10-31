@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
@@ -6,6 +7,8 @@ import yaml from 'js-yaml';
 
 const prWorkflow = yaml.load(readFileSync(new URL('../.github/workflows/pull-request.yml', import.meta.url), 'utf8'));
 const releaseWorkflow = yaml.load(readFileSync(new URL('../.github/workflows/release.yml', import.meta.url), 'utf8'));
+const linuxUpdateWorkflow = yaml.load(readFileSync(new URL('../.github/workflows/linux-appimage-update.yml', import.meta.url), 'utf8'));
+const allWorkflows = [prWorkflow, releaseWorkflow, linuxUpdateWorkflow];
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 
 // Execute the actual github-script step from the parsed workflow, not a copied
@@ -182,7 +185,7 @@ test('PR workflow triggers and job graph keep validation on ready PRs', () => {
   assert.equal(prWorkflow.jobs.build.needs, 'preflight');
   assert.deepEqual(prWorkflow.jobs.package.needs, ['preflight', 'build']);
   assert.equal(prWorkflow.jobs['delta-integration'].needs, 'preflight');
-  assert.equal(prWorkflow.jobs.preflight.steps[0].uses, 'actions/github-script@v7');
+  assert.equal(prWorkflow.jobs.preflight.steps[0].uses, 'actions/github-script@v9');
   assert.deepEqual(prWorkflow.jobs.preflight.steps[0].env, {
     PR_NUMBER: '${{ inputs.pr_number }}'
   });
@@ -233,4 +236,71 @@ test('release checks and builds both platforms before publishing artifacts', () 
     'Baseline verification, packing and Delta reconstruction must precede artifact upload');
   assert.ok(releaseWorkflow.jobs.publish.steps.some(step =>
     step.name === 'Publish verified commit'));
+});
+
+test('all referenced GitHub and GameCI actions use reviewed Node.js 24-capable releases', () => {
+  const versions = new Map([
+    ['actions/checkout', 'v7'],
+    ['actions/cache', 'v6'],
+    ['actions/setup-node', 'v7'],
+    ['actions/setup-dotnet', 'v6'],
+    ['actions/upload-artifact', 'v7'],
+    ['actions/download-artifact', 'v8'],
+    ['actions/github-script', 'v9'],
+    ['game-ci/unity-builder', 'v6'],
+    ['game-ci/unity-test-runner', 'v4.4.0']
+  ]);
+  for (const workflow of allWorkflows) {
+    for (const [jobName, job] of Object.entries(workflow.jobs)) {
+      for (const step of job.steps) {
+        if (!step.uses) continue;
+        const action = step.uses.split('@')[0];
+        assert.ok(versions.has(action), `Unreviewed action ${step.uses} in ${jobName}`);
+        assert.equal(step.uses, `${action}@${versions.get(action)}`, `${jobName}: ${action}`);
+      }
+    }
+  }
+});
+
+test('GameCI actions activate Unity Personal using account secrets, never a machine-bound file', () => {
+  let count = 0;
+  for (const workflow of allWorkflows) {
+    for (const job of Object.values(workflow.jobs)) {
+      for (const step of job.steps) {
+        if (!step.uses?.startsWith('game-ci/')) continue;
+        count++;
+        assert.deepEqual(Object.keys(step.env).filter(key => key.startsWith('UNITY_')).sort(),
+          ['UNITY_EMAIL', 'UNITY_PASSWORD']);
+        assert.equal(step.env.UNITY_EMAIL, '${{ secrets.UNITY_EMAIL }}');
+        assert.equal(step.env.UNITY_PASSWORD, '${{ secrets.UNITY_PASSWORD }}');
+      }
+    }
+  }
+  assert.equal(count, 5, 'Expected test, PR builds, release builds and Linux AppImage update');
+});
+
+test('Unity credential preflights succeed without a license file and reject missing credentials', {
+  skip: process.platform === 'win32'
+}, () => {
+  const checks = [
+    prWorkflow.jobs.preflight.steps.find(step => step.name === 'Check Unity account credentials'),
+    releaseWorkflow.jobs.plan.steps.find(step => step.name === 'Check Unity account credentials')
+  ];
+  for (const step of checks) {
+    assert.ok(step, 'Unity credential guard must exist');
+    assert.deepEqual(Object.keys(step.env).sort(), ['UNITY_EMAIL', 'UNITY_PASSWORD']);
+    const environment = { ...process.env, UNITY_EMAIL: 'ci@example.invalid', UNITY_PASSWORD: 'test-password', UNITY_LICENSE: '' };
+    const run = env => spawnSync('bash', ['-e', '-c', step.run], { env, encoding: 'utf8' });
+    assert.equal(run(environment).status, 0, 'Account-only activation must be accepted');
+    for (const key of ['UNITY_EMAIL', 'UNITY_PASSWORD']) {
+      const result = run({ ...environment, [key]: '' });
+      assert.notEqual(result.status, 0, `Missing ${key} must be rejected`);
+    }
+  }
+});
+
+test('Linux AppImage validation remains manual and release dispatch is unchanged', () => {
+  assert.deepEqual(Object.keys(linuxUpdateWorkflow.on), ['workflow_dispatch']);
+  assert.deepEqual(Object.keys(releaseWorkflow.on), ['workflow_dispatch']);
+  assert.equal(prWorkflow.jobs.gate.needs.includes('package'), true);
 });

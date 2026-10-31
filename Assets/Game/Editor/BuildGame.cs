@@ -69,6 +69,9 @@ public static class BuildGame
         if (report.summary.result != BuildResult.Succeeded)
             throw new BuildFailedException("Unity player build failed.");
         BuildBackgroundStudy.ValidatePackedArt(report);
+        // GameCI CLI requires this exact success marker for custom build methods.
+        // Report success only after Unity and the packed-asset audit have passed.
+        Debug.Log("Build succeeded!");
     }
 
     // Local UI inspection only. No installer, update feed or release publication is produced.
