@@ -248,7 +248,7 @@ test('all referenced GitHub and GameCI actions use reviewed Node.js 24-capable r
     ['actions/download-artifact', 'v8'],
     ['actions/github-script', 'v9'],
     ['game-ci/unity-builder', 'v6'],
-    ['game-ci/unity-test-runner', 'v4.3.2']
+    ['game-ci/unity-test-runner', 'v4.4.0']
   ]);
   for (const workflow of allWorkflows) {
     for (const [jobName, job] of Object.entries(workflow.jobs)) {
