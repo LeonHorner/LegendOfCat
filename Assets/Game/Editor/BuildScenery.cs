@@ -54,7 +54,7 @@ public static class BuildScenery
         foreach (string name in ActiveLayers) {
             var importer = (TextureImporter)AssetImporter.GetAtPath($"Assets/Game/Resources/BackgroundStudy/{name}.png");
             importer.textureCompression = TextureImporterCompression.Uncompressed;
-            // Retain crisp alpha-cutout grass/ivy in the fixed orthographic study.
+            // Retain crisp alpha-cutout grass/ivy in the fixed orthographic course.
             // Mips need a separate coverage/minification review, not a global toggle.
             importer.mipmapEnabled = false;
             importer.isReadable = false;
@@ -63,5 +63,4 @@ public static class BuildScenery
             importer.SaveAndReimport();
         }
     }
-
 }

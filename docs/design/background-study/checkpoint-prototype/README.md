@@ -27,7 +27,7 @@ The former checkpoint-capture menu and batch recorder were removed with the
 standalone scene. Existing frames and CSV remain historical evidence. For current
 behavior, run the movement course from the main menu and its Unity integration tests.
 The archived capture originally used `Logs/checkpoint-scenery-review/` at 25 fps.
-Use an isolated Unity project/Library for batch capture while another Editor is open.
+Historical recordings used a separate Unity project and Library.
 
 Open `Assets/Game/Scenes/Main.unity`, press Play, choose **Movement lab (prototype)**,
 then **Enter movement lab** for interactive testing. Cross gold markers on safe
