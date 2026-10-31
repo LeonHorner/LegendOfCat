@@ -1,6 +1,6 @@
 # Short cat reaction candidate
 
-Review-only candidate for #12, not enabled in gameplay. The user requested a short abrupt, surprised, slightly rough cat-like cry after rejecting the attention-seeking meow and abstract synthetic proposals.
+Rejected review candidate for #12, not enabled in gameplay. User feedback: too short and insufficiently cat-like. The user requested a short abrupt, surprised, slightly rough cat-like cry after rejecting the attention-seeking meow and abstract synthetic proposals.
 
 Source: **Angry Cat Meow** by **bevibeldesign**, published 2016-07-16 on [Freesound](https://freesound.org/people/bevibeldesign/sounds/350411/). The author describes it as a pitch-bent human voice intended to represent a cat being trampled. The source page releases it under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/), permitting adaptation and public redistribution. This is a performed vocal effect, not a real cat injury recording. No AI generator/model is involved in the source.
 

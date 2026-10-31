@@ -11,7 +11,7 @@
   "sourceFile": "source-preview.mp3",
   "derivedFile": "short-reaction.wav",
   "edits": "Keep 0.045-0.465 seconds, mono PCM16 at 48000 Hz; 3 ms attack and 35 ms release fades; peak target 0.35. No further pitch change.",
-  "reviewStatus": "Unselected candidate. Not enabled in gameplay.",
+  "reviewStatus": "Rejected: too short and insufficiently cat-like. Not enabled in gameplay.",
   "sha256": {
     "short-reaction.wav": "e324f0b772c44c2a99f747a289d9f7ee9ca411ec5abf1d3e1786f4a4d3da443e",
     "source-preview.mp3": "1e5b460804ce05e45196d8c0900479b6c4ae153e6781b410e55c28cc42d2c29b"

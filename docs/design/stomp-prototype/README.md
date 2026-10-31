@@ -26,9 +26,16 @@ The previous lateral recoil and falling sine tone were rejected by the user. The
 ![Held running right through a damage hop](damage-run-right.gif)
 ![Held running left through a damage hop](damage-run-left.gif)
 
-## Cat reaction choice pending
+## Real-cat reaction choice pending
 
-The user rejected all three abstract proposals below and the attention-seeking cat-meow reference, and selected the direction of a short abrupt, surprised, slightly rough cat-like cry. A new [420 ms vocal candidate](sound-options/cat-reaction/short-reaction.wav) is prepared from **Angry Cat Meow** by **bevibeldesign**, a performed pitch-bent human voice released under CC0. [Source, license, edit recipe and checksums](sound-options/cat-reaction/README.md) are recorded with the retained source preview. This candidate is not yet selected and is not enabled in gameplay.
+The user rejected the abstract proposals, the attention-seeking cat-meow reference and the 420 ms performed human-voice candidate (too short and insufficiently cat-like). The current direction is a real-cat vocalization with a rough abrupt beginning and a recognizable longer ending.
+
+New review-only excerpts of **Cat Angry Meow.WAV** by **softcoresoft**, [Freesound](https://freesound.org/people/softcoresoft/sounds/327438/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/):
+
+- [Natural-speed excerpt, 1.2 seconds](sound-options/real-cat/natural-reaction.wav).
+- [Shorter excerpt, 0.9 seconds](sound-options/real-cat/short-reaction.wav): same phrase accelerated with pitch preserved, rather than an earlier cut.
+
+[Attribution, license, modifications and source hashes](sound-options/real-cat/README.md) accompany the retained public source preview. No candidate is selected or enabled in gameplay. These source-based alternatives require user listening; the source describes actual hissing/meowing, not an independently verified surprised emotion. The prior performed-voice clip remains in sound-options/cat-reaction solely as rejected history.
 
 ## Rejected abstract sound proposals
 
