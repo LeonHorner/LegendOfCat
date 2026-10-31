@@ -133,12 +133,8 @@ company/product names just to change the public installer filenames.
 Menu settings use a versioned format with backup-before-migration and atomic writes. The
 [persistent data contract](data-migrations.md) governs future settings, save and level formats.
 Keep update packages and feeds attached to releases. Old Java builds cannot self-update to this project.
-Successful in-app N -> N+1 updates have been maintainer-reported on Windows (v0.1.0 -> v0.2.0)
-and Linux (v0.5.0 -> v0.6.0, with the updater fix present in v0.5.0).
-These smoke tests do not establish the complete cross-platform acceptance matrix,
-including interrupted downloads, failed-install recovery and all restart/settings checks.
-Follow [the release test runbook and evidence ledger](../RELEASE-TEST.md) for the latest
-platform-specific status before making stronger verification claims.
+Actual installation and N -> N+1 updates on Windows/Linux still require verification before promoting releases to players.
+Follow [the first release test runbook](../RELEASE-TEST.md) and record both platforms' actual results.
 
 ## Setup status
 Unity activation secrets are configured. The setup PR tracks final Windows/Linux validation.
