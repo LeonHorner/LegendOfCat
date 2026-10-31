@@ -87,6 +87,11 @@ public sealed class SceneryRendererTests
             "Scenery renderer must reuse the existing course camera.");
         Assert.That(study.GetComponentsInChildren<Collider2D>(), Is.Empty,
             "Scenery renderer must not create a second set of collision objects.");
+        // The renderer test drives camera positions explicitly; leave follow behavior to its own course tests.
+        var viewForFixture = (Camera)Study.GetProperty("View").GetValue(study);
+        var followType = AppDomain.CurrentDomain.GetAssemblies()
+            .Select(a => a.GetType("CatCamera")).First(t => t != null);
+        ((Behaviour)viewForFixture.GetComponent(followType)).enabled = false;
         yield return null;
         // Drive the motor directly; live keyboard polling would release the scripted held jump.
         var liveInput = root.GetComponentsInChildren<MonoBehaviour>().First(c => c.GetType().Name == "CatInput");
