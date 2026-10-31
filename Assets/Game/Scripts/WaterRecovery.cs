@@ -5,6 +5,7 @@ using UnityEngine;
 public sealed class WaterRecovery : MonoBehaviour
 {
     public const float SurfaceY = -3.25f;
+    public const float ForegroundInset = 0.65f;
     public const float RespawnTime = 2.1f, Duration = 2.5f;
     public bool Active { get; private set; }
     public bool CameraHeld => Active && !respawned;
@@ -130,10 +131,15 @@ public sealed class WaterRecovery : MonoBehaviour
 
     void Present()
     {
+        float zoom = Mathf.SmoothStep(0, 1, Mathf.Clamp01(Elapsed / 0.55f));
+        // Move the close-up into the painted river, away from its far shoreline.
+        // The body enters at the physical surface; only presentation shifts with the zoom.
+        Vector3 foregroundShift = Vector3.down * (ForegroundInset * scale * zoom);
+        Vector3 visualEntry = entry + foregroundShift;
         // Continue the existing fall through impact, then reveal a submerged neck.
         // The head keeps descending during its authored turn; there is no floating hold.
         float sink = Elapsed * 0.1f + 0.65f * Mathf.Pow(Mathf.InverseLerp(0.9f, 1.6f, Elapsed), 1.5f);
-        reaction.transform.position = entry + new Vector3(facing * 0.30f, 0.40f - sink, 0) * scale;
+        reaction.transform.position = visualEntry + new Vector3(facing * 0.30f, 0.40f - sink, 0) * scale;
         reaction.transform.localScale = Vector3.one;
         reaction.flipX = facing < 0;
         int frame = Elapsed < 0.25f ? 0 : Elapsed < 0.34f ? 1 : Elapsed < 0.43f ? 2
@@ -142,13 +148,12 @@ public sealed class WaterRecovery : MonoBehaviour
         reaction.enabled = !impactBody || Elapsed >= 0.14f;
         if (impactBody) {
             impactBody.enabled = Elapsed < 0.14f;
-            impactBody.transform.position = impactPosition - Vector3.up * (Elapsed * 2.3f) * scale;
+            impactBody.transform.position = impactPosition + foregroundShift - Vector3.up * (Elapsed * 2.3f) * scale;
         }
-        submerge.SetFloat("_Surface", entry.y);
-        float zoom = Mathf.SmoothStep(0, 1, Mathf.Clamp01(Elapsed / 0.55f));
+        submerge.SetFloat("_Surface", visualEntry.y);
         view.orthographicSize = Mathf.Lerp(cameraSize, 1.65f * scale, zoom);
         // Follow the face only slightly as it sinks; keep the surface in the close view.
-        Vector3 close = entry + new Vector3(facing * 0.12f * scale, 0.28f * scale, -10);
+        Vector3 close = entry + new Vector3(facing * 0.12f * scale, (0.28f - ForegroundInset) * scale, -10);
         view.transform.position = Vector3.Lerp(cameraStart, close, zoom);
         float breakAmount = Mathf.Sin(Mathf.Clamp01(Elapsed / 0.4f) * Mathf.PI);
         splash.enabled = Elapsed < 0.4f;
@@ -158,7 +163,7 @@ public sealed class WaterRecovery : MonoBehaviour
             float x = (p / 32f - 0.5f) * (0.9f + Elapsed * 1.2f);
             float envelope = Mathf.Sin(p / 32f * Mathf.PI);
             float crest = envelope * (0.10f + Mathf.Abs(Mathf.Sin(p * 1.7f)) * 0.22f) * breakAmount;
-            splash.SetPosition(p, entry + new Vector3(x, crest, -0.12f) * scale);
+            splash.SetPosition(p, visualEntry + new Vector3(x, crest, -0.12f) * scale);
         }
         float alpha = 1 - Mathf.Clamp01(Elapsed / 1.75f);
         for (int r = 0; r < rings.Length; r++) {
@@ -167,7 +172,7 @@ public sealed class WaterRecovery : MonoBehaviour
             rings[r].startColor = rings[r].endColor = new Color(0.82f, 0.93f, 0.88f, alpha * 0.8f);
             for (int p = 0; p < 49; p++) {
                 float angle = p * Mathf.PI * 2 / 48;
-                rings[r].SetPosition(p, entry + new Vector3(Mathf.Cos(angle) * radius,
+                rings[r].SetPosition(p, visualEntry + new Vector3(Mathf.Cos(angle) * radius,
                     Mathf.Sin(angle) * radius * 0.12f, -0.1f));
             }
         }
@@ -175,8 +180,8 @@ public sealed class WaterRecovery : MonoBehaviour
             float t = Mathf.Min(Elapsed, 0.65f);
             float vx = (i - 5.5f) * 0.38f;
             float vy = 2.4f + (i % 3) * 0.45f;
-            var position = entry + new Vector3(vx * t, vy * t - 6 * t * t, -0.1f) * scale;
-            droplets[i].enabled = Elapsed < 0.65f && position.y >= entry.y;
+            var position = visualEntry + new Vector3(vx * t, vy * t - 6 * t * t, -0.1f) * scale;
+            droplets[i].enabled = Elapsed < 0.65f && position.y >= visualEntry.y;
             droplets[i].startWidth = 0.035f * scale; droplets[i].endWidth = 0.012f * scale;
             droplets[i].startColor = droplets[i].endColor = new Color(0.8f, 0.93f, 0.9f, 1 - t);
             droplets[i].SetPosition(0, position);

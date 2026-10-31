@@ -7,6 +7,12 @@ animation, and approved the six-panel storyboard for implementation. The current
 revision follows that storyboard; final in-game acceptance and merge validation
 remain open.
 
+Subsequent feedback accepted the revised animation and asked for Mika to appear
+farther forward within the water. The close-up now moves 0.65 course units below
+the far-bank water edge as the zoom approaches. Her head, splash, ripples and
+submersion mask share this presentation offset; the physical entry threshold and
+checkpoint behavior are unchanged. Camera close framing follows that offset.
+
 [Normal-speed Unity preview](recovery.mp4) · [Half-speed preview](recovery-slow.mp4)
 
 ![Face close-up](face-closeup.png)
@@ -44,12 +50,14 @@ waterline clip. A breaking shoulder splash clears within 0.4 seconds; droplets a
 ripples follow. The head keeps descending during the turn and blink. The sequence
 calls the course's existing retry callback once under black. `CatCamera`
 yields during the close-up; scenery follows that camera before rendering.
-No persistent format, checkpoint policy or movement ability is added.
+The presentation waterline moves into the visible river with the zoom; it does
+not change the physics water-entry plane. No persistent format, checkpoint policy
+or movement ability is added.
 
 The surface is a level plane matching the prototype river, not per-pixel buoyancy
-or freely swimmable water. The waterline mask has a small wave. The head turn and
-transition from the
-existing airborne art remain subject to in-game motion review. The approved
+or freely swimmable water. The waterline mask has a small wave. The user accepted
+the revised animation; the subsequent foreground placement still awaits in-game
+review. The approved
 [storyboard](storyboard/approved-storyboard.png) sets the staging; it is not a
 screenshot of the implemented effect. [Source generation and exact prompt](storyboard/generation.md)
 record the new atlas. One common pixel scale preserves the skull size; a bottom-row
@@ -89,6 +97,11 @@ editing is needed; runtime course construction attaches the behavior.
   CatCollisionTests and RunLifecycleTests, with zero failures or skipped tests.
 - The revised scoped regression run passed 16/16 tests across the same fixtures,
   with zero failures/skips, using an isolated project with its own Library.
+- Foreground-placement rendering was inspected with water visible behind Mika.
+  Existing both-direction regression coverage now also checks the shifted mask
+  and ripple alignment in a scaled/translated course, with full submersion measured
+  against that local presentation surface. This scoped run passed 16/16 tests
+  with zero failures/skips.
 - Revised Unity-rendered review frames were inspected for impact continuity,
   neck immersion, three-quarter gaze and visible blink before the ears disappear.
   Both source rows use one scale with a registered baseline. Camera/fade timing

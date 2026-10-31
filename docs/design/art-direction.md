@@ -282,3 +282,11 @@ supersedes the first version's four complete-body water reaction frames. Existin
 locomotion artwork and accepted zoom/fade remain unchanged. Concept approval is
 not final in-game acceptance. See [water recovery](water-recovery/README.md), its
 approved storyboard, source prompt and normal/slowed Unity-rendered previews.
+
+The user subsequently accepted the revised animation and requested placement
+farther into the foreground river. The close-up presentation now shifts Mika and
+her water effects 0.65 course units below the far-bank edge, blended with the zoom.
+Her local submersion mask follows the same shift so the face remains readable
+within the water. Physical entry, artwork, expression timing, zoom scale and fade
+remain unchanged. Updated review frames/clips are in the water-recovery folder;
+the placement refinement remains subject to in-game review.

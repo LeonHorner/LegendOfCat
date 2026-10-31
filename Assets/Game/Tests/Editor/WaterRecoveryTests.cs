@@ -134,10 +134,17 @@ public class WaterRecoveryTests
         Call(recovery, "Advance", 0.5f); Call(recovery, "LateUpdate");
         Assert.That(head.sprite, Is.Not.EqualTo(initialDrawing), "The head should turn toward the viewer.");
         Assert.That(head.transform.position.y, Is.LessThan(initialHeight), "Mika must keep descending during the turn.");
+        float inset = (float)recovery.GetType().GetField("ForegroundInset").GetRawConstantValue();
+        float visualSurface = surface - inset * root.transform.lossyScale.y;
+        Assert.That(head.sharedMaterial.GetFloat("_Surface"), Is.EqualTo(visualSurface).Within(0.001f),
+            "The submersion mask must follow Mika into the visible river instead of clipping her at the far bank.");
+        var ripple = root.GetComponentsInChildren<LineRenderer>().First(r => r.name == "Expanding surface ripple");
+        Assert.That(ripple.GetPosition(0).y, Is.EqualTo(visualSurface).Within(0.001f),
+            "Surface effects and Mika must share the foreground waterline.");
         float turningHeight = head.transform.position.y;
         Call(recovery, "Advance", 0.9f); Call(recovery, "LateUpdate");
         Assert.That(head.transform.position.y, Is.LessThan(turningHeight));
-        Assert.That(head.bounds.max.y, Is.LessThan(surface), "Even the ears should be under water before the fade.");
+        Assert.That(head.bounds.max.y, Is.LessThan(visualSurface), "Even the ears should be under water before the fade.");
         Call(cat, "RespawnAt", checkpoint);
         Assert.That(renderer.enabled, Is.True, "Retry restores the original character drawing.");
     }
