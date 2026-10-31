@@ -112,6 +112,6 @@ test('release notes link to the same stable names for a specific version', () =>
     assert.ok(notes.includes('/releases/download/v0.3.0/' + name));
   }
   assert.equal(generateNotes({}, { nextRelease: { gitTag: 'v0.3.0' } }), notes);
-  assert.match(notes, /\[current installation and update test status\]\(https:\/\/github\.com\/LeonHorner\/LegendOfCat\/blob\/main\/RELEASE-TEST\.md\)/);
-  assert.doesNotMatch(notes, /still require real-device verification/);
+  assert.ok(notes.includes('> Early development build. The complete adventure is not available yet.'));
+  assert.doesNotMatch(notes, /real-device verification|current installation and update test status/);
 });
