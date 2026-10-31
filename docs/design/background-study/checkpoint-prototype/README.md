@@ -23,10 +23,10 @@ with two 0.02-second physics steps per recorded frame. Recorded lifecycle state
 confirms activation, fall recovery, pause/retry and full restart. Water capture
 time advances explicitly; normal gameplay uses the native shader clock.
 
-Reproduce with `LegendOfCat/Background study/Record checkpoint prototype`
-or batch execute method `BuildBackgroundStudy.RecordCheckpointPrototype`.
-Raw frames and CSV are written under `Logs/checkpoint-scenery-review/`; encode
-`frame-%03d.png` at 25 fps with ffmpeg. The recorder enters and exits Play Mode.
+The former checkpoint-capture menu and batch recorder were removed with the
+standalone scene. Existing frames and CSV remain historical evidence. For current
+behavior, run the movement course from the main menu and its Unity integration tests.
+The archived capture originally used `Logs/checkpoint-scenery-review/` at 25 fps.
 Use an isolated Unity project/Library for batch capture while another Editor is open.
 
 Open `Assets/Game/Scenes/Main.unity`, press Play, choose **Movement lab (prototype)**,
