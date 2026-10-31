@@ -112,7 +112,7 @@ test('release types and release permissions match realistic versions', async () 
     ['feat!: redesign saved levels', 'major', '1.0.0'],
     ['fix!: incompatible save migration', 'major', '1.0.0'],
     ['fix(api)!: incompatible protocol', 'major', '1.0.0'],
-    ['feat: modify save format\\n\\nBREAKING CHANGE: saves are incompatible', 'major', '1.0.0']
+    ['feat: modify save format\n\nBREAKING CHANGE: saves are incompatible', 'major', '1.0.0']
   ]) {
     const releaseType = await analyze(message);
     assert.equal(releaseType, type, message);
