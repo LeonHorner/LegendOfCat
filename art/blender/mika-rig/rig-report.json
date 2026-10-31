@@ -1,0 +1,35 @@
+{
+  "bones": 33,
+  "deform_bones": 25,
+  "skin_vertices": 29518,
+  "actions": {
+    "Idle": 48,
+    "LookBack": 72,
+    "Listen": 48,
+    "TailTwitch": 48,
+    "Groom": 96,
+    "Stretch": 72,
+    "Run": 16,
+    "Takeoff": 12,
+    "Airborne": 24,
+    "Fall": 12,
+    "Land": 12,
+    "Stop": 16,
+    "JumpReview": 48
+  },
+  "pole_angles": {
+    "Front.L": 3.1415927410125732,
+    "Front.R": 3.1415927410125732,
+    "Hind.L": 0.0,
+    "Hind.R": 0.0
+  },
+  "sole_offsets": {
+    "Front.L": -0.0017432899912819266,
+    "Front.R": -0.0032773041166365147,
+    "Hind.L": -3.645344293090602e-08,
+    "Hind.R": -0.0031525189988315105
+  },
+  "unweighted_vertices": 0,
+  "visual_acceptance": false,
+  "unity_validated": false
+}

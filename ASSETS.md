@@ -229,6 +229,27 @@ RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
   only. Production topology, skeleton, animation, Unity validation and gameplay
   integration remain unfinished. Previous Blender models remain rejected.
 
+## Mika Blender rig and motion candidates — 2026-10-31
+
+- Files: `art/blender/mika-rig/`, including the native rig, baked FBX, texture
+  maps, authoring/verification scripts and actual Blender motion review renders.
+- Source and license: the accepted revision 3 Grab3D Tabby Cat adaptation above;
+  its preserved CC0 license and Meshy AI-assisted source disclosure still apply.
+  No new external character or image generator was used.
+- Authoring: Codex and Blender 5.2.3 LTS, 2026-10-31. A working duplicate received
+  voxel cleanup, regular-quad un-subdivision, surface fitting, UV/texture baking,
+  skeleton, constrained heat weights, paw IK and keyed motion candidates. The
+  accepted dense look study remains unchanged. The working mesh has mixed
+  topology; it is not represented as anatomical hand retopology.
+- Human decisions: retain the accepted natural appearance, open eyes, four
+  resting paw contacts, independent ear/tail motion and editable Unity export.
+  Normal/slowed loops are rendered from the actual rig, not generated motion
+  illustrations. The inherited dark underarm marking remains visible.
+- Validation: normalized four-influence weights, native support measurements and
+  FBX reimport passed. Motion appearance, Unity import/materials and game
+  integration remain unaccepted/unverified. See the folder README and validation
+  report. Keep issue #49 incomplete and the existing 2D playable character intact.
+
 ## Golden River background study — 2026-10-24
 
 `Assets/Game/Resources/BackgroundStudy/painted-atlas.png` is original generated

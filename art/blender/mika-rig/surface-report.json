@@ -1,0 +1,7 @@
+{
+  "source_vertices": 404297,
+  "deformation_vertices": 29518,
+  "deformation_faces": 41150,
+  "quad_faces": 17882,
+  "method": "Fine voxel cleanup, regular-quad un-subdivision, nearest-surface fit and rebaked appearance. Requires deformation review."
+}

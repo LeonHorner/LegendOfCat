@@ -136,6 +136,13 @@ new animation output passes normal/slowed motion and actual-game review. The
 Blender authoring route does not approve replacing the game's 2D presentation
 with a 3D presentation. Issue #49 remains incomplete.
 
+The [2026-10-31 rig candidate](../../art/blender/mika-rig/README.md) adds a reduced
+working surface, editable skeleton/IK, baked FBX and actual motion review loops.
+The accepted v3 source is unchanged. Mechanical weight/contact/export checks do
+not approve the motions: inspect the shoulder/underarm deformation and natural
+gait at normal/slowed speed before any output enters gameplay. Unity activation
+currently blocks Editor validation. This work remains isolated outside `Assets`.
+
 ### Terrain system correction — 2026-10-28
 
 The user rejected the latest tall-wall preview, especially its right platform,
