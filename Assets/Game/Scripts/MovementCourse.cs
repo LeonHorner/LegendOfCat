@@ -63,7 +63,8 @@ public sealed class MovementCourse : MonoBehaviour
         visual.SetParent(player.transform, false);
         var original = Resources.Load<GameObject>("MikaOriginal");
         if (original) {
-            Destroy(visual.gameObject);
+            if (Application.isPlaying) Destroy(visual.gameObject);
+            else DestroyImmediate(visual.gameObject);
             visual = Instantiate(original, player.transform).transform;
             visual.GetComponent<MikaSpritePresentation>().controller = Cat;
             originalMika = true;
@@ -102,6 +103,7 @@ public sealed class MovementCourse : MonoBehaviour
         var scenery = new GameObject("Golden River scenery");
         scenery.transform.SetParent(transform, false);
         scenery.AddComponent<BackgroundStudy>().InitializeForCourse(courseCamera, Cat, Platforms);
+        Cat.gameObject.AddComponent<WaterRecovery>().Initialize(Cat, courseCamera, transform, RetryCheckpoint);
         for (int i = 0; i < CheckpointSpawns.Length; i++) {
             var point = CheckpointSpawns[i];
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),

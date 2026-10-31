@@ -258,3 +258,41 @@ Water geometry omits empty source space without changing its authored mapping or
 animation. Measurements do not establish an FPS gain or explain the user's low
 Editor frame rate. See background-study/extended-prototype/README.md for evidence,
 regressions and limits. The earlier seven-platform integration record is historical.
+
+### Water-entry review prototype — 2026-10-31
+
+For #60 the user requested a first playable version after discussing splash,
+face-focused zoom, sinking head and a short fade back to the last checkpoint.
+Four new complete-character reaction drawings are confined to water recovery;
+existing locomotion artwork is retained. This explicit integration request permits
+reviewing the bounded effect in-game. It does not accept the reaction artwork or
+replace the existing Mika animation review decisions. See
+[water-recovery review](water-recovery/README.md) and ASSETS.md for provenance,
+playback, implementation limits and outstanding review.
+
+### Approved water-entry storyboard — 2026-10-31
+
+The user liked the first water prototype's zoom/fade but rejected the cat's
+above-water pose and disconnected animation. After reviewing the six-panel
+storyboard, the user approved implementation of its three-quarter glance toward
+the camera, connected head/neck motion, submerged shoulders and early splash
+overlap. The revised sequence continues the real falling drawing briefly through
+impact, then uses eight registered head-turn/blink drawings while sinking. This
+supersedes the first version's four complete-body water reaction frames. Existing
+locomotion artwork and accepted zoom/fade remain unchanged. Concept approval is
+not final in-game acceptance. See [water recovery](water-recovery/README.md), its
+approved storyboard, source prompt and normal/slowed Unity-rendered previews.
+
+The user subsequently accepted the revised animation and requested placement
+farther into the foreground river. The close-up presentation now shifts Mika and
+her water effects 0.65 course units below the far-bank edge, blended with the zoom.
+Her local submersion mask follows the same shift so the face remains readable
+within the water. Physical entry, artwork, expression timing, zoom scale and fade
+remain unchanged. Updated review frames/clips are in the water-recovery folder;
+the placement refinement remains subject to in-game review.
+
+Further feedback identified a detached-looking neck cutoff in the early frames.
+A shallow water-tinted alpha transition and small foreground wash now blend the
+neck into the river. Contact dimensions follow course scale. Source artwork,
+head-turn timing, foreground position, camera and fade are retained; refreshed
+normal/slowed review captures show the compositing adjustment.

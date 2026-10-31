@@ -492,3 +492,52 @@ Geometry/camera/parallax now use the placed course coordinate frame so translate
 and uniformly scaled courses retain visual/collider contact and stable water UVs.
 No new artwork, animation, traversal mechanic or source-pixel edit was introduced.
 See docs/design/background-study/review-2026-10-31.md for tests and limitations.
+
+## Mika water-recovery prototype — 2026-10-31
+
+- Asset: `Assets/Game/Resources/WaterRecovery/reactions.png`, four complete-character
+  reaction drawings in a horizontal atlas. Original generated artwork from the
+  built-in OpenAI image generation tool; exact model ID was not exposed.
+- Reference: existing original Mika artwork, specifically
+  `Assets/Game/Art/Mika/Original/original-apex-isolated.png`. No third-party input.
+- License: project `ASSET-LICENSE.md` where rights exist; no claim that a license
+  creates copyright in unprotectable generated output.
+- Human direction: user requested a splash, zoom focused on facial animation,
+  head submersion, brief black fade and checkpoint return, and explicitly asked
+  to evaluate an implemented first version. Natural orange/cream quadruped identity
+  retained; surprised eyes, lifted chin, blink and closed eyes selected for review.
+- Generation specification: transparent four-cell horizontal sheet, complete cat
+  facing right, same dimensions/markings/registration, sturdy paws tucked downward,
+  green eyes, ears slightly back, restrained expressions, no water/background/text,
+  no stretched body or detached pieces. The original reference was supplied as
+  identity/style guidance. Source pixels are retained in the atlas.
+- Integration decisions: rigid frame changes and mirrored facing, world-space
+  submersion mask, code-drawn droplets/ripples and camera zoom. No optical flow,
+  cutout rig or whole-body deformation. Editor import preserves native proportions
+  without mipmaps or compression. Visual acceptance remains pending under #60.
+
+## Mika storyboard water-entry revision — 2026-10-31
+
+- Active asset: `Assets/Game/Resources/WaterRecovery/turn-reactions.png`, eight
+  connected head-and-neck drawings in a four-column/two-row atlas. Original
+  generated artwork from the built-in OpenAI image generation tool; exact model
+  ID was not exposed. Uses project `ASSET-LICENSE.md` where rights exist.
+- Reference: original generated six-panel storyboard archived at
+  `docs/design/water-recovery/storyboard/approved-storyboard.png`, accepted by the
+  user in this chat after rejecting the first version's floating-body animation.
+  The storyboard itself used existing Mika and the game screenshot as references.
+  No third-party input or new outside dependency is used.
+- Human decisions: preserve the accepted zoom/fade; submerge chest/shoulders early;
+  turn Mika's eyes and head from profile toward the viewer in three-quarter view;
+  blink while descending; use an early shoulder splash to connect the drawings.
+- Full generation prompt, selection and registration notes are in
+  `docs/design/water-recovery/storyboard/generation.md`. An initial atlas attempt
+  lacked adequate cell separation; the selected second atlas added explicit
+  padding constraints. Native alpha/source pixels are retained.
+- Implementation uses one pixel scale for all drawings and a registered bottom-row
+  pivot. No optical flow, cutout rig, morphing or whole-body deformation is used.
+  The current falling drawing continues through initial impact for 0.14 seconds;
+  the original prototype reaction sheet above is superseded at runtime. New
+  source is confined to water recovery, with existing locomotion artwork retained.
+- Concept approval permits implementation; final in-game visual acceptance
+  remains pending.
