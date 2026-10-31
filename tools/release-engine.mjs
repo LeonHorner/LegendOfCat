@@ -2,6 +2,7 @@ import semanticRelease from 'semantic-release';
 import { analyzeCommits } from '@semantic-release/commit-analyzer';
 import { generateNotes } from '@semantic-release/release-notes-generator';
 import { execFileSync } from 'node:child_process';
+import releaseConfig from '../release.config.js';
 
 export function git(...args) {
   return execFileSync('git', args, { encoding: 'utf8' }).trim();
@@ -22,10 +23,12 @@ export async function firstReleasePlan() {
     branch: { name: 'main' }, commits, lastRelease: {},
     nextRelease: { version: '0.1.0', gitTag: 'v0.1.0', gitHead: git('rev-parse', 'HEAD') }
   };
-  const type = await analyzeCommits({ preset: 'conventionalcommits' }, context);
+  const commitAnalyzer = releaseConfig.plugins.find(plugin => Array.isArray(plugin) && plugin[0] === '@semantic-release/commit-analyzer')[1];
+  const notesGenerator = releaseConfig.plugins.find(plugin => Array.isArray(plugin) && plugin[0] === '@semantic-release/release-notes-generator')[1];
+  const type = await analyzeCommits(commitAnalyzer, context);
   if (!type) return false;
   context.nextRelease.type = type;
-  context.nextRelease.notes = await generateNotes({ preset: 'conventionalcommits' }, context);
+  context.nextRelease.notes = await generateNotes(notesGenerator, context);
   return { nextRelease: context.nextRelease };
 }
 

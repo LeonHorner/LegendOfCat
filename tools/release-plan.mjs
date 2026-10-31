@@ -1,17 +1,11 @@
 import { planRelease } from './release-engine.mjs';
 import { assertReleaseApproval } from './release-approval.mjs';
+import { inspectReleaseCommitHistory } from './release-commit-policy.mjs';
 import { appendFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
 
-let tag;
-try {
-  tag = execFileSync('git', ['describe', '--tags', '--match', 'v[0-9]*', '--abbrev=0'], {
-    encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']
-  }).trim();
-} catch { /* First release: inspect the entire history. */ }
-const range = tag ? tag + '..HEAD' : 'HEAD';
-const subjects = execFileSync('git', ['log', '--format=%s', range], { encoding: 'utf8' })
-  .trim().split('\n').filter(Boolean);
+const subjects = inspectReleaseCommitHistory()
+  .map(message => message.split(/\r?\n/, 1)[0])
+  .filter(Boolean);
 const convention = /^(feat|fix|perf|docs|style|refactor|test|build|ci|chore|revert)(\([^)]+\))?!?: .+/;
 const invalid = subjects.filter(subject => !convention.test(subject));
 if (invalid.length) {

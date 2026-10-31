@@ -1,12 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import releaseConfig from '../release.config.js';
 import { analyzeCommits } from '@semantic-release/commit-analyzer';
 import { generateNotes } from '@semantic-release/release-notes-generator';
 
-const config = JSON.parse(readFileSync(new URL('../.releaserc.json', import.meta.url), 'utf8'));
 function pluginOptions(name) {
-  const plugin = config.plugins.find(p => Array.isArray(p) && p[0] === name);
+  const plugin = releaseConfig.plugins.find(p => Array.isArray(p) && p[0] === name);
   assert.ok(plugin, 'Missing release plugin: ' + name);
   return plugin[1];
 }
@@ -23,8 +22,18 @@ async function analyze(message) {
   });
 }
 
-test('PR #66 prose about breaking-change descriptions remains patch', async () => {
-  // Reproduces the real PR #66 squash-commit body that incorrectly triggered v1.0.0.
+async function notes(message, type = 'patch') {
+  return generateNotes(notesOptions, {
+    commits: [{ hash: 'abc123', message }],
+    lastRelease: { version: '0.7.0', gitTag: 'v0.7.0' },
+    nextRelease: { version: type === 'major' ? '1.0.0' : '0.7.1',
+      gitTag: type === 'major' ? 'v1.0.0' : 'v0.7.1', type },
+    options: { repositoryUrl },
+    logger
+  });
+}
+
+test('PR #66 prose never creates a major release or breaking changelog section', async () => {
   const message = [
     'fix: clean up in-game release history metadata (#66)',
     '',
@@ -38,77 +47,48 @@ test('PR #66 prose about breaking-change descriptions remains patch', async () =
     '- GitHub Release bodies and version calculation are unchanged.'
   ].join('\n');
   assert.equal(await analyze(message), 'patch');
-  const notes = await generateNotes(notesOptions, {
-    commits: [{ hash: 'abc123', message }],
-    lastRelease: { version: '0.7.0', gitTag: 'v0.7.0' },
-    nextRelease: { version: '0.7.1', gitTag: 'v0.7.1', type: 'patch' },
-    options: { repositoryUrl },
-    logger
-  });
-  assert.doesNotMatch(notes, /BREAKING CHANGES/);
+  assert.doesNotMatch(await notes(message), /BREAKING CHANGES/);
 });
 
-test('explicit breaking footers and bang headers still produce major releases', async () => {
-  for (const message of [
-    'feat!: intentionally change the save format',
-    'fix: change save API\n\nBREAKING CHANGE: old saves are incompatible',
-    'fix: change save API\n\nBREAKING-CHANGE: old saves are incompatible'
-  ]) assert.equal(await analyze(message), 'major', message);
-});
-
-test('breaking prose without a colon is not a major, regardless of case', async () => {
+test('case variants of prose without a colon do not imply a breaking change', async () => {
   for (const line of [
-    'breaking-change descriptions.',
-    'Breaking-Change descriptions.',
-    'BREAKING-CHANGE descriptions.',
-    'breaking change descriptions.',
-    'Breaking Change descriptions.',
-    'BREAKING CHANGE descriptions.'
+    'breaking-change descriptions.', 'Breaking-Change descriptions.',
+    'BREAKING-CHANGE descriptions.', 'breaking change descriptions.',
+    'Breaking Change descriptions.', 'BREAKING CHANGE descriptions.'
   ]) {
-    const message = [
-      'fix: clean up release history (#66)',
-      '',
-      '## Changes',
-      'The following wording is ordinary documentation:',
-      line,
-      '',
-      '## Scope',
-      'Version calculation is unchanged.'
-    ].join('\n');
+    const message = 'fix: clean up release history\n\n' + line;
     assert.equal(await analyze(message), 'patch', line);
+    assert.doesNotMatch(await notes(message), /BREAKING CHANGES/, line);
   }
 });
 
-test('explicit breaking footers are case-insensitive but require a colon', async () => {
-  for (const marker of [
-    'BREAKING CHANGE:',
-    'breaking change:',
-    'Breaking Change:',
-    'bReAkInG cHaNgE:',
-    'BREAKING-CHANGE:',
-    'breaking-change:',
-    'Breaking-Change:'
-  ]) {
-    const message = 'fix: change save format\n\n' +
-      marker + ' existing save files are incompatible';
+test('only exact uppercase breaking footers make a major release', async () => {
+  for (const marker of ['BREAKING CHANGE:', 'BREAKING-CHANGE:']) {
+    const message = 'fix: change save format\n\n' + marker + ' old saves are incompatible';
     assert.equal(await analyze(message), 'major', marker);
+    assert.match(await notes(message, 'major'), /BREAKING CHANGES/, marker);
+  }
+  for (const marker of [
+    'breaking change:', 'Breaking Change:', 'bReAkInG cHaNgE:',
+    'breaking-change:', 'Breaking-Change:', 'BREAKING-change:'
+  ]) {
+    const message = 'fix: explain save format\n\n' + marker + ' details';
+    assert.equal(await analyze(message), 'patch', marker);
+    assert.doesNotMatch(await notes(message), /BREAKING CHANGES/, marker);
   }
 });
 
-test('real breaking notes remain visible in the generated changelog', async () => {
-  const message = 'fix: change save format\n\nBREAKING CHANGE: old saves are incompatible';
-  const notes = await generateNotes(notesOptions, {
-    commits: [{ hash: 'abc123', message }],
-    lastRelease: { version: '0.7.0', gitTag: 'v0.7.0' },
-    nextRelease: { version: '1.0.0', gitTag: 'v1.0.0', type: 'major' },
-    options: { repositoryUrl },
-    logger
-  });
-  assert.match(notes, /BREAKING CHANGES/);
+test('breaking shorthand alone never creates a major release', async () => {
+  assert.notEqual(await analyze('feat!: breaking feature'), 'major');
+  assert.notEqual(await analyze('fix(api)!: change public API'), 'major');
 });
 
-test('normal fix, feature and refactor commits retain expected types', async () => {
+test('fixes, features and CI commits retain their correct classification', async () => {
   assert.equal(await analyze('fix: disable Unity splash screen'), 'patch');
   assert.equal(await analyze('feat: add movement tutorial'), 'minor');
-  assert.ok((await analyze('refactor: rename internal renderer')) == null);
+  assert.ok((await analyze('ci: harden release version classification and approval gates')) == null);
+  assert.doesNotMatch(
+    await notes('ci: harden release version classification and approval gates'),
+    /harden release version classification/
+  );
 });

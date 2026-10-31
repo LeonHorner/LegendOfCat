@@ -1,6 +1,7 @@
 import semanticRelease from 'semantic-release';
 import { firstReleasePlan, planRelease, git } from './release-engine.mjs';
 import { assertReleaseApproval } from './release-approval.mjs';
+import { inspectReleaseCommitHistory } from './release-commit-policy.mjs';
 import { execFileSync } from 'node:child_process';
 import { readdirSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
@@ -9,6 +10,7 @@ import { basename } from 'node:path';
 import { DOWNLOADS } from './release-assets.mjs';
 import { downloadNotes } from './release-notes.mjs';
 
+inspectReleaseCommitHistory();
 const initial = await firstReleasePlan();
 const approvedPlan = initial === null ? await planRelease() : initial;
 if (!approvedPlan) throw new Error('No releasable changes.');

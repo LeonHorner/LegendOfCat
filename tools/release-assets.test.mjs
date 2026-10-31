@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { DOWNLOADS, prepareAssets } from './release-assets.mjs';
 import { packageName } from './delta-release.mjs';
 import { downloadNotes, generateNotes } from './release-notes.mjs';
+import releaseConfig from '../release.config.js';
 
 const VERSION = '0.3.0';
 function fixture(run, withDeltas = false) {
@@ -93,7 +94,6 @@ test('rejects missing, inconsistent or stale release packages', () => {
 
 test('README links and semantic-release asset paths agree with the staging contract', () => {
   const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
-  const releaseConfig = JSON.parse(readFileSync(new URL('../.releaserc.json', import.meta.url), 'utf8'));
   for (const name of Object.values(DOWNLOADS)) {
     assert.ok(readme.includes('/releases/latest/download/' + name), name);
   }

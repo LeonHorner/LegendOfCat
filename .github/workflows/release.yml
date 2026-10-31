@@ -216,7 +216,7 @@ jobs:
           merge-multiple: true
           path: artifacts/releases
       - name: Test version analysis and approval
-        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs
+        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-commit-policy.test.mjs
       - name: Test release asset and download-link contract
         run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
       - name: Stage clean player downloads and update packages
