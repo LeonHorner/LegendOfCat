@@ -1,4 +1,5 @@
 import { planRelease } from './release-engine.mjs';
+import { assertReleaseApproval } from './release-approval.mjs';
 import { appendFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
@@ -17,6 +18,7 @@ if (invalid.length) {
   throw new Error('Non-conventional commits since the last release:\n' + invalid.join('\n'));
 }
 const result = await planRelease();
+if (result) assertReleaseApproval(result.nextRelease, process.env.EXPECTED_VERSION, process.env.ALLOW_MAJOR);
 const version = result ? result.nextRelease.version : '';
 if (process.env.GITHUB_OUTPUT)
   appendFileSync(process.env.GITHUB_OUTPUT, 'version=' + version + '\n');
