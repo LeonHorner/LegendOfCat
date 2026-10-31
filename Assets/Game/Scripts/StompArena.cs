@@ -18,7 +18,10 @@ public sealed class StompArena : MonoBehaviour
     readonly System.Collections.Generic.List<SpriteRenderer> stripes = new System.Collections.Generic.List<SpriteRenderer>();
     Rigidbody2D body;
     Vector2 previous;
-    float flash;
+    float flash, damageFlash, previousTargetX;
+    Material damageMaterial;
+    AudioSource damageAudio;
+    AudioClip damageTone;
     static readonly Rect BossBounds = new Rect(-0.85f, 0, 1.7f, 1.35f);
     static readonly Rect Hazard = new Rect(-2.8f, 0, 5.6f, 0.35f);
     static readonly Vector2 Half = new Vector2(0.45f, 0.45f);
@@ -59,8 +62,16 @@ public sealed class StompArena : MonoBehaviour
         visual.GetComponent<MikaSpritePresentation>().controller = Cat;
         playerSprite = visual.GetComponent<SpriteRenderer>();
         playerColor = playerSprite.color;
+        damageMaterial = new Material(Resources.Load<Shader>("StompDamage"));
+        playerSprite.sharedMaterial = damageMaterial;
+        damageAudio = player.AddComponent<AudioSource>();
+        damageAudio.playOnAwake = false;
+        damageAudio.spatialBlend = 0;
+        damageAudio.volume = .12f;
+        damageTone = CreateDamageTone();
+        damageAudio.clip = damageTone;
         Run = new RunLifecycle(new Vector2(-4, .5f));
-        Run.ResetTransientState += () => { Combat.Reset(); flash = 0; };
+        Run.ResetTransientState += () => { Combat.Reset(); flash = damageFlash = previousTargetX = 0; damageAudio.Stop(); };
         Cat.FellOutOfBounds += Retry;
         var input = player.AddComponent<CatInput>();
         input.controller = Cat;
@@ -73,6 +84,7 @@ public sealed class StompArena : MonoBehaviour
         ArenaCamera.transform.localPosition = new Vector3(0, 2.4f, -10);
         ArenaCamera.orthographic = true; ArenaCamera.orthographicSize = 5;
         ArenaCamera.depth = 2;
+        if (!FindFirstObjectByType<AudioListener>()) ArenaCamera.gameObject.AddComponent<AudioListener>();
         ArenaCamera.backgroundColor = new Color(.08f, .11f, .15f);
         previous = transform.InverseTransformPoint(body.position);
         Present();
@@ -91,15 +103,19 @@ public sealed class StompArena : MonoBehaviour
         // Minkowski expansion includes the player's body and high-speed crossings.
         var bounds = new Bounds(new Vector3(rect.center.x, rect.center.y, 0),
             new Vector3(rect.width + Half.x * 2, rect.height + Half.y * 2, 2));
-        Vector2 delta = current - previous;
-        return bounds.Contains(current) || bounds.Contains(previous) ||
-            delta.sqrMagnitude > 0 && bounds.IntersectRay(new Ray(previous, delta.normalized), out float distance) && distance <= delta.magnitude;
+        Vector2 before = previous - Vector2.right * previousTargetX;
+        current -= Vector2.right * Combat.TargetX;
+        Vector2 delta = current - before;
+        return bounds.Contains(current) || bounds.Contains(before) ||
+            delta.sqrMagnitude > 0 && bounds.IntersectRay(new Ray(before, delta.normalized), out float distance) && distance <= delta.magnitude;
     }
     void FixedUpdate()
     {
-        if (Run.Paused || Combat.Finished) return;
+        if (Run.Paused) return;
+        damageFlash = Mathf.Max(0, damageFlash - Time.fixedDeltaTime);
+        if (Combat.Finished) { Present(); return; }
         Vector2 current = transform.InverseTransformPoint(body.position);
-        bool top = StompCombat.CrossedHead(previous, current, Half, BossBounds);
+        bool top = StompCombat.CrossedHead(previous - Vector2.right * previousTargetX, current - Vector2.right * Combat.TargetX, Half, BossBounds);
         // Resolve the completed simulation against the state displayed for that step.
         if (Combat.TryStomp(top)) {
             current.y = BossBounds.yMax + Half.y + .02f;
@@ -108,13 +124,17 @@ public sealed class StompArena : MonoBehaviour
             impact.transform.localPosition = new Vector3(current.x, BossBounds.yMax);
             flash = .16f;
         } else if ((SweptContact(BossBounds, current) || Combat.Phase == StompCombat.AttackPhase.Attack && SweptContact(Hazard, current)) && Combat.TryDamage()) {
-            float side = Mathf.Abs(current.x) > .001f ? current.x : previous.x;
+            float relativeX = current.x - Combat.TargetX;
+            float side = Mathf.Abs(relativeX) > .001f ? relativeX : previous.x - previousTargetX;
             if (Mathf.Abs(side) <= .001f) side = -body.linearVelocity.x;
             float direction = side > 0 ? 1 : -1;
             Cat.Knockback(new Vector2(direction * 5, 7));
+            damageFlash = .08f;
+            if (Application.isPlaying) damageAudio.Play();
         }
         previous = current;
         if (Combat.Finished) Cat.SetPaused(true);
+        previousTargetX = Combat.TargetX;
         Combat.Advance(Time.fixedDeltaTime);
         Run.Advance(Time.fixedDeltaTime);
         flash = Mathf.Max(0, flash - Time.fixedDeltaTime);
@@ -124,10 +144,20 @@ public sealed class StompArena : MonoBehaviour
     public void Restart() { Cat.RespawnAt(transform.TransformPoint(Run.Restart())); previous = transform.InverseTransformPoint(body.position); Present(); }
     public void TogglePause()
     {
-        if (!Combat.Finished) Cat.SetPaused(Run.TogglePause());
+        if (Combat.Finished) return;
+        Cat.SetPaused(Run.TogglePause());
+        if (Run.Paused) damageAudio.Pause();
+        else damageAudio.UnPause();
     }
     void Present()
     {
+        float x = Combat.TargetX;
+        boss.transform.localPosition = new Vector3(x, .675f);
+        head.transform.localPosition = new Vector3(x, 1.35f);
+        warning.transform.localPosition = new Vector3(x, .175f);
+        phaseLabel.transform.localPosition = new Vector3(x, 2.1f);
+        for (int i = 0; i < stripes.Count; i++) stripes[i].transform.localPosition = new Vector3(x - 2.6f + i * .47f, .175f);
+        damageMaterial.SetFloat("_Flash", damageFlash / .08f);
         var color = playerColor;
         if (!Combat.Finished && Combat.Invulnerability > 0) {
             float elapsed = StompCombat.DamageProtection - Combat.Invulnerability;
@@ -161,9 +191,24 @@ public sealed class StompArena : MonoBehaviour
         if (GUILayout.Button("Menu (Esc)")) BackToMenu?.Invoke();
         GUILayout.EndHorizontal(); GUILayout.EndArea();
     }
+    // Original, softly enveloped falling tone; no external audio asset or device polling.
+    public static AudioClip CreateDamageTone()
+    {
+        const int rate = 22050, count = 2646;
+        var samples = new float[count];
+        float phase = 0;
+        for (int i = 0; i < count; i++) {
+            float t = (float)i / count;
+            phase += 2 * Mathf.PI * Mathf.Lerp(360, 180, t) / rate;
+            samples[i] = Mathf.Sin(phase) * Mathf.Sin(Mathf.PI * t) * (1 - t) * .6f;
+        }
+        var clip = AudioClip.Create("Stomp damage tone", count, 1, rate, false);
+        clip.SetData(samples, 0);
+        return clip;
+    }
     void OnDestroy()
     {
-        if (Application.isPlaying) { Destroy(square); Destroy(texture); }
-        else { DestroyImmediate(square); DestroyImmediate(texture); }
+        if (Application.isPlaying) { Destroy(square); Destroy(texture); Destroy(damageMaterial); Destroy(damageTone); }
+        else { DestroyImmediate(square); DestroyImmediate(texture); DestroyImmediate(damageMaterial); DestroyImmediate(damageTone); }
     }
 }

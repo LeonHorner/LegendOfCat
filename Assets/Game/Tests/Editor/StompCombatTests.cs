@@ -128,9 +128,11 @@ public class StompCombatTests
             arenaType.GetMethod("TogglePause").Invoke(arena, null);
             float remaining = (float)type.GetProperty("Invulnerability").GetValue(state);
             float alpha = sprite.color.a;
+            float targetX = (float)type.GetProperty("TargetX").GetValue(state);
             fixedStep.Invoke(arena, null);
             Assert.That(type.GetProperty("Invulnerability").GetValue(state), Is.EqualTo(remaining));
             Assert.That(sprite.color.a, Is.EqualTo(alpha));
+            Assert.That(type.GetProperty("TargetX").GetValue(state), Is.EqualTo(targetX));
             arenaType.GetMethod("Retry").Invoke(arena, null);
             Assert.That(sprite.color.a, Is.EqualTo(initialAlpha));
             Assert.That(type.GetProperty("Invulnerability").GetValue(state), Is.EqualTo(0));
@@ -160,6 +162,52 @@ public class StompCombatTests
         motionType.GetMethod("Reset").Invoke(motion, null);
         velocity = (Vector2)motionType.GetMethod("Step").Invoke(motion, new object[] { .02f, false, Vector2.zero });
         Assert.That(velocity.x, Is.Zero);
+    }
+
+    [Test] public void TargetKeepsMovingThroughoutRecoveryAndResetsOnRetry()
+    {
+        Call("Advance", 1.56f);
+        float before = Read<float>("TargetX");
+        Assert.That(Read<object>("Phase").ToString(), Is.EqualTo("Recovery"));
+        Call("Advance", .3f);
+        Assert.That(Read<float>("TargetX"), Is.GreaterThan(before));
+        Call("TryStomp", true);
+        Assert.That(Read<float>("TargetX"), Is.GreaterThan(before), "A hit must not teleport the target");
+        Call("Reset");
+        Assert.That(Read<float>("TargetX"), Is.Zero);
+    }
+    [Test] public void MovingHeadCrossingUsesRelativeMotion()
+    {
+        // Stationary player's descending feet; target moves under the landing.
+        var before = new Vector2(1.4f, 2.5f) - new Vector2(0, 0);
+        var after = new Vector2(1.4f, 1.5f) - new Vector2(1, 0);
+        Assert.That(Call("CrossedHead", before, after, Vector2.one * .45f,
+            new Rect(-.85f, 0, 1.7f, 1.35f)), Is.True);
+    }
+
+    [Test] public void TargetMotionIsBoundedAndContinuousAcrossTurns()
+    {
+        float previousX = 0;
+        for (int i = 0; i < 600; i++) {
+            Call("Advance", .02f);
+            float x = Read<float>("TargetX");
+            Assert.That(x, Is.InRange(-2f, 2f));
+            Assert.That(Mathf.Abs(x - previousX), Is.LessThanOrEqualTo(.0241f));
+            previousX = x;
+        }
+    }
+    [Test] public void DamageToneIsShortSoftAndHasNoAbruptEndpoints()
+    {
+        var arenaType = type.Assembly.GetType("StompArena");
+        var clip = (AudioClip)arenaType.GetMethod("CreateDamageTone").Invoke(null, null);
+        try {
+            Assert.That(clip.length, Is.EqualTo(.12f).Within(.001));
+            var samples = new float[clip.samples];
+            clip.GetData(samples, 0);
+            Assert.That(samples[0], Is.Zero);
+            Assert.That(Mathf.Abs(samples[samples.Length - 1]), Is.LessThan(.001));
+            Assert.That(samples.Max(v => Mathf.Abs(v)), Is.InRange(.05f, .6f));
+        } finally { UnityEngine.Object.DestroyImmediate(clip); }
     }
 
 }

@@ -9,6 +9,8 @@ public sealed class StompCombat
     public int PlayerHealth { get; private set; }
     public float PhaseTime { get; private set; }
     public float Invulnerability { get; private set; }
+    public float TargetX => 2 * Mathf.Sin(targetTime * .6f);
+    float targetTime;
     public bool Finished => BossHealth == 0 || PlayerHealth == 0;
     public const float DamageProtection = 1.25f;
     public const float Anticipation = 1.2f, Active = 0.35f, Recovery = 1.8f;
@@ -17,7 +19,7 @@ public sealed class StompCombat
     {
         BossHealth = PlayerHealth = 3;
         Phase = AttackPhase.Anticipation;
-        PhaseTime = Invulnerability = 0;
+        PhaseTime = Invulnerability = targetTime = 0;
     }
     public void Advance(float dt)
     {
@@ -25,6 +27,7 @@ public sealed class StompCombat
             throw new System.ArgumentOutOfRangeException(nameof(dt));
         Invulnerability = Mathf.Max(0, Invulnerability - dt);
         if (Finished) return;
+        targetTime += dt;
         PhaseTime += dt;
         while (PhaseTime >= Duration) {
             PhaseTime -= Duration;
