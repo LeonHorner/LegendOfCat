@@ -22,8 +22,12 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 
 ## Version N: fresh installation
 
-1. After explicit authorization, run `Release` on main (no mode input). Let the workflow
-   select the version; record it as N. Verify both platform packages and feeds were published.
+1. Preview the next version on current `main` using `npm run release:plan` with
+   the required GitHub authentication. After explicit authorization, manually start
+   `Release` on `main`, entering the exact `expected_version` without `v`.
+   For an intentional major bump, separately set `allow_major`; never use it to
+   bypass a surprising version prediction. Plan and publish revalidate the approval.
+   Record the version as N. Verify both platform packages and feeds were published.
    Check that the release shows the three player downloads plus the two `releases.*.json`
    feeds and referenced `.nupkg` files; do not ship `assets.*.json` or legacy `RELEASES`.
    Verify the three player links in the release notes and the README `latest/download/` URLs.
