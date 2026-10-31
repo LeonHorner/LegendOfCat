@@ -258,3 +258,14 @@ Water geometry omits empty source space without changing its authored mapping or
 animation. Measurements do not establish an FPS gain or explain the user's low
 Editor frame rate. See background-study/extended-prototype/README.md for evidence,
 regressions and limits. The earlier seven-platform integration record is historical.
+
+### Water-entry review prototype — 2026-10-31
+
+For #60 the user requested a first playable version after discussing splash,
+face-focused zoom, sinking head and a short fade back to the last checkpoint.
+Four new complete-character reaction drawings are confined to water recovery;
+existing locomotion artwork is retained. This explicit integration request permits
+reviewing the bounded effect in-game. It does not accept the reaction artwork or
+replace the existing Mika animation review decisions. See
+[water-recovery review](water-recovery/README.md) and ASSETS.md for provenance,
+playback, implementation limits and outstanding review.

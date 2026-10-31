@@ -18,9 +18,20 @@ public sealed class CatController : MonoBehaviour
     public event System.Action ReturnedToStart;
     public event System.Action FellOutOfBounds;
     public bool Paused { get; private set; }
+    public bool Recovering { get; private set; }
+
+    public void SetRecovering(bool value)
+    {
+        Recovering = value;
+        Motion.Reset();
+        Grounded = false;
+        body.linearVelocity = Vector2.zero;
+        body.simulated = !Paused && !Recovering;
+    }
 
     public void PressJump()
     {
+        if (Recovering) return;
         Motion.PressJump();
         // Give the current render frame the takeoff state, without advancing physics.
         // Airborne requests keep the existing coyote/buffer rules in FixedUpdate.
@@ -44,7 +55,9 @@ public sealed class CatController : MonoBehaviour
     }
     void FixedUpdate()
     {
-        if (Paused) return;
+        if (Paused || Recovering) return;
+        var water = GetComponent<WaterRecovery>();
+        if (water && water.TryEnter()) return;
         Grounded = false;
         var filter = new ContactFilter2D { useTriggers = false };
         var count = shape.Cast(Vector2.down, filter, hits, 0.04f);
@@ -65,6 +78,7 @@ public sealed class CatController : MonoBehaviour
     // The course chooses the spawn; the controller always resets motor and physics.
     public void RespawnAt(Vector2 position)
     {
+        SetRecovering(false);
         SetPaused(false);
         Motion.Reset();
         body.linearVelocity = Vector2.zero;
@@ -82,13 +96,14 @@ public sealed class CatController : MonoBehaviour
         Paused = value;
         // Freeze motor timers and preserve held input along with physics momentum.
         // Respawn and focus loss still clear input explicitly.
-        body.simulated = !value;
+        body.simulated = !value && !Recovering;
     }
     void OnDisable()
     {
         Motion.Reset();
         if (body) { body.linearVelocity = Vector2.zero; body.simulated = true; }
         Paused = false;
+        Recovering = false;
     }
     void OnDestroy() { if (material) Destroy(material); }
 }

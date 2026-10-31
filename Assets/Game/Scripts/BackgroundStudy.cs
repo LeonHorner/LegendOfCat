@@ -178,6 +178,7 @@ public sealed class BackgroundStudy : MonoBehaviour
             var original = Resources.Load<GameObject>("MikaOriginal");
             if (original) Instantiate(original, player.transform).GetComponent<MikaSpritePresentation>().controller = Cat;
             else Debug.LogError("Background study requires the existing MikaOriginal prefab.");
+            Cat.gameObject.AddComponent<WaterRecovery>().Initialize(Cat, View, transform, Cat.ReturnToStart);
         }
         ApplyViewport(Screen.width, Screen.height);
         ApplyView(6, CameraFloor);
@@ -314,6 +315,11 @@ public sealed class BackgroundStudy : MonoBehaviour
         if (!View) return;
         ApplyViewport(Screen.width, Screen.height);
         if (attachedToCourse) {
+            ApplyView(View.transform.position.x, View.transform.position.y);
+            return;
+        }
+        var recovery = Cat ? Cat.GetComponent<WaterRecovery>() : null;
+        if (recovery && recovery.CameraHeld) {
             ApplyView(View.transform.position.x, View.transform.position.y);
             return;
         }

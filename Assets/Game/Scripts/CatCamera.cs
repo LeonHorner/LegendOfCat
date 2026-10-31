@@ -10,6 +10,8 @@ public sealed class CatCamera : MonoBehaviour
     public void Snap() => snap = true;
     void LateUpdate()
     {
+        var water = target ? target.GetComponent<WaterRecovery>() : null;
+        if (water && water.CameraHeld) return;
         // Read the interpolated render transform, never the fixed-step Rigidbody position.
         var camera = GetComponent<Camera>();
         float scale = courseRoot ? courseRoot.lossyScale.x : 1;

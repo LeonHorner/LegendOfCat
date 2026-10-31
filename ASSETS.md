@@ -492,3 +492,26 @@ Geometry/camera/parallax now use the placed course coordinate frame so translate
 and uniformly scaled courses retain visual/collider contact and stable water UVs.
 No new artwork, animation, traversal mechanic or source-pixel edit was introduced.
 See docs/design/background-study/review-2026-10-31.md for tests and limitations.
+
+## Mika water-recovery prototype — 2026-10-31
+
+- Asset: `Assets/Game/Resources/WaterRecovery/reactions.png`, four complete-character
+  reaction drawings in a horizontal atlas. Original generated artwork from the
+  built-in OpenAI image generation tool; exact model ID was not exposed.
+- Reference: existing original Mika artwork, specifically
+  `Assets/Game/Art/Mika/Original/original-apex-isolated.png`. No third-party input.
+- License: project `ASSET-LICENSE.md` where rights exist; no claim that a license
+  creates copyright in unprotectable generated output.
+- Human direction: user requested a splash, zoom focused on facial animation,
+  head submersion, brief black fade and checkpoint return, and explicitly asked
+  to evaluate an implemented first version. Natural orange/cream quadruped identity
+  retained; surprised eyes, lifted chin, blink and closed eyes selected for review.
+- Generation specification: transparent four-cell horizontal sheet, complete cat
+  facing right, same dimensions/markings/registration, sturdy paws tucked downward,
+  green eyes, ears slightly back, restrained expressions, no water/background/text,
+  no stretched body or detached pieces. The original reference was supplied as
+  identity/style guidance. Source pixels are retained in the atlas.
+- Integration decisions: rigid frame changes and mirrored facing, world-space
+  submersion mask, code-drawn droplets/ripples and camera zoom. No optical flow,
+  cutout rig or whole-body deformation. Editor import preserves native proportions
+  without mipmaps or compression. Visual acceptance remains pending under #60.
