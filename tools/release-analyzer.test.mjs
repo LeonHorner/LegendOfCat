@@ -78,6 +78,19 @@ test('only exact uppercase breaking footers make a major release', async () => {
   }
 });
 
+test('lowercase breaking footers preserve ordinary minor/patch releases', async () => {
+  for (const marker of [
+    'breaking change:', 'Breaking Change:', 'bReAkInG cHaNgE:',
+    'breaking-change:', 'Breaking-Change:', 'BREAKING-change:'
+  ]) {
+    const body = '\n\n' + marker + ' ordinary text, not an authorized major';
+    assert.equal(await analyze('feat: add new level' + body), 'minor', marker);
+    assert.equal(await analyze('fix: correct movement' + body), 'patch', marker);
+    assert.doesNotMatch(await notes('feat: add new level' + body, 'minor'),
+      /BREAKING CHANGES/, marker);
+  }
+});
+
 test('breaking shorthand alone never creates a major release', async () => {
   assert.notEqual(await analyze('feat!: breaking feature'), 'major');
   assert.notEqual(await analyze('fix(api)!: change public API'), 'major');

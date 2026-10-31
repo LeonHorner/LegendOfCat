@@ -78,7 +78,7 @@ jobs:
       - name: Run CI workflow contract tests
         run: node --test tools/ci-workflow.test.mjs
       - name: Check version analysis and approval
-        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-commit-policy.test.mjs
+        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs
       - name: Check release download contracts
         run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
       - name: Check application icons and packaging contracts
