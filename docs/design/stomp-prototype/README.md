@@ -1,60 +1,53 @@
 # Stomp encounter prototype
 
-Issue #12. Open **Stomp lab (prototype)** from the main menu. This isolated runtime arena reuses CatController, CatMotion, CatInput and MikaOriginal; it does not alter the movement course, campaign, saves or character artwork.
+Issue #12. Enter **Stomp lab (prototype)** from the main menu. The isolated greybox reuses CatController, CatMotion, CatInput, RunLifecycle and MikaOriginal. It adds no campaign, save format, new health UI or traversal ability.
 
-## Provisional rules for user review
+## Current encounter
 
-A target moving horizontally throughout every attack phase previews a ground attack for 1.2 seconds (striped ground band), attacks for 0.35 seconds (solid band), then exposes its white head for 1.8 seconds. Labels and silhouettes distinguish the phases without depending on hue. The band's bounds exactly match the ground hazard. The target body remains dangerous from the side; descending feet must cross the head's top during recovery. A hit immediately closes the opening, removes one of three target health points and bounces Mika at 10 units/second. No stomp button is added.
+- Warning: 1.2 seconds, striped ground band and closed dark head.
+- Attack: 0.35 seconds, solid ground band and closed head.
+- Recovery: 1.8 seconds, white vulnerable head. Descending feet must cross its top; side/body contact still hurts.
+- The target moves in every phase, including recovery: x = 2 sin(0.6 t), radius 2 and maximum speed 1.2 units/second. Warnings, ground hazard and labels follow its actual position. Sweeps use relative player/target movement.
+- A valid stomp removes one of three target health points, bounces Mika upward at 10 units/second and restarts the attack cycle without resetting patrol position.
 
-Mika has three provisional health points. Damage gives 1.25 seconds of protection and applies recoil at the current position; it never teleports Mika. The initial velocity is 5 units/second away from the target and 7 upward. The horizontal impulse decays at 25 units/second squared (0.2 seconds), separately from normal movement braking; steering remains active. At centered contact, the previous side decides direction, then opposite horizontal motion, with left as the final fallback. Protected contacts neither damage nor launch again. Ground attacks can be jumped over. Jump release does not cut the automatic bounce; ordinary jumps retain their existing release behavior. Swept body/feet checks cover crossings between physics samples. Presentation uses the same state that resolves each fixed-step collision; visual effects do not delay simulation.
+The timing, patrol and health values remain prototype tuning for user review. A later production boss, phases, art and complex attack patterns belong to #18.
 
-Retry (R / controller Select) and full restart (Backspace / controller LB) reset the entire encounter through RunLifecycle.ResetTransientState, including health, attack phase, protection, impact, momentum and input buffers. Pause (P / controller RB) freezes physics, combat timers and the protection pulse. During protection Mika smoothly pulses between original and half opacity every 0.25 seconds; she never disappears. Retry, restart and encounter completion restore her original color. Both win and loss retain Retry and Menu; no automatic retry cost is imposed. Menu is Esc / controller Start. Move/jump use the existing shared actions, including controller bindings. Touch UI is outside scope.
+## Damage feedback selected for this revision
 
-The target follows a smooth horizontal patrol, x = 2 sin(0.6 t): a two-unit radius and maximum speed of 1.2 units/second. It keeps moving with its head open, reverses smoothly, freezes on pause or encounter completion and resets on retry. A successful stomp does not reset patrol position. Collision sweeps subtract both previous and current target position, so a moving head can pass under descending feet. Warning stripes, active ground hazard and labels track the same target position.
+Damage preserves horizontal velocity and applies only an upward velocity of 7 units/second. Held movement remains active; no forced direction change, horizontal stop, lateral impulse or teleport occurs. Releasing jump does not shorten the automatic hop. Side contact, closed-head contact and the active ground band can cause damage.
 
-The component supports its default unit scale and translation. Rotation or scaled arena instances are not supported tuning contracts. There is no production boss identity, final difficulty or additional traversal ability.
+A small original six-point cream contact star with a warm outline and three tiny sparks opens and fades over 0.15 seconds. It appears on the contacted boss/hazard surface at the collision sample, stays at that arena-space point instead of following either character, and has no collider. High-speed crossings use the swept contact; existing overlaps use the nearest surface point. The star uses native mesh geometry and contains no imported image. A reduced 35%-strength white flash fades over 80 ms so it does not compete with the star. No camera shake or hitstop is added.
 
-## Review gate and remaining work
+Damage gives 1.25 seconds of protection. Mika gently pulses between original and half opacity every 0.25 seconds and never disappears. Protected contact causes no extra damage, hop or effect restart. Pause freezes physics, combat and effects. Retry/restart clear all transient feedback and restore the original sprite color. Effects finish fading after a terminal hit; win/loss retain Retry and Menu.
 
-**User review pending.** Compare telegraph clarity, head window length, bounce height, damage feedback and retry cost in the playable arena before selecting final prototype attack rules/difficulty. These numbers are proposals. Keep the PR draft and #12 open until that review and final validation are complete.
+The previous lateral recoil and falling sine tone were rejected by the user. They are removed from active gameplay; **no damage sound is currently enabled**. The old `damage-tone.wav` is retained solely as a rejected historical preview.
 
-The three images below are actual Unity Play Mode camera renders of the runtime arena. The capture advances combat state explicitly to show the same presentation used by gameplay; it is not a manual playtest or evidence of collision behavior. The camera render excludes the GUI overlay. Run `StompReview.Record` in the pinned Editor to reproduce them. Code includes behavioral regression tests for hit direction, closed windows, damage protection, defeat, bounce and lifecycle reset; they have not yet been executed. Final exact-head Prepare merge must run tests and Windows/Linux player and launcher builds after review.
+![Contact star and restrained flash](contact-star.png)
+![Held running right through a damage hop](damage-run-right.gif)
+![Held running left through a damage hop](damage-run-left.gif)
 
-![Anticipation with striped hazard bounds](anticipation.png)
-![Active ground attack](attack.png)
-![Recovery and vulnerable head](recovery.png)
+## Sound choice pending
 
-## Coordination and validation
+Three original unpitched noise-based proposals have comparable RMS level and quiet peak limits. They contain no external recordings, cat vocalizations, melody or pitch glide. Reproduce them with `python tools/generate-stomp-sound-previews.py`; the deterministic generator documents synthesis and envelope choices. None is wired into gameplay until user selection.
 
-Started from main 989840a. No overlap with open PR #51 (Blender sources), #53 (reward design) or #59 (CI workflows). Ownership: new StompCombat/StompArena/review/tests and narrow CatMotion/CatController launch and StarterScreen menu integration. Existing scenes, prefabs, packages, project settings and art remain owned by their existing features. No new serialized scene is required. Main's current movement/input/presentation integration is reused.
+1. [Soft impact](sound-options/soft-impact.wav): low, softly damped impact, 120 ms.
+2. [Muted tap](sound-options/muted-tap.wav): shorter, slightly clearer tap, 85 ms.
+3. [Soft rustle](sound-options/soft-rustle.wav): airy fabric-like contact, 140 ms.
 
-Unity 6000.3.27f2 import, script compilation and Play Mode phase capture completed with exit code 0 on 2026-10-31. New .meta files were generated by Editor import; packages-lock.json was unchanged. Git whitespace inspection passed. Automated tests, platform builds, in-motion/manual gameplay, small-window/grayscale play review and exact-head merge validation remain pending. No release or merge is authorized.
+## Controls and reuse
 
-## Damage feedback revision - 2026-10-31
+Move/jump use the existing shared keyboard/controller actions, without a stomp button or device polling in combat. Retry: R / controller Select. Full restart: Backspace / controller LB. Pause: P / controller RB. Menu: Esc / controller Start. Retry and restart restore target health, patrol and phase, player health, movement/input state, protection and effects via RunLifecycle.ResetTransientState. Touch UI/mobile builds are outside this issue. Default unit scale and translation are supported; rotation/scaled placement is not a tuning contract.
 
-The user rejected the instantaneous left/right repositioning and selected recoil with a gently transparent protection pulse. This decision changes damage feedback only; attack difficulty remains under review.
+## Evidence and validation
 
-`StompReview.Record` also captures four scripted Play Mode physics sequences: left/right body contact, closed head and active ground attack. Each starts at a known contact and then advances the actual motor, local 2D physics scene and arena in fixed steps, using no input-device polling. Camera rendering excludes the GUI. GIFs play at the recorded rate; their loop boundary restarts the demonstration and is not an in-game teleport. CSVs record position, health, protection and opacity. These reproducible scripted captures do not replace manual playtesting or the pending automated test suite.
+Run `StompReview.Record` in Unity 6000.3.27f2 to reproduce camera captures and CSVs. Phase screenshots explicitly advance state; seven motion sequences advance the real motor, isolated local 2D physics scene and combat. The running sequences feed shared motion values and preserve held direction through contact. CSVs record player/target position, health, protection, opacity, velocity and effect lifetime/contact position. The moving-head sequence starts above an open target to isolate hit detection and bounce. Camera captures exclude the GUI; GIF loops restart the demonstration and are not in-game teleports.
 
-![Left contact recoil and protection pulse](damage-left.gif)
-![Right contact recoil and protection pulse](damage-right.gif)
-![Closed head recoil](damage-closed-head.gif)
-![Ground attack recoil](damage-ground.gif)
+Compilation of runtime and regression sources plus the seven Play Mode captures completed with exit code 0 in an isolated review project with its own Library. The right-running trace starts at x=-1.1 with velocity (7,7) on damage, then x=-0.96 with velocity (7,6.4); left-running mirrors this without a direction reversal. The star remains at x=-0.85/+0.85 while its timer decreases. Captured contact-star rendering was visually inspected. The sound previews were checked for PCM format, duration, RMS and peak levels; subjective listening remains a user decision.
 
-Unity 6000.3.27f2 compiled the updated runtime and test sources and completed all four motion captures with exit code 0. The left/right traces start at x=-1.1/+1.1 without repositioning on damage; their following positions change through simulated recoil. Further hits can occur after protection expires if Mika remains in an active hazard.
+Regression sources cover top/side/closed windows, moving-head sweeps, protection expiry, preserved horizontal velocity, held run direction, hop release behavior, effect placement without retrigger, pause and retry cleanup. Automated tests and Windows/Linux player/launcher builds have not been run and remain part of final Prepare merge. Manual gameplay, small-window/grayscale review, sound choice and overall encounter acceptance remain pending. Keep PR #62 draft and #12 open until review and final exact-head validation complete.
 
-Regression sources additionally cover no position change on damage, protected contacts without repeated impulses, the 1.25-second boundary, the opacity trough, pause/reset and recoil with active steering. Full automated tests/builds remain deferred until final Prepare merge.
+## Coordination and review history
 
-## Moving-head and hit-feedback review - 2026-10-31
+Started from main 989840a. Ownership covers new combat/arena/review/test code and narrow controller launch/menu entry integration. No overlap was identified with #51 (Blender authoring), #53 (reward design) or #59 (CI). Existing scenes, prefabs, packages, project settings, movement course and character artwork are preserved. No shared mutable Library is used for review captures. Review newer merged changes and merge main normally before readiness; no merge or release is authorized here.
 
-The user selected jumping onto a moving head, approved a brief hit flash and a discreet damage tone, and excluded heart-loss animation/new health UI from #12. Existing text counters remain prototype information.
-
-Real damage triggers an 80 ms fading white flash over Mika's authored sprite, followed by the existing protection pulse. The flash preserves source alpha and does not illuminate the whole screen. A quiet original 120 ms falling sine tone plays once per accepted damage event; protected contacts do not retrigger either effect. Pause freezes flash/movement and pauses the tone; retry stops playback and clears feedback. The shader is loaded from Resources so player builds retain it. The runtime creates a nonspatial AudioSource and supplies an AudioListener only if the scene has none.
-
-![Stomp onto the moving head](damage-moving-head.gif)
-
-[Damage sound preview](damage-tone.wav) exports the runtime-generated samples at the same 0.12 source volume, not a recording of audio-device output. `damage-moving-head.csv` records target position and boss health alongside player state. The motion sequence starts above an already open head to isolate landing, moving hit detection and bounce; it is a scripted physics demonstration, not an input playtest. Existing damage captures now also show the moving target and hit flash.
-
-Regression sources cover motion through recovery, bounded continuous patrol, no patrol reset on a successful hit, relative-motion head crossing, pause/reset, and the original tone's duration/envelope. Compile and rendering are performed in an isolated review copy while the user's Editor owns the main worktree; the copies never share a Library. Automated tests and Windows/Linux builds remain deferred to final Prepare merge; manual audiovisual/gameplay acceptance remains pending.
-
-The isolated Unity 6000.3.27f2 Play Mode capture and final runtime/test-source compilation both completed with exit code 0. The moving-head sequence records a successful head hit at frame 16 (approximately 0.32 seconds), boss health 3 to 2, player health still 3, and an upward bounce in the next physics sample. Target X continues increasing through the hit. The captured white flash was inspected against the unchanged source silhouette; no shader compile errors were reported. The sound preview exports the generated waveform; audible in-game listening remains part of user review.
+User decisions on 2026-10-31: reject damage teleport; select short protection with transparency pulse; select a moving vulnerable head; exclude new heart-loss/health UI; reject the first tone and lateral recoil; preserve running with an upward-only damage hop; request sound alternatives and approve a small contact star with restrained flash. Earlier implementation screenshots/commits are historical, not acceptance of superseded feedback. Provenance is in ASSETS.md.

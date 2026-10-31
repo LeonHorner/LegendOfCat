@@ -90,10 +90,10 @@ public class StompCombatTests
             Assert.That(cat.transform.localPosition.x, Is.EqualTo(-4).Within(.001));
         } finally { UnityEngine.Object.DestroyImmediate(root); }
     }
-    [TestCase(-1.1f, -5f)]
-    [TestCase(1.1f, 5f)]
-    [TestCase(0f, -5f)]
-    public void DamageLaunchDoesNotTeleportAndProtectionPulses(float x, float expectedVelocity)
+    [TestCase(-1.1f, 7f)]
+    [TestCase(1.1f, -7f)]
+    [TestCase(0f, 0f)]
+    public void DamageHopPreservesHorizontalMotionAndProtectionPulses(float x, float expectedVelocity)
     {
         var root = new GameObject("Stomp damage test");
         try {
@@ -108,6 +108,7 @@ public class StompCombatTests
             var body = cat.GetComponent<Rigidbody2D>();
             var start = new Vector2(x, .5f);
             body.position = start;
+            body.linearVelocity = new Vector2(expectedVelocity, -2);
             arenaType.GetField("previous", flags).SetValue(arena, start);
             var fixedStep = arenaType.GetMethod("FixedUpdate", flags);
             var present = arenaType.GetMethod("Present", flags);
@@ -116,10 +117,17 @@ public class StompCombatTests
             Assert.That(body.position, Is.EqualTo(start));
             Assert.That(body.linearVelocity, Is.EqualTo(new Vector2(expectedVelocity, 7)));
             Assert.That(type.GetProperty("PlayerHealth").GetValue(state), Is.EqualTo(2));
+            var burst = (Transform)arenaType.GetField("damageBurst", flags).GetValue(arena);
+            Vector3 contact = burst.localPosition;
+            float burstBefore = (float)arenaType.GetField("burstTime", flags).GetValue(arena);
+            Assert.That(burst.gameObject.activeSelf, Is.True);
+            Assert.That(cat.GetComponent<AudioSource>(), Is.Null, "No sound is approved yet");
             body.linearVelocity = Vector2.zero;
             fixedStep.Invoke(arena, null);
             Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero), "Protected contact must not launch again");
             Assert.That(type.GetProperty("PlayerHealth").GetValue(state), Is.EqualTo(2));
+            Assert.That(burst.localPosition, Is.EqualTo(contact), "The star stays at the original contact");
+            Assert.That((float)arenaType.GetField("burstTime", flags).GetValue(arena), Is.LessThan(burstBefore));
             var sprite = cat.GetComponentInChildren<SpriteRenderer>();
             float initialAlpha = ((Color)arenaType.GetField("playerColor", flags).GetValue(arena)).a;
             type.GetMethod("Advance").Invoke(state, new object[] { .125f - 2 * Time.fixedDeltaTime });
@@ -129,12 +137,15 @@ public class StompCombatTests
             float remaining = (float)type.GetProperty("Invulnerability").GetValue(state);
             float alpha = sprite.color.a;
             float targetX = (float)type.GetProperty("TargetX").GetValue(state);
+            float burstPaused = (float)arenaType.GetField("burstTime", flags).GetValue(arena);
             fixedStep.Invoke(arena, null);
             Assert.That(type.GetProperty("Invulnerability").GetValue(state), Is.EqualTo(remaining));
             Assert.That(sprite.color.a, Is.EqualTo(alpha));
+            Assert.That(arenaType.GetField("burstTime", flags).GetValue(arena), Is.EqualTo(burstPaused));
             Assert.That(type.GetProperty("TargetX").GetValue(state), Is.EqualTo(targetX));
             arenaType.GetMethod("Retry").Invoke(arena, null);
             Assert.That(sprite.color.a, Is.EqualTo(initialAlpha));
+            Assert.That(burst.gameObject.activeSelf, Is.False);
             Assert.That(type.GetProperty("Invulnerability").GetValue(state), Is.EqualTo(0));
         } finally { UnityEngine.Object.DestroyImmediate(root); }
     }
@@ -148,17 +159,16 @@ public class StompCombatTests
         Assert.That(Call("TryDamage"), Is.True);
     }
     [TestCase(-1f)] [TestCase(1f)]
-    public void RecoilSurvivesBrakingAndMovementStillResponds(float direction)
+    public void DamageHopKeepsHeldRunDirectionAndIgnoresJumpRelease(float direction)
     {
         var motionType = type.Assembly.GetType("CatMotion");
         var motion = Activator.CreateInstance(motionType);
-        var velocity = new Vector2(direction * 5, 7);
-        motionType.GetMethod("Knockback").Invoke(motion, new object[] { velocity });
+        var velocity = new Vector2(direction * 7, 7);
+        motionType.GetMethod("SetMove").Invoke(motion, new object[] { direction });
+        motionType.GetMethod("Launch").Invoke(motion, new object[] { velocity });
         velocity = (Vector2)motionType.GetMethod("Step").Invoke(motion, new object[] { .02f, false, velocity });
-        Assert.That(velocity.x, Is.EqualTo(direction * 4.5f).Within(.001f));
-        motionType.GetMethod("SetMove").Invoke(motion, new object[] { -direction });
-        velocity = (Vector2)motionType.GetMethod("Step").Invoke(motion, new object[] { .02f, false, velocity });
-        Assert.That(velocity.x * direction, Is.LessThan(4f));
+        Assert.That(velocity.x, Is.EqualTo(direction * 7).Within(.001f));
+        Assert.That(velocity.y, Is.EqualTo(6.4f).Within(.001f));
         motionType.GetMethod("Reset").Invoke(motion, null);
         velocity = (Vector2)motionType.GetMethod("Step").Invoke(motion, new object[] { .02f, false, Vector2.zero });
         Assert.That(velocity.x, Is.Zero);
@@ -196,18 +206,4 @@ public class StompCombatTests
             previousX = x;
         }
     }
-    [Test] public void DamageToneIsShortSoftAndHasNoAbruptEndpoints()
-    {
-        var arenaType = type.Assembly.GetType("StompArena");
-        var clip = (AudioClip)arenaType.GetMethod("CreateDamageTone").Invoke(null, null);
-        try {
-            Assert.That(clip.length, Is.EqualTo(.12f).Within(.001));
-            var samples = new float[clip.samples];
-            clip.GetData(samples, 0);
-            Assert.That(samples[0], Is.Zero);
-            Assert.That(Mathf.Abs(samples[samples.Length - 1]), Is.LessThan(.001));
-            Assert.That(samples.Max(v => Mathf.Abs(v)), Is.InRange(.05f, .6f));
-        } finally { UnityEngine.Object.DestroyImmediate(clip); }
-    }
-
 }
