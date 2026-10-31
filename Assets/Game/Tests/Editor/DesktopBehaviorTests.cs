@@ -151,7 +151,7 @@ public class DesktopBehaviorTests : InputTestFixture
     [TestCase("- Fix checkpoint retry, ReSoLvEs [#31](https://github.com/issues/31)", "• Fix checkpoint retry")]
     [TestCase("- Fix checkpoint retry, fixes #42", "• Fix checkpoint retry")]
     [TestCase("- Fix checkpoint retry, closes the settings window", "• Fix checkpoint retry, closes the settings window")]
-    [TestCase("- The door closes #51 when the player leaves the room", "• The door closes when the player leaves the room")]
+    [TestCase("- The door closes #51 when the player leaves the room", "• The door closes #51 when the player leaves the room")]
     [TestCase("- The player closes a door", "• The player closes a door")]
     [TestCase("- Fix start, closes [#10](https://github.com/issues/10) in the next version", "• Fix start, closes in the next version")]
     [TestCase("- Internal **rendering** work ([abcdef123](https://github.com/example/commit/abcdef123))", "• Internal rendering work")]
