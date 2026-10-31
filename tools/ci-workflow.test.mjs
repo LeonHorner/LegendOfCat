@@ -304,3 +304,26 @@ test('Linux AppImage validation remains manual and release dispatch is unchanged
   assert.deepEqual(Object.keys(releaseWorkflow.on), ['workflow_dispatch']);
   assert.equal(prWorkflow.jobs.gate.needs.includes('package'), true);
 });
+
+test('manual release requires exact version and separate major approval', () => {
+  const inputs = releaseWorkflow.on.workflow_dispatch.inputs;
+  assert.equal(inputs.expected_version.required, true);
+  assert.equal(inputs.expected_version.type, 'string');
+  assert.equal(inputs.allow_major.type, 'boolean');
+  assert.equal(inputs.allow_major.default, false);
+  for (const step of [
+    releaseWorkflow.jobs.plan.steps.find(s => s.id === 'plan'),
+    releaseWorkflow.jobs.publish.steps.find(s => s.id === 'final-plan'),
+    releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit')
+  ]) {
+    assert.ok(step, 'Release approval check missing');
+    assert.equal(step.env.EXPECTED_VERSION, '{{ inputs.expected_version }}');
+    assert.equal(step.env.ALLOW_MAJOR, '{{ inputs.allow_major }}');
+  }
+  for (const job of [
+    prWorkflow.jobs.preflight,
+    releaseWorkflow.jobs.publish
+  ]) {
+    assert.ok(job.steps.some(s => s.run?.includes('tools/release-analyzer.test.mjs')));
+  }
+});
