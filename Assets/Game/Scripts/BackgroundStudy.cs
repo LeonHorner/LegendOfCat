@@ -205,7 +205,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         mesh.triangles = new[] { 0, 2, 1, 1, 2, 3, 2, 4, 3, 3, 4, 5 };
         mesh.RecalculateBounds(); terrainMeshes.Add(mesh);
         var visual = new GameObject(mesh.name); visual.transform.SetParent(transform, false);
-        visual.transform.position = new Vector3(platform.x, 0, 0);
+        visual.transform.localPosition = new Vector3(platform.x, 0, 0);
         visual.AddComponent<MeshFilter>().sharedMesh = mesh;
         var renderer = visual.AddComponent<MeshRenderer>(); renderer.sharedMaterial = terrainMaterial;
         var parameters = new MaterialPropertyBlock();
@@ -222,7 +222,7 @@ public sealed class BackgroundStudy : MonoBehaviour
         var foot = GameObject.CreatePrimitive(PrimitiveType.Quad);
         DestroyImmediate(foot.GetComponent<Collider>());
         foot.name = "Painted shore footing"; foot.transform.SetParent(transform, false);
-        foot.transform.position = new Vector3(platform.x + side * (platform.z * 0.5f + 1.25f), -2.65f, 3);
+        foot.transform.localPosition = new Vector3(platform.x + side * (platform.z * 0.5f + 1.25f), -2.65f, 3);
         foot.transform.localScale = new Vector3(4.8f * side, 2.6f, 1);
         var renderer = foot.GetComponent<MeshRenderer>(); renderer.sharedMaterial = terrainMaterial;
         var parameters = new MaterialPropertyBlock();
@@ -232,7 +232,7 @@ public sealed class BackgroundStudy : MonoBehaviour
     GameObject Block(string label, Vector2 position, Vector2 size, Color color)
     {
         var item = new GameObject(label); item.transform.SetParent(transform, false);
-        item.transform.position = position; item.transform.localScale = size;
+        item.transform.localPosition = position; item.transform.localScale = size;
         var renderer = item.AddComponent<SpriteRenderer>(); renderer.sprite = square; renderer.color = color;
         renderer.sortingOrder = 1; return item;
     }
@@ -241,12 +241,16 @@ public sealed class BackgroundStudy : MonoBehaviour
 
     public void ApplyView(float x, float y)
     {
+        // Keep the damp-foot tint registered with the placed shore/water grid too.
+        terrainMaterial.SetFloat("_CourseOriginY", transform.position.y);
+        terrainMaterial.SetFloat("_CourseScale", transform.lossyScale.y);
         View.transform.position = new Vector3(x, y, -10);
+        var localView = transform.InverseTransformPoint(new Vector3(x, y, 0));
         // Distant scenery has no physical join to the world-space terrain or foreground water.
         for (int i = 0; i < 3; i++) {
             float width = LayerWidth(i);
-            float center = TileCenter(x, TravelFactors[i], width);
-            layers[i].position = new Vector3(Offset(x, TravelFactors[i]) + center, y, 0);
+            float center = TileCenter(localView.x, TravelFactors[i], width);
+            layers[i].localPosition = new Vector3(Offset(localView.x, TravelFactors[i]) + center, localView.y, 0);
             int tileIndex = Mathf.RoundToInt(center / width);
             for (int j = 0; j < 3; j++) {
                 var panel = layers[i].GetChild(j);
@@ -255,13 +259,13 @@ public sealed class BackgroundStudy : MonoBehaviour
                 panel.localScale = scale;
             }
         }
-        PositionForegroundWater(x);
+        PositionForegroundWater(localView.x);
     }
 
     void PositionForegroundWater(float cameraX)
     {
         float center = TileCenter(cameraX, 1, 16);
-        riverFront.position = new Vector3(center, 0, 0);
+        riverFront.localPosition = new Vector3(center, 0, 0);
         int tileIndex = Mathf.RoundToInt(center / 16);
         for (int tile = 0; tile < 3; tile++) {
             var scale = riverFront.GetChild(tile).localScale;

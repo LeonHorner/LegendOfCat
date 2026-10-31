@@ -8,6 +8,23 @@ using UnityEngine.TestTools;
 
 public sealed class BackgroundStudyTests
 {
+    [Test]
+    public void HistoricalPaintingsAreArchivedAndActiveCutoutsKeepTheirImportPolicy()
+    {
+        foreach (string name in new[] { "connected-river", "middle-cutout", "near-cutout", "painted-terrain", "meadow-surface", "hanging-foliage" }) {
+            Assert.That(Resources.Load<Texture2D>("BackgroundStudy/" + name), Is.Null);
+            Assert.That(UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(
+                "Assets/Game/Art/BackgroundStudyArchive/" + name + ".png"), Is.Not.Null);
+        }
+        var active = Resources.LoadAll<Texture2D>("BackgroundStudy");
+        Assert.That(active, Has.Length.EqualTo(9));
+        foreach (var texture in active) {
+            var importer = (UnityEditor.TextureImporter)UnityEditor.AssetImporter.GetAtPath(UnityEditor.AssetDatabase.GetAssetPath(texture));
+            Assert.That(importer.mipmapEnabled, Is.False, "Preserve reviewed alpha edges until coverage/minification is evaluated: " + texture.name);
+        }
+        foreach (string name in new[] { "background-material", "terrain-material", "water-material" })
+            Assert.That(Resources.Load<Material>("BackgroundStudy/" + name).shader, Is.Not.Null);
+    }
     Type Study => AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("BackgroundStudy")).First(t => t != null);
     float Call(string method, params object[] args) => (float)Study.GetMethod(method).Invoke(null, args);
 

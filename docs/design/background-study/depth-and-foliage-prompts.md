@@ -1,5 +1,7 @@
 # River, meadow and hanging foliage — 2026-10-25
 
+2026-10-31 archive location: Historical meadow-surface.png and hanging-foliage.png now reside in Assets/Game/Art/BackgroundStudyArchive/. The foreground-river.png remains active under Resources/BackgroundStudy. These prompts document the original experiments.
+
 Built-in OpenAI image generation; exact model ID not exposed. The archived Golden
 River Ruins v2 reference supplies palette and brush style. No original image
 pixels were edited. Runtime UV windows select foliage columns; original alpha is

@@ -12,6 +12,10 @@ revisions, checksums and known provenance limits.
 
 ## Run
 
+The [2026-10-31 review corrections](review-2026-10-31.md) document historical
+asset packaging, transformed-course alignment, the mipmap decision and remaining
+Editor frame-rate investigation.
+
 The selected scenery also runs in the existing checkpoint prototype: open
 `Assets/Game/Scenes/Main.unity`, press Play, then choose **Movement lab (prototype)**
 and **Enter movement lab**.

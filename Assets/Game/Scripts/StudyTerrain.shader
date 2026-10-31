@@ -1,6 +1,10 @@
 Shader "LegendOfCat/StudyTerrain"
 {
-    Properties { _MainTex ("Painted terrain module", 2D) = "white" {} }
+    Properties {
+        _MainTex ("Painted terrain module", 2D) = "white" {}
+        [HideInInspector] _CourseOriginY ("Course origin", Float) = 0
+        [HideInInspector] _CourseScale ("Course scale", Float) = 1
+    }
     SubShader {
         Tags { "Queue"="AlphaTest" "RenderType"="TransparentCutout" }
         Cull Off
@@ -10,11 +14,12 @@ Shader "LegendOfCat/StudyTerrain"
             #pragma fragment frag
             #include "UnityCG.cginc"
             sampler2D _MainTex;
+            float _CourseOriginY, _CourseScale;
             struct Input { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
             struct Output { float4 vertex : SV_POSITION; float2 uv : TEXCOORD0; float height : TEXCOORD1; };
             Output vert(Input v) {
                 Output o; o.vertex = UnityObjectToClipPos(v.vertex); o.uv = v.uv;
-                o.height = mul(unity_ObjectToWorld, v.vertex).y; return o;
+                o.height = (mul(unity_ObjectToWorld, v.vertex).y - _CourseOriginY) / _CourseScale; return o;
             }
             fixed4 frag(Output i) : SV_Target {
                 fixed4 color = tex2D(_MainTex, i.uv);

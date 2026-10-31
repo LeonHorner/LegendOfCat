@@ -108,6 +108,95 @@ public class MikaPresentationIntegrationTests
     }
 
     [UnityTest]
+    public IEnumerator TransformedCoursesKeepPaintedContactsShoreWaterAndCameraAligned()
+    {
+        foreach (float scale in new[] { 0.75f, 1.5f }) {
+            var placement = new GameObject("Transformed course placement");
+            placement.transform.position = new Vector3(scale < 1 ? -240 : 240, 7, 0);
+            placement.transform.localScale = Vector3.one * scale;
+            var placed = UnityEngine.Object.Instantiate(Resources.Load<GameObject>("MovementCourse"), placement.transform, false);
+            try {
+                var component = placed.GetComponent(Runtime("MovementCourse"));
+                var cat = (Component)Read(component, "Cat");
+                ((Behaviour)cat.GetComponent(Runtime("CatInput"))).enabled = false;
+                var catBody = cat.GetComponent<Rigidbody2D>(); catBody.interpolation = RigidbodyInterpolation2D.None;
+                var scenery = placed.GetComponentInChildren(Runtime("BackgroundStudy"));
+                var camera = (Camera)Read(scenery, "View");
+                var platforms = (Vector3[])Runtime("MovementCourse").GetField("Platforms").GetValue(null);
+                void AssertContacts() {
+                    Physics2D.SyncTransforms();
+                    var colliders = placed.GetComponentsInChildren<BoxCollider2D>()
+                        .Where(c => c.name == "Standable platform").OrderBy(c => c.transform.localPosition.x).ToArray();
+                    var painted = placed.GetComponentsInChildren<MeshFilter>()
+                        .Where(m => m.name == "Painted grounded cliff" || m.name == "Painted floating rock")
+                        .OrderBy(m => m.transform.localPosition.x).ToArray();
+                    var paint = painted[0].GetComponent<MeshRenderer>().sharedMaterial;
+                    Assert.That(paint.GetFloat("_CourseOriginY"), Is.EqualTo(placed.transform.position.y).Within(0.001f));
+                    Assert.That(paint.GetFloat("_CourseScale"), Is.EqualTo(placed.transform.lossyScale.y).Within(0.001f));
+                    Assert.That(painted.Length, Is.EqualTo(colliders.Length));
+                    for (int i = 0; i < painted.Length; i++) {
+                        var left = painted[i].transform.TransformPoint(painted[i].sharedMesh.vertices[2]);
+                        var right = painted[i].transform.TransformPoint(painted[i].sharedMesh.vertices[3]);
+                        Assert.That(left.y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f));
+                        Assert.That(right.y, Is.EqualTo(colliders[i].bounds.max.y).Within(0.001f));
+                        Assert.That((left.x + right.x) * 0.5f, Is.EqualTo(colliders[i].bounds.center.x).Within(0.001f));
+                    }
+                    var feet = placed.GetComponentsInChildren<MeshRenderer>().Where(r => r.name == "Painted shore footing").ToArray();
+                    var indices = new[] { 0, 2, 6, 10, 13 };
+                    Assert.That(feet.Length, Is.EqualTo(indices.Length));
+                    for (int i = 0; i < feet.Length; i++) {
+                        int index = indices[i], side = index == 0 || index == 10 ? -1 : 1;
+                        var p = platforms[index];
+                        var expected = placed.transform.TransformPoint(new Vector3(p.x + side * (p.z * 0.5f + 1.25f), -2.65f, 3));
+                        Assert.That(Vector3.Distance(feet[i].transform.position, expected), Is.LessThan(0.001f));
+                    }
+                }
+                void TickPlaced() {
+                    Physics2D.SyncTransforms();
+                    for (int i = 0; i < 35; i++) { cat.SendMessage("FixedUpdate"); physics.Simulate(Time.fixedDeltaTime); }
+                }
+                void ViewAt(float localX) {
+                    var point = placed.transform.TransformPoint(new Vector3(localX, 1));
+                    scenery.GetType().GetMethod("ApplyView").Invoke(scenery, new object[] { point.x, point.y });
+                }
+                Vector2 WaterUv(Vector3 anchor) {
+                    var panel = placed.GetComponentsInChildren<MeshRenderer>().First(r => r.name.StartsWith("Foreground water tile")
+                        && r.bounds.min.x <= anchor.x && r.bounds.max.x >= anchor.x);
+                    var local = panel.transform.InverseTransformPoint(anchor);
+                    return new Vector2(local.x + 0.5f, local.y + 0.5f);
+                }
+                AssertContacts(); TickPlaced();
+                Assert.That(Read(cat, "Grounded"), Is.True);
+                camera.GetComponent(Runtime("CatCamera")).SendMessage("LateUpdate");
+                Assert.That(camera.orthographicSize, Is.EqualTo(5.5f * scale).Within(0.001f));
+                Assert.That(camera.transform.position.y, Is.EqualTo(placed.transform.TransformPoint(Vector3.up).y).Within(0.001f));
+                var layers = placed.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Painted depth ")).ToArray();
+                ViewAt(17); var before = layers.Select(t => t.position.x).ToArray();
+                ViewAt(19);
+                var travel = new[] { 0.05f, 0.14f, 0.08f };
+                for (int i = 0; i < layers.Length; i++)
+                    Assert.That(layers[i].position.x - before[i], Is.EqualTo(2 * scale * (1 - travel[i])).Within(0.001f));
+                var anchor = placed.transform.TransformPoint(new Vector3(25, -3.8f));
+                ViewAt(23); var uv = WaterUv(anchor); ViewAt(25);
+                Assert.That(Vector2.Distance(uv, WaterUv(anchor)), Is.LessThan(0.0001f), "Water must not swim at a transformed tile recycle.");
+                var checkpoint = (Vector2)placed.transform.TransformPoint(new Vector2(9, 0.52f));
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { checkpoint });
+                TickPlaced(); component.SendMessage("Update");
+                Assert.That(Read(Read(component, "Run"), "Checkpoint"), Is.EqualTo(1));
+                component.GetType().GetMethod("RetryCheckpoint").Invoke(component, null);
+                Assert.That(Vector2.Distance(catBody.position, checkpoint), Is.LessThan(0.001f));
+                component.GetType().GetMethod("RestartRun").Invoke(component, null);
+                Assert.That(Vector2.Distance(catBody.position, placed.transform.TransformPoint(new Vector2(-3, 0.48f))), Is.LessThan(0.001f));
+                placement.transform.position += new Vector3(11, -2);
+                placement.transform.localScale *= 1.2f;
+                ViewAt(19);
+                AssertContacts();
+            } finally { UnityEngine.Object.Destroy(placement); }
+            yield return null;
+        }
+    }
+
+    [UnityTest]
     public IEnumerator PaintedCourseKeepsCheckpointsFallsPauseAndFullRestart()
     {
         var component = course.GetComponent(Runtime("MovementCourse"));

@@ -3,7 +3,7 @@
 Built-in OpenAI image generation, transparent output requested. Exact model ID not
 exposed. Both generations reference our Golden River Ruins v2 archive for style
 and palette only. Project assets: `middle-cutout.png` and `near-cutout.png` under
-`Assets/Game/Resources/BackgroundStudy/`. Original generated RGBA files are copied
+`Assets/Game/Art/BackgroundStudyArchive/`. Original generated RGBA files are copied
 without pixel edits. Runtime alpha treatment rejects the generated faint halo.
 
 ## Middle layer prompt

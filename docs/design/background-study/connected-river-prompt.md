@@ -3,7 +3,7 @@
 Built-in OpenAI image generation with transparent output; exact model ID not
 exposed. Style/palette reference: the archived Golden River Ruins v2 image. The
 original generated RGBA PNG is retained without pixel edits as
-`Assets/Game/Resources/BackgroundStudy/connected-river.png`.
+`Assets/Game/Art/BackgroundStudyArchive/connected-river.png`.
 
 One painting contains the banks, waterfalls, distant water, near water and small
 stones. Registered background and foreground quads sample identical UVs,

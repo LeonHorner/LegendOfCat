@@ -223,7 +223,7 @@ Built-in generation prompt:
 
 ## Golden River transparent replacement layers — 2026-10-25
 
-`Assets/Game/Resources/BackgroundStudy/middle-cutout.png` and `near-cutout.png`
+`Assets/Game/Art/BackgroundStudyArchive/middle-cutout.png` and `near-cutout.png`
 are original RGBA paintings generated with the built-in OpenAI image tool; exact
 model ID was not exposed. Source reference: our archived Golden River Ruins v2,
 used for palette/style. License: ASSET-LICENSE.md where rights exist. No third-party
@@ -238,7 +238,7 @@ select A/B/C or approve final production backgrounds.
 
 ## Golden River painted terrain and corner framing — 2026-10-25
 
-`Assets/Game/Resources/BackgroundStudy/painted-terrain.png` and
+`Assets/Game/Art/BackgroundStudyArchive/painted-terrain.png` and
 `foreground-corners.png` were generated with the built-in OpenAI image tool;
 exact model ID was not exposed. Source reference: our Golden River Ruins v2
 archive for style/palette only. License: ASSET-LICENSE.md where rights exist.
@@ -283,7 +283,7 @@ records a revision target, not user acceptance of final artwork or an A/B/C choi
 
 ## Connected Golden River painting — 2026-10-27
 
-`Assets/Game/Resources/BackgroundStudy/connected-river.png` is an original RGBA
+`Assets/Game/Art/BackgroundStudyArchive/connected-river.png` is an original RGBA
 painting generated with the built-in OpenAI image tool; exact model ID was not
 exposed. Source reference: our Golden River Ruins v2 archive for palette/style.
 License: ASSET-LICENSE.md where rights exist. Original generated pixels are
@@ -473,3 +473,22 @@ or jump-force constants changed. Actual Windows preview screenshots, the render
 comparison and measurement limitations are recorded in
 docs/design/background-study/extended-prototype/README.md. The earlier shader
 branch experiment was discarded after showing no measured benefit.
+
+## Background study review corrections - 2026-10-31
+
+Six unused historical paintings (connected-river, middle-cutout, near-cutout,
+painted-terrain, meadow-surface and hanging-foliage) now live under
+Assets/Game/Art/BackgroundStudyArchive/ rather than Resources. Images, original
+GUIDs, metadata and generation/license records are preserved. Current locations
+and SHA-256 hashes are indexed in docs/design/background-study/historical-asset-locations.json.
+The earlier grouped meadow/foliage generation records remain historical; only
+foreground-river from that group is part of the selected runtime.
+
+Active artwork and texture importer settings are unchanged. Mipmaps remain off
+for the fixed orthographic alpha-cutout art pending a separate coverage-aware
+minification review. This avoids changing grass/leaf contours and adding mip
+storage in this correction; it is not a measured performance improvement.
+Geometry/camera/parallax now use the placed course coordinate frame so translated
+and uniformly scaled courses retain visual/collider contact and stable water UVs.
+No new artwork, animation, traversal mechanic or source-pixel edit was introduced.
+See docs/design/background-study/review-2026-10-31.md for tests and limitations.

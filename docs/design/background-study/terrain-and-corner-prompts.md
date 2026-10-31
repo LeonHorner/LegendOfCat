@@ -1,5 +1,7 @@
 # Terrain and foreground corner studies — 2026-10-25
 
+2026-10-31 archive location: Historical painted-terrain.png now resides in Assets/Game/Art/BackgroundStudyArchive/. The foreground-corners.png remains active under Resources/BackgroundStudy. These prompts document the original experiments.
+
 Built-in OpenAI image generation; exact model ID not exposed. The archived
 Golden River Ruins v2 image supplies style and palette, not layout. Original PNG
 pixels are retained. Terrain samples are tiled/mirrored at runtime; floating

@@ -92,6 +92,7 @@ public sealed class MovementCourse : MonoBehaviour
         bars.cullingMask = 0;
         var follow = courseCamera.gameObject.AddComponent<CatCamera>();
         follow.target = player.transform;
+        follow.courseRoot = transform;
         follow.fixedHeight = true;
         var last = Platforms[Platforms.Length - 1];
         follow.rightBoundary = last.x + last.z * 0.5f + 1;
