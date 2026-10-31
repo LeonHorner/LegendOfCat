@@ -22,7 +22,7 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 
 ## Version N: fresh installation
 
-1. Preview the next version on current `main` using `npm run release:plan` with
+1. Preview the next version on current `main` using `npx semantic-release --dry-run` with
    the required GitHub authentication. After explicit authorization, manually start
    `Release` on `main`, entering the exact `expected_version` without `v`.
    For an intentional major bump, separately set `allow_major`; never use it to
