@@ -3,7 +3,9 @@
 Maintainer documentation for the Unity project. For player information, see the [README](../README.md). Follow [AGENTS.md](../AGENTS.md) for binding agent rules.
 
 ## Open
-Install Unity Hub and Unity **6000.3.27f1**, then add this folder as a project.
+Install Unity Hub and Unity **6000.3.27f2** (revision `22188f149405`), then add this folder as a project.
+This stays on Unity 6.3 LTS and includes the October 2026 security fixes. See the
+[upgrade assessment and validation](unity-security-upgrade-2026-10.md).
 Use **LegendOfCat > Create starter scene** to create/open the initial scene.
 Commit generated Unity settings, Packages/packages-lock.json and any new .meta files after the first import.
 The starter scene test and Windows player build have passed in CI; full platform validation is recorded in the setup PR.
