@@ -139,6 +139,32 @@ public class DesktopBehaviorTests : InputTestFixture
         Assert.That(blocks.Length == 0 ? "" : Text(blocks.GetValue(0)), Is.EqualTo(expected));
     }
 
+    [TestCase(
+        "* integrate selected Golden River scenery into movement prototype ([#54](https://github.com/LeonHorner/LegendOfCat/issues/54)) ([7706517](https://github.com/LeonHorner/LegendOfCat/commit/7706517fd1b79802a4e29d825f0fb758b7c06163)), closes [#51](https://github.com/LeonHorner/LegendOfCat/issues/51) [#53](https://github.com/LeonHorner/LegendOfCat/issues/53) [#50](https://github.com/LeonHorner/LegendOfCat/issues/50) [#16](https://github.com/LeonHorner/LegendOfCat/issues/16) [#16](https://github.com/LeonHorner/LegendOfCat/issues/16)",
+        "• integrate selected Golden River scenery into movement prototype")]
+    [TestCase(
+        "* complete Mika's grounded character animation ([#45](https://github.com/LeonHorner/LegendOfCat/issues/45)) ([d01d470](https://github.com/LeonHorner/LegendOfCat/commit/d01d470ff75714101e2a94808d715f71e414692b)), closes [#10](https://github.com/LeonHorner/LegendOfCat/issues/10) [#10](https://github.com/LeonHorner/LegendOfCat/issues/10) [#41](https://github.com/LeonHorner/LegendOfCat/issues/41)",
+        "• complete Mika's grounded character animation")]
+    [TestCase("* **linux:** preserve AppImage update handoff ([#42](https://github.com/LeonHorner/LegendOfCat/issues/42)) ([e1f088c](https://github.com/LeonHorner/LegendOfCat/commit/e1f088c5bb0ffd14da451d87b67e315eec2001e2)), closes [#40](https://github.com/LeonHorner/LegendOfCat/issues/40)",
+        "• linux: preserve AppImage update handoff")]
+    [TestCase("- Fix checkpoint retry, closes #31 #31, #42", "• Fix checkpoint retry")]
+    [TestCase("- Fix checkpoint retry, ReSoLvEs [#31](https://github.com/issues/31)", "• Fix checkpoint retry")]
+    [TestCase("- Fix checkpoint retry, fixes #42", "• Fix checkpoint retry")]
+    [TestCase("- Fix checkpoint retry, closes the settings window", "• Fix checkpoint retry, closes the settings window")]
+    [TestCase("- The door closes #51 when the player leaves the room", "• The door closes when the player leaves the room")]
+    [TestCase("- The player closes a door", "• The player closes a door")]
+    [TestCase("- Fix start, closes [#10](https://github.com/issues/10) in the next version", "• Fix start, closes in the next version")]
+    [TestCase("- Internal **rendering** work ([abcdef123](https://github.com/example/commit/abcdef123))", "• Internal rendering work")]
+    [TestCase("### ⚠ BREAKING CHANGES", "⚠ BREAKING CHANGES")]
+    [TestCase("- **save:** old files require manual migration", "• save: old files require manual migration")]
+    [TestCase("> BREAKING CHANGE: Older saves cannot load this version.", "BREAKING CHANGE: Older saves cannot load this version.")]
+    public void IngameHistoryHidesOnlyTrailingGitHubMetadata(string markdown, string expected)
+    {
+        var blocks = Parse(markdown);
+        Assert.That(blocks.Length, Is.EqualTo(1), markdown);
+        Assert.That(Text(blocks.GetValue(0)), Is.EqualTo(expected));
+    }
+
     [Test]
     public void EmptyAndLongHistoriesAreBounded()
     {
