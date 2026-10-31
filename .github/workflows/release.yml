@@ -1,6 +1,16 @@
 name: Release
 on:
   workflow_dispatch:
+    inputs:
+      expected_version:
+        description: Exact approved next version without v prefix, e.g. 0.7.1
+        required: true
+        type: string
+      allow_major:
+        description: Authorize an intentional major release
+        required: false
+        default: false
+        type: boolean
 permissions:
   contents: read
 concurrency:
@@ -27,6 +37,8 @@ jobs:
         run: npm run release:plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPECTED_VERSION: ${{ inputs.expected_version }}
+          ALLOW_MAJOR: ${{ inputs.allow_major }}
       - name: Check Unity account credentials
         if: steps.plan.outputs.version != ''
         env:
@@ -52,6 +64,8 @@ jobs:
       - uses: game-ci/unity-test-runner@v4.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPECTED_VERSION: ${{ inputs.expected_version }}
+          ALLOW_MAJOR: ${{ inputs.allow_major }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
@@ -90,6 +104,8 @@ jobs:
       - uses: game-ci/unity-builder@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPECTED_VERSION: ${{ inputs.expected_version }}
+          ALLOW_MAJOR: ${{ inputs.allow_major }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
@@ -202,6 +218,8 @@ jobs:
           pattern: release-*
           merge-multiple: true
           path: artifacts/releases
+      - name: Test version analysis and approval
+        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs
       - name: Test release asset and download-link contract
         run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
       - name: Stage clean player downloads and update packages
@@ -211,11 +229,17 @@ jobs:
         run: npm run release:plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPECTED_VERSION: ${{ inputs.expected_version }}
+          ALLOW_MAJOR: ${{ inputs.allow_major }}
       - name: Publish verified commit
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPECTED_VERSION: ${{ inputs.expected_version }}
+          ALLOW_MAJOR: ${{ inputs.allow_major }}
           EXPECTED: ${{ needs.plan.outputs.version }}
           ACTUAL: ${{ steps.final-plan.outputs.version }}
+          EXPECTED_VERSION: ${{ inputs.expected_version }}
+          ALLOW_MAJOR: ${{ inputs.allow_major }}
         run: |
           test "$EXPECTED" = "$ACTUAL"
           npm run release
