@@ -1,8 +1,8 @@
 # First installation and update test
 
-Status: **successful maintainer-reported in-app updates on Windows** (v0.1.0 -> v0.2.0)
-**and Linux** (v0.5.0 -> v0.6.0). The full platform test matrix remains incomplete.
-This document distinguishes observed smoke tests from comprehensive verification.
+Status: **partially observed on Windows** (v0.1.0 -> v0.2.0, maintainer report); the full
+platform validation remains incomplete. This document is a runbook with clearly labeled
+observations, not evidence of fully verified cross-platform update support.
 Publishing N and N+1 requires separate explicit release authorization. Do not create an artificial
 release merely to exercise the updater; use the next small, real fix for N+1.
 
@@ -63,19 +63,12 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 
 ## Linux update recovery regression (#40)
 
-**Historical failures (before the v0.5.0 updater fix):** A Linux v0.1.0 AppImage
-downloaded v0.2.0 but failed to apply and restart. After PR #42, a separate real
+**Observed failure, not a passing validation.** A Linux v0.1.0 AppImage downloaded
+v0.2.0 but failed to apply and restart. After PR #42, a separate real
 v0.3.0 -> v0.4.0 attempt still failed: the `--update-service` helper crashed
 with SIGBUS shortly after the "Starting Velopack handoff" log entry. Crash
 evidence is recorded in sanitized form in issue #40; the exact FUSE mount
-lifetime explanation was not confirmed by a controlled trace in that investigation.
-
-**Subsequent successful smoke test (maintainer report, 2026-10-31):** An in-app
-Linux AppImage update from stable **v0.5.0 to v0.6.0 succeeded**. The repaired
-Linux updater was therefore present in v0.5.0. This supersedes the earlier
-failure as the latest reported outcome, but it does not retroactively turn the
-v0.1.0/v0.3.0 tests into passes. Automatic restart, retained settings, the exact
-Linux distribution, logs and failure/recovery cases were not separately reported.
+lifetime explanation remains to be confirmed by a controlled trace.
 
 The new Linux handoff stages the exact Velopack 1.2.161 `UpdateNix` and its
 `sq.version` outside the original mount, launches a standalone POSIX supervisor,
@@ -99,12 +92,10 @@ after its 60-second wait fails. The Windows path remains separate.
    test; no success may be claimed if FUSE is unavailable.
 3. `.github/workflows/linux-appimage-update.yml` offers an additional
    manually dispatched, isolated replay of the real FUSE test.
-4. A real Linux N -> N+1 in-app update has been reported successful for
-   v0.5.0 -> v0.6.0. The full acceptance matrix still requires explicit evidence
-   of the graphical Settings UI, automatic restart, correct version on next
-   launch, settings/saves retention, pending reconciliation, absence of new
-   SIGBUS/core dumps, and recoverable failure scenarios before closing #40.
-   A graphical VM or Xvfb can automate core functionality; a normal Linux
+4. A real graphical Unity-driven N -> N+1 update with the Settings UI, automatic
+   restart, correct version, settings/saves retention, next-launch pending
+   reconciliation and no new SIGBUS/core dump is still required before closing
+   #40. A graphical VM or Xvfb can automate core functionality; a normal Linux
    desktop remains useful for dialogs and end-user presentation.
 
 **For both cached/full and fresh download tests**, verify the original
@@ -167,22 +158,7 @@ download progress, log captures, Later/reminder behavior, interruption/retry,
 release history, and detailed update package selection were not reported.
 The update used the release process *before* public installer filenames were
 changed; this observation does not validate Delta packages or new download names.
-A subsequent Linux update (v0.5.0 -> v0.6.0) was successful according to a
-separate maintainer report, though comprehensive Linux validation is incomplete.
-
-## Observed Linux update: v0.5.0 -> v0.6.0
-
-Recorded on 2026-10-31 from the maintainer's report:
-
-- The Linux in-app update from stable v0.5.0 to v0.6.0 succeeded.
-- The Linux updater fix was already included in v0.5.0.
-- Automatic restart, settings preservation, exact installation path/desktop,
-  runtime logs, checksum/feed details, update package selection, retry behavior
-  and next-launch reconciliation were not separately confirmed in this report.
-
-This is functional user-reported evidence, not a comprehensive validation run or
-proof that every older Linux AppImage can update without a manual replacement.
-See #40 for the earlier failures and remaining edge-case acceptance criteria.
+Linux installation/update behavior remains unverified.
 
 ## Evidence
 
@@ -195,7 +171,7 @@ See #40 for the earlier failures and remaining edge-case acceptance criteria.
 | Offline start and retry | Not run | Not run |
 | N+1 tag / commit / release workflow | Pending | Pending |
 | Later persists across restart | Not run | Not run |
-| Installed N -> N+1 update / automatic restart | PASS (maintainer report, v0.1.0 -> v0.2.0, restart confirmed) | PASS (maintainer report, v0.5.0 -> v0.6.0; automatic restart not separately confirmed). Earlier FAILs: v0.1.0 -> v0.2.0 and v0.3.0 -> v0.4.0 (#40) |
+| Installed N -> N+1 update / automatic restart | PASS (maintainer report, v0.1.0 -> v0.2.0) | FAIL (v0.1.0 -> v0.2.0 and v0.3.0 -> v0.4.0, see #40) |
 | Settings update path and download progress | Not reported | Not run |
 | Delta artifact SHA-256 reconstruction / release feed | Not run | Not run |
 | Actual Delta or full download choice (N → N+1) | Not observed | Not run |
@@ -206,7 +182,6 @@ See #40 for the earlier failures and remaining edge-case acceptance criteria.
 | Old version release history read-only | Not reported | Not run |
 | Logs / screenshots / remaining defects | Pending | SIGBUS in update helper; sanitized evidence in #40 |
 
-Do not mark the full cross-platform acceptance matrix verified on these smoke
-reports alone. If the game cannot start at all after a failed installation,
-retain logs and use the official installer to repair it; the in-game warning
-cannot be shown until the game can start again.
+Do not mark update support verified until both real platform tests pass. If the game cannot
+start at all after a failed installation, retain logs and use the official installer to repair
+it; the in-game warning cannot be shown until the game can start again.
