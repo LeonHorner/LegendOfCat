@@ -1,17 +1,23 @@
 using UnityEngine;
 
-// A self-contained greybox: reusable from any menu, with no campaign/save dependencies.
+// A painted checkpoint prototype, reusable from the menu without campaign/save dependencies.
 public sealed class MovementCourse : MonoBehaviour
 {
     public static readonly Vector3[] Platforms = {
         new Vector3(0, -0.75f, 10), new Vector3(9, -0.75f, 4),
         new Vector3(15, 0.25f, 4), new Vector3(22.5f, 0.25f, 3),
         new Vector3(28.5f, 1.25f, 3), new Vector3(34, 0.25f, 4),
-        new Vector3(42, -0.75f, 10)
+        new Vector3(42, -0.75f, 10), new Vector3(52, -0.75f, 4),
+        new Vector3(58.5f, 0.25f, 3), new Vector3(65, 0.25f, 4),
+        new Vector3(73, -0.75f, 6), new Vector3(83, -0.75f, 8),
+        new Vector3(92, 0.25f, 4), new Vector3(100, -0.75f, 8)
     };
     public CatController Cat { get; private set; }
     public RunLifecycle Run { get; private set; }
-    static readonly Vector2[] CheckpointSpawns = { new Vector2(9, 0.52f), new Vector2(34, 1.52f) };
+    public static readonly Vector2[] CheckpointSpawns = {
+        new Vector2(9, 0.52f), new Vector2(34, 1.52f),
+        new Vector2(65, 1.52f), new Vector2(83, 0.52f)
+    };
     public System.Action BackToMenu;
     Sprite square;
     Texture2D texture;
@@ -22,6 +28,10 @@ public sealed class MovementCourse : MonoBehaviour
     string previousPose;
     float landing;
     bool originalMika;
+    bool showHelp;
+    GUIStyle hudStyle;
+    string hudStatus;
+    float hudRefresh, frameSeconds;
 
     void Awake()
     {
@@ -31,12 +41,7 @@ public sealed class MovementCourse : MonoBehaviour
         foreach (var p in Platforms) {
             var platform = Block("Standable platform", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.22f, 0.28f, 0.28f));
             platform.AddComponent<BoxCollider2D>();
-            Block("Continuous landing edge", new Vector2(p.x, p.y + 0.72f), new Vector2(p.z, 0.06f), new Color(0.78f, 0.8f, 0.66f));
-        }
-        // Low-contrast background shapes never intersect or bridge playable edges.
-        for (int i = 0; i < 10; i++) {
-            var hill = Block("Background silhouette", new Vector2(i * 7 - 7, -2), new Vector2(5, 8 + i % 3), new Color(0.13f, 0.18f, 0.23f));
-            hill.GetComponent<SpriteRenderer>().sortingOrder = -10;
+            platform.GetComponent<SpriteRenderer>().enabled = false;
         }
         var player = new GameObject("Mika prototype");
         player.transform.SetParent(transform, false);
@@ -44,7 +49,9 @@ public sealed class MovementCourse : MonoBehaviour
         player.AddComponent<Rigidbody2D>();
         player.AddComponent<BoxCollider2D>().size = new Vector2(0.9f, 0.9f);
         Cat = player.AddComponent<CatController>();
-        Run = new RunLifecycle(player.transform.position);
+        Cat.fallReference = transform;
+        // Session spawn coordinates belong to this course, not its current world placement.
+        Run = new RunLifecycle(player.transform.localPosition);
         Cat.FellOutOfBounds += RetryCheckpoint;
         var input = player.AddComponent<CatInput>();
         input.controller = Cat;
@@ -74,7 +81,7 @@ public sealed class MovementCourse : MonoBehaviour
         courseCamera = new GameObject("Course camera").AddComponent<Camera>();
         courseCamera.transform.SetParent(transform, false);
         courseCamera.orthographic = true;
-        courseCamera.orthographicSize = 5;
+        courseCamera.orthographicSize = 5.5f;
         courseCamera.clearFlags = CameraClearFlags.SolidColor;
         courseCamera.backgroundColor = new Color(0.09f, 0.13f, 0.18f);
         courseCamera.depth = 1;
@@ -87,18 +94,21 @@ public sealed class MovementCourse : MonoBehaviour
         bars.cullingMask = 0;
         var follow = courseCamera.gameObject.AddComponent<CatCamera>();
         follow.target = player.transform;
+        follow.courseRoot = transform;
+        follow.fixedHeight = true;
+        var last = Platforms[Platforms.Length - 1];
+        follow.rightBoundary = last.x + last.z * 0.5f + 1;
         Cat.ReturnedToStart += follow.Snap;
+        var scenery = new GameObject("Golden River scenery");
+        scenery.transform.SetParent(transform, false);
+        scenery.AddComponent<BackgroundStudy>().InitializeForCourse(courseCamera, Cat, Platforms);
         for (int i = 0; i < CheckpointSpawns.Length; i++) {
             var point = CheckpointSpawns[i];
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
                 new Vector2(0.14f, 0.9f), new Color(0.95f, 0.75f, 0.36f));
             Label("CHECKPOINT " + (i + 1), new Vector2(point.x, point.y + 1.2f));
         }
-        Label("EASY / 2 m gap", new Vector2(4, -2));
-        Label("RISE / 2 m + 1 m up", new Vector2(11, -2));
-        Label("PRECISION / 4 m gap", new Vector2(19, -2));
-        Label("RISE / 3 m + 1 m up", new Vector2(25, -2));
-        Label("FINISH / return or retry", new Vector2(42, 1));
+        Label("FINISH / return or retry", new Vector2(100, 1));
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
     {
@@ -127,11 +137,18 @@ public sealed class MovementCourse : MonoBehaviour
     void Update()
     {
         if (Run == null) return;
+        frameSeconds = Mathf.Lerp(frameSeconds, Time.unscaledDeltaTime, 0.08f);
+        hudRefresh -= Time.unscaledDeltaTime;
+        if (hudRefresh <= 0) {
+            hudStatus = (Run.Paused ? "Paused | " : "") + "Checkpoint " + Run.Checkpoint + "/" + CheckpointSpawns.Length
+                + " | R: retry | P: pause";
+            hudRefresh = 0.25f;
+        }
         Run.Advance(Time.deltaTime);
         if (Run.Paused || !Cat.Grounded) return;
-        var position = Cat.GetComponent<Rigidbody2D>().position;
+        Vector2 position = transform.InverseTransformPoint(Cat.GetComponent<Rigidbody2D>().position);
         for (int i = 0; i < CheckpointSpawns.Length; i++) {
-            Vector2 point = transform.TransformPoint(CheckpointSpawns[i]);
+            Vector2 point = CheckpointSpawns[i];
             // Marker/spawn follow the course transform when reused in another scene.
             // Only grounded main-route positions may activate a checkpoint.
             if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f)
@@ -139,8 +156,8 @@ public sealed class MovementCourse : MonoBehaviour
         }
     }
 
-    public void RetryCheckpoint() => Cat.RespawnAt(Run.Retry());
-    public void RestartRun() => Cat.RespawnAt(Run.Restart());
+    public void RetryCheckpoint() => Cat.RespawnAt(transform.TransformPoint(Run.Retry()));
+    public void RestartRun() => Cat.RespawnAt(transform.TransformPoint(Run.Restart()));
     public void TogglePause() => Cat.SetPaused(Run.TogglePause());
 
     void LateUpdate()
@@ -165,21 +182,38 @@ public sealed class MovementCourse : MonoBehaviour
     }
     void OnGUI()
     {
-        float width = Mathf.Min(680, Screen.width - 24);
-        GUILayout.BeginArea(new Rect(12, 12, width, 245), GUI.skin.box);
-        GUILayout.Label("MIKA / CHECKPOINT LAB PROTOTYPE");
-        GUILayout.Label("A/D or arrows: move | Space/W/Up: jump | R: retry | Backspace: full restart");
-        GUILayout.Label("P: pause | Esc: menu | Controller: South jump, Select retry, LB restart, RB pause, Start menu");
-        GUILayout.Label((Run.Paused ? "Paused" : landing > 0 ? "Landing" : Cat.Pose) +
-            " | Checkpoint " + Run.Checkpoint + " / " + CheckpointSpawns.Length +
-            " | Retries " + Run.Retries + " | Elapsed " + Run.ElapsedSeconds.ToString("F1") + "s");
-        GUILayout.Label("Cross the gold markers on safe ground. Falls retry the latest checkpoint.");
+        if (Run == null || !courseCamera) return;
+        if (hudStyle == null) hudStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true };
+        var viewport = courseCamera.rect;
+        float width = Mathf.Min(350, Screen.width * viewport.width - 20);
+        bool expanded = showHelp || Run.Paused;
+        var area = new Rect(Screen.width * viewport.x + 10,
+            Screen.height * (1 - viewport.yMax) + 10, width, expanded ? 176 : 52);
+        var oldColor = GUI.color;
+        GUI.color = new Color(1, 1, 1, 0.4f);
+        GUI.Box(area, GUIContent.none);
+        GUI.color = oldColor;
+        GUILayout.BeginArea(new Rect(area.x + 6, area.y + 3, area.width - 12, area.height - 6));
+        GUILayout.Label(hudStatus ?? "Checkpoint 0/4 | R: retry | P: pause", hudStyle);
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Retry checkpoint", GUILayout.Height(28))) RetryCheckpoint();
-        if (GUILayout.Button("Restart entire run", GUILayout.Height(28))) RestartRun();
-        if (GUILayout.Button(Run.Paused ? "Resume" : "Pause", GUILayout.Height(28))) TogglePause();
-        if (GUILayout.Button("Back to menu", GUILayout.Height(28))) BackToMenu?.Invoke();
-        GUILayout.EndHorizontal(); GUILayout.EndArea();
+        GUILayout.Label("A/D: move | Space: jump | Esc: menu", hudStyle);
+        if (GUILayout.Button(showHelp ? "Less" : "Controls", GUILayout.Width(62), GUILayout.Height(19))) {
+            showHelp = !showHelp; GUI.FocusControl(null);
+        }
+        GUILayout.EndHorizontal();
+        if (expanded) {
+            GUILayout.Label("Arrows/W/Up also work. Backspace: restart entire run. Cross gold markers on safe ground.", hudStyle);
+            GUILayout.Label("Controller: South jump, Select retry, LB restart, RB pause, Start menu.", hudStyle);
+            GUILayout.Label("Retries " + Run.Retries + " | " + Run.ElapsedSeconds.ToString("F1")
+                + "s | " + (1 / Mathf.Max(frameSeconds, 0.001f)).ToString("F0") + " fps", hudStyle);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Retry")) { RetryCheckpoint(); GUI.FocusControl(null); }
+            if (GUILayout.Button("Restart")) { RestartRun(); GUI.FocusControl(null); }
+            if (GUILayout.Button(Run.Paused ? "Resume" : "Pause")) { TogglePause(); GUI.FocusControl(null); }
+            if (GUILayout.Button("Menu")) { BackToMenu?.Invoke(); GUI.FocusControl(null); }
+            GUILayout.EndHorizontal();
+        }
+        GUILayout.EndArea();
     }
     void OnDestroy() { Destroy(square); Destroy(texture); }
 }

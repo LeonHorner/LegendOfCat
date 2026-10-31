@@ -7,6 +7,12 @@ using Velopack.Sources;
 VelopackApp.Build().SetAutoApplyOnStartup(false).Run();
 if (args.Length == 5 && args[0] == "--update-service")
     return await UpdateService.Run(int.Parse(args[1]), int.Parse(args[2]), args[3], args[4]);
+if (OperatingSystem.IsLinux()) {
+    // Repair only a stale, generated KDE entry for this exact AppImage.
+    // A failure to access desktop integration must never prevent gameplay.
+    try { LinuxDesktopComment.RefreshCurrentInstallation(); }
+    catch (Exception) { /* Optional desktop integration. */ }
+}
 // One running game per installation prevents an update replacing another game's files.
 using var instance = new Mutex(false, "LegendOfCat-" + Convert.ToHexString(
     System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(

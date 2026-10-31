@@ -46,6 +46,8 @@ A press/release in one step gives about 0.37 m rise. These figures exclude colli
 edge overlap, coyote grace, acceleration from rest and ground-probe tolerance.
 Do not use the theoretical maximum as a production gap budget.
 
+The original opening segment is retained in the extended painted course:
+
 | Course segment (left to right) | Edge gap | Landing rise | Purpose |
 |---|---:|---:|---|
 | Start → first island | 2 m | 0 m | Easy running jump |
@@ -53,23 +55,32 @@ Do not use the theoretical maximum as a production gap budget.
 | Second → narrow island | 4 m | 0 m | Demanding takeoff/landing |
 | Narrow → raised island | 3 m | 1 m | Demanding rising jump |
 | Raised → lower island | 2 m | -1 m | Readable descent |
-| Lower island → finish | 1 m | -1 m | Recovery |
+| Lower island → wide recovery bank | 1 m | -1 m | Recovery |
 
-All edges have continuous light upper surfaces and darker solid fronts.
-Background columns have lower contrast and render behind the playable plane.
-The orange/cream geometric quadruped is a placeholder; moving legs and jump/fall/landing
-feedback never change collision dimensions or delay movement.
+The original greybox used light upper edges, dark fronts and background columns.
+The current [painted prototype](background-study/README.md) replaces those visuals
+and the geometric cat with the selected scenery and existing Mika presentation.
+Movement feedback does not change collision dimensions or delay movement.
 
 ## Checkpoint and run lifecycle (issue #14)
 
-The movement course is a reusable checkpoint greybox. Two visible checkpoint markers
-sit on safe main-route platforms (X=9 and X=34). They activate only when the cat
+The movement course is a reusable painted checkpoint prototype. Four visible
+checkpoint markers sit on safe main-route platforms (X=9, X=34, X=65 and X=83). They activate only when the cat
 is grounded beside the marker; progress is forward-only, so going backwards does
 not replace a safer recovery point. Spawn positions are fixed safe standing centers,
 never arbitrary mid-jump coordinates. A fall below the course automatically retries
 at the latest checkpoint, or the starting point if none is active. Manual retry uses
 the same path. The controller clears velocity, input buffers and jump grace, and
 snaps the camera at every respawn.
+
+Start/checkpoint positions are stored in course-local coordinates. Retry and
+Restart convert the returned local point through the course's current transform,
+so recovery follows runtime translations and positive uniform scaling, including
+changes after checkpoint activation. Checkpoint proximity uses that same local
+frame. Rotation, mirroring, zero scale and nonuniform scaling are unsupported.
+Movement/gravity constants stay in world units; scaling is not traversal retuning.
+The fall boundary is course-local Y<-7; standalone controllers keep the original
+world-Y check. A course placed below world Y=-7 can therefore recover safely.
 
 On retry and full restart, `RunLifecycle.ResetTransientState` is raised before
 teleporting the player. Future combat systems must subscribe to remove active

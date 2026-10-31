@@ -3,7 +3,9 @@
 Maintainer documentation for the Unity project. For player information, see the [README](../README.md). Follow [AGENTS.md](../AGENTS.md) for binding agent rules.
 
 ## Open
-Install Unity Hub and Unity **6000.3.27f1**, then add this folder as a project.
+Install Unity Hub and Unity **6000.3.27f2** (revision `22188f149405`), then add this folder as a project.
+This stays on Unity 6.3 LTS and includes the October 2026 security fixes. See the
+[upgrade assessment and validation](unity-security-upgrade-2026-10.md).
 Use **LegendOfCat > Create starter scene** to create/open the initial scene.
 Commit generated Unity settings, Packages/packages-lock.json and any new .meta files after the first import.
 The starter scene test and Windows player build have passed in CI; full platform validation is recorded in the setup PR.
@@ -165,6 +167,29 @@ card and 32 KiB of Markdown per release are rendered; parsed summaries are cache
 The top Back to settings control is outside the scroll area and keyboard focus does
 not scroll the content when that fixed control is selected. Full Markdown remains
 on GitHub. This is intentionally a compact summary renderer, not CommonMark.
+
+## Linux KDE menu description
+
+Velopack 1.2.161 embeds `Comment=LegendOfCat <version>` in its
+AppImage desktop metadata. KDE or an AppImage integration utility may copy
+that comment to a separate user-owned `~/.local/share/applications/*.desktop`
+entry. In-place AppImage updates do not refresh such a copied entry.
+
+At each normal Linux AppImage startup, the launcher narrowly updates a stale,
+**generated** `Comment=LegendOfCat x.y.z` to
+`Comment=A little cat, a big adventure` in an existing desktop entry only
+when the entry's `Name=LegendOfCat` and `Exec=` points to the exact launched
+AppImage. It respects `XDG_DATA_HOME`, leaves user-written descriptions and
+other desktop keys unchanged, skips symlinks and treats inaccessible entries
+as optional. It does not create or remove KDE menu entries or modify other
+applications. Desktop menu refresh may occur on KDE's next cache update.
+Freshly integrated AppImages may initially inherit Velopack's packaged
+versioned comment until their first launch.
+
+To inspect the current entry, check `Comment`, `Name` and `Exec` in
+`~/.local/share/applications/*.desktop`. Regression tests exercise the
+actual C# migration with temporary desktop files; do not use source-text
+assertions as a substitute.
 
 The authoritative application icon is tools/icon.ico. Regenerate its lossless PNG
 variant with `node tools/application-icon.mjs`; do not edit the variant independently.

@@ -30,6 +30,31 @@ public class CatMovementTests
         Assert.That(velocity.x, Is.GreaterThan(0));
         Step(true); Assert.That(velocity.x, Is.Zero);
     }
+    [Test]
+    public void EarlyTakeoffPreservesTheFixedStepArcAndShortMovementPulse()
+    {
+        Call("SetMove", 1f); Call("SetMove", 0f); Call("PressJump");
+        var expected = Step(true);
+        var expectedPositions = new float[45];
+        float height = expected.y * 0.02f;
+        for (int i = 0; i < expectedPositions.Length; i++) {
+            if (i == 3) Call("ReleaseJump");
+            height += Step().y * 0.02f;
+            expectedPositions[i] = height;
+        }
+        SetUp();
+        Call("SetMove", 1f); Call("SetMove", 0f); Call("PressJump");
+        Assert.That((bool)motionType.GetMethod("StartBufferedJump").Invoke(motion, new object[] { true, velocity }), Is.True);
+        velocity = (Vector2)motionType.GetProperty("Velocity").GetValue(motion);
+        Assert.That(velocity.y, Is.EqualTo(12));
+        Assert.That(Step(), Is.EqualTo(expected), "Early feedback must not consume movement pulses or add a physics tick.");
+        height = velocity.y * 0.02f;
+        for (int i = 0; i < expectedPositions.Length; i++) {
+            if (i == 3) Call("ReleaseJump");
+            height += Step().y * 0.02f;
+            Assert.That(height, Is.EqualTo(expectedPositions[i]).Within(0.0001f));
+        }
+    }
     [Test] public void CoyoteJumpWorksShortlyAfterLeavingButExpires()
     {
         Step(true); Step(); Step(); Call("PressJump"); Step(); Assert.That(Jumped, Is.True);

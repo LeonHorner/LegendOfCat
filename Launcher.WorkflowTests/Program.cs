@@ -14,6 +14,14 @@ var cases = new (string Name, Func<Task> Run)[] {
     ("failed game shutdown blocks update handoff", GameExitFailure),
     ("failed launcher shutdown blocks Windows update", LauncherExitFailure),
     ("installer launch error propagates", InstallerFailure),
+    ("KDE generated comment migrates once", DesktopCommentTests.MigratesGeneratedKdeComment),
+    ("KDE custom comment remains unchanged", DesktopCommentTests.RespectsUserComment),
+    ("KDE other installation is untouched", DesktopCommentTests.RequiresCorrectAppImage),
+    ("KDE application identity is verified", DesktopCommentTests.RequiresExactApplicationName),
+    ("KDE quoted paths and localized comments are preserved", DesktopCommentTests.HandlesQuotedPathsAndLocales),
+    ("KDE command wrapper is left alone", DesktopCommentTests.RejectsCommandWrappers),
+    ("KDE symlinked entry is not modified", DesktopCommentTests.SkipsSymlinkedEntries),
+    ("KDE launcher repairs matching XDG entries on startup", DesktopCommentTests.RefreshesExistingXdgDesktopEntry),
 };
 
 var failed = 0;

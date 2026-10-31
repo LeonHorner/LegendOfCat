@@ -10,7 +10,7 @@ A charming 2D adventure starring **Mika the cat**. A little cat, a big adventure
 | Linux x64 — AppImage | [Download Linux AppImage](https://github.com/LeonHorner/LegendOfCat/releases/latest/download/LegendOfCat-Linux-x86_64.AppImage) |
 | Windows x64 — portable (optional) | [Download Portable ZIP](https://github.com/LeonHorner/LegendOfCat/releases/latest/download/LegendOfCat-Windows-Portable.zip) |
 
-These builds are **unfinished previews**, not the complete game. Downloads are unsigned and graphical installation / version-to-version updates still need real Windows and Linux verification. If a direct link is not yet available during the transition to the new asset names, use the [latest release page](https://github.com/LeonHorner/LegendOfCat/releases/latest).
+These builds are **unfinished previews**, not the complete game. Downloads are unsigned. For version-specific details, see the [latest release page](https://github.com/LeonHorner/LegendOfCat/releases/latest).
 
 ![Golden River Ruins concept art showing Mika in a painted adventure world](docs/design/references/golden-river-ruins-v2.png)
 

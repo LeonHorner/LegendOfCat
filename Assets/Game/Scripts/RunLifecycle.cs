@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 
 // Session-only rules; campaign records and ability choices are separate features.
+// Start/Spawn use the caller's coordinate frame; MovementCourse supplies local coordinates.
 public sealed class RunLifecycle
 {
     public Vector2 Start { get; }

@@ -15,6 +15,49 @@ public class DesktopBehaviorTests : InputTestFixture
     static object State() => Activator.CreateInstance(Runtime("DisplayState"), 1280, 720, false);
 
     [Test]
+    public void KeyboardTakeoffFeedbackIsImmediateAndReleaseReachesTheNextPhysicsStep()
+    {
+        var keyboard = InputSystem.AddDevice<Keyboard>();
+        var host = new GameObject("Keyboard takeoff fixture");
+        var controller = host.AddComponent(Runtime("CatController"));
+        var input = host.AddComponent(Runtime("CatInput"));
+        var body = host.GetComponent<Rigidbody2D>();
+        InputActionMap actions = null;
+        PhysicsMaterial2D material = null;
+        void Lifecycle(Component target, string name, params object[] args) => target.GetType()
+            .GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, args);
+        try {
+            Lifecycle(controller, "Awake");
+            material = host.GetComponent<BoxCollider2D>().sharedMaterial;
+            // The real course/physics fixture separately establishes grounded contact.
+            controller.GetType().GetProperty("Grounded").SetValue(controller, true);
+            input.GetType().GetField("controller").SetValue(input, controller);
+            Lifecycle(input, "Awake"); Lifecycle(input, "OnApplicationFocus", true);
+            actions = (InputActionMap)Property(input, "Actions");
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.D, Key.Space));
+            InputSystem.Update();
+            Assert.That(Property(controller, "Grounded"), Is.False);
+            Assert.That(Property(controller, "Pose"), Is.EqualTo("Jump"));
+            Assert.That(body.linearVelocity.y, Is.EqualTo(12), "Takeoff state must be visible before FixedUpdate.");
+            Assert.That(body.position, Is.EqualTo(Vector2.zero), "Input must not advance physics or teleport the body.");
+            Lifecycle(controller, "FixedUpdate");
+            Assert.That(body.linearVelocity.x, Is.GreaterThan(1));
+            Assert.That(body.linearVelocity.y, Is.EqualTo(11.4f).Within(0.001f));
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+            InputSystem.Update(); Lifecycle(controller, "FixedUpdate");
+            Assert.That(body.linearVelocity.x, Is.Zero);
+            Assert.That(body.linearVelocity.y, Is.LessThan(5));
+        } finally {
+            actions?.Dispose();
+            host.GetComponent<BoxCollider2D>().sharedMaterial = null;
+            controller.GetType().GetField("material", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(controller, null);
+            UnityEngine.Object.DestroyImmediate(host);
+            if (material) UnityEngine.Object.DestroyImmediate(material);
+            InputSystem.RemoveDevice(keyboard);
+        }
+    }
+
+    [Test]
     public void ResizeDebouncesAndFlushesTheLastWindowSize()
     {
         var state = State();

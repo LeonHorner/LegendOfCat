@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-31",
+  "reason": "Unreferenced historical paintings moved outside Resources without changing image bytes or GUIDs.",
+  "assets": [
+    {
+      "previousPath": "Assets/Game/Resources/BackgroundStudy/connected-river.png",
+      "currentPath": "Assets/Game/Art/BackgroundStudyArchive/connected-river.png",
+      "guid": "948a7e9ac720ec748aa95e9948db3470",
+      "sha256": "ce9a75a46aeb88369c915cbf7f2de0272d6762ee60569004e8ddfb3af6fc6f78"
+    },
+    {
+      "previousPath": "Assets/Game/Resources/BackgroundStudy/middle-cutout.png",
+      "currentPath": "Assets/Game/Art/BackgroundStudyArchive/middle-cutout.png",
+      "guid": "1710dc5078882cc4ba213a7f2596c613",
+      "sha256": "50a961ae83b266f81274b7b706a378e98df3a3e3011d6c763a8091031bb56b9b"
+    },
+    {
+      "previousPath": "Assets/Game/Resources/BackgroundStudy/near-cutout.png",
+      "currentPath": "Assets/Game/Art/BackgroundStudyArchive/near-cutout.png",
+      "guid": "7b647c64ac7a1ec47a87f1027e0145d0",
+      "sha256": "f5b14b2fc665453debfa524490e672ce597090fc22c8c8fc109e313b9974fb18"
+    },
+    {
+      "previousPath": "Assets/Game/Resources/BackgroundStudy/painted-terrain.png",
+      "currentPath": "Assets/Game/Art/BackgroundStudyArchive/painted-terrain.png",
+      "guid": "ebb87300cc9a6a84abf3e4ff4c0b02a4",
+      "sha256": "819d95f482bbd1692a83fb9ba8e850bff91e917e319879775d3c9bc4bfbcdc8a"
+    },
+    {
+      "previousPath": "Assets/Game/Resources/BackgroundStudy/meadow-surface.png",
+      "currentPath": "Assets/Game/Art/BackgroundStudyArchive/meadow-surface.png",
+      "guid": "b152b930b58819c4e8a8da69ea58bb44",
+      "sha256": "f4e83ee77ac0232e0fe7d99b0bfb076f46f101eb44672f7a50725fbcc0e6c2d5"
+    },
+    {
+      "previousPath": "Assets/Game/Resources/BackgroundStudy/hanging-foliage.png",
+      "currentPath": "Assets/Game/Art/BackgroundStudyArchive/hanging-foliage.png",
+      "guid": "4d5a4be6bf636f245b23542a7df1409f",
+      "sha256": "a974d72ad00a21efeb5348bd92c80d16567d15de540be71a676198d30b02834e"
+    }
+  ]
+}
