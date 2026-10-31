@@ -56,6 +56,45 @@ test('explicit breaking footers and bang headers still produce major releases', 
   ]) assert.equal(await analyze(message), 'major', message);
 });
 
+test('breaking prose without a colon is not a major, regardless of case', async () => {
+  for (const line of [
+    'breaking-change descriptions.',
+    'Breaking-Change descriptions.',
+    'BREAKING-CHANGE descriptions.',
+    'breaking change descriptions.',
+    'Breaking Change descriptions.',
+    'BREAKING CHANGE descriptions.'
+  ]) {
+    const message = [
+      'fix: clean up release history (#66)',
+      '',
+      '## Changes',
+      'The following wording is ordinary documentation:',
+      line,
+      '',
+      '## Scope',
+      'Version calculation is unchanged.'
+    ].join('\n');
+    assert.equal(await analyze(message), 'patch', line);
+  }
+});
+
+test('explicit breaking footers are case-insensitive but require a colon', async () => {
+  for (const marker of [
+    'BREAKING CHANGE:',
+    'breaking change:',
+    'Breaking Change:',
+    'bReAkInG cHaNgE:',
+    'BREAKING-CHANGE:',
+    'breaking-change:',
+    'Breaking-Change:'
+  ]) {
+    const message = 'fix: change save format\n\n' +
+      marker + ' existing save files are incompatible';
+    assert.equal(await analyze(message), 'major', marker);
+  }
+});
+
 test('real breaking notes remain visible in the generated changelog', async () => {
   const message = 'fix: change save format\n\nBREAKING CHANGE: old saves are incompatible';
   const notes = await generateNotes(notesOptions, {
