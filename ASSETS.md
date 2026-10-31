@@ -492,3 +492,11 @@ Geometry/camera/parallax now use the placed course coordinate frame so translate
 and uniformly scaled courses retain visual/collider contact and stable water UVs.
 No new artwork, animation, traversal mechanic or source-pixel edit was introduced.
 See docs/design/background-study/review-2026-10-31.md for tests and limitations.
+
+## Stomp prototype greybox — 2026-10-31
+
+- Source: original runtime rectangles, labels and impact marker in `StompArena.cs`; authored by Codex (GPT-6), no image generator or external asset source.
+- License: repository project license. No third-party artwork was added. Existing MikaOriginal keeps its existing provenance.
+- Human direction: issue #12 requests a small greybox head-jump encounter with readable anticipation/attack/recovery; exact rules and difficulty require user review.
+- Creative choices proposed for review: stationary anonymous target, striped warning/solid ground attack, white exposed head, restrained impact flash and short damage protection.
+- Evidence: `docs/design/stomp-prototype/{anticipation,attack,recovery}.png`, generated from the actual Unity runtime arena by `StompReview.Record`. These are review screenshots, not production background/character assets.

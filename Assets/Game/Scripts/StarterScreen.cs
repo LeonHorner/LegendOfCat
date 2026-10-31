@@ -35,6 +35,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     long downloadedBytes, totalBytes;
     Vector2 scroll;
     MovementCourse course;
+    StompArena stompArena;
     VersionedJsonFile displayFile;
     bool fullscreen;
     DisplayState display;
@@ -85,9 +86,27 @@ public sealed partial class StarterScreen : MonoBehaviour
 
     void OpenCourse()
     {
-        if (course != null || popup || applying) return;
+        if (course != null || stompArena != null || popup || applying) return;
         course = Instantiate(Resources.Load<MovementCourse>("MovementCourse"));
         course.BackToMenu = CloseCourse;
+    }
+
+    void OpenStompArena()
+    {
+        if (course != null || stompArena != null || popup || applying) return;
+        stompArena = new GameObject("Stomp lab").AddComponent<StompArena>();
+        stompArena.BackToMenu = CloseStompArena;
+    }
+
+    void CloseStompArena()
+    {
+        if (stompArena == null) return;
+        stompArena.gameObject.SetActive(false);
+        Destroy(stompArena.gameObject);
+        stompArena = null;
+        page = "menu";
+        lastPage = null;
+        previousFocus.Clear();
     }
 
     void CloseCourse()
