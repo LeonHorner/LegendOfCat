@@ -6,7 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-public sealed class BackgroundStudyTests
+public sealed class SceneryRendererTests
 {
     [Test]
     public void HistoricalPaintingsAreArchivedAndActiveCutoutsKeepTheirImportPolicy()
@@ -25,7 +25,7 @@ public sealed class BackgroundStudyTests
         foreach (string name in new[] { "background-material", "terrain-material", "water-material" })
             Assert.That(Resources.Load<Material>("BackgroundStudy/" + name).shader, Is.Not.Null);
     }
-    Type Study => AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("BackgroundStudy")).First(t => t != null);
+    Type Study => AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("SceneryRenderer")).First(t => t != null);
     float Call(string method, params object[] args) => (float)Study.GetMethod(method).Invoke(null, args);
 
     [TestCase(0f)] [TestCase(0.08f)] [TestCase(0.28f)] [TestCase(0.55f)] [TestCase(1f)] [TestCase(1.1f)]
@@ -76,8 +76,22 @@ public sealed class BackgroundStudyTests
         var scene = UnityEngine.SceneManagement.SceneManager.CreateScene("Background physics test",
             new UnityEngine.SceneManagement.CreateSceneParameters(UnityEngine.SceneManagement.LocalPhysicsMode.Physics2D));
         UnityEngine.SceneManagement.SceneManager.SetActiveScene(scene);
-        var root = new GameObject("Background study integration test");
-        var study = root.AddComponent(Study);
+        // Integrate with the real course rather than creating a second camera or motor.
+        var root = new GameObject("Scenery integration course");
+        var courseType = AppDomain.CurrentDomain.GetAssemblies()
+            .Select(a => a.GetType("MovementCourse")).First(t => t != null);
+        root.AddComponent(courseType);
+        var study = root.GetComponentInChildren(Study);
+        Assert.That(study, Is.Not.Null);
+        Assert.That(study.GetComponentsInChildren<Camera>(), Is.Empty,
+            "Scenery renderer must reuse the existing course camera.");
+        Assert.That(study.GetComponentsInChildren<Collider2D>(), Is.Empty,
+            "Scenery renderer must not create a second set of collision objects.");
+        // The renderer test drives camera positions explicitly; leave follow behavior to its own course tests.
+        var viewForFixture = (Camera)Study.GetProperty("View").GetValue(study);
+        var followType = AppDomain.CurrentDomain.GetAssemblies()
+            .Select(a => a.GetType("CatCamera")).First(t => t != null);
+        ((Behaviour)viewForFixture.GetComponent(followType)).enabled = false;
         yield return null;
         // Drive the motor directly; live keyboard polling would release the scripted held jump.
         var liveInput = root.GetComponentsInChildren<MonoBehaviour>().First(c => c.GetType().Name == "CatInput");

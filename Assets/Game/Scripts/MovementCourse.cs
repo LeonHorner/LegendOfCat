@@ -101,7 +101,7 @@ public sealed class MovementCourse : MonoBehaviour
         Cat.ReturnedToStart += follow.Snap;
         var scenery = new GameObject("Golden River scenery");
         scenery.transform.SetParent(transform, false);
-        scenery.AddComponent<BackgroundStudy>().InitializeForCourse(courseCamera, Cat, Platforms);
+        scenery.AddComponent<SceneryRenderer>().InitializeForCourse(courseCamera, Cat, Platforms);
         for (int i = 0; i < CheckpointSpawns.Length; i++) {
             var point = CheckpointSpawns[i];
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
