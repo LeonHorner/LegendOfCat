@@ -238,8 +238,6 @@ jobs:
           ALLOW_MAJOR: ${{ inputs.allow_major }}
           EXPECTED: ${{ needs.plan.outputs.version }}
           ACTUAL: ${{ steps.final-plan.outputs.version }}
-          EXPECTED_VERSION: ${{ inputs.expected_version }}
-          ALLOW_MAJOR: ${{ inputs.allow_major }}
         run: |
           test "$EXPECTED" = "$ACTUAL"
           npm run release
