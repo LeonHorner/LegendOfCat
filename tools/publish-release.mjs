@@ -1,5 +1,6 @@
 import semanticRelease from 'semantic-release';
-import { firstReleasePlan, git } from './release-engine.mjs';
+import { firstReleasePlan, planRelease, git } from './release-engine.mjs';
+import { assertReleaseApproval } from './release-approval.mjs';
 import { execFileSync } from 'node:child_process';
 import { readdirSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
@@ -9,6 +10,11 @@ import { DOWNLOADS } from './release-assets.mjs';
 import { downloadNotes } from './release-notes.mjs';
 
 const initial = await firstReleasePlan();
+const approvedPlan = initial === null ? await planRelease() : initial;
+if (!approvedPlan) throw new Error('No releasable changes.');
+assertReleaseApproval(approvedPlan.nextRelease, process.env.EXPECTED_VERSION, process.env.ALLOW_MAJOR);
+if (process.env.EXPECTED && process.env.EXPECTED !== approvedPlan.nextRelease.version)
+  throw new Error('Release version changed after validation.');
 if (initial === null) {
   await semanticRelease({ ci: true });
 } else if (initial) {
