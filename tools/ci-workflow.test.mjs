@@ -305,25 +305,28 @@ test('Linux AppImage validation remains manual and release dispatch is unchanged
   assert.equal(prWorkflow.jobs.gate.needs.includes('package'), true);
 });
 
-test('manual release requires exact version and separate major approval', () => {
+test('release dispatch has only allow_minor (default on) and allow_major (default off)', () => {
   const inputs = releaseWorkflow.on.workflow_dispatch.inputs;
-  assert.equal(inputs.expected_version.required, true);
-  assert.equal(inputs.expected_version.type, 'string');
+  assert.deepEqual(Object.keys(inputs), ['allow_minor', 'allow_major']);
+  assert.equal(inputs.allow_minor.type, 'boolean');
+  assert.equal(inputs.allow_minor.default, true);
+  assert.equal(inputs.allow_minor.required, false);
   assert.equal(inputs.allow_major.type, 'boolean');
   assert.equal(inputs.allow_major.default, false);
+  assert.equal(inputs.allow_major.required, false);
+  // Check gates at plan and final publish, without exposing a version field.
   for (const step of [
     releaseWorkflow.jobs.plan.steps.find(s => s.id === 'plan'),
     releaseWorkflow.jobs.publish.steps.find(s => s.id === 'final-plan'),
     releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit')
   ]) {
-    assert.ok(step, 'Release approval check missing');
-    assert.equal(step.env.EXPECTED_VERSION, '${{ inputs.expected_version }}');
+    assert.ok(step, 'Release authorization step missing');
+    assert.equal(step.env.ALLOW_MINOR, '${{ inputs.allow_minor }}');
     assert.equal(step.env.ALLOW_MAJOR, '${{ inputs.allow_major }}');
+    assert.equal(step.env.EXPECTED_VERSION, undefined);
   }
-  for (const job of [
-    prWorkflow.jobs.preflight,
-    releaseWorkflow.jobs.publish
-  ]) {
-    assert.ok(job.steps.some(s => s.run?.includes('tools/release-analyzer.test.mjs')));
-  }
+  assert.ok(prWorkflow.jobs.preflight.steps.some(s =>
+    s.run?.includes('tools/release-analyzer.test.mjs')));
+  assert.ok(releaseWorkflow.jobs.publish.steps.some(s =>
+    s.run?.includes('tools/release-analyzer.test.mjs')));
 });

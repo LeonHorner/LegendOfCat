@@ -22,12 +22,16 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 
 ## Version N: fresh installation
 
-1. Preview the next version on current `main` using `npx semantic-release --dry-run` with
-   the required GitHub authentication. After explicit authorization, manually start
-   `Release` on `main`, entering the exact `expected_version` without `v`.
-   For an intentional major bump, separately set `allow_major`; never use it to
-   bypass a surprising version prediction. Plan and publish revalidate the approval.
-   Record the version as N. Verify both platform packages and feeds were published.
+1. After explicit authorization, manually start `Release` on `main`.
+   The only two switches are `allow_minor` (on by default) and
+   `allow_major` (off by default); there is no version input. The
+   version is computed automatically from Conventional Commits. Patch releases
+   are always allowed, while minor and major releases need their respective
+   switches. A disallowed version stops before Unity builds. Optionally
+   preview the computed version via `npx semantic-release --dry-run`; never
+   enable major merely to bypass a surprising prediction. Plan and publish
+   revalidate permissions and version consistency. Record the version as N.
+   Verify both platform packages and feeds were published.
    Check that the release shows the three player downloads plus the two `releases.*.json`
    feeds and referenced `.nupkg` files; do not ship `assets.*.json` or legacy `RELEASES`.
    Verify the three player links in the release notes and the README `latest/download/` URLs.

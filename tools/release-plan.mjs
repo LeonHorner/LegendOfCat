@@ -18,7 +18,7 @@ if (invalid.length) {
   throw new Error('Non-conventional commits since the last release:\n' + invalid.join('\n'));
 }
 const result = await planRelease();
-if (result) assertReleaseApproval(result.nextRelease, process.env.EXPECTED_VERSION, process.env.ALLOW_MAJOR);
+if (result) assertReleaseApproval(result.nextRelease, process.env.ALLOW_MINOR, process.env.ALLOW_MAJOR);
 const version = result ? result.nextRelease.version : '';
 if (process.env.GITHUB_OUTPUT)
   appendFileSync(process.env.GITHUB_OUTPUT, 'version=' + version + '\n');

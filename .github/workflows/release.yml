@@ -2,10 +2,11 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      expected_version:
-        description: Exact approved next version without v prefix, e.g. 0.7.1
-        required: true
-        type: string
+      allow_minor:
+        description: Allow automatically calculated minor feature releases
+        required: false
+        default: true
+        type: boolean
       allow_major:
         description: Authorize an intentional major release
         required: false
@@ -37,7 +38,7 @@ jobs:
         run: npm run release:plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EXPECTED_VERSION: ${{ inputs.expected_version }}
+          ALLOW_MINOR: ${{ inputs.allow_minor }}
           ALLOW_MAJOR: ${{ inputs.allow_major }}
       - name: Check Unity account credentials
         if: steps.plan.outputs.version != ''
@@ -64,8 +65,6 @@ jobs:
       - uses: game-ci/unity-test-runner@v4.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EXPECTED_VERSION: ${{ inputs.expected_version }}
-          ALLOW_MAJOR: ${{ inputs.allow_major }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
@@ -104,8 +103,6 @@ jobs:
       - uses: game-ci/unity-builder@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EXPECTED_VERSION: ${{ inputs.expected_version }}
-          ALLOW_MAJOR: ${{ inputs.allow_major }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
@@ -229,12 +226,12 @@ jobs:
         run: npm run release:plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EXPECTED_VERSION: ${{ inputs.expected_version }}
+          ALLOW_MINOR: ${{ inputs.allow_minor }}
           ALLOW_MAJOR: ${{ inputs.allow_major }}
       - name: Publish verified commit
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EXPECTED_VERSION: ${{ inputs.expected_version }}
+          ALLOW_MINOR: ${{ inputs.allow_minor }}
           ALLOW_MAJOR: ${{ inputs.allow_major }}
           EXPECTED: ${{ needs.plan.outputs.version }}
           ACTUAL: ${{ steps.final-plan.outputs.version }}

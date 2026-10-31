@@ -1,13 +1,24 @@
-// Fail closed before Unity builds, packaging, or any public release.
-export function assertReleaseApproval(nextRelease, expectedVersion, allowMajor = false) {
+// The version stays automatically calculated; these switches only authorize its type.
+// Unapproved minor/major changes fail instead of being silently downgraded.
+const enabled = value => value === true || value === 'true';
+
+export function assertReleaseApproval(nextRelease, allowMinor = false, allowMajor = false) {
   if (!nextRelease || typeof nextRelease.version !== 'string')
     throw new Error('No release version was planned.');
-  if (typeof expectedVersion !== 'string' ||
-      !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(expectedVersion))
-    throw new Error('A valid expected_version (X.Y.Z) must be explicitly provided.');
-  if (expectedVersion !== nextRelease.version)
-    throw new Error('Release version mismatch: approved ' + expectedVersion +
-      ', computed ' + nextRelease.version + '. Review commits; do not bypass.');
-  if (nextRelease.type === 'major' && allowMajor !== true && allowMajor !== 'true')
-    throw new Error('Major release requires separate allow_major approval.');
+  switch (nextRelease.type) {
+    case 'patch':
+      return;
+    case 'minor':
+      if (!enabled(allowMinor))
+        throw new Error('Computed minor release ' + nextRelease.version +
+          ' is blocked: enable allow_minor to permit this feature release.');
+      return;
+    case 'major':
+      if (!enabled(allowMajor))
+        throw new Error('Computed major release ' + nextRelease.version +
+          ' is blocked: enable allow_major only for intentional breaking changes.');
+      return;
+    default:
+      throw new Error('Unsupported release type: ' + String(nextRelease.type));
+  }
 }

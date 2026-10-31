@@ -12,7 +12,7 @@ import { downloadNotes } from './release-notes.mjs';
 const initial = await firstReleasePlan();
 const approvedPlan = initial === null ? await planRelease() : initial;
 if (!approvedPlan) throw new Error('No releasable changes.');
-assertReleaseApproval(approvedPlan.nextRelease, process.env.EXPECTED_VERSION, process.env.ALLOW_MAJOR);
+assertReleaseApproval(approvedPlan.nextRelease, process.env.ALLOW_MINOR, process.env.ALLOW_MAJOR);
 if (process.env.EXPECTED && process.env.EXPECTED !== approvedPlan.nextRelease.version)
   throw new Error('Release version changed after validation.');
 if (initial === null) {

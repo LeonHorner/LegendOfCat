@@ -2,24 +2,44 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { assertReleaseApproval } from './release-approval.mjs';
 
-test('accepts exact patch and minor version approvals', () => {
-  assert.doesNotThrow(() => assertReleaseApproval({ version: '0.7.1', type: 'patch' }, '0.7.1'));
-  assert.doesNotThrow(() => assertReleaseApproval({ version: '0.8.0', type: 'minor' }, '0.8.0'));
+test('patch releases always work regardless of toggles', () => {
+  for (const minor of [undefined, false, 'false', true, 'true'])
+    for (const major of [undefined, false, 'false', true, 'true'])
+      assert.doesNotThrow(() =>
+        assertReleaseApproval({ version: '0.7.1', type: 'patch' }, minor, major));
 });
 
-test('rejects missing, invalid or mismatched version approvals', () => {
-  for (const expected of [undefined, '', 'v0.7.1', '0.7', '01.0.0', '1.0.0'])
-    assert.throws(
-      () => assertReleaseApproval({ version: '0.7.1', type: 'patch' }, expected),
-      /expected_version|mismatch/
-    );
-  assert.throws(() => assertReleaseApproval(null, '0.7.1'), /No release version/);
+test('default permits minor releases but blocks major releases', () => {
+  assert.doesNotThrow(() =>
+    assertReleaseApproval({ version: '0.8.0', type: 'minor' }, 'true', 'false'));
+  assert.throws(() =>
+    assertReleaseApproval({ version: '1.0.0', type: 'major' }, 'true', 'false'),
+    /allow_major/);
 });
 
-test('major version requires both exact number and separate approval', () => {
-  const major = { version: '1.0.0', type: 'major' };
-  assert.throws(() => assertReleaseApproval(major, '0.7.1', true), /mismatch/);
-  assert.throws(() => assertReleaseApproval(major, '1.0.0'), /allow_major/);
-  assert.throws(() => assertReleaseApproval(major, '1.0.0', 'false'), /allow_major/);
-  assert.doesNotThrow(() => assertReleaseApproval(major, '1.0.0', 'true'));
+test('minor is blocked when its own permission is disabled or missing', () => {
+  for (const minor of [undefined, false, 'false', '', null])
+    assert.throws(() =>
+      assertReleaseApproval({ version: '0.8.0', type: 'minor' }, minor, true),
+      /allow_minor/);
+  assert.doesNotThrow(() =>
+    assertReleaseApproval({ version: '0.8.0', type: 'minor' }, true, false));
+});
+
+test('major needs its own permission even when minor is enabled', () => {
+  for (const major of [undefined, false, 'false', '', null])
+    assert.throws(() =>
+      assertReleaseApproval({ version: '1.0.0', type: 'major' }, true, major),
+      /allow_major/);
+  // Separate switches: approving major does not implicitly approve minor.
+  assert.doesNotThrow(() =>
+    assertReleaseApproval({ version: '1.0.0', type: 'major' }, false, 'true'));
+});
+
+test('unexpected release types and absent plans fail closed', () => {
+  assert.throws(() => assertReleaseApproval(null, true, true), /No release version/);
+  assert.throws(() => assertReleaseApproval({ version: '0.8.0' }, true, true), /Unsupported release type/);
+  assert.throws(() =>
+    assertReleaseApproval({ version: '0.8.0', type: 'preview' }, true, true),
+    /Unsupported release type/);
 });
