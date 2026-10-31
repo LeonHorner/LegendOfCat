@@ -56,6 +56,18 @@ test('explicit breaking footers and bang headers still produce major releases', 
   ]) assert.equal(await analyze(message), 'major', message);
 });
 
+test('real breaking notes remain visible in the generated changelog', async () => {
+  const message = 'fix: change save format\\n\\nBREAKING CHANGE: old saves are incompatible';
+  const notes = await generateNotes(notesOptions, {
+    commits: [{ hash: 'abc123', message }],
+    lastRelease: { version: '0.7.0', gitTag: 'v0.7.0' },
+    nextRelease: { version: '1.0.0', gitTag: 'v1.0.0', type: 'major' },
+    options: { repositoryUrl },
+    logger
+  });
+  assert.match(notes, /BREAKING CHANGES/);
+});
+
 test('normal fix, feature and refactor commits retain expected types', async () => {
   assert.equal(await analyze('fix: disable Unity splash screen'), 'patch');
   assert.equal(await analyze('feat: add movement tutorial'), 'minor');
