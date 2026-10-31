@@ -26,9 +26,13 @@ The previous lateral recoil and falling sine tone were rejected by the user. The
 ![Held running right through a damage hop](damage-run-right.gif)
 ![Held running left through a damage hop](damage-run-left.gif)
 
-## Sound choice pending
+## Cat reaction choice pending
 
-Three original unpitched noise-based proposals have comparable RMS level and quiet peak limits. They contain no external recordings, cat vocalizations, melody or pitch glide. Reproduce them with `python tools/generate-stomp-sound-previews.py`; the deterministic generator documents synthesis and envelope choices. None is wired into gameplay until user selection.
+The user rejected all three abstract proposals below and the attention-seeking cat-meow reference, and selected the direction of a short abrupt, surprised, slightly rough cat-like cry. A new [420 ms vocal candidate](sound-options/cat-reaction/short-reaction.wav) is prepared from **Angry Cat Meow** by **bevibeldesign**, a performed pitch-bent human voice released under CC0. [Source, license, edit recipe and checksums](sound-options/cat-reaction/README.md) are recorded with the retained source preview. This candidate is not yet selected and is not enabled in gameplay.
+
+## Rejected abstract sound proposals
+
+These three rejected original unpitched noise-based proposals have comparable RMS level and quiet peak limits. They contain no external recordings, cat vocalizations, melody or pitch glide. Reproduce them with `python tools/generate-stomp-sound-previews.py`; the deterministic generator documents synthesis and envelope choices. None is wired into gameplay. They remain solely as rejected review history.
 
 1. [Soft impact](sound-options/soft-impact.wav): low, softly damped impact, 120 ms.
 2. [Muted tap](sound-options/muted-tap.wav): shorter, slightly clearer tap, 85 ms.
