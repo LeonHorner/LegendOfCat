@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import releaseConfig from '../release.config.js';
 import { analyzeCommits } from '@semantic-release/commit-analyzer';
 import { generateNotes } from '@semantic-release/release-notes-generator';
+import { assertReleaseApproval } from './release-approval.mjs';
 
 function pluginOptions(name) {
   const plugin = releaseConfig.plugins.find(p => Array.isArray(p) && p[0] === name);
@@ -26,8 +27,8 @@ async function notes(message, type = 'patch') {
   return generateNotes(notesOptions, {
     commits: [{ hash: 'abc123', message }],
     lastRelease: { version: '0.7.0', gitTag: 'v0.7.0' },
-    nextRelease: { version: type === 'major' ? '1.0.0' : '0.7.1',
-      gitTag: type === 'major' ? 'v1.0.0' : 'v0.7.1', type },
+    nextRelease: { version: { patch: '0.7.1', minor: '0.8.0', major: '1.0.0' }[type],
+      gitTag: 'v' + { patch: '0.7.1', minor: '0.8.0', major: '1.0.0' }[type], type },
     options: { repositoryUrl },
     logger
   });
@@ -91,9 +92,40 @@ test('lowercase breaking footers preserve ordinary minor/patch releases', async 
   }
 });
 
-test('breaking shorthand alone never creates a major release', async () => {
-  assert.notEqual(await analyze('feat!: breaking feature'), 'major');
-  assert.notEqual(await analyze('fix(api)!: change public API'), 'major');
+test('standard breaking shorthand always computes major release v1.0.0', async () => {
+  for (const message of [
+    'feat!: add a new level with incompatible saves',
+    'fix!: alter existing save schema',
+    'fix(api)!: change public API',
+    'feat(gameplay)!: change gameplay contracts'
+  ]) {
+    assert.equal(await analyze(message), 'major', message);
+    const changelog = await notes(message, 'major');
+    assert.match(changelog, /BREAKING CHANGES/, message);
+  }
+});
+
+test('release types and release permissions match realistic versions', async () => {
+  for (const [message, type, version] of [
+    ['fix: adjust camera', 'patch', '0.7.1'],
+    ['feat: introduce new world', 'minor', '0.8.0'],
+    ['feat!: redesign saved levels', 'major', '1.0.0'],
+    ['fix!: incompatible save migration', 'major', '1.0.0'],
+    ['fix(api)!: incompatible protocol', 'major', '1.0.0'],
+    ['feat: modify save format\\n\\nBREAKING CHANGE: saves are incompatible', 'major', '1.0.0']
+  ]) {
+    const releaseType = await analyze(message);
+    assert.equal(releaseType, type, message);
+    const nextVersion = { patch: '0.7.1', minor: '0.8.0', major: '1.0.0' }[releaseType];
+    assert.equal(nextVersion, version, message);
+    if (releaseType === 'major') {
+      assert.throws(() => assertReleaseApproval({ version, type }, true, false), /allow_major/);
+      assert.doesNotThrow(() => assertReleaseApproval({ version, type }, false, true));
+    } else {
+      assert.doesNotThrow(() => assertReleaseApproval({ version, type }, true, false));
+    }
+    assert.ok((await notes(message, releaseType)).length > 0, message);
+  }
 });
 
 test('fixes, features and CI commits retain their correct classification', async () => {

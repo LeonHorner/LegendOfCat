@@ -1,11 +1,12 @@
 // Shared semantic-release configuration for planning and publishing.
 // The standard noteKeywords parser is case-insensitive; notesPattern is not.
-// A breaking release therefore requires an explicit UPPERCASE footer.
+// Footers must be UPPERCASE; bang headers retain their conventional MAJOR meaning.
 const strictBreaking = {
   noteKeywords: ['BREAKING CHANGE', 'BREAKING-CHANGE'],
   notesPattern: keywords => new RegExp('^(' + keywords + '):[ \\t]+(.+)$'),
-  // Do not infer a breaking release from feat!:; the required footer must be uppercase.
-  breakingHeaderPattern: /(?!)/
+  // Preserve the conventionalcommits preset's default breakingHeaderPattern:
+  // feat!:, fix!:, fix(api)!: and other bang headers are major releases.
+  // Only explicit footer markers (not bang headers) must be uppercase.
 };
 
 export default {

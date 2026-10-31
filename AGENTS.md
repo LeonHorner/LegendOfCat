@@ -46,7 +46,7 @@
 - Never force-push any branch, rewrite published history, delete main, or bypass repository rules.
 - Never discard another agent's or the user's changes. Inspect the worktree before switching branches.
 - Stage only task-related files. Never commit credentials, license secrets, generated build directories or unrelated assets.
-- Use English Conventional Commits, including fix/perf/feat. For an intentional major release, write an explicit uppercase `BREAKING CHANGE: description` or `BREAKING-CHANGE: description` footer. Lowercase/mixed-case markers do not indicate a major release; they do not block a normal release. The `type!:` shorthand alone does not indicate major. Prefer an uppercase breaking footer for intentional major changes.
+- Use English Conventional Commits, including fix/perf/feat. For an intentional major release, write an explicit uppercase `BREAKING CHANGE: description` or `BREAKING-CHANGE: description` footer. Lowercase/mixed-case footer markers do not indicate a major release; they do not block a normal release. Conventional Commit shorthand `feat!:`, `fix!:`, and `fix(api)!:` remains valid and **does trigger major** without a footer. For footer-style major releases, use uppercase `BREAKING CHANGE:` or `BREAKING-CHANGE:`.
 - A normal merge from main into a feature branch is allowed to update its base; merging a feature into main is squash-only.
 
 ## Design references
