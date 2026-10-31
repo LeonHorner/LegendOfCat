@@ -121,7 +121,12 @@ public class StompCombatTests
             Vector3 contact = burst.localPosition;
             float burstBefore = (float)arenaType.GetField("burstTime", flags).GetValue(arena);
             Assert.That(burst.gameObject.activeSelf, Is.True);
-            Assert.That(cat.GetComponent<AudioSource>(), Is.Null, "No sound is approved yet");
+            var audio = cat.GetComponent<AudioSource>();
+            Assert.That(audio.clip, Is.Not.Null);
+            Assert.That(audio.clip.name, Is.EqualTo("StompDamageVoice"));
+            Assert.That(audio.clip.length, Is.EqualTo(.9f).Within(.005f));
+            Assert.That(audio.playOnAwake || audio.loop, Is.False);
+            Assert.That(audio.spatialBlend, Is.Zero);
             body.linearVelocity = Vector2.zero;
             fixedStep.Invoke(arena, null);
             Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero), "Protected contact must not launch again");
@@ -146,6 +151,7 @@ public class StompCombatTests
             arenaType.GetMethod("Retry").Invoke(arena, null);
             Assert.That(sprite.color.a, Is.EqualTo(initialAlpha));
             Assert.That(burst.gameObject.activeSelf, Is.False);
+            Assert.That(audio.isPlaying, Is.False);
             Assert.That(type.GetProperty("Invulnerability").GetValue(state), Is.EqualTo(0));
         } finally { UnityEngine.Object.DestroyImmediate(root); }
     }

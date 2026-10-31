@@ -8,10 +8,13 @@
   "retrieved": "2026-10-31",
   "generatorModel": null,
   "changes": "Source 0.9-2.1 seconds; one natural-speed excerpt and one 4/3-tempo pitch-preserving edit. Mono PCM16/48 kHz, short fades, gain 0.65.",
-  "status": "Unselected review-only auditions, not enabled in gameplay.",
+  "status": "User selected short-reaction.wav (0.9 seconds) for damage playback on 2026-10-31.",
   "sha256": {
     "natural-reaction.wav": "51bb9fb7fd3d989c64e628cf87097ab6ff770e54fcd36e9abc13ac6f397aa271",
     "short-reaction.wav": "d46e22480da5651d5e183f9679422481a4b7f46d01b4ad604fa319f54f002008",
     "source-preview.mp3": "1a20d3e62cb7b2c2a15d4a1113692d09aba881b50dbe6641a1fe7caa4b449af0"
-  }
+  },
+  "runtimeAsset": "Assets/Game/Resources/StompDamageVoice.wav",
+  "runtimeVolume": 0.5,
+  "runtimeNotice": "Assets/StreamingAssets/THIRD-PARTY-NOTICES.txt"
 }

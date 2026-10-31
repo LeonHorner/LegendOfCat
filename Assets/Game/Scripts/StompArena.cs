@@ -20,6 +20,7 @@ public sealed class StompArena : MonoBehaviour
     Vector2 previous;
     float flash, damageFlash, previousTargetX;
     Material damageMaterial;
+    AudioSource damageAudio;
     Mesh burstMesh;
     Material burstCream, burstBrown;
     Transform damageBurst;
@@ -69,9 +70,15 @@ public sealed class StompArena : MonoBehaviour
         playerColor = playerSprite.color;
         damageMaterial = new Material(Resources.Load<Shader>("StompDamage"));
         playerSprite.sharedMaterial = damageMaterial;
+        damageAudio = player.AddComponent<AudioSource>();
+        damageAudio.playOnAwake = false;
+        damageAudio.loop = false;
+        damageAudio.spatialBlend = 0;
+        damageAudio.volume = .5f;
+        damageAudio.clip = Resources.Load<AudioClip>("StompDamageVoice");
         CreateDamageBurst();
         Run = new RunLifecycle(new Vector2(-4, .5f));
-        Run.ResetTransientState += () => { Combat.Reset(); flash = damageFlash = burstTime = previousTargetX = 0; };
+        Run.ResetTransientState += () => { Combat.Reset(); flash = damageFlash = burstTime = previousTargetX = 0; damageAudio.Stop(); };
         Cat.FellOutOfBounds += Retry;
         var input = player.AddComponent<CatInput>();
         input.controller = Cat;
@@ -84,6 +91,7 @@ public sealed class StompArena : MonoBehaviour
         ArenaCamera.transform.localPosition = new Vector3(0, 2.4f, -10);
         ArenaCamera.orthographic = true; ArenaCamera.orthographicSize = 5;
         ArenaCamera.depth = 2;
+        if (!FindFirstObjectByType<AudioListener>()) ArenaCamera.gameObject.AddComponent<AudioListener>();
         ArenaCamera.backgroundColor = new Color(.08f, .11f, .15f);
         previous = transform.InverseTransformPoint(body.position);
         Present();
@@ -148,6 +156,7 @@ public sealed class StompArena : MonoBehaviour
                 damageFlash = .08f;
                 burstTime = DamageBurstDuration;
                 damageBurst.localPosition = contact;
+                if (Application.isPlaying) damageAudio.Play();
             }
         }
         previous = current;
@@ -164,6 +173,8 @@ public sealed class StompArena : MonoBehaviour
     {
         if (Combat.Finished) return;
         Cat.SetPaused(Run.TogglePause());
+        if (Run.Paused) damageAudio.Pause();
+        else damageAudio.UnPause();
     }
     void Present()
     {
@@ -260,6 +271,10 @@ public sealed class StompArena : MonoBehaviour
             sparks[i].transform.localPosition = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * Mathf.Lerp(.34f, .68f, t);
             sparks[i].transform.localScale = Vector3.one * Mathf.Lerp(.14f, .04f, t);
         }
+    }
+    void OnDisable()
+    {
+        if (damageAudio) damageAudio.Stop();
     }
     void OnDestroy()
     {

@@ -20,22 +20,22 @@ A small original six-point cream contact star with a warm outline and three tiny
 
 Damage gives 1.25 seconds of protection. Mika gently pulses between original and half opacity every 0.25 seconds and never disappears. Protected contact causes no extra damage, hop or effect restart. Pause freezes physics, combat and effects. Retry/restart clear all transient feedback and restore the original sprite color. Effects finish fading after a terminal hit; win/loss retain Retry and Menu.
 
-The previous lateral recoil and falling sine tone were rejected by the user. They are removed from active gameplay; **no damage sound is currently enabled**. The old `damage-tone.wav` is retained solely as a rejected historical preview.
+The previous lateral recoil and falling sine tone were rejected by the user. They are removed from active gameplay. Accepted damage now plays the selected 0.9-second real-cat vocal once, at AudioSource volume 0.5. Protected contacts do not retrigger it. Pause/resume pauses/resumes playback; retry, restart and leaving the arena stop it. The old `damage-tone.wav` is retained solely as a rejected historical preview.
 
 ![Contact star and restrained flash](contact-star.png)
 ![Held running right through a damage hop](damage-run-right.gif)
 ![Held running left through a damage hop](damage-run-left.gif)
 
-## Real-cat reaction choice pending
+## Selected real-cat damage voice
 
 The user rejected the abstract proposals, the attention-seeking cat-meow reference and the 420 ms performed human-voice candidate (too short and insufficiently cat-like). The current direction is a real-cat vocalization with a rough abrupt beginning and a recognizable longer ending.
 
-New review-only excerpts of **Cat Angry Meow.WAV** by **softcoresoft**, [Freesound](https://freesound.org/people/softcoresoft/sounds/327438/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/):
+The user selected the second version (0.9 seconds) on 2026-10-31. Review excerpts of **Cat Angry Meow.WAV** by **softcoresoft**, [Freesound](https://freesound.org/people/softcoresoft/sounds/327438/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/):
 
 - [Natural-speed excerpt, 1.2 seconds](sound-options/real-cat/natural-reaction.wav).
 - [Shorter excerpt, 0.9 seconds](sound-options/real-cat/short-reaction.wav): same phrase accelerated with pitch preserved, rather than an earlier cut.
 
-[Attribution, license, modifications and source hashes](sound-options/real-cat/README.md) accompany the retained public source preview. No candidate is selected or enabled in gameplay. These source-based alternatives require user listening; the source describes actual hissing/meowing, not an independently verified surprised emotion. The prior performed-voice clip remains in sound-options/cat-reaction solely as rejected history.
+[Attribution, license, modifications and source hashes](sound-options/real-cat/README.md) accompany the retained public source preview. The 0.9-second version is copied unchanged to `Assets/Game/Resources/StompDamageVoice.wav` and loaded through Resources. Import settings preload uncompressed PCM to avoid a first-hit decode/load delay. The source describes actual hissing/meowing; the user selected its damage-feedback fit. The prior performed-voice clip remains in sound-options/cat-reaction solely as rejected history.
 
 ## Rejected abstract sound proposals
 
@@ -55,10 +55,14 @@ Run `StompReview.Record` in Unity 6000.3.27f2 to reproduce camera captures and C
 
 Compilation of runtime and regression sources plus the seven Play Mode captures completed with exit code 0 in an isolated review project with its own Library. The right-running trace starts at x=-1.1 with velocity (7,7) on damage, then x=-0.96 with velocity (7,6.4); left-running mirrors this without a direction reversal. The star remains at x=-0.85/+0.85 while its timer decreases. Captured contact-star rendering was visually inspected. The sound previews were checked for PCM format, duration, RMS and peak levels; subjective listening remains a user decision.
 
-Regression sources cover top/side/closed windows, moving-head sweeps, protection expiry, preserved horizontal velocity, held run direction, hop release behavior, effect placement without retrigger, pause and retry cleanup. Automated tests and Windows/Linux player/launcher builds have not been run and remain part of final Prepare merge. Manual gameplay, small-window/grayscale review, sound choice and overall encounter acceptance remain pending. Keep PR #62 draft and #12 open until review and final exact-head validation complete.
+Regression sources cover top/side/closed windows, moving-head sweeps, protection expiry, preserved horizontal velocity, held run direction, hop release behavior, effect placement without retrigger, pause and retry cleanup. Automated tests and Windows/Linux player/launcher builds have not been run and remain part of final Prepare merge. Manual gameplay, small-window/grayscale review, integrated audio playback and overall encounter acceptance remain pending. Keep PR #62 draft and #12 open until review and final exact-head validation complete.
 
 ## Coordination and review history
 
 Started from main 989840a. Ownership covers new combat/arena/review/test code and narrow controller launch/menu entry integration. No overlap was identified with #51 (Blender authoring), #53 (reward design) or #59 (CI). Existing scenes, prefabs, packages, project settings, movement course and character artwork are preserved. No shared mutable Library is used for review captures. Review newer merged changes and merge main normally before readiness; no merge or release is authorized here.
 
 User decisions on 2026-10-31: reject damage teleport; select short protection with transparency pulse; select a moving vulnerable head; exclude new heart-loss/health UI; reject the first tone and lateral recoil; preserve running with an upward-only damage hop; request sound alternatives and approve a small contact star with restrained flash. Earlier implementation screenshots/commits are historical, not acceptance of superseded feedback. Provenance is in ASSETS.md.
+
+### Selected-audio integration
+
+The selected clip is nonspatial and non-looping, plays only inside the accepted-damage branch, and shares encounter pause/reset cleanup. An AudioListener is created only if the scene has none. `Assets/StreamingAssets/THIRD-PARTY-NOTICES.txt` accompanies player builds with the creator, source, CC BY 4.0 link and edit disclosure. Regression sources verify the selected 0.9-second resource and source configuration alongside existing protected-contact/reset behavior. Unity import/compilation is checked in the isolated review project; automated tests and both platform builds remain deferred to final Prepare merge. In-game listening with the chosen playback volume remains part of user playtesting.

@@ -5,6 +5,19 @@ using UnityEngine.SceneManagement;
 
 public static class StompReview
 {
+    public static void ConfigureDamageAudio()
+    {
+        var importer = (AudioImporter)AssetImporter.GetAtPath("Assets/Game/Resources/StompDamageVoice.wav");
+        var settings = importer.defaultSampleSettings;
+        settings.loadType = AudioClipLoadType.DecompressOnLoad;
+        settings.compressionFormat = AudioCompressionFormat.PCM;
+        settings.sampleRateSetting = AudioSampleRateSetting.PreserveSampleRate;
+        settings.preloadAudioData = true;
+        importer.defaultSampleSettings = settings;
+        importer.loadInBackground = false;
+        importer.SaveAndReimport();
+    }
+
     // Uses the actual runtime arena, shared character and state-driven presentation.
     public static void Record()
     {
