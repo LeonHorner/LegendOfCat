@@ -67,6 +67,12 @@ public sealed class CatController : MonoBehaviour
         leaveGroundSteps = 2;
     }
 
+    public void Knockback(Vector2 velocity)
+    {
+        Launch(velocity);
+        body.linearVelocity = Motion.Knockback(velocity);
+    }
+
     public void ReturnToStart() => RespawnAt(spawn);
 
     // The course chooses the spawn; the controller always resets motor and physics.

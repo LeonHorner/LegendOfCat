@@ -30,7 +30,7 @@ public static class StompReview
     }
     static void Capture()
     {
-        var scene = SceneManager.CreateScene("Stomp review");
+        var scene = SceneManager.CreateScene("Stomp review", new CreateSceneParameters(LocalPhysicsMode.Physics2D));
         SceneManager.SetActiveScene(scene);
         var root = new GameObject("Stomp review arena");
         var arena = root.AddComponent<StompArena>();
@@ -48,6 +48,39 @@ public static class StompReview
                 pixels.ReadPixels(new Rect(0, 0, 960, 540), 0, 0); pixels.Apply();
                 File.WriteAllBytes("docs/design/stomp-prototype/" + phase + ".png", pixels.EncodeToPNG());
                 arena.Combat.Advance(phase == "anticipation" ? StompCombat.Anticipation : StompCombat.Active);
+            }
+            foreach (var scenario in new[] { "left", "right", "closed-head", "ground" }) {
+                arena.Retry();
+                arena.Cat.GetComponent<CatInput>().enabled = false;
+                var body = arena.Cat.GetComponent<Rigidbody2D>();
+                body.interpolation = RigidbodyInterpolation2D.None;
+                body.position = scenario == "right" ? new Vector2(1.1f, .5f)
+                    : scenario == "closed-head" ? new Vector2(-.2f, 1.7f)
+                    : scenario == "ground" ? new Vector2(-2, .5f) : new Vector2(-1.1f, .5f);
+                if (scenario == "ground") arena.Combat.Advance(StompCombat.Anticipation);
+                arena.Cat.transform.position = body.position;
+                var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+                typeof(StompArena).GetField("previous", flags).SetValue(arena, scenario == "closed-head" ? new Vector2(-.2f, 2) : body.position);
+                var motorStep = typeof(CatController).GetMethod("FixedUpdate", flags);
+                var combatStep = typeof(StompArena).GetMethod("FixedUpdate", flags);
+                var presentation = arena.Cat.GetComponentInChildren<MikaSpritePresentation>();
+                string frames = "Logs/stomp-damage-frames/" + scenario;
+                Directory.CreateDirectory(frames);
+                var csv = new System.Text.StringBuilder("frame,time,x,y,health,protection,alpha\n");
+                for (int frame = 0; frame < 80; frame++) {
+                    if (frame > 0) {
+                        motorStep.Invoke(arena.Cat, null);
+                        scene.GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);
+                    }
+                    combatStep.Invoke(arena, null);
+                    presentation.RenderPose(Time.fixedDeltaTime);
+                    arena.ArenaCamera.Render();
+                    RenderTexture.active = target;
+                    pixels.ReadPixels(new Rect(0, 0, 960, 540), 0, 0); pixels.Apply();
+                    File.WriteAllBytes(frames + "/" + frame.ToString("D3") + ".png", pixels.EncodeToPNG());
+                    csv.AppendLine(System.FormattableString.Invariant($"{frame},{frame * Time.fixedDeltaTime},{body.position.x},{body.position.y},{arena.Combat.PlayerHealth},{arena.Combat.Invulnerability},{presentation.GetComponent<SpriteRenderer>().color.a}"));
+                }
+                File.WriteAllText("docs/design/stomp-prototype/damage-" + scenario + ".csv", csv.ToString());
             }
         } finally {
             RenderTexture.active = previous;

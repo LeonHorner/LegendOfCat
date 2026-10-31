@@ -29,9 +29,9 @@ public class StompCombatTests
     {
         Assert.That(Call("TryDamage"), Is.True);
         Assert.That(Call("TryDamage"), Is.False);
-        Call("Advance", 1.11f);
+        Call("Advance", 1.26f);
         Assert.That(Call("TryDamage"), Is.True);
-        Call("Advance", 1.11f); Call("TryDamage");
+        Call("Advance", 1.26f); Call("TryDamage");
         Assert.That(Read<bool>("Finished"), Is.True);
         Call("Reset");
         Assert.That(Read<int>("PlayerHealth"), Is.EqualTo(3));
@@ -90,4 +90,76 @@ public class StompCombatTests
             Assert.That(cat.transform.localPosition.x, Is.EqualTo(-4).Within(.001));
         } finally { UnityEngine.Object.DestroyImmediate(root); }
     }
+    [TestCase(-1.1f, -5f)]
+    [TestCase(1.1f, 5f)]
+    [TestCase(0f, -5f)]
+    public void DamageLaunchDoesNotTeleportAndProtectionPulses(float x, float expectedVelocity)
+    {
+        var root = new GameObject("Stomp damage test");
+        try {
+            var arenaType = type.Assembly.GetType("StompArena");
+            var arena = root.AddComponent(arenaType);
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            arenaType.GetMethod("Awake", flags).Invoke(arena, null);
+            var cat = (Component)arenaType.GetProperty("Cat").GetValue(arena);
+            cat.GetType().GetMethod("Awake", flags).Invoke(cat, null);
+            var input = cat.GetComponent(type.Assembly.GetType("CatInput"));
+            input.GetType().GetMethod("Awake", flags).Invoke(input, null);
+            var body = cat.GetComponent<Rigidbody2D>();
+            var start = new Vector2(x, .5f);
+            body.position = start;
+            arenaType.GetField("previous", flags).SetValue(arena, start);
+            var fixedStep = arenaType.GetMethod("FixedUpdate", flags);
+            var present = arenaType.GetMethod("Present", flags);
+            var state = arenaType.GetField("Combat").GetValue(arena);
+            fixedStep.Invoke(arena, null);
+            Assert.That(body.position, Is.EqualTo(start));
+            Assert.That(body.linearVelocity, Is.EqualTo(new Vector2(expectedVelocity, 7)));
+            Assert.That(type.GetProperty("PlayerHealth").GetValue(state), Is.EqualTo(2));
+            body.linearVelocity = Vector2.zero;
+            fixedStep.Invoke(arena, null);
+            Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero), "Protected contact must not launch again");
+            Assert.That(type.GetProperty("PlayerHealth").GetValue(state), Is.EqualTo(2));
+            var sprite = cat.GetComponentInChildren<SpriteRenderer>();
+            float initialAlpha = ((Color)arenaType.GetField("playerColor", flags).GetValue(arena)).a;
+            type.GetMethod("Advance").Invoke(state, new object[] { .125f - 2 * Time.fixedDeltaTime });
+            present.Invoke(arena, null);
+            Assert.That(sprite.color.a, Is.EqualTo(initialAlpha * .5f).Within(.002f));
+            arenaType.GetMethod("TogglePause").Invoke(arena, null);
+            float remaining = (float)type.GetProperty("Invulnerability").GetValue(state);
+            float alpha = sprite.color.a;
+            fixedStep.Invoke(arena, null);
+            Assert.That(type.GetProperty("Invulnerability").GetValue(state), Is.EqualTo(remaining));
+            Assert.That(sprite.color.a, Is.EqualTo(alpha));
+            arenaType.GetMethod("Retry").Invoke(arena, null);
+            Assert.That(sprite.color.a, Is.EqualTo(initialAlpha));
+            Assert.That(type.GetProperty("Invulnerability").GetValue(state), Is.EqualTo(0));
+        } finally { UnityEngine.Object.DestroyImmediate(root); }
+    }
+
+    [Test] public void ProtectionLastsTheFullLegacyDuration()
+    {
+        Call("TryDamage");
+        Call("Advance", 1.249f);
+        Assert.That(Call("TryDamage"), Is.False);
+        Call("Advance", .002f);
+        Assert.That(Call("TryDamage"), Is.True);
+    }
+    [TestCase(-1f)] [TestCase(1f)]
+    public void RecoilSurvivesBrakingAndMovementStillResponds(float direction)
+    {
+        var motionType = type.Assembly.GetType("CatMotion");
+        var motion = Activator.CreateInstance(motionType);
+        var velocity = new Vector2(direction * 5, 7);
+        motionType.GetMethod("Knockback").Invoke(motion, new object[] { velocity });
+        velocity = (Vector2)motionType.GetMethod("Step").Invoke(motion, new object[] { .02f, false, velocity });
+        Assert.That(velocity.x, Is.EqualTo(direction * 4.5f).Within(.001f));
+        motionType.GetMethod("SetMove").Invoke(motion, new object[] { -direction });
+        velocity = (Vector2)motionType.GetMethod("Step").Invoke(motion, new object[] { .02f, false, velocity });
+        Assert.That(velocity.x * direction, Is.LessThan(4f));
+        motionType.GetMethod("Reset").Invoke(motion, null);
+        velocity = (Vector2)motionType.GetMethod("Step").Invoke(motion, new object[] { .02f, false, Vector2.zero });
+        Assert.That(velocity.x, Is.Zero);
+    }
+
 }

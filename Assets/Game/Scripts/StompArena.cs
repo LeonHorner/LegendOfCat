@@ -12,6 +12,8 @@ public sealed class StompArena : MonoBehaviour
     Sprite square;
     Texture2D texture;
     SpriteRenderer boss, head, warning, impact;
+    SpriteRenderer playerSprite;
+    Color playerColor;
     TextMesh phaseLabel;
     readonly System.Collections.Generic.List<SpriteRenderer> stripes = new System.Collections.Generic.List<SpriteRenderer>();
     Rigidbody2D body;
@@ -55,6 +57,8 @@ public sealed class StompArena : MonoBehaviour
         Cat.fallReference = transform;
         var visual = Instantiate(Resources.Load<GameObject>("MikaOriginal"), player.transform);
         visual.GetComponent<MikaSpritePresentation>().controller = Cat;
+        playerSprite = visual.GetComponent<SpriteRenderer>();
+        playerColor = playerSprite.color;
         Run = new RunLifecycle(new Vector2(-4, .5f));
         Run.ResetTransientState += () => { Combat.Reset(); flash = 0; };
         Cat.FellOutOfBounds += Retry;
@@ -104,11 +108,10 @@ public sealed class StompArena : MonoBehaviour
             impact.transform.localPosition = new Vector3(current.x, BossBounds.yMax);
             flash = .16f;
         } else if ((SweptContact(BossBounds, current) || Combat.Phase == StompCombat.AttackPhase.Attack && SweptContact(Hazard, current)) && Combat.TryDamage()) {
-            float direction = current.x < 0 ? -1 : 1;
-            current.x = direction * 3.4f;
-            current.y = Mathf.Max(current.y, .6f);
-            body.position = transform.TransformPoint(current);
-            Cat.Launch(new Vector2(direction * 5, 7));
+            float side = Mathf.Abs(current.x) > .001f ? current.x : previous.x;
+            if (Mathf.Abs(side) <= .001f) side = -body.linearVelocity.x;
+            float direction = side > 0 ? 1 : -1;
+            Cat.Knockback(new Vector2(direction * 5, 7));
         }
         previous = current;
         if (Combat.Finished) Cat.SetPaused(true);
@@ -125,6 +128,12 @@ public sealed class StompArena : MonoBehaviour
     }
     void Present()
     {
+        var color = playerColor;
+        if (!Combat.Finished && Combat.Invulnerability > 0) {
+            float elapsed = StompCombat.DamageProtection - Combat.Invulnerability;
+            color.a *= .75f + .25f * Mathf.Cos(elapsed * Mathf.PI * 2 / .25f);
+        }
+        playerSprite.color = color;
         bool open = Combat.Phase == StompCombat.AttackPhase.Recovery;
         bool active = Combat.Phase == StompCombat.AttackPhase.Attack;
         boss.enabled = head.enabled = Combat.BossHealth > 0;

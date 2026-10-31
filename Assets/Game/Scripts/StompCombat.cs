@@ -10,6 +10,7 @@ public sealed class StompCombat
     public float PhaseTime { get; private set; }
     public float Invulnerability { get; private set; }
     public bool Finished => BossHealth == 0 || PlayerHealth == 0;
+    public const float DamageProtection = 1.25f;
     public const float Anticipation = 1.2f, Active = 0.35f, Recovery = 1.8f;
     public StompCombat() => Reset();
     public void Reset()
@@ -54,7 +55,7 @@ public sealed class StompCombat
     {
         if (Finished || Invulnerability > 0) return false;
         PlayerHealth--;
-        Invulnerability = 1.1f;
+        Invulnerability = DamageProtection;
         return true;
     }
 }

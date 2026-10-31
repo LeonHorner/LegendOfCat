@@ -8,19 +8,26 @@ public sealed class CatMotion
     public const float CoyoteTime = 0.10f, BufferTime = 0.12f, ReleaseSpeed = 5;
     public Vector2 Velocity { get; private set; }
     public bool Jumped { get; private set; }
-    float move, pulse, grace, buffer;
+    float move, pulse, grace, buffer, recoil;
     bool held, externalRise;
 
     public void SetMove(float value) { move = Mathf.Clamp(value, -1, 1); if (move != 0) pulse = move; }
     public void PressJump() { buffer = BufferTime; held = true; }
     public void ReleaseJump() => held = false;
-    public void Reset() { Velocity = Vector2.zero; move = pulse = grace = buffer = 0; held = externalRise = false; }
+    public void Reset() { Velocity = Vector2.zero; move = pulse = grace = buffer = recoil = 0; held = externalRise = false; }
 
     public Vector2 Launch(Vector2 velocity)
     {
-        buffer = grace = 0;
+        buffer = grace = recoil = 0;
         externalRise = true;
         return Velocity = velocity;
+    }
+
+    public Vector2 Knockback(Vector2 velocity)
+    {
+        Launch(velocity);
+        recoil = velocity.x;
+        return velocity;
     }
 
     public bool StartBufferedJump(bool grounded, Vector2 actualVelocity)
@@ -40,8 +47,13 @@ public sealed class CatMotion
         var velocity = actualVelocity;
         float axis = move != 0 ? move : pulse;
         pulse = 0;
+        // Decay the external impulse separately so normal braking does not erase it.
+        // Movement input continues to accelerate the controllable part of velocity.
+        velocity.x -= recoil;
+        recoil = Mathf.MoveTowards(recoil, 0, 25 * dt);
         velocity.x = Mathf.MoveTowards(velocity.x, axis * Speed,
             (Mathf.Abs(axis) < 0.01f || axis * velocity.x < 0 ? Braking : Acceleration) * dt);
+        velocity.x += recoil;
         if (grounded && velocity.y < 0) velocity.y = 0;
         if (StartBufferedJump(grounded, velocity)) velocity = Velocity;
         if (velocity.y <= 0 || grounded) externalRise = false;
