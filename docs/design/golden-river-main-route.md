@@ -105,3 +105,12 @@ For local playtesting, build with `BuildGame.BuildPreview` and launch
 **Golden River preview** from its menu. A/D or arrows move, Space jumps, R retries,
 Backspace restarts, P pauses and Escape returns to the menu. Keep the entire
 preview output directory together. This local development build is not a release.
+
+The local Windows development preview build completed successfully with the pinned
+Editor. Windows/Linux release-style packaging and launcher builds remain unrun.
+
+[Rendered start view](golden-river-main-route/start.png): the Windows player loaded
+the route and Mika/scenery correctly. The saved preview display settings selected
+1280x720 despite the requested 960x540 launch size; this single still does not
+establish small-window or full-route motion readability.
+
