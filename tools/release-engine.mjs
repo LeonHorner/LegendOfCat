@@ -55,9 +55,39 @@ function optionsFor(plugin) {
 // Uses the actual semantic-release commit analyzer and notes generator on the
 // frozen Git graph. The semantic-release core publish path is intentionally not
 // invoked: its remote main push check can abort a valid older workflow snapshot.
-export async function planRelease({ cwd = process.cwd(), snapshotSha = process.env.GITHUB_SHA } = {}) {
+export async function planRelease({ cwd = process.cwd(), snapshotSha = process.env.GITHUB_SHA,
+  inspectTagState } = {}) {
   const sha = assertSnapshot(cwd, snapshotSha);
-  const tag = lastStableRelease(cwd, sha);
+  let tag = lastStableRelease(cwd, sha);
+  let incompleteTag = null;
+  if (tag && inspectTagState) {
+    const candidate = inspectTagState(tag);
+    const localSha = runGit(cwd, 'rev-list', '-1', tag);
+    if (candidate.sha !== localSha)
+      throw new Error('Remote tag mismatch for ' + tag + '; aborting release.');
+    if (!candidate.release || candidate.release.draft) {
+      if (candidate.sha !== sha)
+        throw new Error('Unfinished release ' + tag +
+          ' is not on frozen github.sha; rerun the original workflow snapshot.');
+      incompleteTag = tag;
+      const previous = runGit(cwd, 'tag', '--list', 'v[0-9]*', '--merged', sha)
+        .split('\n').filter(other => other !== incompleteTag &&
+          /^v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$/.test(other));
+      previous.sort((a, b) => {
+        const x = a.slice(1).split('.').map(Number);
+        const y = b.slice(1).split('.').map(Number);
+        for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return y[i] - x[i];
+        return 0;
+      });
+      tag = previous[0] || null;
+    }
+  }
+  if (tag && inspectTagState) {
+    const baseline = inspectTagState(tag);
+    if (!baseline.release || baseline.release.draft ||
+        baseline.sha !== runGit(cwd, 'rev-list', '-1', tag))
+      throw new Error('Previous release baseline is not a published matching tag: ' + tag);
+  }
   const range = tag ? tag + '..' + sha : sha;
   const raw = runGit(cwd, 'log', '--format=%H%x1f%B%x1e', range);
   const commits = raw.split('\x1e').map(part => part.trim()).filter(Boolean)
@@ -84,11 +114,14 @@ export async function planRelease({ cwd = process.cwd(), snapshotSha = process.e
   const type = await analyzeCommits(optionsFor('@semantic-release/commit-analyzer'), context);
   if (!type) return false;
   const version = nextVersion(lastRelease.version, type);
+  if (incompleteTag && incompleteTag !== 'v' + version)
+    throw new Error('Incomplete release tag ' + incompleteTag +
+      ' disagrees with recomputed version v' + version + '; manual review required.');
   const release = {
     type, version, gitTag: 'v' + version, name: 'v' + version, gitHead: sha,
     channel: null
   };
   context.nextRelease = release;
   release.notes = await generateNotes(optionsFor('@semantic-release/release-notes-generator'), context);
-  return { nextRelease: release, lastRelease, commits };
+  return { nextRelease: release, lastRelease, commits, incompleteTag };
 }

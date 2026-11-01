@@ -35,6 +35,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Test version analysis and recovery before Unity builds
+        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-snapshot.test.mjs tools/release-recovery.test.mjs tools/release-recovery.test.mjs
       - id: plan
         run: npm run release:plan
         env:
