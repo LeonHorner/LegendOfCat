@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { createHash, createReadStream } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { createReadStream, readFileSync } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { basename } from 'node:path';
 
@@ -99,7 +100,7 @@ export async function publishDraft(release, assets, body) {
     state = inspectTag(tag);
     assertMatchingTag(state, sha, tag);
   }
-  const expectedBody = (await import('node:fs')).readFileSync(body, 'utf8');
+  const expectedBody = readFileSync(body, 'utf8');
   assertDraft(state, release, expectedBody);
   const missing = await assertDraftAssets(state.release.assets, assets);
   if (missing.length) gh('release', 'upload', tag, ...missing, '--repo', repo);
