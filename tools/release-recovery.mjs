@@ -26,9 +26,19 @@ export function getJson(path, request = gh) {
 
 // GitHub Release and Git ref are distinct records: a tag alone is NOT a release.
 // Reject annotated tags, prereleases, missing tag refs for drafts, and conflicts.
-export function inspectTag(tag) {
-  const ref = getJson('git/ref/tags/' + tag);
-  const release = getJson('releases/tags/' + tag);
+export function inspectTag(tag, request = gh) {
+  // The tag endpoint only returns published releases. List every page using
+  // the workflow's contents:write token so drafts are visible as well.
+  const pages = JSON.parse(request('api', '--paginate', '--slurp',
+    endpoint + 'releases?per_page=100'));
+  if (!Array.isArray(pages) || !pages.length ||
+      pages.some(page => !Array.isArray(page) || page.some(item =>
+        !item || typeof item !== 'object' || typeof item.tag_name !== 'string')))
+    throw new Error('Invalid GitHub releases list response');
+  const matches = pages.flat().filter(item => item.tag_name === tag);
+  if (matches.length > 1) throw new Error('Multiple GitHub Releases found for ' + tag);
+  const release = matches[0] ?? null;
+  const ref = getJson('git/ref/tags/' + tag, request);
   if (ref && (ref.ref !== 'refs/tags/' + tag || ref.object?.type !== 'commit' ||
       !/^[a-f0-9]{40}$/.test(ref.object.sha)))
     throw new Error('Unexpected tag reference for ' + tag);

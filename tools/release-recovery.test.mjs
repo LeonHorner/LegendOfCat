@@ -7,7 +7,7 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { DOWNLOADS } from './release-assets.mjs';
 import { planRelease } from './release-engine.mjs';
-import { assertDraftAssets, getJson } from './release-recovery.mjs';
+import { assertDraftAssets, getJson, inspectTag } from './release-recovery.mjs';
 
 const script = fileURLToPath(new URL('./publish-release.mjs', import.meta.url));
 const fakeGh = String.raw`#!/usr/bin/env node
@@ -33,7 +33,16 @@ if (a[0] === 'api') {
     save(); fail('afterTag');
   } else {
     const endpoint = a[1];
-    if (endpoint.includes('/git/ref/tags/')) {
+    if (endpoint === '--paginate') {
+      if (!a.includes('--slurp') || !a.includes('repos/LeonHorner/LegendOfCat/releases?per_page=100')) error(10);
+      if (process.env.GH_MOCK_FAIL === 'listForbidden') { save(); process.stderr.write('gh: Resource not accessible by integration (HTTP 403)\\n'); process.exit(1); }
+      if (process.env.GH_MOCK_FAIL === 'listNotFound') error();
+      if (process.env.GH_MOCK_FAIL === 'listNetwork') { save(); process.stderr.write('network error\\n'); process.exit(1); }
+      const releases = Object.values(state.releases);
+      const pages = [];
+      for (let i = 0; i < releases.length; i += 100) pages.push(releases.slice(i, i + 100));
+      process.stdout.write(JSON.stringify(pages.length ? pages : [[]]));
+    } else if (endpoint.includes('/git/ref/tags/')) {
       const value = endpoint.split('/').at(-1);
       if (!state.tags[value]) error();
       process.stdout.write(JSON.stringify({
@@ -41,7 +50,7 @@ if (a[0] === 'api') {
       }));
     } else if (endpoint.includes('/releases/tags/')) {
       const value = endpoint.split('/').at(-1);
-      if (!state.releases[value]) error();
+      if (!state.releases[value] || state.releases[value].draft) error();
       process.stdout.write(JSON.stringify(state.releases[value]));
     } else error(10);
   }
@@ -259,4 +268,60 @@ test('incomplete starter and unknown asset states block recovery without upload 
       assert.ok(!f.read().calls.slice(before).some(a => a[0] === 'release' && ['upload', 'edit'].includes(a[1])));
     } finally { rmSync(f.cwd, { recursive: true, force: true }); }
   }
+});
+
+
+test('new release completes the full simulated publication sequence', () => {
+  const f = fixture();
+  try {
+    const result = f.run();
+    assert.equal(result.status, 0, result.stderr);
+    const state = f.read();
+    assert.equal(state.tags['v0.7.1'], f.snapshot);
+    assert.equal(state.releases['v0.7.1'].draft, false);
+    assert.equal(state.releases['v0.7.1'].assets.length, 3);
+    const writes = state.calls.filter(a => a.includes('POST') || (a[0] === 'release' && ['create', 'upload', 'edit'].includes(a[1])));
+    assert.deepEqual(writes.map(a => a[0] === 'api' ? 'tag' : a[1]), ['tag', 'create', 'upload', 'edit']);
+    assert.ok(state.calls.filter(a => a.includes('--paginate') && a.includes('--slurp')).length >= 4);
+    assert.ok(!state.calls.some(a => a.some(x => x.includes('/releases/tags/'))));
+  } finally { rmSync(f.cwd, { recursive: true, force: true }); }
+});
+
+test('drafts on a later release-list page are found using the actual remote tag', () => {
+  const f = fixture();
+  try {
+    assert.notEqual(f.run('afterDraft').status, 0);
+    const state = f.read();
+    const draft = state.releases['v0.7.1'];
+    delete state.releases['v0.7.1'];
+    for (let i = 0; i < 101; i++) state.releases['filler' + i] = { tag_name: 'filler' + i };
+    state.releases['v0.7.1'] = draft;
+    f.write(state);
+    const result = f.run();
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(f.read().releases['v0.7.1'].draft, false);
+    assert.equal(f.read().calls.filter(a => a[0] === 'release' && a[1] === 'create').length, 1);
+  } finally { rmSync(f.cwd, { recursive: true, force: true }); }
+});
+
+test('release-list permission, not-found and network errors stop before writes', () => {
+  for (const phase of ['listForbidden', 'listNotFound', 'listNetwork']) {
+    const f = fixture();
+    try {
+      const result = f.run(phase);
+      assert.notEqual(result.status, 0, phase);
+      assert.ok(!f.read().calls.some(a => a.includes('POST') || (a[0] === 'release' && ['create', 'upload', 'edit'].includes(a[1]))), phase);
+    } finally { rmSync(f.cwd, { recursive: true, force: true }); }
+  }
+});
+
+test('malformed, duplicate or failing release-list responses never mean absent', () => {
+  const fake = response => (...args) => {
+    if (args.includes('--paginate')) return response;
+    throw new Error('unexpected ref lookup');
+  };
+  for (const response of ['null', '[]', '{}', '[{}]', '[[null]]', '[[{}]]', 'not json'])
+    assert.throws(() => inspectTag('v0.7.1', fake(response)));
+  assert.throws(() => inspectTag('v0.7.1', fake('[[{"tag_name":"v0.7.1"}],[{"tag_name":"v0.7.1"}]]')), /Multiple/);
+  assert.throws(() => inspectTag('v0.7.1', () => { throw new Error('permission denied'); }), /permission denied/);
 });
