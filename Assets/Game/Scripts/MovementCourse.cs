@@ -12,6 +12,23 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector3(73, -0.75f, 6), new Vector3(83, -0.75f, 8),
         new Vector3(92, 0.25f, 4), new Vector3(100, -0.75f, 8)
     };
+    // Contact heights are platform center + 0.75; widths include clear braking ground.
+    // Introduction: flat run/stop/turn, then two broad, level landings.
+    // Practice: shallow rises/descents, each followed by room to stop.
+    // Final: combine those demands without introducing a new movement rule.
+    public static readonly Vector3[] LevelOnePlatforms = {
+        new Vector3(2, -0.75f, 14), new Vector3(16, -0.75f, 10),
+        new Vector3(28, -0.75f, 10), new Vector3(39, -0.75f, 8),
+        new Vector3(49, -0.25f, 6), new Vector3(58, 0.25f, 6),
+        new Vector3(67, -0.25f, 6), new Vector3(78, -0.75f, 12),
+        new Vector3(89, -0.25f, 6), new Vector3(98, 0.25f, 6),
+        new Vector3(109, -0.75f, 12)
+    };
+    // Reserved broad ground for the upper-route owner; no detour is required here.
+    public static readonly Vector2 UpperRouteEntrance = new Vector2(39, 0.52f);
+    public static readonly Vector2 UpperRouteRejoin = new Vector2(78, 0.52f);
+    public static readonly Vector2 LevelOneExit = new Vector2(111, 0.52f);
+    Vector3[] ActivePlatforms => LevelOne ? LevelOnePlatforms : Platforms;
     public CatController Cat { get; private set; }
     public RunLifecycle Run { get; private set; }
     public static readonly Vector2[] CheckpointSpawns = {
@@ -19,7 +36,7 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector2(65, 1.52f), new Vector2(83, 0.52f)
     };
     public static readonly Vector2[] LevelOneCheckpointSpawns = {
-        new Vector2(34, 1.52f), new Vector2(83, 0.52f)
+        new Vector2(28, 0.52f), new Vector2(78, 0.52f)
     };
     // Configure before enabling the object. The movement lab retains its original course.
     public bool LevelOne;
@@ -46,7 +63,7 @@ public sealed class MovementCourse : MonoBehaviour
         texture = new Texture2D(1, 1);
         texture.SetPixel(0, 0, Color.white); texture.Apply();
         square = Sprite.Create(texture, new Rect(0, 0, 1, 1), Vector2.one * 0.5f, 1);
-        foreach (var p in Platforms) {
+        foreach (var p in ActivePlatforms) {
             var platform = Block("Standable platform", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.22f, 0.28f, 0.28f));
             platform.AddComponent<BoxCollider2D>();
             platform.GetComponent<SpriteRenderer>().enabled = false;
@@ -104,19 +121,28 @@ public sealed class MovementCourse : MonoBehaviour
         follow.target = player.transform;
         follow.courseRoot = transform;
         follow.fixedHeight = true;
-        var last = Platforms[Platforms.Length - 1];
+        var last = ActivePlatforms[ActivePlatforms.Length - 1];
         follow.rightBoundary = last.x + last.z * 0.5f + 1;
         Cat.ReturnedToStart += follow.Snap;
         var scenery = new GameObject("Golden River scenery");
         scenery.transform.SetParent(transform, false);
-        scenery.AddComponent<SceneryRenderer>().InitializeForCourse(courseCamera, Cat, Platforms);
+        scenery.AddComponent<SceneryRenderer>().InitializeForCourse(courseCamera, Cat, ActivePlatforms);
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
                 new Vector2(0.14f, 0.9f), new Color(0.95f, 0.75f, 0.36f));
             Label("CHECKPOINT " + (i + 1), new Vector2(point.x, point.y + 1.2f));
         }
-        Label(LevelOne ? "EXIT" : "FINISH / return or retry", new Vector2(100, 1));
+        if (LevelOne) {
+            Label("RUN / STOP / TURN", new Vector2(2, 1.8f));
+            Label("JUMP TO THE BROAD BANK", new Vector2(7, 2.7f));
+            Label("SHALLOW STEPS", new Vector2(39, 1.8f));
+            Label("PUT IT TOGETHER", new Vector2(78, 2.2f));
+            Label("GOLDEN RIVER EXIT", LevelOneExit + Vector2.up * 1.5f);
+            // Two posts frame a visibly distinct exit without blocking movement.
+            foreach (float x in new[] { 110f, 113f })
+                Block("Exit post", new Vector2(x, 0.9f), new Vector2(0.2f, 1.8f), new Color(0.95f, 0.75f, 0.36f));
+        } else Label("FINISH / return or retry", new Vector2(100, 1));
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
     {
@@ -162,8 +188,8 @@ public sealed class MovementCourse : MonoBehaviour
             if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f)
                 Run.TryActivateCheckpoint(i + 1, point, true);
         }
-        if (LevelOne && !HasReachedExit && Mathf.Abs(position.x - 100) <= 0.7f &&
-            Mathf.Abs(position.y - 0.52f) <= 0.2f) {
+        if (LevelOne && !HasReachedExit && position.x >= 110 && position.x <= 114 &&
+            Mathf.Abs(position.y - LevelOneExit.y) <= 0.2f) {
             HasReachedExit = true;
             ExitReached?.Invoke();
         }

@@ -13,6 +13,8 @@ using UnityEngine.TestTools;
 public class MenuMovementIntegrationTests
 {
     GameObject host;
+    static int exitSignals;
+    static void CountExit() => exitSignals++;
     static Type RuntimeType(string name) => AppDomain.CurrentDomain.GetAssemblies()
         .Select(a => a.GetType(name)).First(t => t != null);
     static object Field(object target, string name) => target.GetType()
@@ -48,6 +50,73 @@ public class MenuMovementIntegrationTests
     }
 
     [UnityTest]
+    public IEnumerator LevelOneCanBeTraversedThroughActualPhysicsWithoutRetries()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        host = new GameObject("Full route physics test");
+        var screen = host.AddComponent(RuntimeType("StarterScreen"));
+        yield return null;
+        Call(screen, "OpenLevelOne");
+        var course = (Component)Field(screen, "course");
+        var cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
+        var body = cat.GetComponent<Rigidbody2D>();
+        ((Behaviour)cat.GetComponent(RuntimeType("CatInput"))).enabled = false;
+        var motion = cat.GetType().GetField("Motion").GetValue(cat);
+        var platforms = (Vector3[])course.GetType().GetField("LevelOnePlatforms").GetValue(null);
+        var run = course.GetType().GetProperty("Run").GetValue(course);
+        var oldMode = Physics2D.simulationMode;
+        Physics2D.simulationMode = SimulationMode2D.Script;
+        try {
+            Physics2D.SyncTransforms();
+            int next = 0;
+            for (int tick = 0; tick < 3000; tick++) {
+                bool grounded = (bool)cat.GetType().GetProperty("Grounded").GetValue(cat);
+                while (next < platforms.Length - 1 && body.position.x > platforms[next].x + platforms[next].z / 2)
+                    next++;
+                motion.GetType().GetMethod("SetMove").Invoke(motion, new object[] { 1f });
+                if (grounded && next < platforms.Length - 1 &&
+                    body.position.x >= platforms[next].x + platforms[next].z / 2 - 0.7f)
+                    cat.GetType().GetMethod("PressJump").Invoke(cat, null);
+                Call(cat, "FixedUpdate");
+                Physics2D.Simulate(Time.fixedDeltaTime);
+                Call(course, "Update");
+                Assert.That((int)run.GetType().GetProperty("Retries").GetValue(run), Is.Zero,
+                    "Failed on platform " + next + " at " + body.position);
+                if ((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course)) break;
+            }
+            Assert.That((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course), Is.True);
+            Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.EqualTo(2));
+            var camera = course.GetComponentInChildren(RuntimeType("CatCamera"));
+            Call(camera, "LateUpdate");
+            Assert.That(camera.transform.position.x, Is.InRange(4.7f, 106.3f));
+            course.GetType().GetMethod("TogglePause").Invoke(course, null);
+            var stopped = body.position;
+            Call(cat, "FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime);
+            Assert.That(body.position, Is.EqualTo(stopped));
+            course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
+            Assert.That(body.position.x, Is.EqualTo(78).Within(0.001f));
+            Assert.That(body.simulated, Is.True);
+            Assert.That((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course), Is.False);
+            course.GetType().GetMethod("RestartRun").Invoke(course, null);
+            Assert.That(body.position.x, Is.EqualTo(-3).Within(0.001f));
+            Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.Zero);
+        } finally {
+            Physics2D.simulationMode = oldMode;
+        }
+    }
+
+    static void SettleCourse(Component cat, Component course)
+    {
+        Physics2D.SyncTransforms();
+        for (int i = 0; i < 20; i++) {
+            Call(cat, "FixedUpdate");
+            Physics2D.Simulate(Time.fixedDeltaTime);
+            Call(course, "Update");
+        }
+    }
+
+    [UnityTest]
     public IEnumerator LevelOneUsesSeparateCheckpointsAndSignalsItsExitOnce()
     {
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -60,25 +129,35 @@ public class MenuMovementIntegrationTests
         var cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
         var body = cat.GetComponent<Rigidbody2D>();
         var run = course.GetType().GetProperty("Run").GetValue(course);
-        int exits = 0;
-        course.GetType().GetEvent("ExitReached").AddEventHandler(course, (Action)(() => exits++));
-        foreach (var point in new[] { new Vector2(34, 1.52f), new Vector2(83, 0.52f) }) {
-            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { point });
-            Physics2D.SyncTransforms();
-            for (int i = 0; i < 15; i++) yield return new WaitForFixedUpdate();
-            yield return null;
+        ((Behaviour)cat.GetComponent(RuntimeType("CatInput"))).enabled = false;
+        exitSignals = 0;
+        course.GetType().GetEvent("ExitReached").AddEventHandler(course, (Action)CountExit);
+        var oldMode = Physics2D.simulationMode;
+        Physics2D.simulationMode = SimulationMode2D.Script;
+        try {
+            foreach (var point in new[] { new Vector2(28, 0.52f), new Vector2(78, 0.52f) }) {
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { point });
+                SettleCourse(cat, course);
+            }
+            Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.EqualTo(2));
+            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(111, 0.52f) });
+            course.GetType().GetMethod("TogglePause").Invoke(course, null);
+            SettleCourse(cat, course);
+            Assert.That(exitSignals, Is.Zero, "Paused contact must not complete the route.");
+            course.GetType().GetMethod("TogglePause").Invoke(course, null);
+            SettleCourse(cat, course);
+            SettleCourse(cat, course);
+            Assert.That(exitSignals, Is.EqualTo(1));
+            course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
+            Assert.That(body.position.x, Is.EqualTo(78).Within(0.001f));
+            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(111, 0.52f) });
+            SettleCourse(cat, course);
+            Assert.That(exitSignals, Is.EqualTo(2), "Retry rearms the transient exit hook.");
+            course.GetType().GetMethod("RestartRun").Invoke(course, null);
+            Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.Zero);
+        } finally {
+            Physics2D.simulationMode = oldMode;
         }
-        Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.EqualTo(2));
-        cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(100, 0.52f) });
-        Physics2D.SyncTransforms();
-        for (int i = 0; i < 15; i++) yield return new WaitForFixedUpdate();
-        yield return null;
-        yield return null;
-        Assert.That(exits, Is.EqualTo(1));
-        course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
-        Assert.That(body.position.x, Is.EqualTo(83).Within(0.001f));
-        course.GetType().GetMethod("RestartRun").Invoke(course, null);
-        Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.Zero);
         Call(screen, "CloseCourse");
         UnityEngine.Object.Destroy(host);
         yield return new ExitPlayMode();

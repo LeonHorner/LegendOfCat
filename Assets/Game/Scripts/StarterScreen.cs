@@ -289,6 +289,7 @@ public sealed partial class StarterScreen : MonoBehaviour
                 course.TogglePause();
             }
         }
+        else if (view == "level-one") OpenLevelOne();
         else if (view == "menu" || view == "settings" || view == "play") page = view;
         else if (!string.IsNullOrEmpty(view)) {
             page = "updates";
