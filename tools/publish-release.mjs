@@ -1,7 +1,5 @@
-import { assertSnapshot } from './release-approval.mjs';
-import semanticRelease from 'semantic-release';
+import { runSnapshotRelease } from './release-snapshot.mjs';
 
 if (!process.env.EXPECTED) throw new Error('Missing validated release version.');
-assertSnapshot(process.env, process.cwd());
-const result = await semanticRelease({ ci: true });
+const result = await runSnapshotRelease();
 if (!result) throw new Error('No release was published.');

@@ -2,6 +2,11 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+      allow_minor:
+        description: Authorize a minor release
+        required: false
+        default: true
+        type: boolean
       allow_major:
         description: Authorize an intentional major release
         required: false
@@ -36,6 +41,7 @@ jobs:
         run: npm run release:plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALLOW_MINOR: ${{ inputs.allow_minor }}
           ALLOW_MAJOR: ${{ inputs.allow_major }}
       - name: Check Unity account credentials
         if: steps.plan.outputs.version != ''
@@ -228,6 +234,7 @@ jobs:
       - name: Publish verified commit
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALLOW_MINOR: ${{ inputs.allow_minor }}
           ALLOW_MAJOR: ${{ inputs.allow_major }}
           EXPECTED: ${{ needs.plan.outputs.version }}
         run: npm run release

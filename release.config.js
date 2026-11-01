@@ -19,11 +19,11 @@ export default {
     }],
     './tools/release-approval.mjs',
     './tools/release-notes.mjs',
-    ['@semantic-release/release-notes-generator', {
+    ['./tools/release-changelog.mjs', {
       preset: 'conventionalcommits',
       parserOpts: strictBreaking
     }],
-    ['@semantic-release/github', {
+    ['./tools/release-github.mjs', {
       successComment: false, failComment: false,
       assets: [{ path: 'artifacts/published/*' }]
     }]

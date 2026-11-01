@@ -305,9 +305,12 @@ test('Linux AppImage validation remains manual and release dispatch is unchanged
   assert.equal(prWorkflow.jobs.gate.needs.includes('package'), true);
 });
 
-test('release dispatch has only allow_major (default off)', () => {
+test('release dispatch has independent minor and major approvals', () => {
   const inputs = releaseWorkflow.on.workflow_dispatch.inputs;
-  assert.deepEqual(Object.keys(inputs), ['allow_major']);
+  assert.deepEqual(Object.keys(inputs), ['allow_minor', 'allow_major']);
+  assert.equal(inputs.allow_minor.type, 'boolean');
+  assert.equal(inputs.allow_minor.default, true);
+  assert.equal(inputs.allow_minor.required, false);
   assert.equal(inputs.allow_major.type, 'boolean');
   assert.equal(inputs.allow_major.default, false);
   assert.equal(inputs.allow_major.required, false);
@@ -317,6 +320,7 @@ test('release dispatch has only allow_major (default off)', () => {
     releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit')
   ]) {
     assert.ok(step, 'Release authorization step missing');
+    assert.equal(step.env.ALLOW_MINOR, '${{ inputs.allow_minor }}');
     assert.equal(step.env.ALLOW_MAJOR, '${{ inputs.allow_major }}');
     assert.equal(step.env.EXPECTED_VERSION, undefined);
   }
@@ -337,7 +341,9 @@ test('release checkouts are pinned to workflow github.sha across all jobs', () =
   const publish = releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit');
   assert.equal(plan.run, 'npm run release:plan');
   assert.ok(publish.run.includes('npm run release'));
+  assert.equal(publish.env.EXPECTED, '${{ needs.plan.outputs.version }}');
   for (const step of [plan, publish]) {
+    assert.equal(step.env.ALLOW_MINOR, '${{ inputs.allow_minor }}');
     assert.equal(step.env.ALLOW_MAJOR, '${{ inputs.allow_major }}');
   }
 });
