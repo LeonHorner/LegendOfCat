@@ -2,6 +2,17 @@
 
 Issue #12. Enter **Simple combat lab** from the main menu. The main menu lists Movement lab first and Simple combat lab second. The isolated greybox reuses CatController, CatMotion, CatInput, RunLifecycle and MikaOriginal. It adds no campaign, save format, new health UI or traversal ability.
 
+## Current validation status
+
+The latest integrated review passed **111/111 focused Unity tests**, including the
+unchanged 34 combat cases, movement, menu transitions, lifecycle, scenery and release
+history. The earlier `edb3ad1` result was **34/34 focused combat tests**. The dated
+main-integration pass below records additional contract checks and remaining limits.
+Earlier capture-only results are dated historical evidence, not the current test
+status. Full exact-revision Prepare merge validation, Windows/Linux player and
+launcher builds, packaging/smoke checks and final user gameplay/audio acceptance
+remain pending. PR #62 stays Draft and issue #12 stays open.
+
 ## Current encounter
 
 - Warning: 1.2 seconds, striped ground band and closed dark head.
@@ -55,29 +66,29 @@ Successful head hits use a distinct flat expanding ring at the head contact and 
 ![Warning, attack and open-head cycle](damage-signals.gif)
 ![Small grayscale signal review](signals-small-grayscale.gif)
 
-The current signals and contact burst were captured in Unity 6000.3.27f2 Play Mode with exit code 0. The first isolated startup failed before logging; a retry with fewer worker threads and Direct3D 11 completed without C# exceptions or shader errors. Both user-owned Editors stayed open. Color frames and the 480-pixel-wide grayscale recovery view were inspected: crosses, upright attack marks and downward chevrons distinguish states without relying on hue. The small grayscale GIF is a downscaled camera capture, not a live small-window/input playtest. Existing movement/health/protection CSV traces remained unchanged; a new signals trace records the complete cycle. Regression sources additionally check phase-specific marker visibility and active marks staying inside hazard height; the suite has not been run.
+**Historical signal capture, 2026-10-31.** The signals and contact burst were captured in Unity 6000.3.27f2 Play Mode with exit code 0. The first isolated startup failed before logging; a retry with fewer worker threads and Direct3D 11 completed without C# exceptions or shader errors. Both user-owned Editors stayed open. Color frames and the 480-pixel-wide grayscale recovery view were inspected: crosses, upright attack marks and downward chevrons distinguish states without relying on hue. The small grayscale GIF is a downscaled camera capture, not a live small-window/input playtest. Existing movement/health/protection CSV traces remained unchanged; a new signals trace records the complete cycle. Regression sources additionally check phase-specific marker visibility and active marks staying inside hazard height; the suite had not yet been run at that capture; the subsequent focused run passed 34/34 tests.
 
 ## Controls and reuse
 
 Move/jump use the existing shared keyboard/controller actions, without a stomp button or device polling in combat. Retry: R / controller Select. Full restart: Backspace / controller LB. Pause: P / controller RB. Menu: Esc / controller Start. Retry and restart restore target health, patrol and phase, player health, movement/input state, protection and effects via RunLifecycle.ResetTransientState. Touch UI/mobile builds are outside this issue. Default unit scale and translation are supported; rotation/scaled placement is not a tuning contract.
 
-## Evidence and validation
+## Historical capture evidence - 2026-10-31
 
 Run `StompReview.Record` in Unity 6000.3.27f2 to reproduce camera captures and CSVs. Phase screenshots explicitly advance state; twelve motion sequences advance the real motor, isolated local 2D physics scene and combat. The running sequences feed shared motion values and preserve held direction through contact. CSVs record player/target position, health, protection, opacity, velocity and effect lifetime/contact position. The moving-head sequence starts above an open target to isolate hit detection and bounce. Camera captures exclude the GUI; GIF loops restart the demonstration and are not in-game teleports.
 
 Compilation of runtime and regression sources plus the Play Mode captures completed with exit code 0 in an isolated review project with its own Library. The right-running trace starts at x=-1.1 with velocity (7,7) on damage, then x=-0.96 with velocity (7,6.4); left-running mirrors this without a direction reversal. The star remains at x=-0.85/+0.85 while its timer decreases. Captured contact-star rendering was visually inspected. The sound previews were checked for PCM format, duration, RMS and peak levels; subjective listening remains a user decision.
 
-Regression sources cover top/side/closed windows, moving-head sweeps, protection expiry, preserved horizontal velocity, held run direction, hop release behavior, effect placement without retrigger, pause and retry cleanup. Automated tests and Windows/Linux player/launcher builds have not been run and remain part of final Prepare merge. Manual gameplay, small-window/grayscale review, integrated audio playback and overall encounter acceptance remain pending. Keep PR #62 draft and #12 open until review and final exact-head validation complete.
+Regression sources cover top/side/closed windows, moving-head sweeps, protection expiry, preserved horizontal velocity, held run direction, hop release behavior, effect placement without retrigger, pause and retry cleanup. At this capture, automated tests and platform builds had not been run. Subsequent review ran the focused combat suite and live small-window/grayscale checks; see the current validation status and dated results below. Full Prepare merge and final user gameplay/audio acceptance remain pending. Keep PR #62 draft and #12 open until review and final exact-head validation complete.
 
 ## Coordination and review history
 
-Started from main 989840a. Ownership covers new combat/arena/review/test code and narrow controller launch/menu entry integration. No overlap was identified with #51 (Blender authoring), #53 (reward design) or #59 (CI). Existing scenes, prefabs, packages, project settings, movement course and character artwork are preserved. No shared mutable Library is used for review captures. Review newer merged changes and merge main normally before readiness; no merge or release is authorized here.
+Historical starting point: main 989840a. Ownership covers new combat/arena/review/test code and narrow controller launch/menu entry integration. No overlap was identified with #51 (Blender authoring), #53 (reward design) or #59 (CI). The initial feature preserved existing scenes, prefabs, packages, project settings, movement course and character artwork. No shared mutable Library is used for review captures. The authorized normal main integration is recorded below; no feature merge or release is authorized here.
 
 User decisions on 2026-10-31: reject damage teleport; select short protection with transparency pulse; select a moving vulnerable head; exclude new heart-loss/health UI; reject the first tone and lateral recoil; preserve running with an upward-only damage hop; request sound alternatives and approve a small contact star with restrained flash; select the compact real-cat voice; request a softer contact effect and clearer combat signals. Earlier implementation screenshots/commits are historical, not acceptance of superseded feedback. Provenance is in ASSETS.md.
 
 ### Selected-audio integration
 
-The selected clip is nonspatial and non-looping, plays only inside the accepted-damage branch, and shares encounter pause/reset cleanup. An AudioListener is created only if the scene has none. `Assets/StreamingAssets/THIRD-PARTY-NOTICES.txt` accompanies player builds with the creator, source, CC BY 4.0 link and edit disclosure. Regression sources verify the selected 0.9-second resource and source configuration alongside existing protected-contact/reset behavior. Unity import/compilation is checked in the isolated review project; automated tests and both platform builds remain deferred to final Prepare merge. In-game listening with the chosen playback volume remains part of user playtesting.
+The selected clip is nonspatial and non-looping, plays only inside the accepted-damage branch, and shares encounter pause/reset cleanup. An AudioListener is created only if the scene has none. `Assets/StreamingAssets/THIRD-PARTY-NOTICES.txt` accompanies player builds with the creator, source, CC BY 4.0 link and edit disclosure. Regression sources verify the selected 0.9-second resource and source configuration alongside existing protected-contact/reset behavior. At this 2026-10-31 audio-integration capture, tests had only been compiled; the later focused run verifies actual playback. Full validation and both platform builds remain pending. In-game listening with the chosen playback volume remains part of user playtesting.
 
 ## Separate player and enemy damage feedback
 
@@ -85,7 +96,7 @@ Mika damage retains the irregular warm burst, brush strokes, restrained sprite f
 
 Effects start only after accepted damage. Pause freezes both sets; retry/restart clear their timers and visibility. Terminal effects keep fading after combat stops. Existing movement, health, damage windows, protection and retry rules are unchanged. The current lab name is Simple combat lab; Movement lab precedes it in the main menu.
 
-### Distinct-hit verification
+### Historical distinct-hit capture verification - 2026-10-31
 
 The full capture now includes player-hit/enemy-hit and terminal player/enemy cases. `StompReview.Record -stompReviewHitsOnly` refreshes those focused cases and moving-head landing. The capture synchronizes deliberately placed fixture transforms before the first physics step. This corrects review setup synchronization without changing runtime movement.
 
@@ -96,7 +107,7 @@ Below: **left Mika takes damage; right the enemy takes damage**. Both comparison
 ![Player damage left, enemy damage right; half speed](hit-types-comparison.gif)
 ![Small grayscale comparison; half speed](hit-types-small-grayscale.gif)
 
-Regression sources cover separate triggers, no enemy effects on player damage, no player burst on enemy damage, protected contacts without effect restart, pause/reset, fixed ring position and terminal fade. They are compiled but have not been executed; final Prepare merge must still run the suite and both platform builds. No ready status, merge or release is claimed by this review pass.
+Regression sources cover separate triggers, no enemy effects on player damage, no player burst on enemy damage, protected contacts without effect restart, pause/reset, fixed ring position and terminal fade. At this 2026-10-31 capture they had been compiled but not executed. The 2026-11-01 focused run subsequently passed 34/34; final Prepare merge must still validate all tests and both platform builds. No ready status, merge or release is claimed by this review pass.
 
 ## PR review corrections - 2026-11-01
 
@@ -135,10 +146,10 @@ Integration review: origin/main f020aea adds #59 workflow/licensing modernizatio
 standalone background study in favor of SceneryRenderer. No stomp arena overlap was
 found. Open PR #61 owns water-recovery integration in the shared controller; this
 review pass changes no controller/motor files. Preserve both features and provenance
-when integrating. Per the requested gate, a normal merge of current main and full
-exact-revision validation follow final gameplay approval. Keep #62 draft and #12 open.
+when integrating. Per the requested gate, the later integration pass below supersedes the deferred main merge; full
+exact-revision validation still follows final gameplay approval. Keep #62 draft and #12 open.
 
-### Review validation
+### Focused review validation - edb3ad1
 
 Unity 6000.3.27f2: **34/34 focused StompCombatTests passed**, zero failures/skips,
 exit code 0. This includes real audio playback in Play Mode and all new physics
@@ -171,3 +182,84 @@ review scene were preserved locally, outside tracked assets.
 ![480x641 live window](window-review/480x641.gif)
 ![320x241 live window, grayscale](window-review/320x241-grayscale.gif)
 ![Small grayscale signal samples](window-review/signals-grayscale-strip.png)
+
+## Final-review improvements and main integration - 2026-11-01
+
+Pause is hidden after victory or defeat; Retry, Restart and Menu remain accessible.
+TogglePause and the combat lifecycle are unchanged. The existing HUD title now
+includes a short phase/result hint (WARNING, GROUND ATTACK, OPEN HEAD, TARGET
+DEFEATED or TRY AGAIN) using the existing 11-pixel UI font. This makes the state
+readable at 320x241 without enlarging the HUD or obscuring the attack geometry.
+The world label and all geometric phase indicators are retained.
+
+Normal merge `d417d21` integrates main
+`afc740af782811ab43216c76bd9b98b86cc4a0d7`; there were **no conflicts**.
+The five commits since divergence are #59's reviewed action/account-activation
+updates and build success marker, #63's SceneryRenderer/BuildScenery restructuring
+and standalone-study retirement, #64's disabled Unity splash, #66's release-history
+cleanup, and #68's case-sensitive breaking footers, frozen release snapshots,
+release permission gates and draft recovery. The imported workflow/build/config,
+scenery and release-history files match main exactly. No unrelated change was
+reverted; source artwork, audio, licenses and metadata are preserved.
+
+PR #61 was inspected at `affe551d307099956d017529e1552a0f10dc32a2`.
+It owns Recovering/SetRecovering, water-entry interception and recovery-aware pause
+and respawn. This pass leaves CatController and CatMotion identical to `edb3ad1`:
+Launch and the automatic rise/held movement behavior remain intact. The stomp lab
+does not attach WaterRecovery; there is no simultaneous water/stomp lifecycle today.
+When #61 integrates the shared controller, preserve Launch, external-rise handling
+and EditMode-safe material cleanup alongside its recovery lock; do not allow a launch
+to bypass an active recovery lock. #61 also needs its course/scenery references
+reconciled with #63's rename. No water implementation was copied or merged here.
+Combined runtime compatibility remains an integration check owned by #61, not a
+claim established by inspecting separate branches.
+
+### Executed integration checks
+
+Unity 6000.3.27f2 in a new isolated project with its own Library:
+**111 passed, 0 failed, 0 skipped**, exit 0. Selected classes: StompCombatTests,
+MenuMovementIntegrationTests, CatCollisionTests, CatMovementTests, RunLifecycleTests,
+DesktopBehaviorTests and SceneryRendererTests. A new behavioral menu round trip
+checks exclusive lab ownership, immediate input/audio shutdown on Menu, reopening
+fresh combat state, and the movement lab using SceneryRenderer. Existing movement
+and resource-cleanup cases passed after main's rename.
+
+The machine-readable [integration-validation.json](integration-validation.json)
+records the main/merge SHAs, per-class counts and hashes of the tested working-copy
+sources. [review-validation.json](review-validation.json) remains the historical
+34-case result rather than being overwritten with a different test scope.
+
+The unchanged audio coroutine passed with actual playback/sample progression,
+protected-contact suppression and pause/resume in batch-mode Windows Unity.
+No concrete reliability failure was found, so no weakened assertions, skips or
+replacement audio test infrastructure were introduced. Linux Unity's audio backend
+and the complete exact-revision CI suite remain part of final Prepare merge.
+
+Refreshed actual Game View recordings include HUD and motion at 640x361, 480x641 and
+320x241; the grayscale small view now has a legible phase hint while retaining the
+same visible arena width and attack shapes. Live inspection confirmed Pause absent
+after defeat, both reset buttons and Menu visible, and Restart restoring 3/3 health
+and the normal Pause button. Victory shares the same finished-state rendering path;
+terminal victory/reset behavior also remains covered by combat tests. Sampling and
+Editor-only startup warning limitations from the preceding window review still apply.
+
+### Local workflow and release-contract checks
+
+With locked dependencies installed using `npm ci --ignore-scripts`, the portable
+Windows subset (workflow, approval, analyzer, snapshot and release-assets tests)
+passed **36 tests, 0 failures, 1 intentional Linux-only skip**. The broader Windows
+attempt included release-recovery tests: 40 passed, 10 failed and 1 skipped because
+the POSIX executable `gh` fixture is not selected by native Windows. The attempted
+API reads used the fixture's mock token and failed with HTTP 401 before mutation.
+Those imported files match main; no unrelated release-tool rewrite was added.
+
+The same broader suite passed **51/51 tests, 0 failures/skips**, exit 0, under local
+WSL Linux using portable Node 24.19.0 with the official archive SHA256 checked.
+Files: ci-workflow, release-approval, release-analyzer, release-snapshot,
+release-recovery and release-assets test suites. This checks the intended
+POSIX fixtures locally, not a GitHub workflow or a player/launcher build. Final
+exact-revision Prepare merge, platform packaging/smoke validation and user
+gameplay/audio acceptance remain outstanding. No merge-ready status is claimed.
+
+![Integrated small-window grayscale review](integration-review/320x241-grayscale.gif)
+![Integrated portrait-window review](integration-review/480x641.gif)

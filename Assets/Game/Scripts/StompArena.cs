@@ -261,12 +261,15 @@ public sealed class StompArena : MonoBehaviour
         float top = Mathf.Max(8, Screen.height - viewport.yMax - height);
         GUILayout.BeginArea(new Rect(viewport.x + 8, top, width, height), GUI.skin.box);
         helpScroll = GUILayout.BeginScrollView(helpScroll);
-        GUILayout.Label("SIMPLE COMBAT LAB / provisional", hudStyle);
+        string phaseHint = Combat.Finished ? (Combat.BossHealth == 0 ? "TARGET DEFEATED" : "TRY AGAIN")
+            : Combat.Phase == StompCombat.AttackPhase.Recovery ? "OPEN HEAD"
+            : Combat.Phase == StompCombat.AttackPhase.Attack ? "GROUND ATTACK" : "WARNING";
+        GUILayout.Label("SIMPLE COMBAT LAB / " + phaseHint, hudStyle);
         GUILayout.Label("Mika " + Combat.PlayerHealth + "/3 | Target " + Combat.BossHealth + "/3" +
             (Combat.Invulnerability > 0 ? " | PROTECTED" : "") + (Run.Paused ? " | PAUSED" : ""), hudStyle);
         GUILayout.BeginHorizontal();
         if (GUILayout.Button(showHelp ? "Less" : "Controls")) showHelp = !showHelp;
-        if (GUILayout.Button(Run.Paused ? "Resume" : "Pause")) TogglePause();
+        if (!Combat.Finished && GUILayout.Button(Run.Paused ? "Resume" : "Pause")) TogglePause();
         if (GUILayout.Button("Menu")) BackToMenu?.Invoke();
         GUILayout.EndHorizontal();
         if (expanded) {
