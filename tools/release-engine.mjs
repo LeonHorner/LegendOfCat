@@ -72,7 +72,7 @@ export async function planRelease({ cwd = process.cwd(), snapshotSha = process.e
       incompleteTag = tag;
       const previous = runGit(cwd, 'tag', '--list', 'v[0-9]*', '--merged', sha)
         .split('\n').filter(other => other !== incompleteTag &&
-          /^v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$/.test(other));
+          /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(other));
       previous.sort((a, b) => {
         const x = a.slice(1).split('.').map(Number);
         const y = b.slice(1).split('.').map(Number);
@@ -114,6 +114,15 @@ export async function planRelease({ cwd = process.cwd(), snapshotSha = process.e
   const type = await analyzeCommits(optionsFor('@semantic-release/commit-analyzer'), context);
   if (!type) return false;
   const version = nextVersion(lastRelease.version, type);
+  if (inspectTagState) {
+    const targetState = inspectTagState('v' + version);
+    if (targetState.sha && targetState.sha !== sha)
+      throw new Error('Planned release tag v' + version +
+        ' already targets another commit; refusing to replace it.');
+    if (targetState.release && (!targetState.sha || !targetState.release.draft))
+      throw new Error('Planned release v' + version +
+        ' already has a published or inconsistent GitHub Release.');
+  }
   if (incompleteTag && incompleteTag !== 'v' + version)
     throw new Error('Incomplete release tag ' + incompleteTag +
       ' disagrees with recomputed version v' + version + '; manual review required.');

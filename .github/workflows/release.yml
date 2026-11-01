@@ -36,7 +36,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Test version analysis and recovery before Unity builds
-        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-snapshot.test.mjs tools/release-recovery.test.mjs tools/release-recovery.test.mjs
+        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-snapshot.test.mjs tools/release-recovery.test.mjs
       - id: plan
         run: npm run release:plan
         env:
@@ -226,7 +226,7 @@ jobs:
           merge-multiple: true
           path: artifacts/releases
       - name: Test version analysis and approval
-        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-snapshot.test.mjs
+        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-snapshot.test.mjs tools/release-recovery.test.mjs
       - name: Test release asset and download-link contract
         run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
       - name: Stage clean player downloads and update packages
