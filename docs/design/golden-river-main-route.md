@@ -12,7 +12,7 @@ by integration tests and must remain usable when a separate Level 1 is added.
 At the motor's maximum speed of seven units per second, crossing 109 units on
 uninterrupted flat ground would take about 16 seconds. This arithmetic is not a
 playtest or a prediction for the actual platform course; it shows why the
-existing distance alone cannot substantiate the 4–6-minute first-success target.
+existing distance alone cannot substantiate the 4â€“6-minute first-success target.
 
 ## Boundaries
 
@@ -71,8 +71,8 @@ a first-player timing measurement or gameplay capture.
 
 This remains a short layout awaiting pacing review. At seven units per second,
 the 114-unit start-to-exit distance is far below four minutes without substantial
-learning pauses. Do not label this the completed 4�6-minute course or claim the
-1�2-minute checkpoint replay target. Do not slow the motor or add forced waits
+learning pauses. Do not label this the completed 4–6-minute course or claim the
+1–2-minute checkpoint replay target. Do not slow the motor or add forced waits
 to manufacture duration. Use real playtest observations to decide how much
 additional authored traversal is needed while retaining the existing composition.
 
@@ -89,7 +89,7 @@ Current remote main was 2b18294 at inspection. Full exact-head Windows/Linux tes
 player/launcher builds and packaging gates remain required once implementation and
 playtest evidence are complete. Keep the PR draft and #71 open until then.
 
-## Local verification � 2026-11-01
+## Local verification — 2026-11-01
 
 Unity 6000.3.27f2: **15/15 scoped tests passed**, no failures or skips
 (`MenuMovementIntegrationTests`, `RunLifecycleTests`, `CatCollisionTests`).
@@ -114,3 +114,16 @@ the route and Mika/scenery correctly. The saved preview display settings selecte
 1280x720 despite the requested 960x540 launch size; this single still does not
 establish small-window or full-route motion readability.
 
+
+## User playtest - 2026-11-01
+
+The user reported a 20-second complete traversal of the supplied Windows preview,
+then confirmed no falls and no unclear places. This is one user-reported run,
+not instrumented timing or a recorded gameplay capture. No failed-attempt time
+was reported; checkpoint recovery/replay cost was not exercised in this run.
+
+The result is 12-18 times shorter than the approved 4-6-minute target. It supports
+initial route reachability and clarity for this tester, not the intended duration,
+learning curve or checkpoint spacing. The route needs substantial additional,
+varied authored traversal before #71 can be considered complete. Preserve motor
+responsiveness; do not manufacture duration with forced waits or slower movement.
