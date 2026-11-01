@@ -1,13 +1,9 @@
-import { planRelease } from './release-engine.mjs';
-import { assertReleaseApproval } from './release-approval.mjs';
+import { assertSnapshot } from './release-approval.mjs';
+import semanticRelease from 'semantic-release';
 import { appendFileSync } from 'node:fs';
-import { inspectTag } from './release-recovery.mjs';
 
-// github.sha is immutable even if other PRs are merged into main during this run.
-const result = await planRelease({ inspectTagState: inspectTag });
-if (result) assertReleaseApproval(result.nextRelease, process.env.ALLOW_MINOR, process.env.ALLOW_MAJOR);
+assertSnapshot(process.env, process.cwd());
+const result = await semanticRelease({ dryRun: true, ci: true });
 const version = result ? result.nextRelease.version : '';
-if (process.env.GITHUB_OUTPUT)
-  appendFileSync(process.env.GITHUB_OUTPUT, 'version=' + version + '\n');
-console.log(version ? 'Planned release: ' + version + ' (' + result.nextRelease.gitHead + ')'
-  : 'No releasable changes.');
+if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `version=${version}\n`);
+console.log(version ? `Planned release: ${version}` : 'No releasable changes.');
