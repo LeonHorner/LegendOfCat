@@ -139,6 +139,49 @@ public class MenuMovementIntegrationTests
         Assert.That(sourceArt.All(o => o), Is.True);
     }
 
+    [UnityTest]
+    public IEnumerator CombatMenuRoundTripPreservesMovementLabAndStopsAudio()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        host = new GameObject("Combat menu integration test");
+        var screen = host.AddComponent(RuntimeType("StarterScreen"));
+        yield return null;
+        Call(screen, "OpenStompArena");
+        var arena = (Component)Field(screen, "stompArena");
+        Assert.That(arena, Is.Not.Null);
+        Call(screen, "OpenStompArena");
+        Assert.That(Field(screen, "stompArena"), Is.SameAs(arena));
+        Call(screen, "OpenCourse");
+        Assert.That(Field(screen, "course"), Is.Null, "Only one lab may own gameplay input.");
+        var cat = (Component)arena.GetType().GetProperty("Cat").GetValue(arena);
+        var audio = cat.GetComponent<AudioSource>();
+        audio.Play();
+        var input = cat.GetComponent(RuntimeType("CatInput"));
+        ((Action)arena.GetType().GetField("BackToMenu").GetValue(arena))();
+        Assert.That(arena.gameObject.activeSelf, Is.False);
+        Assert.That(audio.isPlaying, Is.False);
+        var actions = input.GetType().GetProperty("Actions").GetValue(input);
+        Assert.That(actions.GetType().GetProperty("enabled").GetValue(actions), Is.False);
+        Assert.That(Field(screen, "page"), Is.EqualTo("menu"));
+        Assert.That(Field(screen, "stompArena"), Is.Null);
+        yield return null;
+        Assert.That(arena == null, Is.True);
+        Call(screen, "OpenCourse");
+        var course = (Component)Field(screen, "course");
+        Assert.That(course, Is.Not.Null);
+        Assert.That(course.GetComponentInChildren(RuntimeType("SceneryRenderer")), Is.Not.Null);
+        Call(screen, "OpenStompArena");
+        Assert.That(Field(screen, "stompArena"), Is.Null);
+        ((Action)course.GetType().GetField("BackToMenu").GetValue(course))();
+        yield return null;
+        Call(screen, "OpenStompArena");
+        var reopened = (Component)Field(screen, "stompArena");
+        var combat = reopened.GetType().GetField("Combat").GetValue(reopened);
+        Assert.That(combat.GetType().GetProperty("PlayerHealth").GetValue(combat), Is.EqualTo(3));
+        Assert.That(combat.GetType().GetProperty("BossHealth").GetValue(combat), Is.EqualTo(3));
+    }
+
     [UnityTearDown]
     public IEnumerator Cleanup()
     {
