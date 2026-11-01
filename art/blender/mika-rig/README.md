@@ -5,14 +5,20 @@ for [issue #49](https://github.com/LeonHorner/LegendOfCat/issues/49).
 The accepted source file is unchanged. These motions have **not** received visual
 approval and do not replace the playable 2D character.
 
-The user rejected the first running candidate on 2026-11-01 as unnatural.
-Revision 2 replaces its nearly static torso and marching feet with coordinated
-pelvis/spine motion, gathered and extended phases, shorter staggered support,
-forward head/neck alignment and a trailing tail. Foot recovery matches the
-backward stance velocity at touchdown. This is a new review candidate, not an
-accepted result. Review `run-v2-normal.gif`, `run-v2-slow.gif` and the matching
-`run-oblique-*.gif` views before judging the motion. The previous loop remains
-in Git history at `615a775`, not as the current preview.
+The user rejected the first running candidate on 2026-11-01 as unnatural and
+found revision 2 better, but requested stronger whole-body movement to match the
+paired-leg run. Revision 3 adds a pronounced gather/extension cycle: the spine
+arches as the hips tuck forward, lengthens on push-off, and the body pitches and
+rises/falls through support and flight. The neck counter-rotates to steady the
+head, and the tail follows the pelvis. Supported paws constrain body height;
+recovering paws stay within limb reach. The model and other 12 actions are unchanged.
+
+Review `run-v3-normal.gif`, `run-v3-slow.gif` and the matching
+`run-oblique-*.gif` views. This is a new review candidate, not an accepted result.
+Revision 2 remains in Git history at `97ee6b1`; the first loop is at `615a775`.
+The user-supplied running-cat GIF was inspected locally for the sequence of
+extension, forelimb support, spinal gathering and hindlimb push-off. Its creator
+and redistribution license are unverified, so it is not included in the repository.
 
 ## Files and use
 
@@ -44,7 +50,7 @@ build machines.
 | TailTwitch | 48 | Distal tail motion |
 | Groom | 96 | One raised forepaw, three support paws |
 | Stretch | 72 | Lowered chest, forward forepaws |
-| Run | 12 | Revision 2; 0.62 m virtual travel per cycle; half-frame keys |
+| Run | 12 | Revision 3; 0.62 m virtual travel per cycle; half-frame keys |
 | Takeoff / Airborne / Fall / Land / Stop | 12 / 24 / 12 / 12 / 16 | Transition building blocks |
 | JumpReview | 48 | Authoring arc diagnostic; not a gameplay root-motion clip |
 
@@ -76,9 +82,10 @@ On 2026-11-01, native weight normalization/four-influence checks and FBX reimpor
 passed: one mesh, 25 deform bones and all 13 actions. Sampled baked bone positions
 matched native positions within 0.000001 m. The running support soles stayed
 within 0.00031 m of the floor; support wrist displacement with 0.62 m/cycle virtual
-travel was below 0.000011 m per half-frame sample. The running pose matrices match
-at both loop endpoints. These measurements are at authoring
-scale; inspect the full motion and actual game scale before acceptance.
+travel was below 0.000001 m per half-frame sample. The running pose matrices match
+at both loop endpoints. A native-file comparison also confirmed identical skin
+coordinates/weights and all 12 non-run actions relative to revision 2. These
+measurements are at authoring scale; inspect the full motion and actual game scale before acceptance.
 
 Remaining: visual review of normal/slowed loops, shoulder/underarm deformation
 refinement where needed, natural gait and action-transition review, actual Unity

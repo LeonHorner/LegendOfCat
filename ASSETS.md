@@ -257,6 +257,15 @@ RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
   copied motion footage is used. Reference reading is linked in the folder
   README. Visual acceptance and Unity validation remain pending.
 
+- Revision 3, 2026-11-01: human feedback requested stronger body movement for the
+  paired-leg run. Codex and Blender 5.2.3 LTS authored increased spinal flexion,
+  pelvic tuck/extension, body pitch/heave and tail follow-through on the same
+  CC0-derived skin. Local motion reference: user-supplied
+  `tumblr_n0r2iuDJRW1sg7h2jo1_1280-2378486781.gif`; creator and license unverified.
+  This reference is not redistributed, embedded or used as a texture. No motion
+  capture data was extracted; the animation curves are locally authored. Actual
+  Blender renders show the revised candidate. Visual acceptance remains pending.
+
 ## Golden River background study — 2026-10-24
 
 `Assets/Game/Resources/BackgroundStudy/painted-atlas.png` is original generated

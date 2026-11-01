@@ -149,6 +149,13 @@ gathered/extended phases and revised foot timing. Its side and three-quarter
 normal/slowed renders are a fresh review candidate; prior contact/export checks
 do not override the rejection. Do not integrate either run without acceptance.
 
+The user found revision 2 better but requested more body movement matching its
+paired-leg running gait, supplying a local animated reference. Revision 3 adds
+stronger spinal gather/extension, hip tuck, body pitch/heave and tail follow-through.
+The accepted model and non-run actions are unchanged. Review the new revision 3
+side and three-quarter loops at normal/slowed speed before acceptance. The
+reference GIF is not redistributed; its creator/license are unverified.
+
 ### Terrain system correction — 2026-10-28
 
 The user rejected the latest tall-wall preview, especially its right platform,

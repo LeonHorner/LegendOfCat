@@ -15,7 +15,7 @@ for index,(name,step) in enumerate(clips):
         # complete loop keeps its authored duration rather than speeding up.
         ticks=[round(i*100*step/24*multiplier)*10 for i in range(len(frames)+1)]
         durations=[b-a for a,b in zip(ticks,ticks[1:])]
-        prefix='run-v2' if name=='Run' else name.lower()
+        prefix='run-v3' if name=='Run' else name.lower()
         frames[0].save(OUT/f'{prefix}-{suffix}.gif',save_all=True,append_images=frames[1:],duration=durations,loop=0,optimize=False)
     representative=frames[len(frames)//2].resize((240,200))
     col=index%4;row=index//4

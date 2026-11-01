@@ -1,4 +1,4 @@
-"""Author a gathered/extended running study after the first gait was rejected.
+"""Author a gathered/extended running study from whole-body motion feedback.
 
 The source rig and other actions remain editable. No gameplay asset is changed.
 """
@@ -56,20 +56,27 @@ def author_run(rig, scene, sole_offsets):
             pose.location = (0, 0, 0)
             pose.rotation_quaternion = (1, 0, 0, 0)
             pose.scale = (1, 1, 1)
+        # Gather ahead of hind contact, extend into fore contact, and let the
+        # pelvis/chest pitch in opposite directions through the flight phases.
         gathered = math.cos(phase-math.tau*.85)
-        move('Pelvis', (.012*math.sin(phase), 0, -.04+.018*math.cos(phase-math.tau*.25)))
-        rotate('Pelvis', -.15*gathered)
-        rotate('Spine', .28*gathered)
-        rotate('Chest', .10*gathered)
+        body_pitch=-.20*math.cos(phase)
+        pelvis_pitch=-.30-.45*gathered+body_pitch
+        spine_pitch=.55+.80*gathered
+        chest_pitch=-.10*gathered
+        body_height=smooth_keys([(0,-.055),(.15,-.035),(.32,0),(.46,.01),(.62,.035),(.78,.005),(.92,-.05),(1,-.055)],t)
+        move('Pelvis', (.025*gathered+.012*math.sin(phase), 0, body_height))
+        rotate('Pelvis', pelvis_pitch)
+        rotate('Spine', spine_pitch)
+        rotate('Chest', chest_pitch)
         rotate('Neck', -.25, (0, 0, 1))
-        rotate('Neck', -.23*gathered+.20, add=True)
+        rotate('Neck', -(pelvis_pitch+spine_pitch+chest_pitch)+.20, add=True)
         rotate('Head', -.85, (0, 0, 1))
         rotate('Head', -.18+.025*math.sin(phase-.4), add=True)
-        rotate('Tail.1', -1.05+.15*gathered+.055*math.sin(phase-.7))
-        rotate('Tail.2', -.10+.04*math.sin(phase-1.0))
-        rotate('Tail.3', -.08+.03*math.sin(phase-1.3))
-        rotate('Tail.4', -.18+.025*math.sin(phase-1.6))
-        rotate('Tail.5', -.20+.02*math.sin(phase-1.9))
+        rotate('Tail.1', -1.05-pelvis_pitch-.225*(1+gathered)+.10*math.sin(phase-.7))
+        rotate('Tail.2', -.10+.09*math.sin(phase-1.0))
+        rotate('Tail.3', -.08+.08*math.sin(phase-1.3))
+        rotate('Tail.4', -.18+.07*math.sin(phase-1.6))
+        rotate('Tail.5', -.20+.06*math.sin(phase-1.9))
         for key, delay in CONTACTS.items():
             u = (t-delay) % 1
             front = key.startswith('Front')
@@ -91,6 +98,32 @@ def author_run(rig, scene, sole_offsets):
             rotate('CTRL_'+key,pitch)
             if front:
                 move(key+'.Upper', (.009*math.cos(math.tau*u),0,.003*math.sin(math.tau*u)))
+        # Supported feet constrain how high the body can rise. Keep those
+        # targets fixed and let the torso absorb the landing through flexion.
+        bpy.context.view_layer.update()
+        lower=0
+        for key,delay in CONTACTS.items():
+            if (t-delay)%1>STANCE:continue
+            hip=rig.pose.bones[key+'.Upper'].head
+            target=rig.pose.bones['CTRL_'+key].head
+            reach=(bones[key+'.Upper'].length+bones[key+'.Lower'].length)*.985
+            horizontal=(hip.x-target.x)**2+(hip.y-target.y)**2
+            ceiling=target.z+math.sqrt(max(0,reach*reach-horizontal))
+            lower=max(lower,hip.z-ceiling)
+        if lower>0:
+            move('Pelvis',(.025*gathered+.012*math.sin(phase),0,body_height-lower))
+            bpy.context.view_layer.update()
+        # Recovering paws follow the body, with their targets inside the fixed
+        # limb length. This does not change any supported paw's ground target.
+        for key,delay in CONTACTS.items():
+            if (t-delay)%1<=STANCE:continue
+            hip=rig.pose.bones[key+'.Upper'].head
+            target=rig.pose.bones['CTRL_'+key].head
+            reach=(bones[key+'.Upper'].length+bones[key+'.Lower'].length)*.985
+            delta=target-hip
+            if delta.length>reach:
+                position=hip+delta.normalized()*reach
+                move('CTRL_'+key,position-bones['CTRL_'+key].head_local)
         for pose in rig.pose.bones:
             if pose.bone.use_deform or pose.name.startswith('CTRL_'):
                 pose.keyframe_insert('location',frame=frame,group=pose.name)
@@ -112,7 +145,7 @@ if __name__ == '__main__':
     report=json.loads((OUT/'rig-report.json').read_text())
     author_run(rig,scene,report['sole_offsets'])
     report['actions']['Run']=DURATION
-    report['run']={'stride_m':STRIDE,'stance_fraction':STANCE,'contacts':CONTACTS,'revision':2,'visual_acceptance':False}
+    report['run']={'stride_m':STRIDE,'stance_fraction':STANCE,'contacts':CONTACTS,'revision':3,'visual_acceptance':False}
     (OUT/'rig-report.json').write_text(json.dumps(report,indent=2)+'\n')
     rig.animation_data.action=bpy.data.actions['Run'];scene.frame_start=1;scene.frame_end=DURATION;scene.frame_set(1)
     bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'mika-rig.blend'))
@@ -122,4 +155,4 @@ if __name__ == '__main__':
     scene.camera.rotation_euler=(Vector((-.05,0,.25))-scene.camera.location).to_track_quat('-Z','Y').to_euler()
     scene.camera.data.ortho_scale=.86
     for frame in [1,4,7,10]:
-        scene.frame_set(frame);scene.render.filepath=f'/tmp/mika-authoring/revision-2/pose-{frame}.png';bpy.ops.render.render(write_still=True)
+        scene.frame_set(frame);scene.render.filepath=f'/tmp/mika-authoring/revision-3/pose-{frame}.png';bpy.ops.render.render(write_still=True)
