@@ -143,6 +143,12 @@ not approve the motions: inspect the shoulder/underarm deformation and natural
 gait at normal/slowed speed before any output enters gameplay. Unity activation
 currently blocks Editor validation. This work remains isolated outside `Assets`.
 
+On 2026-11-01 the user rejected that first running candidate as unnatural.
+Revision 2 reauthors the gait with coordinated body movement, forward gaze,
+gathered/extended phases and revised foot timing. Its side and three-quarter
+normal/slowed renders are a fresh review candidate; prior contact/export checks
+do not override the rejection. Do not integrate either run without acceptance.
+
 ### Terrain system correction — 2026-10-28
 
 The user rejected the latest tall-wall preview, especially its right platform,

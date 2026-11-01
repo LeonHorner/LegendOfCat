@@ -56,10 +56,11 @@
       "max_stance_displacement_per_frame_m": null
     },
     "Run": {
-      "max_ik_target_error_m": 2.0703418138957207e-05,
-      "support_sole_min_m": -0.0001396720763295889,
-      "support_sole_max_m": 0.00012137379962950945,
-      "max_stance_displacement_per_frame_m": 9.940314340685557e-08
+      "max_ik_target_error_m": 2.5189575592790775e-05,
+      "support_sole_min_m": -5.869357846677303e-05,
+      "support_sole_max_m": 0.0003021417651325464,
+      "max_stance_displacement_per_frame_m": 1.0820102946372945e-05,
+      "loop_seam_matrix_error": 0.0
     },
     "Takeoff": {
       "max_ik_target_error_m": 0.000599860387394061,

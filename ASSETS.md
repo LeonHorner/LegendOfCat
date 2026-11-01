@@ -249,6 +249,13 @@ RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
   FBX reimport passed. Motion appearance, Unity import/materials and game
   integration remain unaccepted/unverified. See the folder README and validation
   report. Keep issue #49 incomplete and the existing 2D playable character intact.
+- Revision 2, 2026-11-01: the user rejected the first gait as unnatural. Codex and
+  Blender reauthored the run with pelvis/spine/shoulder coordination, forward
+  head/neck alignment, staggered contacts, gathered/extended recovery and a
+  trailing tail. New side/three-quarter loops are actual Blender renders. The
+  same CC0 source and editable skin are retained; no new generated imagery or
+  copied motion footage is used. Reference reading is linked in the folder
+  README. Visual acceptance and Unity validation remain pending.
 
 ## Golden River background study — 2026-10-24
 

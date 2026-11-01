@@ -2,10 +2,13 @@
 import bpy
 import json
 import math
+import sys
 from pathlib import Path
 from mathutils import Vector, Matrix, Quaternion
 
 OUT=Path(__file__).resolve().parent
+sys.path.insert(0,str(OUT))
+from revise_run import author_run, DURATION, STRIDE, STANCE, CONTACTS
 CACHE=Path('/tmp/mika-authoring')
 bpy.ops.wm.open_mainfile(filepath=str(CACHE/'prepared-surface.blend'))
 scene=bpy.context.scene
@@ -133,9 +136,10 @@ for key in legs:
     indices=[v.index for v in skin.data.vertices if any(g.group==group and g.weight>.75 for g in v.groups)]
     sole_offsets[key]=-min(evaluated.data.vertices[i].co.z for i in indices)
 
-clips={'Idle':48,'LookBack':72,'Listen':48,'TailTwitch':48,'Groom':96,'Stretch':72,'Run':16,'Takeoff':12,'Airborne':24,'Fall':12,'Land':12,'Stop':16,'JumpReview':48}
+clips={'Idle':48,'LookBack':72,'Listen':48,'TailTwitch':48,'Groom':96,'Stretch':72,'Run':DURATION,'Takeoff':12,'Airborne':24,'Fall':12,'Land':12,'Stop':16,'JumpReview':48}
 rig.animation_data_create()
 for clip,length in clips.items():
+    if clip=='Run':continue
     rig.animation_data.action=None;reset()
     for frame in range(1,length+2):
         t=(frame-1)/length;phase=t*math.tau;reset()
@@ -159,17 +163,6 @@ for clip,length in clips.items():
         if clip=='Stretch':
             amount=pulse(t);translate('Pelvis',(0,0,.009*amount));rotate('Spine',(0,1,0),.40*amount);rotate('Chest',(0,1,0),.28*amount);rotate('Neck',(0,1,0),-.22*amount)
             for key in ['Front.L','Front.R']:foot(key,(.075*amount,0,0))
-        if clip=='Run':
-            translate('Pelvis',(0,0,.003*math.cos(phase*2)-.014))
-            rotate('Tail.1',(0,1,0),-.90+.035*math.sin(phase))
-            rotate('Tail.2',(0,1,0),.10)
-            rotate('Spine',(0,1,0),.045*math.sin(phase));rotate('Chest',(0,1,0),-.035*math.sin(phase))
-            for key,delay in [('Hind.L',0),('Hind.R',.12),('Front.L',.52),('Front.R',.62)]:
-                u=(t-delay)%1;stance=.32;stride=.36
-                if u<stance:x=stride*(stance/2-u);z=0;pitch=0
-                else:
-                    q=(u-stance)/(1-stance);x=-stride*stance/2+stride*stance*ease(q);z=.065*math.sin(math.pi*q)**1.35;pitch=-.28*math.sin(math.pi*q)
-                foot(key,(x,0,z),pitch)
         if clip in {'Takeoff','Airborne','Fall','Land','JumpReview'}:
             if clip=='Takeoff':crouch=.018*pulse(t);fold=.035*ease(t)
             elif clip=='Airborne':crouch=0;fold=.055+.012*math.sin(math.pi*t)
@@ -189,6 +182,7 @@ for clip,length in clips.items():
                 pb.keyframe_insert('location',frame=frame,group=pb.name);pb.keyframe_insert('rotation_quaternion',frame=frame,group=pb.name)
     action=rig.animation_data.action;action.name=clip;action.use_fake_user=True
     track=rig.animation_data.nla_tracks.new();track.name=clip;track.strips.new(clip,1,action);track.mute=True
+author_run(rig,scene,sole_offsets)
 rig.animation_data.action=bpy.data.actions['Idle'];scene.frame_start=1;scene.frame_end=48;scene.render.fps=24;scene.frame_set(1)
 rig['motion_review']='Unaccepted motion candidates. Preserve the accepted game until reviewed.'
 rig['forward_axis']='+X';rig['unit']='meter';rig['source']='Accepted Mika v3 and its CC0 provenance.'
@@ -197,12 +191,13 @@ scene.cycles.samples=16;scene.render.resolution_x=900;scene.render.resolution_y=
 # Camera transformed with the aligned mesh keeps the accepted review angle.
 bpy.ops.object.select_all(action='DESELECT');rig.select_set(True);bpy.context.view_layer.objects.active=rig
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'mika-rig.blend'))
-camera_location=scene.camera.location.copy();camera_scale=scene.camera.data.ortho_scale
+camera_location=scene.camera.location.copy();camera_scale=scene.camera.data.ortho_scale;camera_rotation=scene.camera.rotation_euler.copy()
 for clip,frame in [('Idle',1),('Groom',49),('Stretch',37),('Run',5),('LookBack',37)]:
-    scene.camera.location=camera_location;scene.camera.data.ortho_scale=camera_scale
+    scene.camera.location=camera_location;scene.camera.rotation_euler=camera_rotation;scene.camera.data.ortho_scale=camera_scale
     if clip=='Run':
-        scene.camera.location.x-=.04;scene.camera.data.ortho_scale=.86
+        scene.camera.location=(-.05,1.5,.37);scene.camera.data.ortho_scale=.86
+        scene.camera.rotation_euler=(Vector((-.05,0,.25))-scene.camera.location).to_track_quat('-Z','Y').to_euler()
     rig.animation_data.action=bpy.data.actions[clip];scene.frame_set(frame)
     scene.render.filepath=str(OUT/('pose-'+clip.lower()+'.png'));bpy.ops.render.render(write_still=True)
-report={'bones':len(arm.bones),'deform_bones':sum(b.use_deform for b in arm.bones),'skin_vertices':len(skin.data.vertices),'actions':clips,'pole_angles':pole_angles,'sole_offsets':sole_offsets,'unweighted_vertices':sum(not v.groups for v in skin.data.vertices),'visual_acceptance':False,'unity_validated':False}
+report={'bones':len(arm.bones),'deform_bones':sum(b.use_deform for b in arm.bones),'skin_vertices':len(skin.data.vertices),'actions':clips,'pole_angles':pole_angles,'sole_offsets':sole_offsets,'unweighted_vertices':sum(not v.groups for v in skin.data.vertices),'visual_acceptance':False,'unity_validated':False,'run':{'stride_m':STRIDE,'stance_fraction':STANCE,'contacts':CONTACTS,'revision':2,'visual_acceptance':False}}
 (OUT/'rig-report.json').write_text(json.dumps(report,indent=2)+'\n');print('RIG_REPORT',report,flush=True)

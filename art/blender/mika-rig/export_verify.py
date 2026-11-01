@@ -33,8 +33,13 @@ for name, length in source['actions'].items():
     bounds = []
     previous_support = {}
     stance_displacements = []
-    for frame in range(1, length + 2):
-        scene.frame_set(frame)
+    step = .5 if name == 'Run' else 1
+    first_pose = None
+    for sample in range(round(length/step) + 1):
+        frame=1+sample*step
+        scene.frame_set(int(frame),subframe=frame%1)
+        if first_pose is None:
+            first_pose={b.name:b.matrix.copy() for b in rig.pose.bones}
         evaluated = skin.evaluated_get(bpy.context.evaluated_depsgraph_get())
         for key in legs:
             errors.append((rig.pose.bones[key + '.Lower'].tail -
@@ -42,16 +47,16 @@ for name, length in source['actions'].items():
             if name in {'Idle', 'LookBack', 'Listen', 'TailTwitch', 'Stretch'} or (name == 'Groom' and key != 'Front.L'):
                 heights.append(min(evaluated.data.vertices[i].co.z for i in soles[key]))
             if name == 'Run':
-                delay = {'Hind.L': 0, 'Hind.R': .12, 'Front.L': .52, 'Front.R': .62}[key]
+                delay = source['run']['contacts'][key]
                 t = (frame - 1) / length
                 u = (t - delay) % 1
-                if u < .32:
+                if u < source['run']['stance_fraction']:
                     heights.append(min(evaluated.data.vertices[i].co.z for i in soles[key]))
                     point = rig.pose.bones[key + '.Paw'].head.copy()
-                    point.x += .36 * t
+                    point.x += source['run']['stride_m'] * t
                     if key in previous_support:
                         old_frame, old_point = previous_support[key]
-                        if old_frame == frame - 1:
+                        if old_frame == frame - step:
                             stance_displacements.append((point - old_point).length)
                     previous_support[key] = (frame, point)
                 else:
@@ -65,7 +70,12 @@ for name, length in source['actions'].items():
                      'support_sole_min_m': min(heights) if heights else None,
                      'support_sole_max_m': max(heights) if heights else None,
                      'max_stance_displacement_per_frame_m': max(stance_displacements) if stance_displacements else None}
+    if name=='Run':
+        seam=max(abs(b.matrix[row][col]-first_pose[b.name][row][col]) for b in rig.pose.bones for row in range(4) for col in range(4))
+        assert seam<1e-5, 'Running loop does not close'
+        metrics[name]['loop_seam_matrix_error']=seam
 # Resting soles and fixed controller scales are useful regressions, not a visual gate.
+print('RUN_CONTACTS', metrics['Run'], flush=True)
 assert max(abs(metrics['Idle'][k]) for k in ['support_sole_min_m', 'support_sole_max_m']) < .006
 assert metrics['Run']['max_ik_target_error_m'] < .001
 assert metrics['Run']['max_stance_displacement_per_frame_m'] < .001
@@ -82,6 +92,7 @@ bpy.ops.export_scene.fbx(
     apply_unit_scale=True, add_leaf_bones=False, use_armature_deform_only=True,
     bake_anim=True, bake_anim_use_nla_strips=False, bake_anim_use_all_actions=True,
     bake_anim_force_startend_keying=True, bake_anim_simplify_factor=0,
+    bake_anim_step=.5,
     path_mode='COPY', embed_textures=True)
 # Reimport into an empty scene; validate the actual exported artifact.
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -99,7 +110,7 @@ roundtrip_errors = []
 imported = armatures[0]
 for (name, frame), positions in samples.items():
     imported.animation_data.action = next(a for a in bpy.data.actions if a.name.endswith('|' + name))
-    bpy.context.scene.frame_set(frame)
+    bpy.context.scene.frame_set(int(frame),subframe=frame%1)
     for key, point in positions.items():
         roundtrip_errors.append((imported.matrix_world @ imported.pose.bones[key].head - point).length)
 assert max(roundtrip_errors) < .001, 'FBX baked motion differs from native bone positions'

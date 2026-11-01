@@ -5,6 +5,15 @@ for [issue #49](https://github.com/LeonHorner/LegendOfCat/issues/49).
 The accepted source file is unchanged. These motions have **not** received visual
 approval and do not replace the playable 2D character.
 
+The user rejected the first running candidate on 2026-11-01 as unnatural.
+Revision 2 replaces its nearly static torso and marching feet with coordinated
+pelvis/spine motion, gathered and extended phases, shorter staggered support,
+forward head/neck alignment and a trailing tail. Foot recovery matches the
+backward stance velocity at touchdown. This is a new review candidate, not an
+accepted result. Review `run-v2-normal.gif`, `run-v2-slow.gif` and the matching
+`run-oblique-*.gif` views before judging the motion. The previous loop remains
+in Git history at `615a775`, not as the current preview.
+
 ## Files and use
 
 - `mika-rig.blend`: editable skin, 25 deform bones, four paw IK controls, four
@@ -35,7 +44,7 @@ build machines.
 | TailTwitch | 48 | Distal tail motion |
 | Groom | 96 | One raised forepaw, three support paws |
 | Stretch | 72 | Lowered chest, forward forepaws |
-| Run | 16 | In-place gait; 0.36 m virtual travel per cycle |
+| Run | 12 | Revision 2; 0.62 m virtual travel per cycle; half-frame keys |
 | Takeoff / Airborne / Fall / Land / Stop | 12 / 24 / 12 / 12 / 16 | Transition building blocks |
 | JumpReview | 48 | Authoring arc diagnostic; not a gameplay root-motion clip |
 
@@ -46,10 +55,10 @@ Use Blender 5.2.3 LTS from the repository root. The scripts use
 modify scenes, prefabs, project settings or game code.
 
 ```sh
-ALSOFT_DRIVERS=null blender --background --disable-autoexec --python art/blender/mika-rig/prepare_surface.py
-ALSOFT_DRIVERS=null blender --background --disable-autoexec --python art/blender/mika-rig/build_rig.py
-ALSOFT_DRIVERS=null blender --background --disable-autoexec --python art/blender/mika-rig/export_verify.py
-ALSOFT_DRIVERS=null blender --background --disable-autoexec --python art/blender/mika-rig/render_review.py
+ALSOFT_DRIVERS=null blender --background --disable-autoexec --python-exit-code 1 --python art/blender/mika-rig/prepare_surface.py
+ALSOFT_DRIVERS=null blender --background --disable-autoexec --python-exit-code 1 --python art/blender/mika-rig/build_rig.py
+ALSOFT_DRIVERS=null blender --background --disable-autoexec --python-exit-code 1 --python art/blender/mika-rig/export_verify.py
+ALSOFT_DRIVERS=null blender --background --disable-autoexec --python-exit-code 1 --python art/blender/mika-rig/render_review.py
 python art/blender/mika-rig/assemble_review.py
 ```
 
@@ -63,11 +72,12 @@ The hidden original remains available for comparison in the native file.
 
 ## Current validation and remaining work
 
-On 2026-10-31, native weight normalization/four-influence checks and FBX reimport
+On 2026-11-01, native weight normalization/four-influence checks and FBX reimport
 passed: one mesh, 25 deform bones and all 13 actions. Sampled baked bone positions
 matched native positions within 0.000001 m. The running support soles stayed
-within 0.00014 m of the floor; support wrist displacement with 0.36 m/cycle virtual
-travel was below 0.000001 m per sampled frame. These measurements are at authoring
+within 0.00031 m of the floor; support wrist displacement with 0.62 m/cycle virtual
+travel was below 0.000011 m per half-frame sample. The running pose matrices match
+at both loop endpoints. These measurements are at authoring
 scale; inspect the full motion and actual game scale before acceptance.
 
 Remaining: visual review of normal/slowed loops, shoulder/underarm deformation
@@ -88,3 +98,8 @@ motion were authored with Codex and Blender on 2026-10-31. No new image generato
 or third-party character was used. Human direction prioritizes the accepted
 natural cat appearance, open eyes, grounded support and editable Unity animation.
 See `ASSETS.md` and the v3 source license/manifest for provenance.
+
+Revision 2 reference reading: [Bertram and Gutmann, gallop mechanics](https://pmc.ncbi.nlm.nih.gov/articles/PMC2696142/)
+and [cat gallop coordination](https://www.sciencedirect.com/science/article/pii/S0091677377922799).
+These informed phase structure; the motion curves are locally authored artistic
+choices, not measured cat motion, copied footage or a validated biomechanics model.

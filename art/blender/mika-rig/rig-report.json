@@ -9,7 +9,7 @@
     "TailTwitch": 48,
     "Groom": 96,
     "Stretch": 72,
-    "Run": 16,
+    "Run": 12,
     "Takeoff": 12,
     "Airborne": 24,
     "Fall": 12,
@@ -31,5 +31,17 @@
   },
   "unweighted_vertices": 0,
   "visual_acceptance": false,
-  "unity_validated": false
+  "unity_validated": false,
+  "run": {
+    "stride_m": 0.62,
+    "stance_fraction": 0.24,
+    "contacts": {
+      "Hind.L": 0,
+      "Hind.R": 0.06,
+      "Front.L": 0.46,
+      "Front.R": 0.52
+    },
+    "revision": 2,
+    "visual_acceptance": false
+  }
 }
