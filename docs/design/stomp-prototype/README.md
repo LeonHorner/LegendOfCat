@@ -4,6 +4,26 @@ Issue #12. Enter **Simple combat lab** from the main menu. The main menu lists M
 
 ## Current validation status
 
+The first full Prepare merge run on `b6e1272` passed 203/204 Unity tests; the Linux
+headless audio test failed at its initial `isPlaying` assertion after a fixed
+120 ms wall-clock wait. Both Windows/Linux player and launcher builds, packaging,
+smoke checks and Delta checks passed in that run. The audio test now uses Unity's
+offline mixer and verifies actual nonzero samples, playback position, protected
+contact, pause/resume and reset without a physical audio clock. The new revision
+must pass automatic exact-head validation before merge readiness can be claimed.
+See [the failed run](https://github.com/LeonHorner/LegendOfCat/actions/runs/41306648831).
+Local verification of the final offline-audio correction: **204/204 EditMode tests
+passed**, no failures/skips, exit 0, in isolated Windows Unity 6000.3.27f2. The
+archive fixture was copied into that isolated project before the successful full
+run. [Unity AudioRenderer](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/AudioRenderer.html)
+renders the real mixer on the main thread; the test sets/restores capture rate and
+stops recording in finally. No skip, mock audio source, gameplay change or silent
+fallback is used. This includes the existing protected-contact and lifecycle tests.
+Current main `981bf1b` (#69, semantic-release restoration) was already integrated
+by PR commit `b6e1272`; this worktree fast-forwarded to that existing PR revision.
+
+Historical pre-CI results:
+
 The latest integrated review passed **111/111 focused Unity tests**, including the
 unchanged 34 combat cases, movement, menu transitions, lifecycle, scenery and release
 history. The earlier `edb3ad1` result was **34/34 focused combat tests**. The dated
@@ -11,7 +31,9 @@ main-integration pass below records additional contract checks and remaining lim
 Earlier capture-only results are dated historical evidence, not the current test
 status. Full exact-revision Prepare merge validation, Windows/Linux player and
 launcher builds, packaging/smoke checks and final user gameplay/audio acceptance
-remain pending. PR #62 stays Draft and issue #12 stays open.
+remain pending for those historical revisions. PR #62 was subsequently made ready
+for review externally; this fix preserves that state and does not authorize merge
+or release. Issue #12 remains open.
 
 ## Current encounter
 

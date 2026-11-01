@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using System.Collections;
 using System.Reflection;
+using Unity.Collections;
 
 public class StompCombatTests
 {
@@ -401,33 +402,60 @@ public class StompCombatTests
         var audio = cat.GetComponent<AudioSource>();
         var fixedStep = arenaType.GetMethod("FixedUpdate", Private);
         var state = arenaType.GetField("Combat").GetValue(arena);
+        int priorCaptureRate = Time.captureFramerate;
+        bool recording = false;
         try {
+            // Render the real mixer explicitly: CI has no physical audio clock/device.
+            Time.captureFramerate = 50;
+            Assert.That(AudioSettings.speakerMode, Is.EqualTo(AudioSpeakerMode.Stereo));
+            recording = AudioRenderer.Start();
+            Assert.That(recording, Is.True, "The test requires Unity's offline audio renderer");
             body.position = new Vector2(0, .5f);
             arenaType.GetField("previous", Private).SetValue(arena, body.position);
             fixedStep.Invoke(arena, null);
             body.simulated = false;
-            yield return new WaitForSecondsRealtime(.12f);
+            float energy = 0;
+            for (int i = 0; i < 3; i++) { yield return null; energy += RenderAudioEnergy(); }
             Assert.That(audio.isPlaying, Is.True);
+            Assert.That(energy, Is.GreaterThan(0), "Accepted damage must produce actual mixed voice samples");
             int sample = audio.timeSamples;
             float burst = (float)arenaType.GetField("burstTime", Private).GetValue(arena);
             fixedStep.Invoke(arena, null);
-            Assert.That(audio.timeSamples, Is.GreaterThanOrEqualTo(sample), "Protected contact must not restart audio");
+            Assert.That(audio.timeSamples, Is.GreaterThanOrEqualTo(sample), "Protected contact must not rewind the clip");
+            for (int i = 0; i < 3; i++) { yield return null; RenderAudioEnergy(); }
+            Assert.That(audio.timeSamples, Is.GreaterThan(sample), "Protected contact must preserve playback progress");
             Assert.That((float)arenaType.GetField("burstTime", Private).GetValue(arena), Is.LessThan(burst));
             Assert.That(state.GetType().GetProperty("PlayerHealth").GetValue(state), Is.EqualTo(2));
             arenaType.GetMethod("TogglePause").Invoke(arena, null);
             sample = audio.timeSamples;
             fixedStep.Invoke(arena, null);
-            yield return new WaitForSecondsRealtime(.12f);
+            for (int i = 0; i < 3; i++) { yield return null; RenderAudioEnergy(); }
             Assert.That(audio.isPlaying, Is.False);
             Assert.That(audio.timeSamples, Is.EqualTo(sample));
             arenaType.GetMethod("TogglePause").Invoke(arena, null);
-            yield return new WaitForSecondsRealtime(.08f);
+            energy = 0;
+            for (int i = 0; i < 3; i++) { yield return null; energy += RenderAudioEnergy(); }
             Assert.That(audio.isPlaying, Is.True);
             Assert.That(audio.timeSamples, Is.GreaterThan(sample));
+            Assert.That(energy, Is.GreaterThan(0), "Resume must restore actual voice output");
             arenaType.GetMethod("Restart").Invoke(arena, null);
             Assert.That(audio.isPlaying, Is.False);
             Assert.That(body.simulated, Is.True);
-        } finally { UnityEngine.Object.Destroy(root); }
+        } finally {
+            if (recording) AudioRenderer.Stop();
+            Time.captureFramerate = priorCaptureRate;
+            UnityEngine.Object.Destroy(root);
+        }
         yield return new ExitPlayMode();
+    }
+
+    static float RenderAudioEnergy()
+    {
+        using (var samples = new NativeArray<float>(AudioRenderer.GetSampleCountForCaptureFrame() * 2, Allocator.Temp)) {
+            Assert.That(AudioRenderer.Render(samples), Is.True);
+            float energy = 0;
+            for (int i = 0; i < samples.Length; i++) energy += samples[i] * samples[i];
+            return energy;
+        }
     }
 }
