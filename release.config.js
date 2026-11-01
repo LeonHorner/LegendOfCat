@@ -10,22 +10,14 @@ const strictBreaking = {
 };
 
 export default {
-  branches: ['main'],
-  tagFormat: 'v' + '${version}',
   plugins: [
     ['@semantic-release/commit-analyzer', {
       preset: 'conventionalcommits',
       parserOpts: strictBreaking
     }],
-    './tools/release-notes.mjs',
     ['@semantic-release/release-notes-generator', {
       preset: 'conventionalcommits',
       parserOpts: strictBreaking
-    }],
-    ['@semantic-release/github', {
-      successComment: false,
-      failComment: false,
-      assets: [{ path: 'artifacts/published/*' }]
     }]
   ]
 };

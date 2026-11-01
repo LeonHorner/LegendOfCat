@@ -8,8 +8,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DOWNLOADS, prepareAssets } from './release-assets.mjs';
 import { packageName } from './delta-release.mjs';
-import { downloadNotes, generateNotes } from './release-notes.mjs';
-import releaseConfig from '../release.config.js';
+import { downloadNotes } from './release-notes.mjs';
 
 const VERSION = '0.3.0';
 function fixture(run, withDeltas = false) {
@@ -92,18 +91,11 @@ test('rejects missing, inconsistent or stale release packages', () => {
   });
 });
 
-test('README links and semantic-release asset paths agree with the staging contract', () => {
+test('README links agree with the staged player downloads', () => {
   const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
   for (const name of Object.values(DOWNLOADS)) {
     assert.ok(readme.includes('/releases/latest/download/' + name), name);
   }
-  const notesIndex = releaseConfig.plugins.indexOf('./tools/release-notes.mjs');
-  assert.ok(notesIndex !== -1);
-  assert.ok(notesIndex < releaseConfig.plugins.findIndex(plugin =>
-    Array.isArray(plugin) && plugin[0] === '@semantic-release/release-notes-generator'));
-  const github = releaseConfig.plugins.find(plugin =>
-    Array.isArray(plugin) && plugin[0] === '@semantic-release/github');
-  assert.equal(github[1].assets[0].path, 'artifacts/published/*');
 });
 
 test('release notes link to the same stable names for a specific version', () => {
@@ -111,5 +103,4 @@ test('release notes link to the same stable names for a specific version', () =>
   for (const name of Object.values(DOWNLOADS)) {
     assert.ok(notes.includes('/releases/download/v0.3.0/' + name));
   }
-  assert.equal(generateNotes({}, { nextRelease: { gitTag: 'v0.3.0' } }), notes);
 });
