@@ -90,6 +90,13 @@ public class MenuMovementIntegrationTests
         Assert.That(landmarks, Has.Length.EqualTo(3));
         Assert.That(landmarks.Select(t => t.name).Distinct().Count(), Is.EqualTo(3));
         Assert.That(landmarks.All(t => t.GetComponent<Collider2D>() == null), Is.True);
+        foreach (var landmark in landmarks) {
+            var properties = new MaterialPropertyBlock();
+            landmark.GetComponent<MeshRenderer>().GetPropertyBlock(properties);
+            Assert.That(properties.GetTexture("_MainTex").name, Does.EndWith("-hill-v2"));
+            Assert.That(landmark.GetComponent<MeshRenderer>().bounds.min.y, Is.LessThan(-8),
+                "The hillside's solid bottom belongs below the viewport, not inside a platform gap.");
+        }
         var apply = scenery.GetType().GetMethod("ApplyView");
         apply.Invoke(scenery, new object[] { 84f, 1f });
         var positions = landmarks.Select(t => t.localPosition).ToArray();

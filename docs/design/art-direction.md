@@ -298,3 +298,19 @@ foreground water remain unchanged. The user also explicitly requested suspended
 supports below grounded banks and nearer the water; two descending crossings now
 use contacts down to -1 and retain reachable rising exits. Keep families consistent
 within each crossing and verify the low landings against actual water/readability.
+
+
+### Supported background hills replace opacity blending - 2026-11-01
+
+The user rejected the latest faded landmark foot as stranger than before. The
+requested replacement is a real supporting ground plane on that background layer,
+with a hillside descending out of view and naturally painted contours, without
+abrupt cutoffs or soft blur. This supersedes the prior base/side alpha-feathering
+and partial-alpha mist preservation as the active landmark treatment.
+
+The new mill/aqueduct/willow paintings include complete continuous hills, with
+solid ground reaching the lower source border. The expanded landscape places
+that border below the camera. Original cutouts are archived with Unity metadata;
+experimental shader opacity controls are removed. Keep the existing independent
+foreground river, 2D movement, low suspended crossings and unique reversible
+landmark anchors. New hill artwork still requires in-game user review.

@@ -180,8 +180,6 @@ public sealed class SceneryRenderer : MonoBehaviour
     {
         landmarkMaterial = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
         landmarkMaterial.SetFloat("_Cutout", 1);
-        landmarkMaterial.SetFloat("_SoftAlpha", 1);
-        landmarkMaterial.SetFloat("_LandmarkBlend", 1);
         landmarkMaterial.SetFloat("_Fog", 0.24f);
         landmarkMaterial.SetFloat("_Saturation", 0.72f);
         var names = new[] { "waterwheel", "viaduct", "willow" };
@@ -191,11 +189,12 @@ public sealed class SceneryRenderer : MonoBehaviour
             var item = Quad();
             item.name = "Unique landmark " + names[i];
             item.transform.SetParent(transform, false);
-            item.transform.localPosition = new Vector3(LandmarkAnchors[i], 0.5f, 8);
-            item.transform.localScale = new Vector3(17, 17f / 1.5f, 1);
+            item.transform.localPosition = new Vector3(LandmarkAnchors[i], -0.5f, 8);
+            // The opaque hillside continues below the viewport; its sides descend under the river.
+            item.transform.localScale = new Vector3(30, 20, 1);
             item.GetComponent<MeshRenderer>().sharedMaterial = landmarkMaterial;
             var properties = new MaterialPropertyBlock();
-            properties.SetTexture("_MainTex", Resources.Load<Texture2D>("GoldenRiver/landmark-" + names[i]));
+            properties.SetTexture("_MainTex", Resources.Load<Texture2D>("GoldenRiver/landmark-" + names[i] + "-hill-v2"));
             properties.SetFloat("_Brightness", brightness[i]);
             properties.SetFloat("_Fog", fog[i]);
             item.GetComponent<MeshRenderer>().SetPropertyBlock(properties);

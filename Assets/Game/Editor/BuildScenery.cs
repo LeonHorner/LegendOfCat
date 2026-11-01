@@ -19,7 +19,8 @@ public static class BuildScenery
             .Select(p => p.sourceAssetPath));
         if (paths.Count == 0)
             throw new BuildFailedException("Packed-art auditing requires a complete clean build report.");
-        if (paths.Any(p => p.StartsWith("Assets/Game/Art/BackgroundStudyArchive/", System.StringComparison.Ordinal)))
+        if (paths.Any(p => p.StartsWith("Assets/Game/Art/BackgroundStudyArchive/", System.StringComparison.Ordinal)
+            || p.StartsWith("Assets/Game/Art/GoldenRiverArchive/", System.StringComparison.Ordinal)))
             throw new BuildFailedException("Historical background artwork must not be packed into the player.");
         foreach (string name in ActiveLayers)
             if (!paths.Contains(ResourcesDirectory + name + ".png"))
@@ -34,12 +35,13 @@ public static class BuildScenery
     }
 
     public static readonly string[] GoldenRiverArt = {
-        "shelf-root", "shelf-masonry", "landmark-waterwheel", "landmark-viaduct", "landmark-willow"
+        "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2"
     };
 
     [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]
     public static void ImportGoldenRiverArt()
     {
+        ArchiveLandmarkCutouts();
         foreach (string name in GoldenRiverArt) {
             var importer = (TextureImporter)AssetImporter.GetAtPath("Assets/Game/Resources/GoldenRiver/" + name + ".png");
             importer.textureCompression = TextureImporterCompression.Uncompressed;
@@ -51,6 +53,19 @@ public static class BuildScenery
             importer.SaveAndReimport();
         }
         AssetDatabase.SaveAssets();
+    }
+
+    static void ArchiveLandmarkCutouts()
+    {
+        const string archive = "Assets/Game/Art/GoldenRiverArchive";
+        foreach (string name in new[] { "waterwheel", "viaduct", "willow" }) {
+            string source = "Assets/Game/Resources/GoldenRiver/landmark-" + name + ".png";
+            if (!AssetDatabase.LoadAssetAtPath<Texture2D>(source)) continue;
+            if (!AssetDatabase.IsValidFolder(archive)) AssetDatabase.CreateFolder("Assets/Game/Art", "GoldenRiverArchive");
+            // Unity moves the asset and its GUID-bearing metadata together.
+            string error = AssetDatabase.MoveAsset(source, archive + "/landmark-" + name + ".png");
+            if (!string.IsNullOrEmpty(error)) throw new System.InvalidOperationException(error);
+        }
     }
 
     // Resources materials retain shader references in player builds; Shader.Find alone does not.

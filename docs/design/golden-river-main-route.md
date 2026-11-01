@@ -346,3 +346,67 @@ checks. Local output is
 `Builds/GoldenRiverLowCrossingPreview/LegendOfCatPreview.exe --preview-view level-one`.
 Final Windows/Linux player/launcher packaging, merge-ready validation, integration
 of PR #61 and user acceptance remain pending; no release was performed.
+
+## Supported landmark hills - 2026-11-01
+
+The user rejected the most recent opacity blend as looking stranger and suggested
+an actual background ground plane which runs downhill out of the picture without
+an abrupt or blurred boundary. This explicitly replaces the preceding partial-
+alpha/mist/base-feather experiments as the active composition direction.
+
+All three landmarks now have painted supporting hills in the same source image
+and parallax layer. The image includes the building/tree foundation, continuous
+sloping grass/earth/embedded rock and solid ground to the lower canvas edge.
+The final composition was zoomed out after the initial hill edits still had
+high side contours. Runtime quads are 30x20 course units centered at y=-0.5;
+the solid lower edge lies at y=-10.5, well below the fixed camera. Hillside sides
+descend toward the foreground river instead of ending as exposed floating cutouts.
+No screen-height or object-base opacity fade is used. The standard authored-cutout
+edge treatment rejects generated glow outside the grass/architecture silhouettes.
+Existing per-landmark brightness/fog grading is retained.
+
+Original isolated cutouts are archived with unchanged GUIDs under
+`Assets/Game/Art/GoldenRiverArchive`; the active Resources paintings use the
+`-hill-v2` suffix. The packed-art validator requires the new hills and rejects
+archive content. ASSETS.md and hill-prompts.md record source, editing calls,
+model disclosure, license caveats and human direction. No old .meta file or
+serialized scene/prefab was hand-edited.
+
+Gameplay, lower suspended supports, motor/jump rules, checkpoints, exit and the
+independent world-space foreground river are unchanged. The new asset regressions
+check solid source bottoms and descending side coverage; runtime tests check hill
+texture binding, off-camera bottom placement and reversible landmark registration.
+The GPU test checks that ground opacity survives without feathering and that
+brightness grading/source-halo rejection still work.
+
+### Supported-hill verification
+
+Unity 6000.3.27f2 with Direct3D 11: **29/29 scoped tests passed**, zero
+failures/skips. New source-art checks confirm continuous opaque ground (allowing
+the PNG's antialiased outermost border) and side contours below the main visible
+area. Runtime checks confirm hill texture bindings, off-camera lower canvas and
+reversible placement. The GPU regression confirms solid ground opacity without
+base feathering, brightness grading and generated-halo rejection. Whole-course
+actual-physics, checkpoints, timer, camera, pause, retry and restart tests pass.
+
+The three archived original PNGs and their .meta files were compared to their
+previous Git blobs: all six are byte-for-byte unchanged after the Unity move.
+Static runtime renders at 960x540 and 640x360, plus small grayscale versions,
+were updated for all ten review locations. Inspected the mill base, hill exits,
+aqueduct foundations and willow ground. The painted hills remain continuous
+through the platform gaps and descend beneath the independent foreground river;
+no manufactured alpha fade or lower source-image cutoff is exposed in those
+views. These are static authoring renders, not user acceptance or a full
+player-input capture.
+
+- [Mill on supporting ground](golden-river-main-route/variety-evidence/watermill-base-960.png)
+- [Aqueduct ridge](golden-river-main-route/variety-evidence/aqueduct-960.png)
+- [Willow hillside](golden-river-main-route/variety-evidence/willow-960.png)
+- [Mill hill exit](golden-river-main-route/variety-evidence/watermill-edge-640.png)
+
+The supported-hill Windows development preview build succeeded, including packed-
+art checks for all active paintings and exclusion of the archived cutouts. Local
+output: `Builds/GoldenRiverHillPreview/LegendOfCatPreview.exe --preview-view level-one`.
+Earlier preview folders are superseded. Final Linux/player-launcher packaging,
+exact-head merge validation, PR #61 integration and user acceptance remain pending;
+no release was performed.

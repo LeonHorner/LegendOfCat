@@ -550,3 +550,12 @@ license/generation disclosures are unchanged. Geometry lowers two existing
 suspended sequences; registered platform art follows their unchanged colliders'
 widths. No new generated or third-party image is involved. Review captures now
 also cover lower boundaries and the two low crossings.
+
+## Supported Golden River landmark hills - 2026-11-01
+
+- Source: built-in OpenAI image generation EDIT tool, two separate edit passes per landmark (six calls total); exact model identifier not exposed. First pass referenced the original project landmark; second pass referenced its intermediate solid-hill composition. Final source PNGs retain generated pixels/alpha without manual raster processing.
+- Active files: `Assets/Game/Resources/GoldenRiver/landmark-{waterwheel,viaduct,willow}-hill-v2.png`. The two shelf PNGs keep their existing paths and provenance. Original isolated landmark PNGs and their GUID-bearing metadata are retained under `Assets/Game/Art/GoldenRiverArchive/`, moved with Unity AssetDatabase and excluded from player packages. The intermediate edit outputs are not runtime assets.
+- License: the same original-art policy in ASSET-LICENSE.md, CC BY-NC 4.0 only to the extent project rights holders own applicable rights; no copyright claim in otherwise unprotected AI output. No third-party artwork or license was introduced.
+- Human creative direction: the user rejected the latest mist/opacity blend as stranger than before and requested a real ground plane under the landmark, descending out of the image like a hill without an abrupt or blurred edge. This supersedes the local base/side feathering approach above.
+- Creative decisions: paint complete rounded supporting hills in the same layer as each landmark, expand the surrounding landscape/headroom, retain recognizable landmark identity, render the source's natural grass/stone silhouette with the existing cutout policy, and position the solid lower canvas below the camera. Remove the experimental opacity feather and partial-alpha halo path; keep existing brightness/fog grading, reversible unique anchors, independent foreground river and gameplay geometry.
+- Full prompts: `docs/design/golden-river-main-route/hill-prompts.md`. Final edited composition remains subject to in-game review. Static Unity center/entry/exit/low-crossing captures document the proposed result, not final acceptance.

@@ -9,12 +9,12 @@ using UnityEngine.TestTools;
 public sealed class SceneryRendererTests
 {
     [Test]
-    public void LandmarkMaterialPreservesPartialAlphaAndSupportsDarkerPaint()
+    public void HillMaterialKeepsSolidGroundAndSupportsDarkerPaint()
     {
         if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
             Assert.Ignore("The landmark shader regression requires a graphics device.");
         var source = new Texture2D(1, 1, TextureFormat.RGBA32, false, true);
-        source.SetPixel(0, 0, new Color(1, 1, 1, 0.25f)); source.Apply();
+        source.SetPixel(0, 0, Color.white); source.Apply();
         var material = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
         var target = new RenderTexture(8, 8, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
         var pixels = new Texture2D(8, 8, TextureFormat.RGB24, false, true);
@@ -23,27 +23,45 @@ public sealed class SceneryRendererTests
             material.SetFloat("_Cutout", 1);
             material.SetFloat("_Fog", 0);
             material.SetFloat("_Saturation", 1);
-            material.SetFloat("_SoftAlpha", 1);
-            float soft = RenderLandmarkSample(source, material, target, pixels);
-            Assert.That(soft, Is.GreaterThan(0.05f), "Authored translucent mist must survive rendering.");
-            material.SetFloat("_LandmarkBlend", 1);
-            Assert.That(RenderLandmarkSample(source, material, target, pixels), Is.GreaterThan(0.05f));
-            Assert.That(pixels.GetPixel(4, 0).grayscale, Is.LessThan(0.01f),
-                "The painted base must dissolve into the scenery without a detached ground patch.");
-            Assert.That(pixels.GetPixel(0, 4).grayscale, Is.LessThan(soft * 0.5f),
-                "The source rectangle sides need an artwork-local transition.");
-            material.SetFloat("_LandmarkBlend", 0);
+            float solid = RenderLandmarkSample(source, material, target, pixels);
+            Assert.That(solid, Is.GreaterThan(0.95f));
+            Assert.That(pixels.GetPixel(4, 0).grayscale, Is.GreaterThan(0.95f),
+                "Solid hill ground must remain opaque down to the image bottom.");
             material.SetFloat("_Brightness", 0.5f);
-            float dark = RenderLandmarkSample(source, material, target, pixels);
-            Assert.That(dark, Is.LessThan(soft * 0.75f));
-            material.SetFloat("_SoftAlpha", 0);
+            Assert.That(RenderLandmarkSample(source, material, target, pixels), Is.LessThan(solid * 0.75f));
+            source.SetPixel(0, 0, new Color(1, 1, 1, 0.25f)); source.Apply();
             Assert.That(RenderLandmarkSample(source, material, target, pixels), Is.LessThan(0.01f),
-                "Existing cutout layers retain their original threshold.");
+                "Reject the generator's translucent glow beyond the painted silhouettes.");
         } finally {
             RenderTexture.active = previous;
             target.Release();
             UnityEngine.Object.DestroyImmediate(source); UnityEngine.Object.DestroyImmediate(material);
             UnityEngine.Object.DestroyImmediate(target); UnityEngine.Object.DestroyImmediate(pixels);
+        }
+    }
+
+    [Test]
+    public void LandmarkHillsHaveSolidGroundAndDescendBeforeTheirSideBorders()
+    {
+        foreach (string name in new[] { "waterwheel", "viaduct", "willow" }) {
+            var source = Resources.Load<Texture2D>("GoldenRiver/landmark-" + name + "-hill-v2");
+            Assert.That(source, Is.Not.Null, name);
+            Assert.That(Resources.Load<Texture2D>("GoldenRiver/landmark-" + name), Is.Null);
+            Assert.That(UnityEditor.AssetDatabase.LoadAssetAtPath<Texture2D>(
+                "Assets/Game/Art/GoldenRiverArchive/landmark-" + name + ".png"), Is.Not.Null);
+            var pixels = new Texture2D(2, 2);
+            try {
+                pixels.LoadImage(System.IO.File.ReadAllBytes(UnityEditor.AssetDatabase.GetAssetPath(source)));
+                var data = pixels.GetPixels32();
+                // Allow source-border antialiasing; these alpha values render above 99% opacity.
+                for (int x = 0; x < pixels.width; x++)
+                    Assert.That(data[x].a, Is.GreaterThanOrEqualTo(235), "Solid bottom: " + name + " x=" + x);
+                // At the placed 20-unit height, these sides are already beneath the visible river.
+                for (int y = (int)(pixels.height * 0.4f); y < pixels.height; y++) {
+                    Assert.That(data[y * pixels.width].a, Is.LessThan(128), "Left hillside: " + name);
+                    Assert.That(data[y * pixels.width + pixels.width - 1].a, Is.LessThan(128), "Right hillside: " + name);
+                }
+            } finally { UnityEngine.Object.DestroyImmediate(pixels); }
         }
     }
 
