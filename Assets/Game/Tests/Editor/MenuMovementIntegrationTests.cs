@@ -50,6 +50,41 @@ public class MenuMovementIntegrationTests
     }
 
     [UnityTest]
+    public IEnumerator LevelOneUsesDistinctShelvesAndNonRepeatingLandmarks()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        host = new GameObject("Route variety test");
+        var screen = host.AddComponent(RuntimeType("StarterScreen"));
+        yield return null;
+        Call(screen, "OpenLevelOne");
+        var course = (Component)Field(screen, "course");
+        var scenery = course.GetComponentInChildren(RuntimeType("SceneryRenderer"));
+        var roots = course.GetComponentsInChildren<MeshFilter>().Where(f => f.name == "Root island").ToArray();
+        var masonry = course.GetComponentsInChildren<MeshFilter>().Where(f => f.name == "Masonry shelf").ToArray();
+        Assert.That(roots.Length, Is.GreaterThan(0));
+        Assert.That(masonry.Length, Is.GreaterThan(0));
+        foreach (var pair in new[] { (roots[0], "shelf-root"), (masonry[0], "shelf-masonry") }) {
+            var block = new MaterialPropertyBlock();
+            pair.Item1.GetComponent<MeshRenderer>().GetPropertyBlock(block);
+            Assert.That(block.GetTexture("_MainTex"), Is.SameAs(Resources.Load<Texture2D>("GoldenRiver/" + pair.Item2)));
+        }
+        var landmarks = course.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Unique landmark ")).ToArray();
+        Assert.That(landmarks, Has.Length.EqualTo(3));
+        Assert.That(landmarks.Select(t => t.name).Distinct().Count(), Is.EqualTo(3));
+        Assert.That(landmarks.All(t => t.GetComponent<Collider2D>() == null), Is.True);
+        var apply = scenery.GetType().GetMethod("ApplyView");
+        apply.Invoke(scenery, new object[] { 84f, 1f });
+        var positions = landmarks.Select(t => t.localPosition).ToArray();
+        foreach (float x in new[] { 1000f, -200f, 342f, 84f }) apply.Invoke(scenery, new object[] { x, 1f });
+        Assert.That(landmarks.Select(t => t.localPosition).ToArray(), Is.EqualTo(positions),
+            "Landmarks must retain their unique anchors after travel, reversal and teleport.");
+        var platforms = course.GetComponentsInChildren<BoxCollider2D>().Where(c => c.name == "Standable platform").ToArray();
+        Assert.That(platforms.Max(c => c.transform.position.y) - platforms.Min(c => c.transform.position.y), Is.GreaterThan(1.5f));
+        Assert.That(platforms.Select(c => c.transform.localScale.x).Distinct().Count(), Is.GreaterThanOrEqualTo(8));
+    }
+
+    [UnityTest]
     public IEnumerator LevelOneCanBeTraversedThroughActualPhysicsWithoutRetries()
     {
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

@@ -9,6 +9,12 @@ public sealed class SceneryRenderer : MonoBehaviour
     public const float CameraFloor = 1f;
     public static bool IsFloating(int index) => index == 3 || index == 4 || index == 8 || index == 12;
     public CatController Cat { get; private set; }
+    // Optional course-owned styling; null retains the original Movement Lab selection.
+    public int[] FloatingPlatforms, RootPlatforms;
+    public bool RouteLandmarks;
+    readonly Transform[] landmarks = new Transform[3];
+    public static readonly float[] LandmarkAnchors = { 84, 216, 342 };
+    Material landmarkMaterial;
     Rigidbody2D catBody;
     readonly Transform[] layers = new Transform[3];
     readonly Material[] materials = new Material[3];
@@ -104,8 +110,9 @@ public sealed class SceneryRenderer : MonoBehaviour
         var platforms = coursePlatforms;
         for (int index = 0; index < platforms.Length; index++) {
             var p = platforms[index];
-            Terrain(p, IsFloating(index), index);
+            Terrain(p, FloatingPlatforms == null ? IsFloating(index) : System.Array.IndexOf(FloatingPlatforms, index) >= 0, index);
         }
+        if (RouteLandmarks) CreateLandmarks();
         cornerMaterial = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
         cornerMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-corners");
         cornerMaterial.SetFloat("_Cutout", 1); cornerMaterial.SetFloat("_Fog", 0);
@@ -134,11 +141,15 @@ public sealed class SceneryRenderer : MonoBehaviour
         bool bank = platform.z >= 6;
         float contact = platform.y + 0.75f;
         // Register the load-bearing grass, not the brighter leaves above its edge.
-        float contactUV = floating ? 0.66f : bank ? 0.587f : 0.748f;
-        float landingFraction = floating ? 0.90f : bank ? 0.89f : 0.76f;
+        bool distinctShelf = floating && FloatingPlatforms != null;
+        bool rootShelf = distinctShelf && System.Array.IndexOf(RootPlatforms, variant) >= 0;
+        string texturePath = distinctShelf ? "GoldenRiver/" + (rootShelf ? "shelf-root" : "shelf-masonry")
+            : floating ? "BackgroundStudy/painted-shelf-v3" : bank ? "BackgroundStudy/painted-bank-v2" : "BackgroundStudy/painted-pillar-v2";
+        float contactUV = distinctShelf ? (rootShelf ? 0.68f : 0.66f) : floating ? 0.66f : bank ? 0.587f : 0.748f;
+        float landingFraction = distinctShelf ? (rootShelf ? 0.90f : 0.96f) : floating ? 0.90f : bank ? 0.89f : 0.76f;
         float width = platform.z / landingFraction;
-        float bottom = floating ? contact - 0.90f : -4.5f;
-        float crown = contact + (floating ? 0.35f : 0.60f);
+        float bottom = distinctShelf ? contact - width / 3 * contactUV : floating ? contact - 0.90f : -4.5f;
+        float crown = distinctShelf ? contact + width / 3 * (1 - contactUV) : contact + (floating ? 0.35f : 0.60f);
         float half = width * 0.5f;
         var vertices = new[] {
             new Vector3(-half, bottom, 2), new Vector3(half, bottom, 2),
@@ -147,7 +158,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         };
         bool mirror = variant % 3 == 1;
         float left = mirror ? 1 : 0, right = 1 - left;
-        var mesh = new Mesh { name = floating ? "Painted floating rock" : "Painted grounded cliff" };
+        var mesh = new Mesh { name = distinctShelf ? (rootShelf ? "Root island" : "Masonry shelf") : floating ? "Painted floating rock" : "Painted grounded cliff" };
         mesh.vertices = vertices;
         mesh.uv = new[] { new Vector2(left, 0), new Vector2(right, 0),
             new Vector2(left, contactUV), new Vector2(right, contactUV),
@@ -159,11 +170,31 @@ public sealed class SceneryRenderer : MonoBehaviour
         visual.AddComponent<MeshFilter>().sharedMesh = mesh;
         var renderer = visual.AddComponent<MeshRenderer>(); renderer.sharedMaterial = terrainMaterial;
         var parameters = new MaterialPropertyBlock();
-        parameters.SetTexture("_MainTex", Resources.Load<Texture2D>(
-            floating ? "BackgroundStudy/painted-shelf-v3" : bank ? "BackgroundStudy/painted-bank-v2" : "BackgroundStudy/painted-pillar-v2"));
+        parameters.SetTexture("_MainTex", Resources.Load<Texture2D>(texturePath));
         renderer.SetPropertyBlock(parameters);
         if (!floating && (variant == 0 || variant == 2 || variant == 6 || variant == 10 || variant == 13))
             ShoreFoot(platform, variant == 0 || variant == 10 ? -1 : 1);
+    }
+
+    void CreateLandmarks()
+    {
+        landmarkMaterial = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
+        landmarkMaterial.SetFloat("_Cutout", 1);
+        landmarkMaterial.SetFloat("_Fog", 0.42f);
+        landmarkMaterial.SetFloat("_Saturation", 0.65f);
+        var names = new[] { "waterwheel", "viaduct", "willow" };
+        for (int i = 0; i < names.Length; i++) {
+            var item = Quad();
+            item.name = "Unique landmark " + names[i];
+            item.transform.SetParent(transform, false);
+            item.transform.localPosition = new Vector3(LandmarkAnchors[i], 0.5f, 8);
+            item.transform.localScale = new Vector3(17, 17f / 1.5f, 1);
+            item.GetComponent<MeshRenderer>().sharedMaterial = landmarkMaterial;
+            var properties = new MaterialPropertyBlock();
+            properties.SetTexture("_MainTex", Resources.Load<Texture2D>("GoldenRiver/landmark-" + names[i]));
+            item.GetComponent<MeshRenderer>().SetPropertyBlock(properties);
+            landmarks[i] = item.transform;
+        }
     }
 
     void ShoreFoot(Vector3 platform, int side)
@@ -206,6 +237,18 @@ public sealed class SceneryRenderer : MonoBehaviour
                 scale.x = ((tileIndex + j - 1) & 1) == 0 ? width : -width;
                 panel.localScale = scale;
             }
+        }
+        if (RouteLandmarks) {
+            float proximity = 0;
+            for (int i = 0; i < landmarks.Length; i++) {
+                var position = landmarks[i].localPosition;
+                // Each landmark has one fixed anchor, never participates in tile recycling.
+                position.x = LandmarkAnchors[i] + (localView.x - LandmarkAnchors[i]) * 0.65f;
+                landmarks[i].localPosition = position;
+                proximity = Mathf.Max(proximity, 1 - Mathf.Clamp01(Mathf.Abs(localView.x - LandmarkAnchors[i]) / 45));
+            }
+            // Recede the recurring valley architecture while a unique landmark is in view.
+            materials[1].SetFloat("_Fog", Mathf.Lerp(0.32f, 0.62f, proximity));
         }
         PositionForegroundWater(localView.x);
     }
@@ -258,7 +301,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         foreach (var material in materials) Release(material);
         foreach (var mesh in terrainMeshes) Release(mesh);
         Release(quadMesh);
-        Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial);
+        Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial); Release(landmarkMaterial);
     }
 
     static void Release(Object owned)

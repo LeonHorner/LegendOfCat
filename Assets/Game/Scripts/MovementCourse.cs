@@ -12,30 +12,63 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector3(73, -0.75f, 6), new Vector3(83, -0.75f, 8),
         new Vector3(92, 0.25f, 4), new Vector3(100, -0.75f, 8)
     };
-    // Introduction: generous level jumps, changing landing lengths and quiet banks.
-    // Later sections retain the previous layout, translated after checkpoint one.
+    // First show a gentle rise, then vary height/width in bounded climbing and descending groups.
+    // Broad banks separate suspended crossings; no new traversal ability is required.
     public static readonly Vector3[] LevelOnePlatforms = {
-        // Sheltered start and first isolated jumps; level contact throughout.
-        new Vector3(7, -0.75f, 24), new Vector3(30, -0.75f, 18),
-        new Vector3(49, -0.75f, 16), new Vector3(65, -0.75f, 12),
-        new Vector3(84, -0.75f, 22), new Vector3(104, -0.75f, 14),
-        new Vector3(118, -0.75f, 10), new Vector3(134, -0.75f, 18),
-        new Vector3(158, -0.75f, 26),
-        // Three-unit gaps after the initial two-unit gaps; broad recovery ground.
-        new Vector3(181, -0.75f, 14), new Vector3(197, -0.75f, 12),
-        new Vector3(216, -0.75f, 20), new Vector3(234, -0.75f, 10),
-        new Vector3(250, -0.75f, 16), new Vector3(272, -0.75f, 22),
-        // Alternate short practice landings with longer release-of-pressure banks.
-        new Vector3(291, -0.75f, 12), new Vector3(308, -0.75f, 16),
-        new Vector3(323, -0.75f, 10), new Vector3(342, -0.75f, 22),
-        new Vector3(362, -0.75f, 14), new Vector3(378, -0.75f, 12),
-        new Vector3(396, -0.75f, 20), new Vector3(417, -0.75f, 16),
-        // Existing practice and final combination, shifted by 392 units.
-        new Vector3(431, -0.75f, 8), new Vector3(441, -0.25f, 6),
-        new Vector3(450, 0.25f, 6), new Vector3(459, -0.25f, 6),
-        new Vector3(470, -0.75f, 12), new Vector3(481, -0.25f, 6),
-        new Vector3(490, 0.25f, 6), new Vector3(501, -0.75f, 12)
+        new Vector3(7f, -0.75f, 24f),
+        new Vector3(30f, -0.75f, 18f),
+        new Vector3(43.5f, -0.25f, 5f),
+        new Vector3(50f, 0.25f, 4f),
+        new Vector3(56f, 0.75f, 4f),
+        new Vector3(65.5f, 0f, 11f),
+        new Vector3(84f, -0.75f, 22f),
+        new Vector3(100f, -0.25f, 6f),
+        new Vector3(107.5f, 0.5f, 5f),
+        new Vector3(114.75f, 1f, 4.5f),
+        new Vector3(121.25f, 0.25f, 3.5f),
+        new Vector3(128.5f, -0.25f, 7f),
+        new Vector3(138.5f, -0.75f, 9f),
+        new Vector3(148.5f, -0.5f, 7f),
+        new Vector3(156f, 0.25f, 4f),
+        new Vector3(162f, 1f, 4f),
+        new Vector3(168.5f, 0.25f, 5f),
+        new Vector3(181f, -0.5f, 14f),
+        new Vector3(194f, -1f, 6f),
+        new Vector3(202f, -0.25f, 4f),
+        new Vector3(210.5f, 0.25f, 7f),
+        new Vector3(221.5f, -0.25f, 9f),
+        new Vector3(231.25f, 0.5f, 4.5f),
+        new Vector3(238f, 1f, 4f),
+        new Vector3(245.75f, 0.25f, 6.5f),
+        new Vector3(255f, -0.5f, 6f),
+        new Vector3(272f, -1f, 22f),
+        new Vector3(288f, -0.5f, 6f),
+        new Vector3(295f, 0.25f, 4f),
+        new Vector3(302.5f, 1f, 5f),
+        new Vector3(309f, 0.5f, 4f),
+        new Vector3(315.5f, -0.25f, 5f),
+        new Vector3(324f, -0.75f, 8f),
+        new Vector3(338f, -1f, 14f),
+        new Vector3(350f, -0.25f, 6f),
+        new Vector3(357f, 0.5f, 4f),
+        new Vector3(363f, 1f, 4f),
+        new Vector3(369f, 0.25f, 4f),
+        new Vector3(379f, -0.5f, 10f),
+        new Vector3(390f, 0f, 8f),
+        new Vector3(398f, 0.75f, 4f),
+        new Vector3(404f, 0f, 4f),
+        new Vector3(417f, -0.75f, 16f),
+        new Vector3(431f, -0.75f, 8f),
+        new Vector3(441f, -0.25f, 6f),
+        new Vector3(450f, 0.25f, 6f),
+        new Vector3(459f, -0.25f, 6f),
+        new Vector3(470f, -0.75f, 12f),
+        new Vector3(481f, -0.25f, 6f),
+        new Vector3(490f, 0.25f, 6f),
+        new Vector3(501f, -0.75f, 12f)
     };
+    public static readonly int[] LevelOneFloatingPlatforms = { 3, 4, 8, 9, 10, 14, 15, 16, 19, 20, 22, 23, 24, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
+    public static readonly int[] LevelOneRootPlatforms = { 3, 8, 10, 15, 19, 22, 24, 29, 31, 35, 37, 41 };
     // Reserved broad ground for the upper-route owner; no detour is required here.
     public static readonly Vector2 UpperRouteEntrance = new Vector2(431, 0.52f);
     public static readonly Vector2 UpperRouteRejoin = new Vector2(470, 0.52f);
@@ -140,7 +173,13 @@ public sealed class MovementCourse : MonoBehaviour
         Cat.ReturnedToStart += follow.Snap;
         var scenery = new GameObject("Golden River scenery");
         scenery.transform.SetParent(transform, false);
-        scenery.AddComponent<SceneryRenderer>().InitializeForCourse(courseCamera, Cat, ActivePlatforms);
+        var sceneryRenderer = scenery.AddComponent<SceneryRenderer>();
+        if (LevelOne) {
+            sceneryRenderer.FloatingPlatforms = LevelOneFloatingPlatforms;
+            sceneryRenderer.RootPlatforms = LevelOneRootPlatforms;
+            sceneryRenderer.RouteLandmarks = true;
+        }
+        sceneryRenderer.InitializeForCourse(courseCamera, Cat, ActivePlatforms);
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
@@ -150,9 +189,9 @@ public sealed class MovementCourse : MonoBehaviour
         if (LevelOne) {
             Label("RUN / STOP / TURN", new Vector2(4, 1.8f));
             Label("JUMP TO THE BROAD BANK", new Vector2(17, 2.2f));
-            Label("ROOM TO STOP", new Vector2(84, 1.8f));
-            Label("A LITTLE FARTHER", new Vector2(168, 1.8f));
-            Label("FIND YOUR RHYTHM", new Vector2(272, 1.8f));
+            Label("OLD WATERMILL", new Vector2(84, 1.8f));
+            Label("OVER THE RUINS", new Vector2(145, 2.4f));
+            Label("WILLOW BANK", new Vector2(337, 1.8f));
             Label("INTRODUCTION COMPLETE", new Vector2(420, 2.4f));
             Label("SHALLOW STEPS", new Vector2(431, 1.8f));
             Label("PUT IT TOGETHER", new Vector2(470, 2.2f));

@@ -24,10 +24,33 @@ public static class BuildScenery
         foreach (string name in ActiveLayers)
             if (!paths.Contains(ResourcesDirectory + name + ".png"))
                 throw new BuildFailedException("Missing selected scenery in player build: " + name);
+        foreach (string name in GoldenRiverArt)
+            if (!paths.Contains("Assets/Game/Resources/GoldenRiver/" + name + ".png"))
+                throw new BuildFailedException("Missing Golden River route art: " + name);
         foreach (string name in new[] { "background-material", "terrain-material", "water-material" })
             if (!paths.Contains(ResourcesDirectory + name + ".mat"))
                 throw new BuildFailedException("Missing scenery shader-reference material: " + name);
         Debug.Log("Packed scenery verified: nine active paintings and three shader-reference materials; historical art excluded.");
+    }
+
+    public static readonly string[] GoldenRiverArt = {
+        "shelf-root", "shelf-masonry", "landmark-waterwheel", "landmark-viaduct", "landmark-willow"
+    };
+
+    [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]
+    public static void ImportGoldenRiverArt()
+    {
+        foreach (string name in GoldenRiverArt) {
+            var importer = (TextureImporter)AssetImporter.GetAtPath("Assets/Game/Resources/GoldenRiver/" + name + ".png");
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.mipmapEnabled = false;
+            importer.isReadable = false;
+            importer.alphaIsTransparency = true;
+            importer.wrapMode = TextureWrapMode.Clamp;
+            importer.maxTextureSize = 2048;
+            importer.SaveAndReimport();
+        }
+        AssetDatabase.SaveAssets();
     }
 
     // Resources materials retain shader references in player builds; Shader.Find alone does not.

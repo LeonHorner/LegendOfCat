@@ -179,3 +179,66 @@ The updated Windows development preview build succeeded. Its local output is
 `--preview-view level-one` or choose Golden River preview in the menu. The earlier
 `Builds/GoldenRiverPreview` folder contains the superseded short revision.
 No release, installer or final Windows/Linux packaging gate was run.
+
+## Variety correction after the 61-second playtest - 2026-11-01
+
+The user reported 61 seconds for the expanded introduction but found it very
+boring, specifically requesting platforms at different heights, more different
+sizes, distinct floating-platform graphics and significant unique background
+locations. That rejection supersedes the flat introduction as the design target.
+
+The correction keeps the same checkpoint/exit anchors and approximate horizontal
+extent, but replaces the flat repetition with 51 platforms across the preview:
+29 grounded banks/steps and 22 suspended supports (12 rooted islands, ten masonry
+shelves). Contact heights range from -0.25 to 1.75; widths range from 3.5 to 24.
+A gentle first rise introduces height independently before short ascending and
+descending groups. Broad banks between groups provide braking/recovery space.
+Start and both checkpoint banks retain their safe unchanged contacts.
+
+Three new background paintings appear once each: a watermill near x=84, broken
+aqueduct near x=216 and ancient willow near x=342. Each has one absolute anchor
+with local parallax, separate from the recycled distant layers. Returning or
+retrying cannot create another copy. The recurring valley architecture recedes
+with a smooth atmospheric tint while a landmark is nearby. Background landmarks
+have no collision and never draw over the gameplay plane. The existing moving
+foreground river is preserved.
+
+This user-requested art addition is a bounded route-variety prototype in #71;
+it does not claim final completion of scenery issue #73. These new assets and
+their generation prompts are recorded in ASSETS.md and variety-prompts.md. No
+serialized scene/prefab or existing metadata is hand-edited; Unity generates new
+asset metadata on import. The new drawings still require in-game user review.
+
+### Variety verification and review images
+
+Unity 6000.3.27f2: **27/27 scoped tests passed**, zero failures/skips
+(MenuMovementIntegrationTests, RunLifecycleTests, CatCollisionTests,
+SceneryRendererTests). The complete actual-physics route remains reachable without
+retry; uninterrupted scripted travel remains 60.40 seconds to checkpoint 1 and
+72.20 seconds to the current exit. These measurements do not establish enjoyment,
+first-player learning time or the final 4-6-minute course goal.
+
+`GoldenRiverReview.Record` rendered four real runtime course locations at 960x540
+and 640x360, with grayscale checks at 640x360. Inspected suspended grass contacts,
+different shelf silhouettes, landmark presence behind the player/platforms and
+small-image separation. These are static authoring renders with numerical water
+time, not live player-input screenshots or motion capture; no new in-motion
+acceptance is claimed.
+
+- [First suspended steps](golden-river-main-route/variety-evidence/suspended-steps-960.png)
+- [Watermill](golden-river-main-route/variety-evidence/watermill-960.png)
+- [Aqueduct](golden-river-main-route/variety-evidence/aqueduct-960.png)
+- [Willow, small grayscale](golden-river-main-route/variety-evidence/willow-640-gray.png)
+
+The three landmark paintings are unique within this course, but the original
+far valley/sky still recycle. Repeated underlying castle silhouettes remain a
+known limitation for the later whole-level scenery pass. Final visual acceptance,
+player review of challenge/fun, full-route player-input capture, remaining-section
+pacing and PR #61 integration are pending. New art is covered by the existing
+packed-art validator; Windows/Linux final builds and packaging remain separate.
+
+The revised Windows development preview build succeeded, including the packed-art
+checks for all five new paintings. Local output:
+`Builds/GoldenRiverVarietyPreview/LegendOfCatPreview.exe --preview-view level-one`.
+Earlier preview folders contain superseded layouts. Linux/player-launcher packages,
+final exact-head merge validation and final user acceptance remain unrun/pending.

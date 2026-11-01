@@ -258,3 +258,20 @@ Water geometry omits empty source space without changing its authored mapping or
 animation. Measurements do not establish an FPS gain or explain the user's low
 Editor frame rate. See background-study/extended-prototype/README.md for evidence,
 regressions and limits. The earlier seven-platform integration record is historical.
+
+
+### Golden River introduction variety - 2026-11-01
+
+The user timed the expanded introduction at 61 seconds but rejected it as very
+boring. The requested correction is different platform heights, much more varied
+platform sizes, different drawings for floating supports and significant unique
+background locations. Duration alone did not meet the gameplay goal.
+
+The scoped route revision introduces gentle rising/descending groups and smaller
+suspended landings between broad banks. Original rooted-island and broken-masonry
+paintings distinguish suspended structures. A single watermill, aqueduct and
+willow create unique local landmarks with absolute, reversible parallax. This
+bounded prototype refinement is authorized in #71; final whole-level scenic polish
+and visual acceptance remain #73/#16. Keep the approved motor, 2D presentation,
+Mika baseline and independent foreground river; do not restore rejected scenery
+experiments or introduce new abilities. See the route notes and ASSETS.md.
