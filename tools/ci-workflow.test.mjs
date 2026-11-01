@@ -305,12 +305,9 @@ test('Linux AppImage validation remains manual and release dispatch is unchanged
   assert.equal(prWorkflow.jobs.gate.needs.includes('package'), true);
 });
 
-test('release dispatch has only allow_minor (default on) and allow_major (default off)', () => {
+test('release dispatch has only allow_major (default off)', () => {
   const inputs = releaseWorkflow.on.workflow_dispatch.inputs;
-  assert.deepEqual(Object.keys(inputs), ['allow_minor', 'allow_major']);
-  assert.equal(inputs.allow_minor.type, 'boolean');
-  assert.equal(inputs.allow_minor.default, true);
-  assert.equal(inputs.allow_minor.required, false);
+  assert.deepEqual(Object.keys(inputs), ['allow_major']);
   assert.equal(inputs.allow_major.type, 'boolean');
   assert.equal(inputs.allow_major.default, false);
   assert.equal(inputs.allow_major.required, false);
@@ -320,7 +317,6 @@ test('release dispatch has only allow_minor (default on) and allow_major (defaul
     releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit')
   ]) {
     assert.ok(step, 'Release authorization step missing');
-    assert.equal(step.env.ALLOW_MINOR, '${{ inputs.allow_minor }}');
     assert.equal(step.env.ALLOW_MAJOR, '${{ inputs.allow_major }}');
     assert.equal(step.env.EXPECTED_VERSION, undefined);
   }
@@ -342,7 +338,16 @@ test('release checkouts are pinned to workflow github.sha across all jobs', () =
   assert.equal(plan.run, 'npm run release:plan');
   assert.ok(publish.run.includes('npm run release'));
   for (const step of [plan, publish]) {
-    assert.equal(step.env.ALLOW_MINOR, '${{ inputs.allow_minor }}');
     assert.equal(step.env.ALLOW_MAJOR, '${{ inputs.allow_major }}');
   }
+});
+
+test('the planned version is passed to Unity, launcher, Velopack and asset staging', () => {
+  const build = releaseWorkflow.jobs.build.steps.find(step => step.uses?.startsWith('game-ci/unity-builder@'));
+  assert.equal(build.with.version, '${{ needs.plan.outputs.version }}');
+  assert.match(build.with.customParameters, /-releaseVersion \$\{\{ needs\.plan\.outputs\.version \}\}/);
+  const steps = releaseWorkflow.jobs.package.steps;
+  assert.match(steps.find(s => s.name === 'Publish launcher').run, /-p:Version=\$\{\{ needs\.plan\.outputs\.version \}\}/);
+  assert.match(steps.find(s => s.name === 'Package installer and update feed').run, /--packVersion \$\{\{ needs\.plan\.outputs\.version \}\}/);
+  assert.match(releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Stage clean player downloads and update packages').run, /\$\{\{ needs\.plan\.outputs\.version \}\}/);
 });
