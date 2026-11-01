@@ -14,9 +14,3 @@ export function downloadNotes(tag) {
     '> Early development build. The complete adventure is not available yet.'
   ].join('\n');
 }
-
-// semantic-release concatenates output from generateNotes plugins in order;
-// this plugin runs before the conventional commit changelog.
-export function generateNotes(_config, context) {
-  return downloadNotes(context.nextRelease.gitTag);
-}

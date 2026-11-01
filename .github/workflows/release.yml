@@ -1,6 +1,17 @@
 name: Release
 on:
   workflow_dispatch:
+    inputs:
+      allow_minor:
+        description: Allow automatically calculated minor feature releases
+        required: false
+        default: true
+        type: boolean
+      allow_major:
+        description: Authorize an intentional major release
+        required: false
+        default: false
+        type: boolean
 permissions:
   contents: read
 concurrency:
@@ -17,16 +28,21 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Test version analysis and recovery before Unity builds
+        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-snapshot.test.mjs tools/release-recovery.test.mjs tools/release-assets.test.mjs tools/delta-release.test.mjs
       - id: plan
         run: npm run release:plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALLOW_MINOR: ${{ inputs.allow_minor }}
+          ALLOW_MAJOR: ${{ inputs.allow_major }}
       - name: Check Unity account credentials
         if: steps.plan.outputs.version != ''
         env:
@@ -43,6 +59,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/cache@v6
         with:
           path: Library
@@ -81,6 +99,8 @@ jobs:
             player: LegendOfCat
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/cache@v6
         with:
           path: Library
@@ -123,6 +143,8 @@ jobs:
         shell: pwsh
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 8.0.x
@@ -191,6 +213,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
@@ -202,20 +225,16 @@ jobs:
           pattern: release-*
           merge-multiple: true
           path: artifacts/releases
+      - name: Test version analysis and approval
+        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-snapshot.test.mjs tools/release-recovery.test.mjs
       - name: Test release asset and download-link contract
         run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
       - name: Stage clean player downloads and update packages
         run: node tools/release-assets.mjs artifacts/releases artifacts/published ${{ needs.plan.outputs.version }}
-      - name: Confirm release version has not changed
-        id: final-plan
-        run: npm run release:plan
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish verified commit
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ALLOW_MINOR: ${{ inputs.allow_minor }}
+          ALLOW_MAJOR: ${{ inputs.allow_major }}
           EXPECTED: ${{ needs.plan.outputs.version }}
-          ACTUAL: ${{ steps.final-plan.outputs.version }}
-        run: |
-          test "$EXPECTED" = "$ACTUAL"
-          npm run release
+        run: npm run release
