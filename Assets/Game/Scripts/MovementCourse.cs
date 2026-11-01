@@ -12,22 +12,34 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector3(73, -0.75f, 6), new Vector3(83, -0.75f, 8),
         new Vector3(92, 0.25f, 4), new Vector3(100, -0.75f, 8)
     };
-    // Contact heights are platform center + 0.75; widths include clear braking ground.
-    // Introduction: flat run/stop/turn, then two broad, level landings.
-    // Practice: shallow rises/descents, each followed by room to stop.
-    // Final: combine those demands without introducing a new movement rule.
+    // Introduction: generous level jumps, changing landing lengths and quiet banks.
+    // Later sections retain the previous layout, translated after checkpoint one.
     public static readonly Vector3[] LevelOnePlatforms = {
-        new Vector3(2, -0.75f, 14), new Vector3(16, -0.75f, 10),
-        new Vector3(28, -0.75f, 10), new Vector3(39, -0.75f, 8),
-        new Vector3(49, -0.25f, 6), new Vector3(58, 0.25f, 6),
-        new Vector3(67, -0.25f, 6), new Vector3(78, -0.75f, 12),
-        new Vector3(89, -0.25f, 6), new Vector3(98, 0.25f, 6),
-        new Vector3(109, -0.75f, 12)
+        // Sheltered start and first isolated jumps; level contact throughout.
+        new Vector3(7, -0.75f, 24), new Vector3(30, -0.75f, 18),
+        new Vector3(49, -0.75f, 16), new Vector3(65, -0.75f, 12),
+        new Vector3(84, -0.75f, 22), new Vector3(104, -0.75f, 14),
+        new Vector3(118, -0.75f, 10), new Vector3(134, -0.75f, 18),
+        new Vector3(158, -0.75f, 26),
+        // Three-unit gaps after the initial two-unit gaps; broad recovery ground.
+        new Vector3(181, -0.75f, 14), new Vector3(197, -0.75f, 12),
+        new Vector3(216, -0.75f, 20), new Vector3(234, -0.75f, 10),
+        new Vector3(250, -0.75f, 16), new Vector3(272, -0.75f, 22),
+        // Alternate short practice landings with longer release-of-pressure banks.
+        new Vector3(291, -0.75f, 12), new Vector3(308, -0.75f, 16),
+        new Vector3(323, -0.75f, 10), new Vector3(342, -0.75f, 22),
+        new Vector3(362, -0.75f, 14), new Vector3(378, -0.75f, 12),
+        new Vector3(396, -0.75f, 20), new Vector3(417, -0.75f, 16),
+        // Existing practice and final combination, shifted by 392 units.
+        new Vector3(431, -0.75f, 8), new Vector3(441, -0.25f, 6),
+        new Vector3(450, 0.25f, 6), new Vector3(459, -0.25f, 6),
+        new Vector3(470, -0.75f, 12), new Vector3(481, -0.25f, 6),
+        new Vector3(490, 0.25f, 6), new Vector3(501, -0.75f, 12)
     };
     // Reserved broad ground for the upper-route owner; no detour is required here.
-    public static readonly Vector2 UpperRouteEntrance = new Vector2(39, 0.52f);
-    public static readonly Vector2 UpperRouteRejoin = new Vector2(78, 0.52f);
-    public static readonly Vector2 LevelOneExit = new Vector2(111, 0.52f);
+    public static readonly Vector2 UpperRouteEntrance = new Vector2(431, 0.52f);
+    public static readonly Vector2 UpperRouteRejoin = new Vector2(470, 0.52f);
+    public static readonly Vector2 LevelOneExit = new Vector2(503, 0.52f);
     Vector3[] ActivePlatforms => LevelOne ? LevelOnePlatforms : Platforms;
     public CatController Cat { get; private set; }
     public RunLifecycle Run { get; private set; }
@@ -36,12 +48,14 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector2(65, 1.52f), new Vector2(83, 0.52f)
     };
     public static readonly Vector2[] LevelOneCheckpointSpawns = {
-        new Vector2(28, 0.52f), new Vector2(78, 0.52f)
+        new Vector2(420, 0.52f), new Vector2(470, 0.52f)
     };
     // Configure before enabling the object. The movement lab retains its original course.
     public bool LevelOne;
     public event System.Action ExitReached;
     public bool HasReachedExit { get; private set; }
+    // Session time includes retries, excludes pauses; frozen on the first checkpoint.
+    public float IntroductionSeconds { get; private set; } = -1;
     Vector2[] ActiveCheckpoints => LevelOne ? LevelOneCheckpointSpawns : CheckpointSpawns;
     public System.Action BackToMenu;
     Sprite square;
@@ -134,13 +148,17 @@ public sealed class MovementCourse : MonoBehaviour
             Label("CHECKPOINT " + (i + 1), new Vector2(point.x, point.y + 1.2f));
         }
         if (LevelOne) {
-            Label("RUN / STOP / TURN", new Vector2(2, 1.8f));
-            Label("JUMP TO THE BROAD BANK", new Vector2(7, 2.7f));
-            Label("SHALLOW STEPS", new Vector2(39, 1.8f));
-            Label("PUT IT TOGETHER", new Vector2(78, 2.2f));
+            Label("RUN / STOP / TURN", new Vector2(4, 1.8f));
+            Label("JUMP TO THE BROAD BANK", new Vector2(17, 2.2f));
+            Label("ROOM TO STOP", new Vector2(84, 1.8f));
+            Label("A LITTLE FARTHER", new Vector2(168, 1.8f));
+            Label("FIND YOUR RHYTHM", new Vector2(272, 1.8f));
+            Label("INTRODUCTION COMPLETE", new Vector2(420, 2.4f));
+            Label("SHALLOW STEPS", new Vector2(431, 1.8f));
+            Label("PUT IT TOGETHER", new Vector2(470, 2.2f));
             Label("GOLDEN RIVER EXIT", LevelOneExit + Vector2.up * 1.5f);
             // Two posts frame a visibly distinct exit without blocking movement.
-            foreach (float x in new[] { 110f, 113f })
+            foreach (float x in new[] { LevelOneExit.x - 1, LevelOneExit.x + 2 })
                 Block("Exit post", new Vector2(x, 0.9f), new Vector2(0.2f, 1.8f), new Color(0.95f, 0.75f, 0.36f));
         } else Label("FINISH / return or retry", new Vector2(100, 1));
     }
@@ -175,7 +193,8 @@ public sealed class MovementCourse : MonoBehaviour
         hudRefresh -= Time.unscaledDeltaTime;
         if (hudRefresh <= 0) {
             hudStatus = (Run.Paused ? "Paused | " : "") + "Checkpoint " + Run.Checkpoint + "/" + ActiveCheckpoints.Length
-                + " | R: retry | P: pause";
+                + (LevelOne ? " | Intro " + (IntroductionSeconds < 0 ? Run.ElapsedSeconds : IntroductionSeconds).ToString("F1")
+                    + "s" : " | R: retry | P: pause");
             hudRefresh = 0.25f;
         }
         Run.Advance(Time.deltaTime);
@@ -185,10 +204,11 @@ public sealed class MovementCourse : MonoBehaviour
             Vector2 point = ActiveCheckpoints[i];
             // Marker/spawn follow the course transform when reused in another scene.
             // Only grounded main-route positions may activate a checkpoint.
-            if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f)
-                Run.TryActivateCheckpoint(i + 1, point, true);
+            if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f &&
+                Run.TryActivateCheckpoint(i + 1, point, true) && LevelOne && i == 0)
+                IntroductionSeconds = Run.ElapsedSeconds;
         }
-        if (LevelOne && !HasReachedExit && position.x >= 110 && position.x <= 114 &&
+        if (LevelOne && !HasReachedExit && position.x >= LevelOneExit.x - 1 && position.x <= LevelOneExit.x + 3 &&
             Mathf.Abs(position.y - LevelOneExit.y) <= 0.2f) {
             HasReachedExit = true;
             ExitReached?.Invoke();
@@ -196,7 +216,7 @@ public sealed class MovementCourse : MonoBehaviour
     }
 
     public void RetryCheckpoint() { HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Retry())); }
-    public void RestartRun() { HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Restart())); }
+    public void RestartRun() { IntroductionSeconds = -1; HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Restart())); }
     public void TogglePause() => Cat.SetPaused(Run.TogglePause());
 
     void LateUpdate()

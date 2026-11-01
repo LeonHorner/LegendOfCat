@@ -70,7 +70,8 @@ public class MenuMovementIntegrationTests
         try {
             Physics2D.SyncTransforms();
             int next = 0;
-            for (int tick = 0; tick < 3000; tick++) {
+            float introductionTravel = -1, traversal = 0;
+            for (int tick = 0; tick < 6000; tick++) {
                 bool grounded = (bool)cat.GetType().GetProperty("Grounded").GetValue(cat);
                 while (next < platforms.Length - 1 && body.position.x > platforms[next].x + platforms[next].z / 2)
                     next++;
@@ -81,25 +82,39 @@ public class MenuMovementIntegrationTests
                 Call(cat, "FixedUpdate");
                 Physics2D.Simulate(Time.fixedDeltaTime);
                 Call(course, "Update");
+                traversal = (tick + 1) * Time.fixedDeltaTime;
+                if (introductionTravel < 0 && (int)run.GetType().GetProperty("Checkpoint").GetValue(run) >= 1)
+                    introductionTravel = traversal;
                 Assert.That((int)run.GetType().GetProperty("Retries").GetValue(run), Is.Zero,
                     "Failed on platform " + next + " at " + body.position);
                 if ((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course)) break;
             }
             Assert.That((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course), Is.True);
             Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.EqualTo(2));
+            Assert.That(introductionTravel, Is.InRange(60f, 65f),
+                "Uninterrupted basic traversal should establish the introduction pacing baseline.");
+            Debug.Log("Scripted physics only: introduction " + introductionTravel.ToString("F2")
+                + "s; whole preview " + traversal.ToString("F2") + "s. Not a player playtest.");
             var camera = course.GetComponentInChildren(RuntimeType("CatCamera"));
+            // Script simulation does not update the interpolated render transform.
+            cat.transform.position = body.position;
+            camera.GetType().GetMethod("Snap").Invoke(camera, null);
             Call(camera, "LateUpdate");
-            Assert.That(camera.transform.position.x, Is.InRange(4.7f, 106.3f));
+            Assert.That(camera.transform.position.x, Is.EqualTo(508f - 5.5f * 16 / 9).Within(0.01f));
             course.GetType().GetMethod("TogglePause").Invoke(course, null);
             var stopped = body.position;
             Call(cat, "FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime);
             Assert.That(body.position, Is.EqualTo(stopped));
             course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
-            Assert.That(body.position.x, Is.EqualTo(78).Within(0.001f));
+            Assert.That(body.position.x, Is.EqualTo(470).Within(0.001f));
+            Assert.That((float)course.GetType().GetProperty("IntroductionSeconds").GetValue(course), Is.GreaterThanOrEqualTo(0));
             Assert.That(body.simulated, Is.True);
             Assert.That((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course), Is.False);
             course.GetType().GetMethod("RestartRun").Invoke(course, null);
             Assert.That(body.position.x, Is.EqualTo(-3).Within(0.001f));
+            Call(camera, "LateUpdate");
+            Assert.That(camera.transform.position.x, Is.EqualTo(-5f + 5.5f * 16 / 9).Within(0.01f));
+            Assert.That((float)course.GetType().GetProperty("IntroductionSeconds").GetValue(course), Is.EqualTo(-1));
             Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.Zero);
         } finally {
             Physics2D.simulationMode = oldMode;
@@ -135,12 +150,18 @@ public class MenuMovementIntegrationTests
         var oldMode = Physics2D.simulationMode;
         Physics2D.simulationMode = SimulationMode2D.Script;
         try {
-            foreach (var point in new[] { new Vector2(28, 0.52f), new Vector2(78, 0.52f) }) {
+            float introductionTime = -1;
+            foreach (var point in new[] { new Vector2(420, 0.52f), new Vector2(470, 0.52f) }) {
+                run.GetType().GetMethod("Advance").Invoke(run, new object[] { 3f });
                 cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { point });
                 SettleCourse(cat, course);
+                float recorded = (float)course.GetType().GetProperty("IntroductionSeconds").GetValue(course);
+                if (introductionTime < 0) introductionTime = recorded;
+                Assert.That(recorded, Is.EqualTo(introductionTime), "Later checkpoints must not overwrite the intro time.");
             }
+            Assert.That(introductionTime, Is.GreaterThanOrEqualTo(3));
             Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.EqualTo(2));
-            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(111, 0.52f) });
+            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(503, 0.52f) });
             course.GetType().GetMethod("TogglePause").Invoke(course, null);
             SettleCourse(cat, course);
             Assert.That(exitSignals, Is.Zero, "Paused contact must not complete the route.");
@@ -149,8 +170,8 @@ public class MenuMovementIntegrationTests
             SettleCourse(cat, course);
             Assert.That(exitSignals, Is.EqualTo(1));
             course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
-            Assert.That(body.position.x, Is.EqualTo(78).Within(0.001f));
-            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(111, 0.52f) });
+            Assert.That(body.position.x, Is.EqualTo(470).Within(0.001f));
+            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(503, 0.52f) });
             SettleCourse(cat, course);
             Assert.That(exitSignals, Is.EqualTo(2), "Retry rearms the transient exit hook.");
             course.GetType().GetMethod("RestartRun").Invoke(course, null);

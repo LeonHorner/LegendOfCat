@@ -29,7 +29,7 @@ existing distance alone cannot substantiate the 4â€“6-minute first-success 
 - Issues #72 and #73 own the optional traversal and scenery pass respectively.
   Reserve stable interfaces before either integrates shared scene or asset work.
 
-## Playable route revision
+## Initial playable route revision (superseded by the expanded introduction below)
 
 The menu's **Golden River preview** creates a separate course. Movement Lab keeps
 its fourteen platforms, four checkpoints and existing menu lifecycle. Level 1
@@ -54,7 +54,7 @@ hand-edited. Existing original/generated artwork is reused without new assets.
 ### Exit contract for #74
 
 Subscribe to `MovementCourse.ExitReached` on the active course instance after
-entry. It fires once when unpaused Mika is grounded within x=110..114 at the
+entry. It fires once when unpaused Mika is grounded within one unit before to three units after `LevelOneExit.x` at the
 final bank's contact height. `HasReachedExit` is set before callbacks run. Retry
 and full restart clear it; another valid traversal can signal again. Closing the
 course destroys that session; consumers must detach handlers when their own
@@ -69,7 +69,7 @@ retry, both checkpoint activations, exit reachability, bounded camera position,
 pause, retry and full restart. It is a deterministic reachability test, **not**
 a first-player timing measurement or gameplay capture.
 
-This remains a short layout awaiting pacing review. At seven units per second,
+The initial revision was a short layout awaiting pacing review. At seven units per second,
 the 114-unit start-to-exit distance is far below four minutes without substantial
 learning pauses. Do not label this the completed 4–6-minute course or claim the
 1–2-minute checkpoint replay target. Do not slow the motor or add forced waits
@@ -127,3 +127,55 @@ initial route reachability and clarity for this tester, not the intended duratio
 learning curve or checkpoint spacing. The route needs substantial additional,
 varied authored traversal before #71 can be considered complete. Preserve motor
 responsiveness; do not manufacture duration with forced waits or slower movement.
+
+## Expanded introduction - 2026-11-01
+
+After the 20-second, no-fall playtest the user approved expanding and testing the
+first section before sizing the remaining sections. This revision replaces the
+initial three-bank introduction with 23 level banks ending at checkpoint 1 at
+(420, 0.52). Its design target is 60-90 seconds including learning pauses, not
+an asserted first-player result. The start-to-checkpoint distance is 423 units;
+at unchanged maximum speed it requires roughly 60 seconds of forward travel.
+
+| Beat | Contact spans | Intent |
+| --- | --- | --- |
+| Sheltered start | -5..19 | Run, brake and reverse without an immediate nearby gap. |
+| First jumps | 21..171 | Two-unit gaps with broad landings; alternate short jump practice and longer banks with room to stop. |
+| Wider crossings | 174..283 | Three-unit gaps at the same height, with ten-unit or wider landings; no simultaneous elevation demand. |
+| Changing rhythm | 285..406 | Alternate two/three-unit gaps and shorter/longer banks, testing the same jump at different intervals. |
+| Safe recovery | 409..425 | Sixteen-unit bank; checkpoint center five units before its right edge. |
+
+The later practice/final geometry is translated by +392 units, without changing
+its widths, heights or gaps. Checkpoint 2 is now (470, 0.52), the optional entrance
+is (431, 0.52), rejoin is (470, 0.52), and exit reference is (503, 0.52). There are
+still exactly two checkpoints beyond start and 31 main-route platforms. These
+later sections remain short placeholders for subsequent pacing iterations.
+
+The compact HUD shows **Intro** session seconds and freezes that reading on first
+activation of checkpoint 1. It includes time spent before retries, excludes pause,
+and resets on full restart. It is session feedback, not a saved record or a clean
+attempt timer. For this review, play from full restart to **INTRODUCTION COMPLETE**,
+report the displayed time, falls, and whether any stretch feels repetitive, empty
+or awkward. The rest of the route remains traversable after that marker.
+
+This is a collision/pacing iteration using existing scenery. The longer route
+exposes repeated/mirrored banks and scenery; unique landmarks and final scenery
+remain #73's scope. Duration alone does not establish an enjoyable introduction;
+shorten or rearrange dull stretches after the next player review. Motor, jump,
+Mika artwork, water shader, Movement Lab and serialized assets are unchanged.
+
+### Expanded-introduction verification
+
+Unity 6000.3.27f2: **15/15 scoped tests passed**, no failures/skips, after the
+layout/timer update. Scripted whole-route physics traversal took **60.40 seconds
+to checkpoint 1** and **72.20 seconds to the current exit**, with no retries.
+These are simulated uninterrupted traversal times, not human first-success times.
+Regression checks also cover the frozen introduction reading, full-restart reset,
+both exact camera limits, both checkpoint activations, pause and exit rearming.
+The user playtest of this longer revision is pending.
+
+The updated Windows development preview build succeeded. Its local output is
+`Builds/GoldenRiverIntroPreview/LegendOfCatPreview.exe`; launch with
+`--preview-view level-one` or choose Golden River preview in the menu. The earlier
+`Builds/GoldenRiverPreview` folder contains the superseded short revision.
+No release, installer or final Windows/Linux packaging gate was run.
