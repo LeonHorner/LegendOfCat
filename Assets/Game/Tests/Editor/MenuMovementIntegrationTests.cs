@@ -48,6 +48,43 @@ public class MenuMovementIntegrationTests
     }
 
     [UnityTest]
+    public IEnumerator LevelOneUsesSeparateCheckpointsAndSignalsItsExitOnce()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        host = new GameObject("Level one menu test");
+        var screen = host.AddComponent(RuntimeType("StarterScreen"));
+        yield return null;
+        Call(screen, "OpenLevelOne");
+        var course = (Component)Field(screen, "course");
+        var cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
+        var body = cat.GetComponent<Rigidbody2D>();
+        var run = course.GetType().GetProperty("Run").GetValue(course);
+        int exits = 0;
+        course.GetType().GetEvent("ExitReached").AddEventHandler(course, (Action)(() => exits++));
+        foreach (var point in new[] { new Vector2(34, 1.52f), new Vector2(83, 0.52f) }) {
+            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { point });
+            Physics2D.SyncTransforms();
+            for (int i = 0; i < 15; i++) yield return new WaitForFixedUpdate();
+            yield return null;
+        }
+        Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.EqualTo(2));
+        cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(100, 0.52f) });
+        Physics2D.SyncTransforms();
+        for (int i = 0; i < 15; i++) yield return new WaitForFixedUpdate();
+        yield return null;
+        yield return null;
+        Assert.That(exits, Is.EqualTo(1));
+        course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
+        Assert.That(body.position.x, Is.EqualTo(83).Within(0.001f));
+        course.GetType().GetMethod("RestartRun").Invoke(course, null);
+        Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.Zero);
+        Call(screen, "CloseCourse");
+        UnityEngine.Object.Destroy(host);
+        yield return new ExitPlayMode();
+    }
+
+    [UnityTest]
     public IEnumerator MenuRoundTripPreservesUpdatesAndDisablesTheOldCourse()
     {
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

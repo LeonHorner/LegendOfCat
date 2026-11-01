@@ -18,6 +18,14 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector2(9, 0.52f), new Vector2(34, 1.52f),
         new Vector2(65, 1.52f), new Vector2(83, 0.52f)
     };
+    public static readonly Vector2[] LevelOneCheckpointSpawns = {
+        new Vector2(34, 1.52f), new Vector2(83, 0.52f)
+    };
+    // Configure before enabling the object. The movement lab retains its original course.
+    public bool LevelOne;
+    public event System.Action ExitReached;
+    public bool HasReachedExit { get; private set; }
+    Vector2[] ActiveCheckpoints => LevelOne ? LevelOneCheckpointSpawns : CheckpointSpawns;
     public System.Action BackToMenu;
     Sprite square;
     Texture2D texture;
@@ -102,13 +110,13 @@ public sealed class MovementCourse : MonoBehaviour
         var scenery = new GameObject("Golden River scenery");
         scenery.transform.SetParent(transform, false);
         scenery.AddComponent<SceneryRenderer>().InitializeForCourse(courseCamera, Cat, Platforms);
-        for (int i = 0; i < CheckpointSpawns.Length; i++) {
-            var point = CheckpointSpawns[i];
+        for (int i = 0; i < ActiveCheckpoints.Length; i++) {
+            var point = ActiveCheckpoints[i];
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
                 new Vector2(0.14f, 0.9f), new Color(0.95f, 0.75f, 0.36f));
             Label("CHECKPOINT " + (i + 1), new Vector2(point.x, point.y + 1.2f));
         }
-        Label("FINISH / return or retry", new Vector2(100, 1));
+        Label(LevelOne ? "EXIT" : "FINISH / return or retry", new Vector2(100, 1));
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
     {
@@ -140,24 +148,29 @@ public sealed class MovementCourse : MonoBehaviour
         frameSeconds = Mathf.Lerp(frameSeconds, Time.unscaledDeltaTime, 0.08f);
         hudRefresh -= Time.unscaledDeltaTime;
         if (hudRefresh <= 0) {
-            hudStatus = (Run.Paused ? "Paused | " : "") + "Checkpoint " + Run.Checkpoint + "/" + CheckpointSpawns.Length
+            hudStatus = (Run.Paused ? "Paused | " : "") + "Checkpoint " + Run.Checkpoint + "/" + ActiveCheckpoints.Length
                 + " | R: retry | P: pause";
             hudRefresh = 0.25f;
         }
         Run.Advance(Time.deltaTime);
         if (Run.Paused || !Cat.Grounded) return;
         Vector2 position = transform.InverseTransformPoint(Cat.GetComponent<Rigidbody2D>().position);
-        for (int i = 0; i < CheckpointSpawns.Length; i++) {
-            Vector2 point = CheckpointSpawns[i];
+        for (int i = 0; i < ActiveCheckpoints.Length; i++) {
+            Vector2 point = ActiveCheckpoints[i];
             // Marker/spawn follow the course transform when reused in another scene.
             // Only grounded main-route positions may activate a checkpoint.
             if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f)
                 Run.TryActivateCheckpoint(i + 1, point, true);
         }
+        if (LevelOne && !HasReachedExit && Mathf.Abs(position.x - 100) <= 0.7f &&
+            Mathf.Abs(position.y - 0.52f) <= 0.2f) {
+            HasReachedExit = true;
+            ExitReached?.Invoke();
+        }
     }
 
-    public void RetryCheckpoint() => Cat.RespawnAt(transform.TransformPoint(Run.Retry()));
-    public void RestartRun() => Cat.RespawnAt(transform.TransformPoint(Run.Restart()));
+    public void RetryCheckpoint() { HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Retry())); }
+    public void RestartRun() { HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Restart())); }
     public void TogglePause() => Cat.SetPaused(Run.TogglePause());
 
     void LateUpdate()
@@ -194,7 +207,7 @@ public sealed class MovementCourse : MonoBehaviour
         GUI.Box(area, GUIContent.none);
         GUI.color = oldColor;
         GUILayout.BeginArea(new Rect(area.x + 6, area.y + 3, area.width - 12, area.height - 6));
-        GUILayout.Label(hudStatus ?? "Checkpoint 0/4 | R: retry | P: pause", hudStyle);
+        GUILayout.Label(hudStatus ?? ("Checkpoint 0/" + ActiveCheckpoints.Length + " | R: retry | P: pause"), hudStyle);
         GUILayout.BeginHorizontal();
         GUILayout.Label("A/D: move | Space: jump | Esc: menu", hudStyle);
         if (GUILayout.Button(showHelp ? "Less" : "Controls", GUILayout.Width(62), GUILayout.Height(19))) {

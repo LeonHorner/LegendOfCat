@@ -130,6 +130,7 @@ public sealed partial class StarterScreen
             Label("The adventure is taking shape.", headingStyle);
             Label("Explore the current build and make yourself at home. Mika's campaign is still in development.");
             GUILayout.Space(18);
+            if (Button("Golden River preview")) OpenLevelOne();
             if (Button("Movement lab")) page = "play";
             if (Button("Simple combat lab")) OpenStompArena();
             if (Button(string.IsNullOrEmpty(available) ? "Settings" : "Settings - Update available")) page = "settings";

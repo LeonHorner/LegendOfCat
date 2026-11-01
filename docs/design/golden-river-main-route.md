@@ -5,7 +5,7 @@ needed to turn it into Level 1; they are not evidence of a finished route.
 
 ## Existing prototype
 
-The menu opens `MovementCourse`, a 109-unit painted movement lab with fourteen
+The menu also opens `MovementCourse` as a 109-unit painted movement lab with fourteen
 platforms and four checkpoints. Its final sign does not provide a completion
 event. The lab's existing geometry, checkpoints and menu round trip are covered
 by integration tests and must remain usable when a separate Level 1 is added.
@@ -31,10 +31,12 @@ existing distance alone cannot substantiate the 4–6-minute first-success targe
 
 ## Remaining implementation and evidence
 
-Design and implement the separate menu entry and main route using existing
-movement, lifecycle and scenery. Place recovery points on safe ground at teaching
-boundaries, then verify retries and full restarts against actual collision geometry.
-Add a reachable exit and its completion contract. Exercise the course, camera,
+The Golden River preview has a separate menu entry and reuses the existing course
+with two checkpoints and a grounded, one-shot exit event. This is an initial
+integration baseline, not a completed route: its geometry is still the movement
+lab's and the checkpoint positions have not been tuned through playtesting.
+Develop the teaching progression and verify recovery points, retries, restarts
+and the exit against actual collision geometry. Exercise the course, camera,
 pause, retry, restart and menu lifecycle in Unity behavior tests.
 
 Record real first-success traversal times, failures by section and replay costs,

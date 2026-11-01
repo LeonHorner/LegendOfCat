@@ -91,6 +91,17 @@ public sealed partial class StarterScreen : MonoBehaviour
         course.BackToMenu = CloseCourse;
     }
 
+    void OpenLevelOne()
+    {
+        if (course != null || stompArena != null || popup || applying) return;
+        var root = new GameObject("Golden River main route");
+        root.SetActive(false);
+        course = root.AddComponent<MovementCourse>();
+        course.LevelOne = true;
+        course.BackToMenu = CloseCourse;
+        root.SetActive(true);
+    }
+
     void OpenStompArena()
     {
         if (course != null || stompArena != null || popup || applying) return;
