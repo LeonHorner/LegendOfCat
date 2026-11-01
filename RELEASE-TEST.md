@@ -25,7 +25,7 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 1. After explicit authorization, manually start `Release` on `main`.
    The `allow_minor` switch defaults on and `allow_major` defaults off. Patch releases are
    automatic; an unapproved minor or major stops before Unity builds. The version is
-   calculated from Conventional Commits. Review an unexpected major before
+   calculated from Conventional Commits reachable from the dispatched commit. Later merges are excluded; verify the tag points to the dispatched commit. Existing tags or releases stop publication; inspect any interruption before recovery. Review an unexpected major before
    allowing it. Record the version as N. If the run fails, follow the manual
    recovery guidance in `docs/releasing.md` before retrying.
    Check that the release shows the three player downloads plus the two `releases.*.json`

@@ -11,7 +11,7 @@ function pluginOptions(name) {
   return plugin[1];
 }
 const analyzerOptions = pluginOptions('@semantic-release/commit-analyzer');
-const notesOptions = pluginOptions('@semantic-release/release-notes-generator');
+const notesOptions = pluginOptions('./tools/release-changelog.mjs');
 const logger = { log() {}, error() {} };
 const repositoryUrl = 'https://github.com/LeonHorner/LegendOfCat';
 

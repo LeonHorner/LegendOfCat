@@ -341,6 +341,7 @@ test('release checkouts are pinned to workflow github.sha across all jobs', () =
   const publish = releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit');
   assert.equal(plan.run, 'npm run release:plan');
   assert.ok(publish.run.includes('npm run release'));
+  assert.equal(publish.env.EXPECTED, '${{ needs.plan.outputs.version }}');
   for (const step of [plan, publish]) {
     assert.equal(step.env.ALLOW_MINOR, '${{ inputs.allow_minor }}');
     assert.equal(step.env.ALLOW_MAJOR, '${{ inputs.allow_major }}');

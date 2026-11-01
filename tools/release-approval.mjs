@@ -1,13 +1,12 @@
 import { execFileSync } from 'node:child_process';
 
-// Fail closed if main moved while the snapshot was being built.
+// The checked-out commit must be the immutable workflow snapshot.
 export function assertSnapshot(env, cwd) {
   if (!env.GITHUB_SHA) throw new Error('Missing workflow snapshot SHA.');
   const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
   const head = git('rev-parse', 'HEAD');
-  const remote = git('ls-remote', '--heads', 'origin', 'refs/heads/main').split(/\s+/)[0];
-  if (head !== env.GITHUB_SHA || remote !== head)
-    throw new Error('Release snapshot no longer matches main; start a new authorized run.');
+  if (head !== env.GITHUB_SHA)
+    throw new Error('Release checkout does not match the workflow snapshot.');
 }
 
 export function verifyConditions(_config, { env, cwd }) {
