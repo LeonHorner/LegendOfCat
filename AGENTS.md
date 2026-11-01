@@ -7,7 +7,7 @@
 - Squash PR titles must be Conventional Commits. Do not require external review approval for this solo workflow.
 - Run automatic merge validation for open, ready-for-review PRs; each update to a ready PR revalidates its exact head. Draft PRs skip full validation. A manual Prepare merge dispatch remains available as fallback. Releases run only with explicit user authorization. Always require the merge-ready status before squash merge.
 - Compilation and static inspection are allowed during development. Do not claim unrun checks passed.
-- Do not trigger or publish a release unless the user explicitly requests it.
+- Do not trigger or publish a release unless the user explicitly requests it. The version is automatically computed. Manual Release offers only `allow_minor` (default on) and `allow_major` (default off); patch is always allowed. Do not enable `allow_major` for a surprising version without reviewing the commit messages. Re-run the original workflow for interrupted releases and follow `docs/releasing.md` for recovery.
 - Preserve all Unity .meta files; never hand-edit serialized scenes when Editor tooling is available.
 - Keep Unity MCP local, editor-only, and pinned to a reviewed revision before adding it.
 - Generated scenes and asset metadata must be committed after the first Editor import.
@@ -46,7 +46,7 @@
 - Never force-push any branch, rewrite published history, delete main, or bypass repository rules.
 - Never discard another agent's or the user's changes. Inspect the worktree before switching branches.
 - Stage only task-related files. Never commit credentials, license secrets, generated build directories or unrelated assets.
-- Use English Conventional Commits, including fix/perf/feat and BREAKING CHANGE when appropriate.
+- Use English Conventional Commits, including fix/perf/feat. For an intentional major release, write an explicit uppercase `BREAKING CHANGE: description` or `BREAKING-CHANGE: description` footer. Lowercase/mixed-case footer markers do not indicate a major release; they do not block a normal release. Conventional Commit shorthand `feat!:`, `fix!:`, and `fix(api)!:` remains valid and **does trigger major** without a footer. For footer-style major releases, use uppercase `BREAKING CHANGE:` or `BREAKING-CHANGE:`.
 - A normal merge from main into a feature branch is allowed to update its base; merging a feature into main is squash-only.
 
 ## Design references

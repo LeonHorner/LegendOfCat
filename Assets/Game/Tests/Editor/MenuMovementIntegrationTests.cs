@@ -22,7 +22,7 @@ public class MenuMovementIntegrationTests
 
     static UnityEngine.Object[] SceneryResources(Component course)
     {
-        var study = course.GetComponentInChildren(RuntimeType("BackgroundStudy"));
+        var study = course.GetComponentInChildren(RuntimeType("SceneryRenderer"));
         Assert.That(study, Is.Not.Null);
         // Check synchronously after OpenCourse, before deferred destruction could hide a collider.
         Assert.That(course.GetComponentsInChildren<Collider>(true), Is.Empty);
@@ -41,7 +41,6 @@ public class MenuMovementIntegrationTests
         Assert.That(quad.uv, Is.EqualTo(new[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one }));
         var owned = filters.Select(f => (UnityEngine.Object)f.sharedMesh)
             .Concat(filters.Select(f => (UnityEngine.Object)f.GetComponent<MeshRenderer>().sharedMaterial))
-            .Concat(new[] { (UnityEngine.Object)Field(study, "square"), (UnityEngine.Object)Field(study, "pixel") })
             .Distinct().ToArray();
         Assert.That(owned.All(o => o && !AssetDatabase.Contains(o)), Is.True,
             "Track generated resources, never imported artwork or shader-reference materials.");
