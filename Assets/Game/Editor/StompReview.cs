@@ -5,6 +5,43 @@ using UnityEngine.SceneManagement;
 
 public static class StompReview
 {
+    // Run only in the isolated review copy: a real free-aspect Game View includes IMGUI.
+    public static void OpenInteractive()
+    {
+        if (!Application.dataPath.Replace('\\', '/').Contains("/artifacts/stomp-review-project/"))
+            throw new System.InvalidOperationException("Use the isolated stomp review project.");
+        UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene);
+        SessionState.SetBool("StompInteractive", true);
+        Install();
+        EditorApplication.EnterPlaymode();
+    }
+    static EditorWindow reviewWindow;
+    static double nextCapture;
+    static int windowCapture;
+    static bool capturePending;
+    static int windowFrame;
+    static readonly Vector2Int[] reviewSizes = { new Vector2Int(640, 360), new Vector2Int(480, 640), new Vector2Int(320, 240) };
+    static void CaptureWindow()
+    {
+        if (!EditorApplication.isPlaying || !reviewWindow) { EditorApplication.update -= CaptureWindow; return; }
+        if (EditorApplication.timeSinceStartup < nextCapture) return;
+        if (capturePending) {
+            string directory = "docs/design/stomp-prototype/window-review/window-" + windowCapture;
+            Directory.CreateDirectory(directory);
+            ScreenCapture.CaptureScreenshot(directory + "/" + windowFrame.ToString("D3") + ".png");
+            if (windowFrame == 0) Debug.Log("Stomp live Game View capture: " + Screen.width + "x" + Screen.height);
+            capturePending = ++windowFrame < 40;
+            nextCapture = EditorApplication.timeSinceStartup + (capturePending ? .1 : 1);
+            return;
+        }
+        if (windowCapture == reviewSizes.Length) { EditorApplication.update -= CaptureWindow; return; }
+        var size = reviewSizes[windowCapture++];
+        reviewWindow.position = new Rect(100, 100, size.x, size.y + 22);
+        reviewWindow.Focus();
+        capturePending = true;
+        windowFrame = 0;
+        nextCapture = EditorApplication.timeSinceStartup + 2;
+    }
     public static void ConfigureDamageAudio()
     {
         var importer = (AudioImporter)AssetImporter.GetAtPath("Assets/Game/Resources/StompDamageVoice.wav");
@@ -33,6 +70,12 @@ public static class StompReview
     }
     static void StateChanged(PlayModeStateChange state)
     {
+        if (state == PlayModeStateChange.EnteredPlayMode && SessionState.GetBool("StompInteractive", false)) {
+            SessionState.SetBool("StompInteractive", false);
+            new GameObject("Interactive stomp review").AddComponent<StompArena>();
+            EditorApplication.update += OpenReviewWindow;
+            return;
+        }
         if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool("StompReview", false)) return;
         SessionState.SetBool("StompReview", false);
         int result = 0;
@@ -40,6 +83,17 @@ public static class StompReview
         catch (System.Exception error) { Debug.LogException(error); result = 1; }
         if (Application.isBatchMode) EditorApplication.Exit(result);
         else EditorApplication.ExitPlaymode();
+    }
+    static void OpenReviewWindow()
+    {
+        EditorApplication.update -= OpenReviewWindow;
+        var gameView = typeof(EditorWindow).Assembly.GetType("UnityEditor.GameView");
+        foreach (var existing in Resources.FindObjectsOfTypeAll(gameView)) ((EditorWindow)existing).Close();
+        reviewWindow = ScriptableObject.CreateInstance(gameView) as EditorWindow;
+        reviewWindow.ShowUtility();
+        gameView.GetProperty("selectedSizeIndex", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)?.SetValue(reviewWindow, 0);
+        windowCapture = 0; nextCapture = 0;
+        EditorApplication.update += CaptureWindow;
     }
     static void Capture()
     {

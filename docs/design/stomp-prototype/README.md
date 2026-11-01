@@ -97,3 +97,77 @@ Below: **left Mika takes damage; right the enemy takes damage**. Both comparison
 ![Small grayscale comparison; half speed](hit-types-small-grayscale.gif)
 
 Regression sources cover separate triggers, no enemy effects on player damage, no player burst on enemy damage, protected contacts without effect restart, pause/reset, fixed ring position and terminal fade. They are compiled but have not been executed; final Prepare merge must still run the suite and both platform builds. No ready status, merge or release is claimed by this review pass.
+
+## PR review corrections - 2026-11-01
+
+The stomp ring now uses the original descending sweep before bounce height correction.
+Its center is clamped to the head interval interpolated at the contact instant, so
+partial foot overlaps and fast horizontal travel cannot put its origin beyond the
+contacted head. The ring stays at that world contact while the head moves away.
+The visible cap and separate flash now end at the unchanged logical surface,
+y=1.35. Bounce retains the existing y=1.82 clearance correction, x position and
+horizontal velocity; no damage-hop, protection, input, patrol or phase tuning changes.
+
+The arena uses MenuLayout.Letterbox16By9 and an explicit 16:9 camera aspect, retaining
+the existing world coordinates and framing. Solid-color clearing avoids inheriting
+an unrelated scene skybox. The normal HUD is compact; Controls expands wrapped
+instructions and reset actions. Pause/results also expand it. Available width and
+height bound the panel, with scrolling when necessary. A tall window uses its upper
+letterbox space for the panel. This is prototype UI, not new health presentation.
+
+Behavioral regressions add actual scripted 2D simulation for centered and partial
+edge landings, both horizontal directions, a 35-unit/s sweep and outside-head misses
+against a moving target. They assert contact location, unchanged x/velocity, bounce,
+health, phase and visible edge registration. Existing behavioral tests are retained;
+terminal cases cover both Retry and Restart. A Play Mode coroutine verifies actual
+audio playback, sample progress, pause/resume and no replay during protected contact.
+
+Reproduce live small-window evidence with StompReview.OpenInteractive in the isolated
+artifacts/stomp-review-project copy. It opens a real free-aspect Game View, resizes
+through 640x360, 480x640 and 320x240 requested content sizes and captures the GUI plus
+a complete live patrol/signal cycle at each size. Editor toolbar rounding can add
+one pixel to the requested height. Captures run in wall-clock time rather than the
+deterministic physics-only recording loop. Grayscale exports are derived from these
+actual window frames, not from a wide-view crop.
+
+Integration review: origin/main f020aea adds #59 workflow/licensing modernization,
+#64 splash-screen settings, #66 release-history cleanup and #63 retirement of the
+standalone background study in favor of SceneryRenderer. No stomp arena overlap was
+found. Open PR #61 owns water-recovery integration in the shared controller; this
+review pass changes no controller/motor files. Preserve both features and provenance
+when integrating. Per the requested gate, a normal merge of current main and full
+exact-revision validation follow final gameplay approval. Keep #62 draft and #12 open.
+
+### Review validation
+
+Unity 6000.3.27f2: **34/34 focused StompCombatTests passed**, zero failures/skips,
+exit code 0. This includes real audio playback in Play Mode and all new physics
+cases. The first two runs exposed scene-setup restrictions in the new EditMode
+fixture; it now uses the project's existing scripted-physics test pattern and
+restores simulation mode in cleanup. Source SHA256 hashes and the result summary
+are retained in [review-validation.json](review-validation.json). This supersedes
+earlier statements that the combat suite had only been compiled. Full suites,
+Windows/Linux player/launcher builds and packaging/smoke checks remain unrun here.
+
+Actual free-aspect Game View captures measured 640x361, 480x641 and 320x241 pixels.
+Mika's spawn, the moving target, the complete warning/attack footprint and compact
+HUD remain visible. At 320x241 the phase text is very small; the cap, crosses,
+chevrons and ground marks carry the gameplay distinction. Grayscale frames retain
+those different forms. Expanded controls intentionally cover gameplay when paused
+or inspecting instructions; Retry/Restart remain reachable in the smallest window.
+Live mouse checks verified defeat Retry restored both health counters and the
+compact HUD, and Pause exposed Resume with wrapped controls inside the window.
+This establishes layout behavior, not final difficulty or user gameplay acceptance.
+
+Recordings sample 40 actual window frames at approximately 10 Hz; GIFs encode at
+10 fps and loop. Capture scheduling/frame load can cause small timing differences;
+use the deterministic CSV captures for precise physics timing. Unity's unrelated
+Search database startup callback raised an Editor exception during interactive
+startup; the deferred update-based window setup completed despite it. No runtime
+combat exception or C# compilation failure was observed. Backups from the isolated
+review scene were preserved locally, outside tracked assets.
+
+![640x361 live window](window-review/640x361.gif)
+![480x641 live window](window-review/480x641.gif)
+![320x241 live window, grayscale](window-review/320x241-grayscale.gif)
+![Small grayscale signal samples](window-review/signals-grayscale-strip.png)

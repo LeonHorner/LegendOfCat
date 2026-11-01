@@ -38,6 +38,9 @@ public sealed class StompArena : MonoBehaviour
     readonly MeshRenderer[] sparks = new MeshRenderer[3];
     float burstTime;
     public const float DamageBurstDuration = .15f;
+    bool showHelp;
+    Vector2 helpScroll;
+    GUIStyle hudStyle;
     static readonly Rect BossBounds = new Rect(-0.85f, 0, 1.7f, 1.35f);
     static readonly Rect Hazard = new Rect(-2.8f, 0, 5.6f, 0.35f);
     static readonly Vector2 Half = new Vector2(0.45f, 0.45f);
@@ -52,7 +55,7 @@ public sealed class StompArena : MonoBehaviour
         foreach (float x in new[] { -8.25f, 8.25f })
             Block("Arena boundary", new Vector2(x, 2), new Vector2(.5f, 5), new Color(.25f, .3f, .33f)).gameObject.AddComponent<BoxCollider2D>();
         boss = Block("Target body / contact damage", new Vector2(0, .675f), new Vector2(1.7f, 1.35f), Color.gray);
-        head = Block("Head vulnerability marker", new Vector2(0, 1.35f), new Vector2(1.7f, .12f), Color.white);
+        head = Block("Head vulnerability marker", new Vector2(0, BossBounds.yMax - .06f), new Vector2(BossBounds.width, .12f), Color.white);
         warning = Block("Ground attack extent", new Vector2(0, .175f), new Vector2(5.6f, .35f), Color.white);
         warning.sortingOrder = 2;
         for (int i = 0; i < 12; i++) {
@@ -112,8 +115,10 @@ public sealed class StompArena : MonoBehaviour
         ArenaCamera.transform.localPosition = new Vector3(0, 2.4f, -10);
         ArenaCamera.orthographic = true; ArenaCamera.orthographicSize = 5;
         ArenaCamera.depth = 2;
+        ArenaCamera.clearFlags = CameraClearFlags.SolidColor;
         if (!FindFirstObjectByType<AudioListener>()) ArenaCamera.gameObject.AddComponent<AudioListener>();
         ArenaCamera.backgroundColor = new Color(.08f, .11f, .15f);
+        LateUpdate();
         previous = transform.InverseTransformPoint(body.position);
         Present();
     }
@@ -164,11 +169,15 @@ public sealed class StompArena : MonoBehaviour
         bool top = StompCombat.CrossedHead(previous - Vector2.right * previousTargetX, current - Vector2.right * Combat.TargetX, Half, BossBounds);
         // Resolve the completed simulation against the state displayed for that step.
         if (Combat.TryStomp(top)) {
+            // Resolve contact from the uncorrected sweep, in the moving target's frame.
+            float crossing = (previous.y - Half.y - BossBounds.yMax) / (previous.y - current.y);
+            float targetAtContact = Mathf.Lerp(previousTargetX, Combat.TargetX, crossing);
+            float centerAtContact = Mathf.Lerp(previous.x, current.x, crossing);
+            float contactX = Mathf.Clamp(centerAtContact, targetAtContact + BossBounds.xMin, targetAtContact + BossBounds.xMax);
+            impact.transform.localPosition = new Vector3(contactX, BossBounds.yMax);
             current.y = BossBounds.yMax + Half.y + .02f;
             body.position = transform.TransformPoint(current);
             Cat.Launch(new Vector2(body.linearVelocity.x, 10));
-            float crossing = (previous.y - Half.y - BossBounds.yMax) / (previous.y - current.y);
-            impact.transform.localPosition = new Vector3(Mathf.Lerp(previous.x, current.x, crossing), BossBounds.yMax);
             flash = EnemyImpactDuration;
             enemyHeadFlashTime = EnemyHeadFlashDuration;
         } else {
@@ -204,7 +213,7 @@ public sealed class StompArena : MonoBehaviour
     {
         float x = Combat.TargetX;
         boss.transform.localPosition = new Vector3(x, .675f);
-        head.transform.localPosition = new Vector3(x, 1.35f);
+        head.transform.localPosition = new Vector3(x, BossBounds.yMax - head.transform.localScale.y * .5f);
         warning.transform.localPosition = new Vector3(x, .175f);
         phaseLabel.transform.localPosition = new Vector3(x, 2.1f);
         for (int i = 0; i < stripes.Count; i++) stripes[i].transform.localPosition = new Vector3(x - 2.6f + i * .47f, .175f);
@@ -230,25 +239,45 @@ public sealed class StompArena : MonoBehaviour
         successCream.color = new Color(.8f, .94f, 1, 1 - ringProgress);
         // A separate narrow overlay never replaces the newly closed cap or its crosses.
         enemyHeadFlash.enabled = enemyHeadFlashTime > 0;
-        enemyHeadFlash.transform.localPosition = new Vector3(x, BossBounds.yMax);
+        enemyHeadFlash.transform.localPosition = new Vector3(x, BossBounds.yMax - enemyHeadFlash.transform.localScale.y * .5f);
         enemyHeadFlash.color = new Color(.8f, .94f, 1, Mathf.Clamp01(enemyHeadFlashTime / EnemyHeadFlashDuration));
         phaseLabel.text = Combat.Finished ? (Combat.BossHealth == 0 ? "TARGET DEFEATED" : "TRY AGAIN")
             : open ? "OPEN HEAD / JUMP NOW" : active ? "ATTACK / GROUND UNSAFE" : "WARNING / GROUND ATTACK";
     }
+    void LateUpdate()
+    {
+        ArenaCamera.rect = MenuLayout.Letterbox16By9(Screen.width, Screen.height);
+        ArenaCamera.aspect = 16f / 9f;
+    }
     void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(12, 12, Mathf.Min(620, Screen.width - 24), 175), GUI.skin.box);
-        GUILayout.Label("SIMPLE COMBAT LAB / provisional rules for review");
-        GUILayout.Label("Move and jump with the shared controls. Descend onto the white head during recovery.");
-        GUILayout.Label("Dark head and sides hurt. Striped ground warning becomes a solid active attack.");
+        if (!ArenaCamera || Run == null) return;
+        if (hudStyle == null) hudStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true };
+        var viewport = ArenaCamera.pixelRect;
+        float width = Mathf.Max(1, Mathf.Min(440, viewport.width - 16));
+        bool expanded = showHelp || Run.Paused || Combat.Finished;
+        float height = Mathf.Min(expanded ? 210 : 88, Screen.height - 16);
+        // Anchor in the top letterbox bar when available; otherwise use the viewport.
+        float top = Mathf.Max(8, Screen.height - viewport.yMax - height);
+        GUILayout.BeginArea(new Rect(viewport.x + 8, top, width, height), GUI.skin.box);
+        helpScroll = GUILayout.BeginScrollView(helpScroll);
+        GUILayout.Label("SIMPLE COMBAT LAB / provisional", hudStyle);
         GUILayout.Label("Mika " + Combat.PlayerHealth + "/3 | Target " + Combat.BossHealth + "/3" +
-            (Combat.Invulnerability > 0 ? " | DAMAGE PROTECTION" : "") + (Run.Paused ? " | PAUSED" : ""));
+            (Combat.Invulnerability > 0 ? " | PROTECTED" : "") + (Run.Paused ? " | PAUSED" : ""), hudStyle);
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Retry (R)")) Retry();
-        if (GUILayout.Button("Restart (Backspace)")) Restart();
-        if (GUILayout.Button(Run.Paused ? "Resume (P)" : "Pause (P)")) TogglePause();
-        if (GUILayout.Button("Menu (Esc)")) BackToMenu?.Invoke();
-        GUILayout.EndHorizontal(); GUILayout.EndArea();
+        if (GUILayout.Button(showHelp ? "Less" : "Controls")) showHelp = !showHelp;
+        if (GUILayout.Button(Run.Paused ? "Resume" : "Pause")) TogglePause();
+        if (GUILayout.Button("Menu")) BackToMenu?.Invoke();
+        GUILayout.EndHorizontal();
+        if (expanded) {
+            GUILayout.Label("Shared move/jump controls. Descend onto the white head. Dark head/sides hurt; striped ground becomes an active attack.", hudStyle);
+            GUILayout.Label("R: retry | Backspace: restart | P: pause | Esc: menu. Controller: South jump, Select retry, LB restart, RB pause, Start menu.", hudStyle);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Retry")) Retry();
+            if (GUILayout.Button("Restart")) Restart();
+            GUILayout.EndHorizontal();
+        }
+        GUILayout.EndScrollView(); GUILayout.EndArea();
     }
     void CreateDamageBurst()
     {

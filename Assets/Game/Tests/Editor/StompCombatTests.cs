@@ -2,9 +2,13 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
+using System.Collections;
+using System.Reflection;
 
 public class StompCombatTests
 {
+    const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
     Type type;
     object combat;
     object Call(string name, params object[] args) => type.GetMethod(name).Invoke(combat, args);
@@ -251,9 +255,10 @@ public class StompCombatTests
         } finally { UnityEngine.Object.DestroyImmediate(root); }
     }
 
-    [TestCase(true, false)] [TestCase(false, false)]
-    [TestCase(true, true)] [TestCase(false, true)]
-    public void AcceptedHitsHaveDistinctFeedbackAndTerminalEffectsFinish(bool enemyHit, bool finalHit)
+    [TestCase(true, false, false)] [TestCase(false, false, false)]
+    [TestCase(true, true, false)] [TestCase(false, true, false)]
+    [TestCase(true, true, true)] [TestCase(false, true, true)]
+    public void AcceptedHitsHaveDistinctFeedbackAndTerminalEffectsFinish(bool enemyHit, bool finalHit, bool restart)
     {
         var root = new GameObject("Distinct hit feedback test");
         try {
@@ -306,9 +311,123 @@ public class StompCombatTests
             }
             Assert.That(ring.transform.localPosition, Is.EqualTo(ringPosition));
             Assert.That(ring.enabled || headFlash.enabled || burst.gameObject.activeSelf, Is.False);
-            arenaType.GetMethod("Retry").Invoke(arena, null);
+            arenaType.GetMethod(restart ? "Restart" : "Retry").Invoke(arena, null);
             Assert.That(ring.enabled || headFlash.enabled || burst.gameObject.activeSelf, Is.False);
+            Assert.That(type.GetProperty("Finished").GetValue(state), Is.False);
+            Assert.That(type.GetProperty("BossHealth").GetValue(state), Is.EqualTo(3));
+            Assert.That(type.GetProperty("PlayerHealth").GetValue(state), Is.EqualTo(3));
+            Assert.That(body.simulated, Is.True);
+            Assert.That(body.position, Is.EqualTo(new Vector2(-4, .5f)));
+            Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero));
+            Assert.That(cat.GetComponent<AudioSource>().isPlaying, Is.False);
         } finally { UnityEngine.Object.DestroyImmediate(root); }
     }
 
+    [TestCase(0f, 0f, true)]
+    [TestCase(1.24f, -7f, true)]
+    [TestCase(-1.24f, 7f, true)]
+    [TestCase(1.24f, 7f, true)]
+    [TestCase(-1.24f, -7f, true)]
+    [TestCase(0f, 35f, true)]
+    [TestCase(1.34f, 0f, false)]
+    [TestCase(-1.34f, 0f, false)]
+    public void PhysicsStompUsesMovingHeadContact(float offset, float velocityX, bool hit)
+    {
+        var priorSimulation = Physics2D.simulationMode;
+        Physics2D.simulationMode = SimulationMode2D.Script;
+        var root = new GameObject("Physics arena");
+        try {
+            var arenaType = type.Assembly.GetType("StompArena");
+            var arena = root.AddComponent(arenaType);
+            arenaType.GetMethod("Awake", Private).Invoke(arena, null);
+            var cat = (Component)arenaType.GetProperty("Cat").GetValue(arena);
+            cat.GetType().GetMethod("Awake", Private).Invoke(cat, null);
+            var input = cat.GetComponent(type.Assembly.GetType("CatInput"));
+            input.GetType().GetMethod("Awake", Private).Invoke(input, null);
+            var state = arenaType.GetField("Combat").GetValue(arena);
+            type.GetMethod("Advance").Invoke(state, new object[] { 1.56f });
+            var body = cat.GetComponent<Rigidbody2D>();
+            body.interpolation = RigidbodyInterpolation2D.None;
+            float targetNow = (float)type.GetProperty("TargetX").GetValue(state);
+            // Store a real preceding patrol sample, then simulate a fast descending crossing.
+            arenaType.GetField("previousTargetX", Private).SetValue(arena, targetNow);
+            var before = new Vector2(targetNow + offset, 1.86f);
+            body.position = before;
+            body.linearVelocity = new Vector2(velocityX, -8);
+            arenaType.GetField("previous", Private).SetValue(arena, before);
+            type.GetMethod("Advance").Invoke(state, new object[] { Time.fixedDeltaTime });
+            float targetAfter = (float)type.GetProperty("TargetX").GetValue(state);
+            Assert.That(targetAfter, Is.GreaterThan(targetNow));
+            Physics2D.SyncTransforms();
+            Physics2D.Simulate(Time.fixedDeltaTime);
+            var simulated = body.position;
+            Assert.That(simulated.y, Is.LessThan(1.8f));
+            float fraction = (before.y - 1.8f) / (before.y - simulated.y);
+            float targetContact = Mathf.Lerp(targetNow, targetAfter, fraction);
+            float expectedX = Mathf.Clamp(Mathf.Lerp(before.x, simulated.x, fraction), targetContact - .85f, targetContact + .85f);
+            arenaType.GetMethod("FixedUpdate", Private).Invoke(arena, null);
+            Assert.That(type.GetProperty("BossHealth").GetValue(state), Is.EqualTo(hit ? 2 : 3));
+            Assert.That(body.position.x, Is.EqualTo(simulated.x).Within(.0001f), "No horizontal correction or teleport");
+            if (!hit) return;
+            Assert.That(type.GetProperty("PlayerHealth").GetValue(state), Is.EqualTo(3));
+            Assert.That(type.GetProperty("Phase").GetValue(state).ToString(), Is.EqualTo("Anticipation"));
+            Assert.That(body.position.y, Is.EqualTo(1.82f).Within(.0001f));
+            Assert.That(body.linearVelocity, Is.EqualTo(new Vector2(velocityX, 10)));
+            var ring = (MeshRenderer)arenaType.GetField("impact", Private).GetValue(arena);
+            Assert.That(ring.transform.localPosition.x, Is.EqualTo(expectedX).Within(.0001f));
+            Assert.That(ring.transform.localPosition.y, Is.EqualTo(1.35f));
+            foreach (string marker in new[] { "head", "enemyHeadFlash" }) {
+                var edge = (SpriteRenderer)arenaType.GetField(marker, Private).GetValue(arena);
+                Assert.That(edge.bounds.max.y, Is.EqualTo(1.35f).Within(.0001f));
+            }
+        } finally {
+            UnityEngine.Object.DestroyImmediate(root);
+            Physics2D.simulationMode = priorSimulation;
+        }
+    }
+
+    [UnityTest]
+    public IEnumerator DamageAudioPausesResumesAndProtectedContactDoesNotRestartIt()
+    {
+        yield return new EnterPlayMode();
+        var arenaType = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("StompArena")).First(t => t != null);
+        var root = new GameObject("Stomp audio regression");
+        var arena = (Behaviour)root.AddComponent(arenaType);
+        arena.enabled = false;
+        var cat = (Behaviour)arenaType.GetProperty("Cat").GetValue(arena);
+        cat.enabled = false;
+        ((Behaviour)cat.GetComponent(cat.GetType().Assembly.GetType("CatInput"))).enabled = false;
+        var body = cat.GetComponent<Rigidbody2D>();
+        var audio = cat.GetComponent<AudioSource>();
+        var fixedStep = arenaType.GetMethod("FixedUpdate", Private);
+        var state = arenaType.GetField("Combat").GetValue(arena);
+        try {
+            body.position = new Vector2(0, .5f);
+            arenaType.GetField("previous", Private).SetValue(arena, body.position);
+            fixedStep.Invoke(arena, null);
+            body.simulated = false;
+            yield return new WaitForSecondsRealtime(.12f);
+            Assert.That(audio.isPlaying, Is.True);
+            int sample = audio.timeSamples;
+            float burst = (float)arenaType.GetField("burstTime", Private).GetValue(arena);
+            fixedStep.Invoke(arena, null);
+            Assert.That(audio.timeSamples, Is.GreaterThanOrEqualTo(sample), "Protected contact must not restart audio");
+            Assert.That((float)arenaType.GetField("burstTime", Private).GetValue(arena), Is.LessThan(burst));
+            Assert.That(state.GetType().GetProperty("PlayerHealth").GetValue(state), Is.EqualTo(2));
+            arenaType.GetMethod("TogglePause").Invoke(arena, null);
+            sample = audio.timeSamples;
+            fixedStep.Invoke(arena, null);
+            yield return new WaitForSecondsRealtime(.12f);
+            Assert.That(audio.isPlaying, Is.False);
+            Assert.That(audio.timeSamples, Is.EqualTo(sample));
+            arenaType.GetMethod("TogglePause").Invoke(arena, null);
+            yield return new WaitForSecondsRealtime(.08f);
+            Assert.That(audio.isPlaying, Is.True);
+            Assert.That(audio.timeSamples, Is.GreaterThan(sample));
+            arenaType.GetMethod("Restart").Invoke(arena, null);
+            Assert.That(audio.isPlaying, Is.False);
+            Assert.That(body.simulated, Is.True);
+        } finally { UnityEngine.Object.Destroy(root); }
+        yield return new ExitPlayMode();
+    }
 }
