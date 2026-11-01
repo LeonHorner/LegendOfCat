@@ -181,6 +181,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         landmarkMaterial = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
         landmarkMaterial.SetFloat("_Cutout", 1);
         landmarkMaterial.SetFloat("_SoftAlpha", 1);
+        landmarkMaterial.SetFloat("_LandmarkBlend", 1);
         landmarkMaterial.SetFloat("_Fog", 0.24f);
         landmarkMaterial.SetFloat("_Saturation", 0.72f);
         var names = new[] { "waterwheel", "viaduct", "willow" };

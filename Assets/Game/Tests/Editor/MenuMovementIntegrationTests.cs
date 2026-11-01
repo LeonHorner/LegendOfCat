@@ -71,6 +71,17 @@ public class MenuMovementIntegrationTests
         }
         var floatingIndices = (int[])course.GetType().GetField("LevelOneFloatingPlatforms").GetValue(null);
         var rootIndices = (int[])course.GetType().GetField("LevelOneRootPlatforms").GetValue(null);
+        var geometry = (Vector3[])course.GetType().GetField("LevelOnePlatforms").GetValue(null);
+        float lowestContact = float.PositiveInfinity;
+        bool descendsFromBank = false;
+        foreach (int index in floatingIndices) {
+            lowestContact = Mathf.Min(lowestContact, geometry[index].y + 0.75f);
+            if (index > 0 && !floatingIndices.Contains(index - 1) && geometry[index].y < geometry[index - 1].y)
+                descendsFromBank = true;
+        }
+        Assert.That(lowestContact, Is.LessThanOrEqualTo(-1f),
+            "Some suspended supports should approach the foreground river.");
+        Assert.That(descendsFromBank, Is.True, "A suspended crossing can descend below its grounded entrance.");
         for (int i = 1; i < floatingIndices.Length; i++)
             if (floatingIndices[i] == floatingIndices[i - 1] + 1)
                 Assert.That(rootIndices.Contains(floatingIndices[i]), Is.EqualTo(rootIndices.Contains(floatingIndices[i - 1])),

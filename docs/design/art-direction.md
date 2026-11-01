@@ -286,3 +286,15 @@ than applying the existing crisp foliage alpha threshold. Use restrained local
 brightness/fog grading, particularly a darker willow. One connected floating
 sequence should use one material family; change families at grounded section
 boundaries. This feedback does not approve the previous composition as final.
+
+
+### Landmark bases and lower suspended supports - 2026-11-01
+
+The user circled detached lower mist/ground patches and requested the equivalent
+correction on the other background landmarks. The three landmark paintings share
+an artwork-local base/side opacity transition so their painted ground skirts
+recede into the valley. Source pixels, distant repeating-layer policy and
+foreground water remain unchanged. The user also explicitly requested suspended
+supports below grounded banks and nearer the water; two descending crossings now
+use contacts down to -1 and retain reachable rising exits. Keep families consistent
+within each crossing and verify the low landings against actual water/readability.

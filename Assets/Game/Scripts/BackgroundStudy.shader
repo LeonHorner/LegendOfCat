@@ -1,6 +1,6 @@
 Shader "LegendOfCat/BackgroundStudy"
 {
-    Properties { _MainTex ("Painted layer", 2D) = "white" {} _Cutout ("Use authored alpha", Float) = 0 _SoftAlpha ("Preserve painted transparency", Float) = 0 _Brightness ("Paint brightness", Float) = 1 _Fog ("Atmospheric tint", Float) = 0.23 _Saturation ("Paint saturation", Float) = 1 _Corner ("Foreground tint", Float) = 0 _CornerSide ("Corner half", Float) = 0 _AtlasCount ("Atlas columns", Float) = 1 _AtlasIndex ("Atlas column", Float) = 0 }
+    Properties { _MainTex ("Painted layer", 2D) = "white" {} _Cutout ("Use authored alpha", Float) = 0 _SoftAlpha ("Preserve painted transparency", Float) = 0 _Brightness ("Paint brightness", Float) = 1 _LandmarkBlend ("Painted base transition", Float) = 0 _Fog ("Atmospheric tint", Float) = 0.23 _Saturation ("Paint saturation", Float) = 1 _Corner ("Foreground tint", Float) = 0 _CornerSide ("Corner half", Float) = 0 _AtlasCount ("Atlas columns", Float) = 1 _AtlasIndex ("Atlas column", Float) = 0 }
     SubShader {
         Tags { "Queue"="Transparent" "RenderType"="Transparent" }
         Blend SrcAlpha OneMinusSrcAlpha
@@ -11,7 +11,7 @@ Shader "LegendOfCat/BackgroundStudy"
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            sampler2D _MainTex; float _Cutout, _SoftAlpha, _Brightness, _Fog, _Saturation, _Corner, _CornerSide, _AtlasCount, _AtlasIndex;
+            sampler2D _MainTex; float _Cutout, _SoftAlpha, _Brightness, _LandmarkBlend, _Fog, _Saturation, _Corner, _CornerSide, _AtlasCount, _AtlasIndex;
             struct Input { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
             struct Output { float4 vertex : SV_POSITION; float2 uv : TEXCOORD0; };
             Output vert(Input v) { Output o; o.vertex = UnityObjectToClipPos(v.vertex); o.uv = v.uv; return o; }
@@ -29,6 +29,11 @@ Shader "LegendOfCat/BackgroundStudy"
                 // Landmark paintings already contain a soft atmospheric boundary.
                 // Keep that authored transition; existing cutout layers retain their edge policy.
                 c.rgb *= _Brightness;
+                // Local artwork-space feathering removes the detached painted ground/mist skirt.
+                // It follows each landmark through parallax instead of defining a screen-height band.
+                float baseBlend = smoothstep(0.12, 0.48, i.uv.y);
+                float sideBlend = smoothstep(0.0, 0.16, min(i.uv.x, 1 - i.uv.x));
+                c.a *= lerp(1, baseBlend * sideBlend, _LandmarkBlend);
                 if (_Corner > 0.5) {
                     c.rgb *= 0.72;
                 }

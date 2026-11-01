@@ -52,8 +52,8 @@ public static class GoldenRiverReview
         var scenery = root.GetComponentInChildren<SceneryRenderer>();
         var presentation = cat.GetComponentInChildren<MikaSpritePresentation>();
         var previousTarget = RenderTexture.active;
-        var points = new[] { new Vector2(49, 1.52f), new Vector2(84, .52f), new Vector2(211, 1.52f), new Vector2(342, .27f), new Vector2(121, 1.52f), new Vector2(246, 1.52f), new Vector2(156, 1.52f) };
-        var names = new[] { "suspended-steps", "watermill", "aqueduct", "willow", "watermill-edge", "aqueduct-edge", "masonry-sequence" };
+        var points = new[] { new Vector2(49, 1.52f), new Vector2(84, .52f), new Vector2(211, .27f), new Vector2(342, .27f), new Vector2(121, 1.52f), new Vector2(246, 1.52f), new Vector2(156, 1.52f), new Vector2(100, 1.02f), new Vector2(302.5f, -.48f), new Vector2(202, -.23f) };
+        var names = new[] { "suspended-steps", "watermill", "aqueduct", "willow", "watermill-edge", "aqueduct-edge", "masonry-sequence", "watermill-base", "low-root-crossing", "low-masonry-crossing" };
         try {
             for (int index = 0; index < points.Length; index++) {
                 cat.RespawnAt(points[index]);

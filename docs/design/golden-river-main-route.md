@@ -290,3 +290,59 @@ packed-art checks. Local output:
 `Builds/GoldenRiverCompositionPreview/LegendOfCatPreview.exe --preview-view level-one`.
 The previous variety preview is superseded. No final Linux/player-launcher
 packaging, merge-ready validation or release was performed.
+
+## Lower crossings and landmark-base review - 2026-11-01
+
+The user circled residual detached painted mist/ground at the mill's lower
+boundary, asked to address the same behavior on the other background paintings,
+and requested that suspended platforms can also lie closer to the water and
+below grounded platforms.
+
+All three landmark paintings now share a local artwork-space alpha transition at
+their bases and outer sides, preserving partial-alpha contours while dissolving
+the isolated painted ground skirt into the existing distant landscape. This
+transition travels with each landmark under parallax. Recycled valley/canopy/sky
+layers, world-space foreground river and source PNG pixels are unchanged.
+
+The masonry crossing at x=202/210.5 now has contact heights -0.75/-0.25 below its
+initial bank, and the rooted sequence at x=295/302.5/309/315.5 descends through
+-0.5/-1/-0.75/-0.25 before returning to the zero-height grounded bank. These use
+the same widths/gaps and grouped artwork families. Checkpoint and exit locations
+are unchanged. The contact-height range is now -1..1.75. The lowest roots remain
+above the visible river; no swimming mechanic or new recovery behavior is added.
+
+Additional review views target the mill's lower base and both low crossings.
+The GPU regression checks the local base/side transition while retaining central
+painted opacity; geometry assertions require a genuinely low suspended platform
+and a descent below a grounded entrance. Actual full-route simulation checks that
+the descent and return remain possible using the existing movement rules.
+
+### Lower-crossing verification
+
+Unity 6000.3.27f2 with Direct3D 11: **28/28 scoped tests passed**, no failures or
+skips, after lowering the crossings and adding the local base transition.
+The full actual-physics route succeeds without retry, including both descents
+and returns to grounded banks. The new lower-contact/family checks and GPU
+base/side blending regression pass. A test-local closure lost across Play Mode
+reload was replaced with explicit iteration before the successful rerun.
+
+The inspected PR #61 source uses a local water-entry sole height of -3.25;
+the new lowest standable contact is -1. This static interface check is not a
+claim that the still-unmerged recovery implementation has been integrated or
+playtested here.
+
+The static Unity review now covers ten course locations at 960x540 and 640x360,
+with grayscale versions of the smaller renders. Inspected the new lower
+background-base transition and both low platform families. Landings remain above
+the foreground water and distinct from the distant scenery in these static views;
+actual gameplay review remains required.
+
+- [Mill lower base](golden-river-main-route/variety-evidence/watermill-base-960.png)
+- [Low rooted crossing](golden-river-main-route/variety-evidence/low-root-crossing-960.png)
+- [Low masonry crossing](golden-river-main-route/variety-evidence/low-masonry-crossing-960.png)
+
+The updated Windows development preview build succeeded, including packed-art
+checks. Local output is
+`Builds/GoldenRiverLowCrossingPreview/LegendOfCatPreview.exe --preview-view level-one`.
+Final Windows/Linux player/launcher packaging, merge-ready validation, integration
+of PR #61 and user acceptance remain pending; no release was performed.

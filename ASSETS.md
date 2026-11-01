@@ -539,3 +539,14 @@ art family per connected floating sequence. The willow is darker and retains mor
 source color instead of pale atmospheric mixing. No new image generator request,
 source-pixel edit or third-party asset is involved. Existing generation prompts,
 model disclosure and original-art license caveat above remain authoritative.
+
+### Landmark base transitions and lower crossings - 2026-11-01
+
+The user circled remaining lower mill mist/ground patches and requested the same
+correction across the other landmark paintings, together with lower floating
+supports near the water. All three landmark materials now use the same local
+source-UV base/side alpha transition. The five original source PNGs and their
+license/generation disclosures are unchanged. Geometry lowers two existing
+suspended sequences; registered platform art follows their unchanged colliders'
+widths. No new generated or third-party image is involved. Review captures now
+also cover lower boundaries and the two low crossings.

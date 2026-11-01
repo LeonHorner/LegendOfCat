@@ -26,6 +26,13 @@ public sealed class SceneryRendererTests
             material.SetFloat("_SoftAlpha", 1);
             float soft = RenderLandmarkSample(source, material, target, pixels);
             Assert.That(soft, Is.GreaterThan(0.05f), "Authored translucent mist must survive rendering.");
+            material.SetFloat("_LandmarkBlend", 1);
+            Assert.That(RenderLandmarkSample(source, material, target, pixels), Is.GreaterThan(0.05f));
+            Assert.That(pixels.GetPixel(4, 0).grayscale, Is.LessThan(0.01f),
+                "The painted base must dissolve into the scenery without a detached ground patch.");
+            Assert.That(pixels.GetPixel(0, 4).grayscale, Is.LessThan(soft * 0.5f),
+                "The source rectangle sides need an artwork-local transition.");
+            material.SetFloat("_LandmarkBlend", 0);
             material.SetFloat("_Brightness", 0.5f);
             float dark = RenderLandmarkSample(source, material, target, pixels);
             Assert.That(dark, Is.LessThan(soft * 0.75f));
