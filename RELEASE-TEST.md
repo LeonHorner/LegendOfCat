@@ -23,8 +23,8 @@ release merely to exercise the updater; use the next small, real fix for N+1.
 ## Version N: fresh installation
 
 1. After explicit authorization, manually start `Release` on `main`.
-   The only switch is `allow_major`, off by default. Patch and minor releases are
-   automatic; an unapproved major stops before Unity builds. The version is
+   The `allow_minor` switch defaults on and `allow_major` defaults off. Patch releases are
+   automatic; an unapproved minor or major stops before Unity builds. The version is
    calculated from Conventional Commits. Review an unexpected major before
    allowing it. Record the version as N. If the run fails, follow the manual
    recovery guidance in `docs/releasing.md` before retrying.

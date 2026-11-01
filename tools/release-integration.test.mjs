@@ -25,8 +25,8 @@ function fixture(message) {
   git(cwd, 'checkout', '--detach', sha);
   return { dir, cwd, remote, sha, mock };
 }
-async function run(f, {dryRun = false, major = 'false', expected} = {}) {
-  const env = { ...process.env, CI:'true', GITHUB_ACTIONS:'true', GITHUB_EVENT_NAME:'push', GITHUB_REF:'refs/heads/main', GITHUB_SHA:f.sha, ALLOW_MAJOR:major, EXPECTED:expected || '' };
+async function run(f, {dryRun = false, minor = 'true', major = 'false', expected} = {}) {
+  const env = { ...process.env, CI:'true', GITHUB_ACTIONS:'true', GITHUB_EVENT_NAME:'push', GITHUB_REF:'refs/heads/main', GITHUB_SHA:f.sha, ALLOW_MINOR:minor, ALLOW_MAJOR:major, EXPECTED:expected || '' };
   delete env.GITHUB_TOKEN; delete env.GH_TOKEN;
   return semanticRelease({ repositoryUrl: f.remote, branches:['main'], tagFormat:'v${version}', dryRun, ci:true,
     plugins:[analyzer, approval, f.mock] }, { cwd:f.cwd, env });
@@ -72,6 +72,16 @@ test('a newer main prevents publishing an older checked-out snapshot', async () 
   try {
     git(f.cwd, 'checkout', 'main'); git(f.cwd, 'commit', '--allow-empty', '-m', 'feat: newer feature'); git(f.cwd, 'push', 'origin', 'main'); git(f.cwd, 'checkout', '--detach', f.sha);
     assert.equal(await run(f), false);
+    assert.equal(existsSync(join(f.dir, 'published.json')), false);
+  } finally { rmSync(f.dir, {recursive:true, force:true}); }
+});
+
+
+test('disabled minor approval fails during planning without publishing', async () => {
+  const f = fixture('feat: add menu');
+  try {
+    await assert.rejects(run(f, {dryRun:true, minor:'false', major:'true'}), /allow_minor/);
+    assert.equal(git(f.cwd, 'tag', '--list', 'v0.8.0'), '');
     assert.equal(existsSync(join(f.dir, 'published.json')), false);
   } finally { rmSync(f.dir, {recursive:true, force:true}); }
 });
