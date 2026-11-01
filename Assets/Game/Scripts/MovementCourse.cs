@@ -68,7 +68,8 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector3(501f, -0.75f, 12f)
     };
     public static readonly int[] LevelOneFloatingPlatforms = { 3, 4, 8, 9, 10, 14, 15, 16, 19, 20, 22, 23, 24, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
-    public static readonly int[] LevelOneRootPlatforms = { 3, 8, 10, 15, 19, 22, 24, 29, 31, 35, 37, 41 };
+    // Keep each connected suspended sequence in one material family.
+    public static readonly int[] LevelOneRootPlatforms = { 3, 4, 8, 9, 10, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
     // Reserved broad ground for the upper-route owner; no detour is required here.
     public static readonly Vector2 UpperRouteEntrance = new Vector2(431, 0.52f);
     public static readonly Vector2 UpperRouteRejoin = new Vector2(470, 0.52f);

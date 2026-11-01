@@ -275,3 +275,14 @@ bounded prototype refinement is authorized in #71; final whole-level scenic poli
 and visual acceptance remain #73/#16. Keep the approved motor, 2D presentation,
 Mika baseline and independent foreground river; do not restore rejected scenery
 experiments or introduce new abilities. See the route notes and ASSETS.md.
+
+
+### Golden River landmark and platform-family correction - 2026-11-01
+
+The next user run took 60.7 seconds. Mill/aqueduct edges looked pasted or cut out,
+connected floating sequences mixed styles, and the willow was too bright. Preserve
+the authored translucent atmospheric boundaries of landmark paintings rather
+than applying the existing crisp foliage alpha threshold. Use restrained local
+brightness/fog grading, particularly a darker willow. One connected floating
+sequence should use one material family; change families at grounded section
+boundaries. This feedback does not approve the previous composition as final.

@@ -528,3 +528,14 @@ See docs/design/background-study/review-2026-10-31.md for tests and limitations.
 - Human creative direction: the user measured the earlier introduction at 61 seconds but rejected it as very boring, requesting different platform heights/sizes, different floating-platform graphics and significant unique background locations. This authorizes this bounded gameplay/visual iteration, not final art acceptance or completion of #73.
 - Creative implementation: rooted slate island and broken masonry shelf have distinct silhouettes and registered landing contacts, with their natural roughly 3:1 source proportions retained. One abandoned watermill, one broken aqueduct and one ancient willow mark separate sections; each is instantiated once with absolute anchor-based parallax, without tiling or mirrored duplicates. Atmospheric tint/saturation keep background landmarks behind the crisp playable plane. Existing bank, shelf, valley, water and Mika provenance remains applicable.
 - Exact generation prompts: `docs/design/golden-river-main-route/variety-prompts.md`. `GoldenRiverReview.Record` captures actual Unity course views at 960x540 and 640x360, plus grayscale versions of the smaller renders; these static authoring captures are not player-input recordings.
+
+### Golden River composition refinement - 2026-11-01
+
+The user reported 60.7 seconds and rejected pasted/cut-out landmark boundaries,
+mixed styles within floating sequences and the pale willow. The existing five
+generated source PNGs remain unchanged. Original shader/code changes preserve
+painted landmark partial alpha, apply per-landmark brightness/fog and assign one
+art family per connected floating sequence. The willow is darker and retains more
+source color instead of pale atmospheric mixing. No new image generator request,
+source-pixel edit or third-party asset is involved. Existing generation prompts,
+model disclosure and original-art license caveat above remain authoritative.

@@ -242,3 +242,51 @@ checks for all five new paintings. Local output:
 `Builds/GoldenRiverVarietyPreview/LegendOfCatPreview.exe --preview-view level-one`.
 Earlier preview folders contain superseded layouts. Linux/player-launcher packages,
 final exact-head merge validation and final user acceptance remain unrun/pending.
+
+## Composition review correction - 2026-11-01
+
+The user reported **60.7 seconds** for the varied introduction and supplied four
+in-game crops. Feedback: the mill appeared pasted into the scene; connected
+floating sequences mixed incompatible styles; mill/aqueduct boundaries looked
+cut out; the willow was too bright. This is a timing observation and rejection
+of those visual details, not final route/scenery acceptance.
+
+Landmark rendering now retains the source paintings' partial alpha rather than
+applying the crisp vegetation-cutout threshold to their atmospheric boundaries.
+Existing sky/valley/canopy/foreground cutout policy is unchanged. Per-landmark
+paint brightness and reduced pale fog mixing give the willow a darker, less
+washed-out appearance and bring the mill/aqueduct into the surrounding palette.
+No source image pixels, collision surfaces, jump rules or landmark anchors change.
+
+Connected suspended sequences now use one family throughout: rooted islands in
+the natural-bank sections, masonry throughout the ruined crossing. There are
+still 22 suspended supports, now 14 root islands and eight masonry shelves.
+Style changes occur at grounded section boundaries rather than alternating on
+every jump. The visual review utility includes side-boundary views of the mill
+and aqueduct and a view of a whole masonry sequence, in addition to center views.
+
+### Composition correction verification
+
+**28/28 scoped tests passed** on Unity 6000.3.27f2 with Direct3D 11, zero
+failures/skips. The new GPU regression verifies that partial-alpha landmark
+pixels survive, brightness grading darkens them, and original cutout behavior
+remains selectable. The test explicitly skips on a Null graphics device rather
+than claiming a software-rendered shader result. Sequence checks require adjacent
+suspended supports to retain one family. Whole-route physics/lifecycle regressions
+continue to pass.
+
+Updated center, side-boundary and sequence renders were inspected at 960x540 and
+640x360, including small grayscale views. Authored mist now softens the exposed
+mill/aqueduct boundaries instead of leaving the former jagged cutoff; the willow
+is visibly darker. These are static rendering checks, not final user acceptance:
+
+- [Mill boundary](golden-river-main-route/variety-evidence/watermill-edge-960.png)
+- [Aqueduct boundary](golden-river-main-route/variety-evidence/aqueduct-edge-960.png)
+- [Consistent masonry sequence](golden-river-main-route/variety-evidence/masonry-sequence-960.png)
+- [Darker willow](golden-river-main-route/variety-evidence/willow-960.png)
+
+The Windows development preview build for this correction succeeded, including
+packed-art checks. Local output:
+`Builds/GoldenRiverCompositionPreview/LegendOfCatPreview.exe --preview-view level-one`.
+The previous variety preview is superseded. No final Linux/player-launcher
+packaging, merge-ready validation or release was performed.

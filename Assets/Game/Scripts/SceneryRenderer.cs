@@ -180,9 +180,12 @@ public sealed class SceneryRenderer : MonoBehaviour
     {
         landmarkMaterial = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
         landmarkMaterial.SetFloat("_Cutout", 1);
-        landmarkMaterial.SetFloat("_Fog", 0.42f);
-        landmarkMaterial.SetFloat("_Saturation", 0.65f);
+        landmarkMaterial.SetFloat("_SoftAlpha", 1);
+        landmarkMaterial.SetFloat("_Fog", 0.24f);
+        landmarkMaterial.SetFloat("_Saturation", 0.72f);
         var names = new[] { "waterwheel", "viaduct", "willow" };
+        var brightness = new[] { 0.87f, 0.89f, 0.72f };
+        var fog = new[] { 0.24f, 0.28f, 0.16f };
         for (int i = 0; i < names.Length; i++) {
             var item = Quad();
             item.name = "Unique landmark " + names[i];
@@ -192,6 +195,8 @@ public sealed class SceneryRenderer : MonoBehaviour
             item.GetComponent<MeshRenderer>().sharedMaterial = landmarkMaterial;
             var properties = new MaterialPropertyBlock();
             properties.SetTexture("_MainTex", Resources.Load<Texture2D>("GoldenRiver/landmark-" + names[i]));
+            properties.SetFloat("_Brightness", brightness[i]);
+            properties.SetFloat("_Fog", fog[i]);
             item.GetComponent<MeshRenderer>().SetPropertyBlock(properties);
             landmarks[i] = item.transform;
         }

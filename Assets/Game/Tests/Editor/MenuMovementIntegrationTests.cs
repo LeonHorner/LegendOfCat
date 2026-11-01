@@ -69,6 +69,12 @@ public class MenuMovementIntegrationTests
             pair.Item1.GetComponent<MeshRenderer>().GetPropertyBlock(block);
             Assert.That(block.GetTexture("_MainTex"), Is.SameAs(Resources.Load<Texture2D>("GoldenRiver/" + pair.Item2)));
         }
+        var floatingIndices = (int[])course.GetType().GetField("LevelOneFloatingPlatforms").GetValue(null);
+        var rootIndices = (int[])course.GetType().GetField("LevelOneRootPlatforms").GetValue(null);
+        for (int i = 1; i < floatingIndices.Length; i++)
+            if (floatingIndices[i] == floatingIndices[i - 1] + 1)
+                Assert.That(rootIndices.Contains(floatingIndices[i]), Is.EqualTo(rootIndices.Contains(floatingIndices[i - 1])),
+                    "A connected suspended sequence must retain one visual family.");
         var landmarks = course.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Unique landmark ")).ToArray();
         Assert.That(landmarks, Has.Length.EqualTo(3));
         Assert.That(landmarks.Select(t => t.name).Distinct().Count(), Is.EqualTo(3));

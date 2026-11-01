@@ -9,6 +9,47 @@ using UnityEngine.TestTools;
 public sealed class SceneryRendererTests
 {
     [Test]
+    public void LandmarkMaterialPreservesPartialAlphaAndSupportsDarkerPaint()
+    {
+        if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
+            Assert.Ignore("The landmark shader regression requires a graphics device.");
+        var source = new Texture2D(1, 1, TextureFormat.RGBA32, false, true);
+        source.SetPixel(0, 0, new Color(1, 1, 1, 0.25f)); source.Apply();
+        var material = new Material(Shader.Find("LegendOfCat/BackgroundStudy"));
+        var target = new RenderTexture(8, 8, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+        var pixels = new Texture2D(8, 8, TextureFormat.RGB24, false, true);
+        var previous = RenderTexture.active;
+        try {
+            material.SetFloat("_Cutout", 1);
+            material.SetFloat("_Fog", 0);
+            material.SetFloat("_Saturation", 1);
+            material.SetFloat("_SoftAlpha", 1);
+            float soft = RenderLandmarkSample(source, material, target, pixels);
+            Assert.That(soft, Is.GreaterThan(0.05f), "Authored translucent mist must survive rendering.");
+            material.SetFloat("_Brightness", 0.5f);
+            float dark = RenderLandmarkSample(source, material, target, pixels);
+            Assert.That(dark, Is.LessThan(soft * 0.75f));
+            material.SetFloat("_SoftAlpha", 0);
+            Assert.That(RenderLandmarkSample(source, material, target, pixels), Is.LessThan(0.01f),
+                "Existing cutout layers retain their original threshold.");
+        } finally {
+            RenderTexture.active = previous;
+            target.Release();
+            UnityEngine.Object.DestroyImmediate(source); UnityEngine.Object.DestroyImmediate(material);
+            UnityEngine.Object.DestroyImmediate(target); UnityEngine.Object.DestroyImmediate(pixels);
+        }
+    }
+
+    static float RenderLandmarkSample(Texture source, Material material, RenderTexture target, Texture2D pixels)
+    {
+        RenderTexture.active = target;
+        GL.Clear(true, true, Color.black);
+        Graphics.Blit(source, target, material);
+        pixels.ReadPixels(new Rect(0, 0, 8, 8), 0, 0); pixels.Apply();
+        return pixels.GetPixel(4, 4).grayscale;
+    }
+
+    [Test]
     public void HistoricalPaintingsAreArchivedAndActiveCutoutsKeepTheirImportPolicy()
     {
         foreach (string name in new[] { "connected-river", "middle-cutout", "near-cutout", "painted-terrain", "meadow-surface", "hanging-foliage" }) {
