@@ -43,11 +43,12 @@ export function assertMatchingTag(state, sha, tag) {
     throw new Error('GitHub Release exists without its expected tag: ' + tag);
 }
 
+// target_commitish is informational once a tag exists; GitHub can report its
+// default branch there. The actual remote Git ref SHA is authoritative.
 function assertDraft(state, release, body) {
   if (!state.sha || !state.release || !state.release.draft ||
       state.release.tag_name !== release.gitTag ||
       state.release.prerelease || state.release.name !== release.gitTag ||
-      state.release.target_commitish !== release.gitHead ||
       state.release.body?.trimEnd() !== body.trimEnd())
     throw new Error('Conflicting existing draft metadata for ' + release.gitTag +
       '; manual inspection required, no overwrite.');

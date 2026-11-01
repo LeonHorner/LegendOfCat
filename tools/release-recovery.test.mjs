@@ -51,7 +51,8 @@ if (a[0] === 'api') {
     error(8);
   state.releases[tag] = {
     tag_name: tag, name: tag, prerelease: false, draft: true,
-    target_commitish: process.env.GITHUB_SHA,
+    // GitHub may return its default branch even for a pre-existing tag.
+    target_commitish: 'main',
     body: fs.readFileSync(a[a.indexOf('--notes-file') + 1], 'utf8'), assets: []
   };
   save(); fail('afterDraft');
