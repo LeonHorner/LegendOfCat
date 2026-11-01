@@ -36,7 +36,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Test version analysis and recovery before Unity builds
-        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-snapshot.test.mjs tools/release-recovery.test.mjs
+        run: node --test tools/release-approval.test.mjs tools/release-analyzer.test.mjs tools/release-snapshot.test.mjs tools/release-recovery.test.mjs tools/release-assets.test.mjs tools/delta-release.test.mjs
       - id: plan
         run: npm run release:plan
         env:
@@ -231,20 +231,10 @@ jobs:
         run: node --test tools/release-assets.test.mjs tools/delta-release.test.mjs
       - name: Stage clean player downloads and update packages
         run: node tools/release-assets.mjs artifacts/releases artifacts/published ${{ needs.plan.outputs.version }}
-      - name: Confirm release version has not changed
-        id: final-plan
-        run: npm run release:plan
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ALLOW_MINOR: ${{ inputs.allow_minor }}
-          ALLOW_MAJOR: ${{ inputs.allow_major }}
       - name: Publish verified commit
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ALLOW_MINOR: ${{ inputs.allow_minor }}
           ALLOW_MAJOR: ${{ inputs.allow_major }}
           EXPECTED: ${{ needs.plan.outputs.version }}
-          ACTUAL: ${{ steps.final-plan.outputs.version }}
-        run: |
-          test "$EXPECTED" = "$ACTUAL"
-          npm run release
+        run: npm run release

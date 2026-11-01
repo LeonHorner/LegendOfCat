@@ -317,7 +317,6 @@ test('release dispatch has only allow_minor (default on) and allow_major (defaul
   // Check gates at plan and final publish, without exposing a version field.
   for (const step of [
     releaseWorkflow.jobs.plan.steps.find(s => s.id === 'plan'),
-    releaseWorkflow.jobs.publish.steps.find(s => s.id === 'final-plan'),
     releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit')
   ]) {
     assert.ok(step, 'Release authorization step missing');
@@ -341,9 +340,8 @@ test('release checkouts are pinned to workflow github.sha across all jobs', () =
   const plan = releaseWorkflow.jobs.plan.steps.find(s => s.id === 'plan');
   const publish = releaseWorkflow.jobs.publish.steps.find(s => s.name === 'Publish verified commit');
   assert.equal(plan.run, 'npm run release:plan');
-  assert.ok(publish.run.includes('test "$EXPECTED" = "$ACTUAL"'));
   assert.ok(publish.run.includes('npm run release'));
-  for (const step of [plan, releaseWorkflow.jobs.publish.steps.find(s => s.id === 'final-plan'), publish]) {
+  for (const step of [plan, publish]) {
     assert.equal(step.env.ALLOW_MINOR, '${{ inputs.allow_minor }}');
     assert.equal(step.env.ALLOW_MAJOR, '${{ inputs.allow_major }}');
   }

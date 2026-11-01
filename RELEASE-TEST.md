@@ -28,10 +28,10 @@ release merely to exercise the updater; use the next small, real fix for N+1.
    version is computed automatically from Conventional Commits. Patch releases
    are always allowed, while minor and major releases need their respective
    switches. A disallowed version stops before Unity builds. Optionally
-   preview the computed version via `npx semantic-release --dry-run`; never
+   preview the computed version via `npm run release:plan` with `ALLOW_MINOR` and `ALLOW_MAJOR` set; never
    enable major merely to bypass a surprising prediction. Plan and publish
    revalidate permissions and version consistency. Record the version as N.
-   Verify both platform packages and feeds were published.
+   If the run fails, follow the interrupted-release recovery in `docs/releasing.md` and re-run the original workflow snapshot. Verify both platform packages and feeds were published.
    Check that the release shows the three player downloads plus the two `releases.*.json`
    feeds and referenced `.nupkg` files; do not ship `assets.*.json` or legacy `RELEASES`.
    Verify the three player links in the release notes and the README `latest/download/` URLs.

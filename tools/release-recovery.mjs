@@ -11,12 +11,15 @@ export function gh(...args) {
   return execFileSync('gh', args, { encoding: 'utf8' }).trim();
 }
 
-function getJson(path) {
+export function getJson(path, request = gh) {
   try {
-    return JSON.parse(gh('api', endpoint + path));
+    const value = JSON.parse(request('api', endpoint + path));
+    if (!value || typeof value !== 'object' || Array.isArray(value))
+      throw new Error('Invalid GitHub API response for ' + path);
+    return value;
   } catch (error) {
     // Authentication/permission/network/invalid-JSON errors are NOT a missing release.
-    if (error.status === 1 && /HTTP 404:/.test(String(error.stderr))) return null;
+    if (error.status === 1 && /(?:HTTP 404:|\(HTTP 404\))/.test(String(error.stderr))) return null;
     throw error;
   }
 }
@@ -29,7 +32,8 @@ export function inspectTag(tag) {
   if (ref && (ref.ref !== 'refs/tags/' + tag || ref.object?.type !== 'commit' ||
       !/^[a-f0-9]{40}$/.test(ref.object.sha)))
     throw new Error('Unexpected tag reference for ' + tag);
-  if (release && (!ref || release.tag_name !== tag || release.prerelease ||
+  if (release && (!ref || release.tag_name !== tag || typeof release.draft !== 'boolean' ||
+      release.prerelease !== false ||
       !Array.isArray(release.assets)))
     throw new Error('Contradictory GitHub Release/tag state for ' + tag);
   return { sha: ref?.object.sha ?? null, release };
@@ -67,6 +71,9 @@ export async function assertDraftAssets(existing, files) {
     if (!local.has(asset.name) || seen.has(asset.name))
       throw new Error('Unexpected or duplicate existing draft asset: ' + asset.name);
     seen.add(asset.name);
+    if (asset.state !== 'uploaded')
+      throw new Error('Draft asset ' + asset.name + ' has state ' + String(asset.state) +
+        '; inspect the draft and follow the manual recovery instructions.');
     const path = local.get(asset.name);
     const size = (await stat(path)).size;
     const checksum = await digest(path);

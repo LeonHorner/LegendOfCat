@@ -7,7 +7,7 @@ import { spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { DOWNLOADS } from './release-assets.mjs';
 import { planRelease } from './release-engine.mjs';
-import { assertDraftAssets } from './release-recovery.mjs';
+import { assertDraftAssets, getJson } from './release-recovery.mjs';
 
 const script = fileURLToPath(new URL('./publish-release.mjs', import.meta.url));
 const fakeGh = String.raw`#!/usr/bin/env node
@@ -19,7 +19,7 @@ const path = process.env.GH_MOCK_STATE;
 const state = JSON.parse(fs.readFileSync(path, 'utf8'));
 state.calls.push(a);
 const save = () => fs.writeFileSync(path, JSON.stringify(state));
-const error = (code = 1) => { save(); process.stderr.write('HTTP 404: Not Found\n'); process.exit(code); };
+const error = (code = 1) => { save(); process.stderr.write('gh: Not Found (HTTP 404)\n'); process.exit(code); };
 const fail = phase => { if (process.env.GH_MOCK_FAIL === phase) { save(); process.exit(45); } };
 const tag = 'v0.7.1';
 if (a[0] === 'api') {
@@ -64,7 +64,7 @@ if (a[0] === 'api') {
     const name = require('node:path').basename(file);
     if (state.releases[tag].assets.some(asset => asset.name === name)) error(6);
     state.releases[tag].assets.push({
-      name, size: buffer.length,
+      name, state: 'uploaded', size: buffer.length,
       digest: 'sha256:' + crypto.createHash('sha256').update(buffer).digest('hex')
     });
     save(); fail('duringUpload');
@@ -229,4 +229,34 @@ test('plan detects a same-snapshot incomplete tag, but rejects a different snaps
       /Unfinished release/
     );
   } finally { rmSync(f.cwd, { recursive: true, force: true }); }
+});
+
+
+test('GitHub CLI recognizes actual 404 formats without hiding other failures', () => {
+  for (const stderr of ['gh: Not Found (HTTP 404)\n', 'HTTP 404: Not Found\n']) {
+    assert.equal(getJson('releases/tags/v1.0.0', () => { throw Object.assign(new Error('gh failed'), { status: 1, stderr }); }), null);
+  }
+  for (const [status, stderr] of [[1, 'gh: Forbidden (HTTP 403)'], [1, 'network timeout'], [1, 'gh: Bad Gateway (HTTP 502)'], [2, 'gh: Not Found (HTTP 404)']]) {
+    assert.throws(() => getJson('releases/tags/v1.0.0', () => { throw Object.assign(new Error(stderr), { status, stderr }); }));
+  }
+  assert.throws(() => getJson('releases/tags/v1.0.0', () => '{invalid'), SyntaxError);
+  for (const value of ['null', '[]', 'false'])
+    assert.throws(() => getJson('releases/tags/v1.0.0', () => value), /Invalid GitHub API response/);
+});
+
+test('incomplete starter and unknown asset states block recovery without upload or publication', () => {
+  for (const assetState of ['starter', 'processing', undefined]) {
+    const f = fixture();
+    try {
+      assert.notEqual(f.run('duringUpload').status, 0);
+      const state = f.read();
+      state.releases['v0.7.1'].assets[0].state = assetState;
+      f.write(state);
+      const before = state.calls.length;
+      const result = f.run();
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, /manual recovery instructions/);
+      assert.ok(!f.read().calls.slice(before).some(a => a[0] === 'release' && ['upload', 'edit'].includes(a[1])));
+    } finally { rmSync(f.cwd, { recursive: true, force: true }); }
+  }
 });

@@ -14,7 +14,7 @@ const result = await planRelease({ inspectTagState: inspectTag });
 if (!result) throw new Error('No releasable changes.');
 const release = result.nextRelease;
 assertReleaseApproval(release, process.env.ALLOW_MINOR, process.env.ALLOW_MAJOR);
-if (process.env.EXPECTED !== release.version || process.env.ACTUAL !== release.version)
+if (process.env.EXPECTED !== release.version)
   throw new Error('Release version changed since planning.');
 if (release.gitHead !== sha)
   throw new Error('Release target differs from workflow github.sha.');
