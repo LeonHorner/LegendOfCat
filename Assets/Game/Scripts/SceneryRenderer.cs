@@ -23,8 +23,6 @@ public sealed class SceneryRenderer : MonoBehaviour
     readonly System.Collections.Generic.List<Mesh> terrainMeshes = new System.Collections.Generic.List<Mesh>();
     Material terrainMaterial, cornerMaterial, riverFrontMaterial;
     Transform riverFront;
-    readonly Texture2D[] riverPaintings = new Texture2D[2];
-    MaterialPropertyBlock riverProperties;
     Mesh quadMesh;
     float waterRunAmount, waterRunOffset;
     bool initialized;
@@ -55,7 +53,6 @@ public sealed class SceneryRenderer : MonoBehaviour
     {
         if (initialized) return;
         initialized = true;
-        riverProperties = new MaterialPropertyBlock();
         // Render-only unit quad: never create a primitive's temporary MeshCollider.
         quadMesh = new Mesh { name = "Scenery unit quad" };
         quadMesh.vertices = new[] { new Vector3(-0.5f, -0.5f), new Vector3(0.5f, -0.5f),
@@ -110,24 +107,22 @@ public sealed class SceneryRenderer : MonoBehaviour
         riverFront = new GameObject("Foreground water").transform;
         riverFront.SetParent(transform, false);
         riverFrontMaterial = PaintedMaterial("water-material", "LegendOfCat/StudyWater");
-        riverFrontMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-river");
-        riverPaintings[0] = (Texture2D)riverFrontMaterial.mainTexture;
-        riverPaintings[1] = Resources.Load<Texture2D>("GoldenRiver/river-stones-slab-v1");
+        riverFrontMaterial.mainTexture = Resources.Load<Texture2D>(RouteLandmarks ? "GoldenRiver/river-water-v2" : "BackgroundStudy/foreground-river");
         riverFrontMaterial.SetFloat("_Fog", 0.20f);
         riverFrontMaterial.SetFloat("_Saturation", 0.70f);
-        // All authored opaque pixels lie below v=0.242; retain a bilinear margin.
-        // Preserve the original world/UV mapping while avoiding 75% empty overdraw.
+        // Keep transparent headroom: clipping at the old wave height cuts new crests into a rectangle.
+        // Retain the original world/UV mapping for both the lab and route paintings.
         var waterMesh = new Mesh { name = "Visible foreground water" };
         waterMesh.vertices = new[] { new Vector3(-0.5f, -0.5f), new Vector3(0.5f, -0.5f),
-            new Vector3(-0.5f, -0.25f), new Vector3(0.5f, -0.25f) };
-        waterMesh.uv = new[] { Vector2.zero, Vector2.right, new Vector2(0, 0.25f), new Vector2(1, 0.25f) };
+            new Vector3(-0.5f, 0), new Vector3(0.5f, 0) };
+        waterMesh.uv = new[] { Vector2.zero, Vector2.right, new Vector2(0, 0.5f), new Vector2(1, 0.5f) };
         waterMesh.triangles = new[] { 0, 2, 1, 1, 2, 3 };
         waterMesh.RecalculateBounds(); terrainMeshes.Add(waterMesh);
         for (int tile = 0; tile < 3; tile++) {
             var front = Quad();
             front.name = "Foreground water tile " + tile;
             front.transform.SetParent(riverFront, false);
-            front.transform.localPosition = new Vector3((tile - 1) * 16, -0.32f, -2);
+            front.transform.localPosition = new Vector3((tile - 1) * 16, RouteLandmarks ? -0.64f : -0.32f, -2);
             front.transform.localScale = new Vector3(16, 16 / 1.5f, 1);
             front.GetComponent<MeshRenderer>().sharedMaterial = riverFrontMaterial;
             front.GetComponent<MeshFilter>().sharedMesh = waterMesh;
@@ -142,6 +137,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         if (RouteLandmarks) {
             CreateLandmarks();
             CreateEasterEggs();
+            CreateRiverRocks();
         }
         cornerMaterial = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
         cornerMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/foreground-corners");
@@ -322,6 +318,32 @@ public sealed class SceneryRenderer : MonoBehaviour
         }
     }
 
+    void CreateRiverRocks()
+    {
+        float[] anchors = { 22, 78, 163, 273, 394, 487 };
+        for (int i = 0; i < anchors.Length; i++) {
+            var rock = Quad();
+            rock.name = "Unique river rock group " + i;
+            rock.transform.SetParent(transform, false);
+            rock.transform.localPosition = new Vector3(anchors[i], -4.47f, -2.3f);
+            rock.transform.localScale = new Vector3(2.2f, 2.2f, 1);
+            var mesh = Instantiate(quadMesh);
+            mesh.name = rock.name + " mesh";
+            float left = (i % 3) / 3f, right = left + 1f / 3;
+            float bottom = i < 3 ? 0.5f : 0, top = bottom + 0.5f;
+            mesh.uv = new[] { new Vector2(left, bottom), new Vector2(right, bottom),
+                new Vector2(left, top), new Vector2(right, top) };
+            terrainMeshes.Add(mesh);
+            rock.GetComponent<MeshFilter>().sharedMesh = mesh;
+            rock.GetComponent<MeshRenderer>().sharedMaterial = landmarkMaterial;
+            var properties = new MaterialPropertyBlock();
+            properties.SetTexture("_MainTex", Resources.Load<Texture2D>("GoldenRiver/river-rock-groups-v1"));
+            properties.SetFloat("_Fog", 0.08f);
+            properties.SetFloat("_Brightness", 0.9f);
+            rock.GetComponent<MeshRenderer>().SetPropertyBlock(properties);
+        }
+    }
+
     void ShoreFoot(Vector3 platform, int side)
     {
         // A low decorative buttress joins the cliff to its bank below the landing plane.
@@ -375,7 +397,7 @@ public sealed class SceneryRenderer : MonoBehaviour
                 landmarks[i].localPosition = position;
             }
             // Register the small statue with the right-hand battlement in the valley painting.
-            easterEggs[0].localPosition = new Vector3(Offset(localView.x, ValleyTravel) + 33.54f, localView.y + 2.09f, 12);
+            easterEggs[0].localPosition = new Vector3(Offset(localView.x, ValleyTravel) + 34.9f, localView.y + 4.37f, 12);
             UpdateFish(waterCaptureTime >= 0 ? waterCaptureTime : fishClock);
         }
         PositionForegroundWater(localView.x);
@@ -390,12 +412,6 @@ public sealed class SceneryRenderer : MonoBehaviour
             var scale = riverFront.GetChild(tile).localScale;
             scale.x = ((tileIndex + tile - 1) & 1) == 0 ? 16 : -16;
             riverFront.GetChild(tile).localScale = scale;
-            if (RouteLandmarks) {
-                int absoluteTile = tileIndex + tile - 1;
-                int painting = ((absoluteTile % 2) + 2) % 2;
-                riverProperties.SetTexture("_MainTex", riverPaintings[painting]);
-                riverFront.GetChild(tile).GetComponent<MeshRenderer>().SetPropertyBlock(riverProperties);
-            }
         }
     }
 

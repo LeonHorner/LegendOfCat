@@ -500,3 +500,12 @@ The latest user review supersedes the pale limestone and flat-mountain variants:
 Latest original-style revision: 30/30 scoped Unity EditMode tests passed in Temp/restored-style-tests-final.xml. Eighteen normal-framing positions were captured at 960/640 widths, with grayscale companions, plus a five-second fish detail GIF. These are scripted scenery reviews, not full player-input playtest evidence.
 
 The Windows development preview at Builds/GoldenRiverPaintedPreview/LegendOfCatPreview.exe built successfully and passed packed-art auditing (25 active paintings; archive excluded). Full Windows/Linux player/launcher gates remain pending while PR #77 is a draft.
+
+### Nonrepeating river stones and supported statue refinement
+The user still recognized the alternating stone tiles, so stones are now removed from the repeated wave layer. Six unique atlas cells are rendered once at x=22,78,163,273,394,487, independently of water tile recycling. They have no colliders and do not reshuffle on camera movement or retry. The water mesh now retains headroom through v=0.5, preventing a new painting's visible upper alpha from being cut into a rectangular bar. The statue was refined from a close-up study, masked and composited in PhotoCraft onto the existing parapet; the rest of the panorama was retained. Review captures include all six rock anchors and both sides of a water-tile boundary.
+
+Validation for this correction: 30/30 scoped Unity EditMode tests passed (Temp/water-statue-tests.xml). Both the lab and route water paintings have maximum alpha 1 above the retained v=0.5 mesh crop, so no visible paint is clipped at that upper edge. A pixel comparison against the previous committed panorama found zero visible changes outside the statue edit area. PhotoCraft used a fresh local MCP connection to the existing 127.0.0.1 bridge; no Codex configuration or credentials were changed.
+
+The final PhotoCraft statue layer was lowered two source pixels so the paws overlap the parapet rather than leaving a visible gap. The non-rendering review anchor follows the final composited statue position. Its contact was inspected in the actual Unity render.
+
+Windows development preview built successfully at Builds/GoldenRiverWaterPreview/LegendOfCatPreview.exe; packed-art validation confirmed 26 active paintings and excluded archived art. Full Windows/Linux production and launcher checks remain pending for the draft feature.

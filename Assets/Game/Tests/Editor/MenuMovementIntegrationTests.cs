@@ -84,8 +84,25 @@ public class MenuMovementIntegrationTests
         Assert.That(BoundTextureNames(bankArt), Is.EquivalentTo(new[] { "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3" }));
         var panoramas = course.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Continuous ")).ToArray();
         var waterTiles = course.GetComponentsInChildren<MeshFilter>().Where(t => t.name.StartsWith("Foreground water tile ")).ToArray();
-        Assert.That(BoundTextureNames(waterTiles), Is.EquivalentTo(new[] { "foreground-river", "river-stones-slab-v1" }),
-            "The river must use different authored rock formations rather than only scaling one painting.");
+        Assert.That(waterTiles, Has.Length.EqualTo(3));
+        Assert.That(waterTiles[0].GetComponent<Renderer>().sharedMaterial.mainTexture.name, Is.EqualTo("river-water-v2"));
+        var rocks = course.GetComponentsInChildren<MeshFilter>().Where(t => t.name.StartsWith("Unique river rock group ")).ToArray();
+        Assert.That(rocks, Has.Length.EqualTo(6));
+        Assert.That(rocks.Select(t => t.sharedMesh.uv[0]).Distinct().Count(), Is.EqualTo(6),
+            "Each rock painting must appear once, independently of recycled wave tiles.");
+        foreach (var rock in rocks) Assert.That(rock.GetComponents<Collider2D>(), Is.Empty);
+        var waterPixels = new Texture2D(2, 2);
+        try {
+            waterPixels.LoadImage(System.IO.File.ReadAllBytes(AssetDatabase.GetAssetPath(waterTiles[0].GetComponent<Renderer>().sharedMaterial.mainTexture)));
+            var pixels = waterPixels.GetPixels32();
+            float topV = waterTiles[0].sharedMesh.uv.Max(uv => uv.y);
+            int maxExcludedAlpha = 0;
+            for (int row = Mathf.CeilToInt(topV * waterPixels.height) - 2; row < waterPixels.height; row++)
+                for (int column = 0; column < waterPixels.width; column++)
+                    maxExcludedAlpha = Mathf.Max(maxExcludedAlpha, pixels[row * waterPixels.width + column].a);
+            Assert.That(maxExcludedAlpha, Is.LessThan(128),
+                "The route water mesh must not slice through visible alpha into a rectangular upper edge.");
+        } finally { UnityEngine.Object.Destroy(waterPixels); }
         Assert.That(panoramas, Has.Length.EqualTo(2));
         var panoramaApply = scenery.GetType().GetMethod("ApplyView");
         foreach (float x in new[] { -3f, 84f, 216f, 342f, 503f, 84f }) {

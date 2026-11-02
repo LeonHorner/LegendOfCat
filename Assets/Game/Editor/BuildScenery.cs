@@ -38,13 +38,18 @@ public static class BuildScenery
         "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2",
         "valley-panorama-v3", "canopy-panorama-v3", "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3",
         "shelf-root-compact-v3", "shelf-masonry-compact-v3",
-        "egg-watching-fish", "egg-no-cats-sign", "egg-cat-rock", "river-stones-slab-v1"
+        "egg-watching-fish", "egg-no-cats-sign", "egg-cat-rock", "river-water-v2", "river-rock-groups-v1"
     };
 
     [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]
     public static void ImportGoldenRiverArt()
     {
         ArchiveLandmarkCutouts();
+        const string repeatingStones = "Assets/Game/Resources/GoldenRiver/river-stones-slab-v1.png";
+        if (AssetDatabase.LoadAssetAtPath<Texture2D>(repeatingStones)) {
+            string error = AssetDatabase.MoveAsset(repeatingStones, "Assets/Game/Art/GoldenRiverArchive/river-stones-slab-v1.png");
+            if (!string.IsNullOrEmpty(error)) throw new System.InvalidOperationException(error);
+        }
         const string rejectedKing = "Assets/Game/Resources/GoldenRiver/egg-cat-king.png";
         if (AssetDatabase.LoadAssetAtPath<Texture2D>(rejectedKing)) {
             string error = AssetDatabase.MoveAsset(rejectedKing, "Assets/Game/Art/GoldenRiverArchive/egg-cat-king.png");
