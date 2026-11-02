@@ -163,6 +163,12 @@ continues animation improvements, varied runs with random selection, walking,
 idle actions and Unity/gameplay integration. This publication approval does not
 establish actual-game acceptance or accept every exploratory action.
 
+The next review on 2026-11-02 identified a stiff running tail. Local revision 4
+adds delayed flexion increasing toward the tip and slight lateral follow-through.
+The current run's body and paw animation remain intact. Normal/slowed previews
+and baked tail-joint verification accompany the candidate; publication and visual
+acceptance of this tail revision remain pending.
+
 ### Terrain system correction — 2026-10-28
 
 The user rejected the latest tall-wall preview, especially its right platform,

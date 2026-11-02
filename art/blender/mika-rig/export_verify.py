@@ -61,9 +61,10 @@ for name, length in source['actions'].items():
                     previous_support[key] = (frame, point)
                 else:
                     previous_support.pop(key, None)
-        if frame in {1, length // 2 + 1, length + 1}:
+        if name == 'Run' or frame in {1, length // 2 + 1, length + 1}:
             samples[(name, frame)] = {key: rig.matrix_world @ rig.pose.bones[key].head
-                                      for key in ['Head', 'Front.L.Paw', 'Hind.R.Paw']}
+                                      for key in ['Head', 'Front.L.Paw', 'Hind.R.Paw'] +
+                                      [f'Tail.{i}' for i in range(1, 6)]}
         if name == 'Run':
             bounds.append(tuple(rig.pose.bones['Head'].head))
     metrics[name] = {'max_ik_target_error_m': max(errors),

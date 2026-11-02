@@ -72,11 +72,15 @@ def author_run(rig, scene, sole_offsets):
         rotate('Neck', -(pelvis_pitch+spine_pitch+chest_pitch)+.20, add=True)
         rotate('Head', -.85, (0, 0, 1))
         rotate('Head', -.18+.025*math.sin(phase-.4), add=True)
-        rotate('Tail.1', -1.05-pelvis_pitch-.225*(1+gathered)+.10*math.sin(phase-.7))
-        rotate('Tail.2', -.10+.09*math.sin(phase-1.0))
-        rotate('Tail.3', -.08+.08*math.sin(phase-1.3))
-        rotate('Tail.4', -.18+.07*math.sin(phase-1.6))
-        rotate('Tail.5', -.20+.06*math.sin(phase-1.9))
+        # The root follows the pelvis; successive joints lag behind it with
+        # increasing flexion, so the tip continues moving after the base turns.
+        rotate('Tail.1', -1.05-pelvis_pitch-.10*(1+gathered)+.14*math.sin(phase-.7))
+        for index, (bias, amplitude) in enumerate([
+            (-.10, .20), (-.08, .28), (-.18, .36), (-.20, .42)
+        ], start=2):
+            lag = .7 + .8*(index-1)
+            rotate(f'Tail.{index}', bias+amplitude*math.sin(phase-lag))
+            rotate(f'Tail.{index}', .035*math.sin(phase-lag-.5), (0, 0, 1), add=True)
         for key, delay in CONTACTS.items():
             u = (t-delay) % 1
             front = key.startswith('Front')
@@ -145,7 +149,7 @@ if __name__ == '__main__':
     report=json.loads((OUT/'rig-report.json').read_text())
     author_run(rig,scene,report['sole_offsets'])
     report['actions']['Run']=DURATION
-    report['run']={'stride_m':STRIDE,'stance_fraction':STANCE,'contacts':CONTACTS,'revision':3,'visual_acceptance':False}
+    report['run']={'stride_m':STRIDE,'stance_fraction':STANCE,'contacts':CONTACTS,'revision':4,'visual_acceptance':False}
     (OUT/'rig-report.json').write_text(json.dumps(report,indent=2)+'\n')
     rig.animation_data.action=bpy.data.actions['Run'];scene.frame_start=1;scene.frame_end=DURATION;scene.frame_set(1)
     bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'mika-rig.blend'))
@@ -155,4 +159,4 @@ if __name__ == '__main__':
     scene.camera.rotation_euler=(Vector((-.05,0,.25))-scene.camera.location).to_track_quat('-Z','Y').to_euler()
     scene.camera.data.ortho_scale=.86
     for frame in [1,4,7,10]:
-        scene.frame_set(frame);scene.render.filepath=f'/tmp/mika-authoring/revision-3/pose-{frame}.png';bpy.ops.render.render(write_still=True)
+        scene.frame_set(frame);scene.render.filepath=f'/tmp/mika-authoring/tail-review/pose-{frame}.png';bpy.ops.render.render(write_still=True)

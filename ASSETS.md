@@ -272,6 +272,12 @@ RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
   Existing source, license and generator disclosures remain unchanged. This is
   approval of the authoring deliverable, not a Unity/gameplay validation result.
 
+- Tail revision 4, 2026-11-02: the user found the running tail too stiff. Codex
+  and Blender 5.2.3 LTS authored progressively delayed joint flexion and subtle
+  sideways follow-through. Only the Run tail curves changed; the same CC0-derived
+  skin and textures are used. No external artwork or new generation was used.
+  New actual Blender previews are local review candidates pending acceptance.
+
 ## Golden River background study — 2026-10-24
 
 `Assets/Game/Resources/BackgroundStudy/painted-atlas.png` is original generated

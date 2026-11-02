@@ -1,11 +1,16 @@
 """Package actual rendered frames into normal/slowed review loops."""
 from pathlib import Path
+import sys
 from PIL import Image, ImageDraw, ImageOps
 
 OUT=Path(__file__).resolve().parent
 CACHE=Path('/tmp/mika-authoring/review-frames')
 clips=[('Run',.5),('Idle',4),('Groom',6),('Stretch',6),('LookBack',6),('Listen',4),('TailTwitch',4),('JumpReview',3)]
-sheet=Image.new('RGB',(960,872),'#20252a')
+# Reuse the other review tiles when only the running clips were rendered.
+run_only = '--run-only' in sys.argv
+if run_only:
+    clips = clips[:1]
+sheet = Image.open(OUT/'motion-review-sheet.png').convert('RGB') if run_only else Image.new('RGB',(960,872),'#20252a')
 for index,(name,step) in enumerate(clips):
     frames=[Image.open(p).convert('RGB') for p in sorted((CACHE/name).glob('*.png'))]
     expected={'Run':24,'Idle':12,'Groom':16,'Stretch':12,'LookBack':12,'Listen':12,'TailTwitch':12,'JumpReview':16}[name]
@@ -15,7 +20,7 @@ for index,(name,step) in enumerate(clips):
         # complete loop keeps its authored duration rather than speeding up.
         ticks=[round(i*100*step/24*multiplier)*10 for i in range(len(frames)+1)]
         durations=[b-a for a,b in zip(ticks,ticks[1:])]
-        prefix='run-v3' if name=='Run' else name.lower()
+        prefix='run-v4' if name=='Run' else name.lower()
         frames[0].save(OUT/f'{prefix}-{suffix}.gif',save_all=True,append_images=frames[1:],duration=durations,loop=0,optimize=False)
     representative=frames[len(frames)//2].resize((240,200))
     col=index%4;row=index//4

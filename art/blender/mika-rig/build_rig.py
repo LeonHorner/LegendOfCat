@@ -199,5 +199,5 @@ for clip,frame in [('Idle',1),('Groom',49),('Stretch',37),('Run',5),('LookBack',
         scene.camera.rotation_euler=(Vector((-.05,0,.25))-scene.camera.location).to_track_quat('-Z','Y').to_euler()
     rig.animation_data.action=bpy.data.actions[clip];scene.frame_set(frame)
     scene.render.filepath=str(OUT/('pose-'+clip.lower()+'.png'));bpy.ops.render.render(write_still=True)
-report={'bones':len(arm.bones),'deform_bones':sum(b.use_deform for b in arm.bones),'skin_vertices':len(skin.data.vertices),'actions':clips,'pole_angles':pole_angles,'sole_offsets':sole_offsets,'unweighted_vertices':sum(not v.groups for v in skin.data.vertices),'visual_acceptance':False,'unity_validated':False,'run':{'stride_m':STRIDE,'stance_fraction':STANCE,'contacts':CONTACTS,'revision':3,'visual_acceptance':False}}
+report={'bones':len(arm.bones),'deform_bones':sum(b.use_deform for b in arm.bones),'skin_vertices':len(skin.data.vertices),'actions':clips,'pole_angles':pole_angles,'sole_offsets':sole_offsets,'unweighted_vertices':sum(not v.groups for v in skin.data.vertices),'visual_acceptance':False,'unity_validated':False,'run':{'stride_m':STRIDE,'stance_fraction':STANCE,'contacts':CONTACTS,'revision':4,'visual_acceptance':False}}
 (OUT/'rig-report.json').write_text(json.dumps(report,indent=2)+'\n');print('RIG_REPORT',report,flush=True)

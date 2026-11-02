@@ -25,6 +25,22 @@ The user-supplied running-cat GIF was inspected locally for the sequence of
 extension, forelimb support, spinal gathering and hindlimb push-off. Its creator
 and redistribution license are unverified, so it is not included in the repository.
 
+### Tail revision 4 — local review, 2026-11-02
+
+The user found the published running tail too stiff. This revision increases
+flexion progressively along the tail and delays each joint relative to its
+parent, with a small sideways follow-through. The root compensates for pelvis
+pitch while the tip continues its motion after the base turns. The run's body,
+head and paw curves, skin/weights and other 12 actions are preserved.
+Review `run-v4-normal.gif` and `run-v4-slow.gif`; the revision 3 side loops remain
+available for comparison. The three-quarter previews show revision 4.
+Native comparisons confirm all non-tail curves and skin/weights are identical.
+The tail loop closes, and all five tail-joint positions are checked through
+every half-frame of the exported run. For a run-only render refresh, use
+`python art/blender/mika-rig/assemble_review.py --run-only`.
+This local change awaits visual review before publication. Prior PR validation
+applies to the published revision, not these new animation files.
+
 ## Files and use
 
 - `mika-rig.blend`: editable skin, 25 deform bones, four paw IK controls, four
