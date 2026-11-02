@@ -1,0 +1,3 @@
+# Keep third-party metadata byte-for-byte, including its original CRLF endings.
+LICENSE.txt -text whitespace=cr-at-eol
+manifest.json -text whitespace=cr-at-eol

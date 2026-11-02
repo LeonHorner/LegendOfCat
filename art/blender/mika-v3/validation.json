@@ -1,0 +1,15 @@
+{
+  "mesh_vertices": 404297,
+  "mesh_triangles": 765012,
+  "armatures": 0,
+  "packed_images": 5,
+  "status": "Appearance accepted; unrigged work in progress; not tested in Unity.",
+  "native_reopened": true,
+  "material_images_embedded": true,
+  "final_views_rendered_from_reopened_file": true,
+  "appearance_review": {
+    "accepted": true,
+    "date": "2026-10-24",
+    "scope": "Visible model only; rigging, animation and Unity integration remain incomplete."
+  }
+}
