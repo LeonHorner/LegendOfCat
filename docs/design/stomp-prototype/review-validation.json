@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-01",
+  "unity": "6000.3.27f2",
+  "scope": "StompCombatTests only, isolated review project",
+  "result": "Passed",
+  "total": 34,
+  "passed": 34,
+  "failed": 0,
+  "skipped": 0,
+  "runtimeSha256": "5347b634bd0e3c0adae0cd349643a07c7978fbdbfd0089fe4cb35b29609c30d3",
+  "testsSha256": "cd0f7675f6f274a0b33d5f142afe676142e38b9c1f49df0bea68dbe521b82465",
+  "fullPrepareMerge": "Pending gameplay approval and normal integration of current main",
+  "platformBuilds": "Not run in this review pass"
+}

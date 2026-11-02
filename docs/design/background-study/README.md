@@ -1,4 +1,4 @@
-# Golden River: selected subtle distance
+# Golden River: selected scenery and historical study
 
 Issue [#50](https://github.com/LeonHorner/LegendOfCat/issues/50).
 On 2026-10-30 the user selected Subtle distance, requested removal of the chooser
@@ -31,7 +31,7 @@ changes. Supported transforms are translation and positive uniform scaling;
 rotation, mirroring, zero scale and nonuniform scaling are unsupported.
 The course's fall boundary is local Y < -7, so valid placements below world Y=-7
 do not create a repeated fall/retry loop.
-The separate 109-unit art lab below remains available for scenery stress review.
+The standalone art-study scene and its comparison tools were retired; the playable movement course remains the source of truth for scenery behavior.
 See the [integrated checkpoint evidence](checkpoint-prototype/README.md) for
 screenshots, a short recording, lifecycle data and reproduction instructions.
 The [extended prototype review](extended-prototype/README.md) records the current
@@ -40,13 +40,12 @@ The normal HUD is 350x52 pixels; Controls or pause reveals help, actions and fps
 
 Resources material assets hold references to the three scenery shaders so player
 builds retain them. Regenerate missing materials with
-`LegendOfCat/Background study/Prepare runtime materials`.
+`LegendOfCat/Scenery/Prepare runtime materials`.
 
 Use Unity 6000.3.27f2, as pinned in ProjectSettings/ProjectVersion.txt.
-Open Assets/Game/Scenes/BackgroundStudy.unity and press Play.
-A/D/arrows move, Space jumps, R retries. Stop/restart Play after code changes.
-The small help panel has movement instructions and an optional camera tour;
-there are no concept buttons or parallax sliders.
+Open Assets/Game/Scenes/Main.unity, press Play, and select **Movement lab (prototype)**.
+The course uses `SceneryRenderer` with its existing camera, water, terrain and checkpoints.
+The old standalone study scene, camera tour and comparison controls were removed.
 
 The fixed travel factors are sky 0.05, recessed valley 0.14 and distant canopy
 0.08. Gameplay cliffs, nearby shore decoration and foreground water remain in
@@ -92,12 +91,10 @@ water activity only; movement and collision are unchanged.
 - [Grounded shore](subtle-ground.png), [extended route](subtle-extended.png), [raised-camera stress](subtle-jump-stress.png).
 - [Actual raised ground contact](play-ground-contact.png) and [highest-platform jump](play-jump.png).
 
-Use LegendOfCat > Background study > Capture comparison to regenerate selected
-evidence, then pwsh -File tools/export-background-study.ps1 with FFmpeg available.
-The menu name is retained for existing workflows; it now captures only the
-selected direction. Numbered frames live under ignored Logs/background-study-motion/.
-Capture time advances explicitly at 25 fps. These are deterministic renders,
-not real-time performance or complete player-input traversal recordings.
+These are historical deterministic captures from the original background study.
+Its comparison-capture command and export script have been retired; the files
+are preserved review evidence, not current capture instructions.
+They are not measurements of gameplay frame pacing or a full input traversal.
 
 ## Historical alternatives and selection rationale
 
@@ -132,7 +129,7 @@ uses the actual graphics path.
 
 Motor/jump checks use isolated, explicitly stepped 2D physics with live input
 disabled, so headless scheduling cannot shorten a scripted held jump.
-Tests and captures run in an ignored isolated project with its own Library.
+Editor tests instantiate the real `MovementCourse` and exercise scenery with isolated 2D physics.
 Source matches and committed whitespace checks are inspected. Logs stay under
 ignored Logs/. Recorded renders do not establish frame pacing, measured GPU cost
 or full traversal readability. Player/launcher builds and final exact-head merge
@@ -143,7 +140,9 @@ Grounded bodies stretch vertically and grass is not pixel-flat. The selected
 direction is a basis for #16, not final full-level artwork. ASSETS.md and prompt
 archives document provenance; the current shader changes introduce no new pixels.
 
-Ownership remains the BackgroundStudy lab, generator, shader, tests, exporter and
-documentation. No overlap with open Blender/keepsake work. Existing local scene
-and importer edits remain outside this feature's commits. The lab stays excluded
-from release scenes.
+The active course renderer is `SceneryRenderer` and packed-art validation is in
+`BuildScenery`. The existing Resources/BackgroundStudy asset paths and shader
+names remain stable to preserve imported Unity material references. Historic
+images, generated-source attribution and archived study decisions are retained.
+PR #61 also changes the earlier renderer and course; integrate its water recovery
+work deliberately before merging both branches.

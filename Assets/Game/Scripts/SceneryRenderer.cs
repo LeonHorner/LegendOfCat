@@ -1,26 +1,12 @@
 using UnityEngine;
 
-// Selected scenery, shared by the comparison lab and the checkpoint prototype.
+// Painted parallax, terrain and water renderer for the playable course.
 [DefaultExecutionOrder(100)]
-public sealed class BackgroundStudy : MonoBehaviour
+public sealed class SceneryRenderer : MonoBehaviour
 {
     public const float SkyTravel = 0.05f, ValleyTravel = 0.14f, CanopyTravel = 0.08f;
-    public bool tour;
-    public bool showControls = true;
     public Camera View { get; private set; }
     public const float CameraFloor = 1f;
-    public const float CourseLeft = -5, CourseRight = 104;
-    public const float TourDistance = 100;
-    // Long scenery route; the menu prototype uses this layout with checkpoint recovery.
-    public static readonly Vector3[] Platforms = {
-        new Vector3(0, -0.75f, 10), new Vector3(9, -0.75f, 4),
-        new Vector3(15, 0.25f, 4), new Vector3(22.5f, 0.25f, 3),
-        new Vector3(28.5f, 1.25f, 3), new Vector3(34, 0.25f, 4),
-        new Vector3(42, -0.75f, 10), new Vector3(52, -0.75f, 4),
-        new Vector3(58.5f, 0.25f, 3), new Vector3(65, 0.25f, 4),
-        new Vector3(73, -0.75f, 6), new Vector3(83, -0.75f, 8),
-        new Vector3(92, 0.25f, 4), new Vector3(100, -0.75f, 8)
-    };
     public static bool IsFloating(int index) => index == 3 || index == 4 || index == 8 || index == 12;
     public CatController Cat { get; private set; }
     Rigidbody2D catBody;
@@ -29,20 +15,14 @@ public sealed class BackgroundStudy : MonoBehaviour
     readonly System.Collections.Generic.List<Mesh> terrainMeshes = new System.Collections.Generic.List<Mesh>();
     Material terrainMaterial, cornerMaterial, riverFrontMaterial;
     Transform riverFront;
-    Texture2D pixel;
-    Sprite square;
     Mesh quadMesh;
-    float tourTime;
     float waterRunAmount, waterRunOffset;
-    Vector3 cameraVelocity;
-    bool initialized, attachedToCourse;
+    bool initialized;
     Vector3[] coursePlatforms;
     static readonly float[] TravelFactors = { SkyTravel, ValleyTravel, CanopyTravel };
 
     public void InitializeForCourse(Camera camera, CatController cat, Vector3[] platforms)
     {
-        attachedToCourse = true;
-        showControls = false;
         View = camera;
         Cat = cat;
         catBody = cat.GetComponent<Rigidbody2D>();
@@ -61,14 +41,10 @@ public sealed class BackgroundStudy : MonoBehaviour
     public static float TileCenter(float cameraX, float speed, float width) =>
         Mathf.Floor(cameraX * speed / width + 0.5f) * width;
 
-    void Start() => Initialize();
-    public void Initialize()
+    void Initialize()
     {
         if (initialized) return;
         initialized = true;
-        pixel = new Texture2D(1, 1);
-        pixel.SetPixel(0, 0, Color.white); pixel.Apply();
-        square = Sprite.Create(pixel, new Rect(0, 0, 1, 1), Vector2.one * 0.5f, 1);
         // Render-only unit quad: never create a primitive's temporary MeshCollider.
         quadMesh = new Mesh { name = "Scenery unit quad" };
         quadMesh.vertices = new[] { new Vector3(-0.5f, -0.5f), new Vector3(0.5f, -0.5f),
@@ -76,19 +52,6 @@ public sealed class BackgroundStudy : MonoBehaviour
         quadMesh.uv = new[] { Vector2.zero, Vector2.right, Vector2.up, Vector2.one };
         quadMesh.triangles = new[] { 0, 2, 1, 1, 2, 3 };
         quadMesh.RecalculateBounds();
-        if (!attachedToCourse) {
-            View = new GameObject("Study camera").AddComponent<Camera>();
-            View.transform.SetParent(transform, false);
-            View.orthographic = true; View.orthographicSize = 5.5f;
-            View.transform.position = new Vector3(6, CameraFloor, -10);
-            View.depth = 1;
-            View.clearFlags = CameraClearFlags.SolidColor;
-            View.backgroundColor = new Color(0.8f, 0.79f, 0.7f);
-            var bars = new GameObject("Study viewport bars").AddComponent<Camera>();
-            bars.transform.SetParent(transform, false);
-            bars.depth = 0; bars.clearFlags = CameraClearFlags.SolidColor;
-            bars.backgroundColor = Color.black; bars.cullingMask = 0;
-        }
         var atlas = Resources.Load<Texture2D>("BackgroundStudy/painted-atlas");
         var textures = new[] { atlas, Resources.Load<Texture2D>("BackgroundStudy/recessed-valley-v4"),
             Resources.Load<Texture2D>("BackgroundStudy/distant-canopy-v3") };
@@ -138,14 +101,9 @@ public sealed class BackgroundStudy : MonoBehaviour
         }
         terrainMaterial = PaintedMaterial("terrain-material", "LegendOfCat/StudyTerrain");
         terrainMaterial.mainTexture = Resources.Load<Texture2D>("BackgroundStudy/painted-pillar-v2");
-        var platforms = coursePlatforms ?? Platforms;
+        var platforms = coursePlatforms;
         for (int index = 0; index < platforms.Length; index++) {
             var p = platforms[index];
-            if (!attachedToCourse) {
-                var ground = Block("World-space ground", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.19f, 0.23f, 0.2f));
-                ground.GetComponent<SpriteRenderer>().enabled = false;
-                ground.AddComponent<BoxCollider2D>();
-            }
             Terrain(p, IsFloating(index), index);
         }
         cornerMaterial = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
@@ -165,19 +123,6 @@ public sealed class BackgroundStudy : MonoBehaviour
             renderer.sharedMaterial = cornerMaterial; renderer.sortingOrder = 10;
             var parameters = new MaterialPropertyBlock(); parameters.SetFloat("_CornerSide", side);
             renderer.SetPropertyBlock(parameters);
-        }
-        if (!attachedToCourse) {
-            var player = new GameObject("Mika existing prototype");
-            player.transform.SetParent(transform, false); player.transform.position = new Vector3(-3, 0.48f);
-            catBody = player.AddComponent<Rigidbody2D>();
-            player.AddComponent<BoxCollider2D>().size = new Vector2(0.9f, 0.9f);
-            Cat = player.AddComponent<CatController>();
-            var input = player.AddComponent<CatInput>(); input.controller = Cat;
-            input.RetryCheckpoint = () => Cat.ReturnToStart();
-            input.RestartRun = () => Cat.ReturnToStart();
-            var original = Resources.Load<GameObject>("MikaOriginal");
-            if (original) Instantiate(original, player.transform).GetComponent<MikaSpritePresentation>().controller = Cat;
-            else Debug.LogError("Background study requires the existing MikaOriginal prefab.");
         }
         ApplyViewport(Screen.width, Screen.height);
         ApplyView(6, CameraFloor);
@@ -238,14 +183,6 @@ public sealed class BackgroundStudy : MonoBehaviour
         var item = new GameObject("Scenery quad", typeof(MeshFilter), typeof(MeshRenderer));
         item.GetComponent<MeshFilter>().sharedMesh = quadMesh;
         return item;
-    }
-
-    GameObject Block(string label, Vector2 position, Vector2 size, Color color)
-    {
-        var item = new GameObject(label); item.transform.SetParent(transform, false);
-        item.transform.localPosition = position; item.transform.localScale = size;
-        var renderer = item.AddComponent<SpriteRenderer>(); renderer.sprite = square; renderer.color = color;
-        renderer.sortingOrder = 1; return item;
     }
 
     static float LayerWidth(int layer) => layer == 0 ? 64 : layer == 1 ? 40 : 48;
@@ -313,38 +250,15 @@ public sealed class BackgroundStudy : MonoBehaviour
     {
         if (!View) return;
         ApplyViewport(Screen.width, Screen.height);
-        if (attachedToCourse) {
-            ApplyView(View.transform.position.x, View.transform.position.y);
-            return;
-        }
-        if (tour) {
-            tourTime += Time.deltaTime;
-            ApplyView(Mathf.PingPong(tourTime * 5, TourDistance) - 2, CameraFloor);
-        } else {
-            float half = View.orthographicSize * View.aspect;
-            float x = Mathf.Clamp(Cat.transform.position.x + 2, half + CourseLeft, CourseRight - half);
-            // The course's highest jump fits here; keep water and cliff feet in view.
-            var desired = new Vector3(x, CameraFloor, -10);
-            var position = Vector3.SmoothDamp(View.transform.position, desired, ref cameraVelocity, 0.16f);
-            ApplyView(position.x, position.y);
-        }
+        ApplyView(View.transform.position.x, View.transform.position.y);
     }
 
-    void OnGUI()
-    {
-        if (!showControls) return;
-        GUILayout.BeginArea(new Rect(10, 10, Mathf.Min(Screen.width - 20, 460), 74), GUI.skin.box);
-        GUILayout.Label("A/D: move | Space: jump | R: retry");
-        tour = GUILayout.Toggle(tour, "Camera tour (disable to follow Mika)");
-        GUILayout.EndArea();
-    }
     void OnDestroy()
     {
         foreach (var material in materials) Release(material);
         foreach (var mesh in terrainMeshes) Release(mesh);
         Release(quadMesh);
         Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial);
-        Release(square); Release(pixel);
     }
 
     static void Release(Object owned)

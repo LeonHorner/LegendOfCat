@@ -3,15 +3,16 @@
 Maintainer documentation. Do not trigger or publish a release without an explicit user request. See [Development](development.md) for merge preparation.
 
 ## Release
-Configure Actions secrets UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD (GameCI activation).
-Run **Actions > Release** on main. No mode or version input is needed.
-Conventional Commits since the last release determine the version: fix/perf = patch, feat = minor, !/BREAKING CHANGE = major.
-Docs/chore/test alone produce no release. The first release is 0.1.0. Later releases follow Conventional Commits; a breaking change can promote 0.x to 1.0.0.
-After successful version planning, Unity EditMode tests and Windows/Linux player builds run in parallel. Platform packaging (including the self-contained launchers, startup smoke checks, installers and update feeds) may proceed after both player builds, but **publish** waits for all tests, both builds and both packages to succeed. Failed, skipped or cancelled required jobs cannot publish. The final release plan/version recheck still runs immediately before publication. GitHub Release dispatch remains manual and restricted to `main`; no PR event publishes a release.
-Linux startup checks use Xvfb: this Unity player still requires a valid window backend with
-`-batchmode -nographics`. Prepare merge also runs the Linux payload check. Both workflows retain
-startup logs as artifacts; a virtual-display smoke check does not verify a graphical installation.
-Git tags are the version source; no bot version commits. Builds remain unsigned until signing is configured.
+Configure GitHub Actions secrets `UNITY_EMAIL` and `UNITY_PASSWORD` for Unity Personal account activation in GameCI. No machine-bound `UNITY_LICENSE` file is required or passed to the workflows. GameCI uses account activation when only these credentials are provided. Ensure each CI job releases its temporary Unity activation normally; do not suppress activation or license return.
+Run **Actions > Release** manually on `main` only after explicit authorization. Each job checks out the dispatched commit. semantic-release calculates the version and release notes from Conventional Commits and tags reachable from the dispatched commit. A temporary local remote pins its main branch to that commit for planning and publication; the GitHub publisher uploads the staged assets. The `allow_minor` input defaults to true and `allow_major` defaults to false. Patch releases are always allowed; an unapproved minor or major fails before Unity tests and builds. Version input and automatic downgrades are not supported. Before publishing, the version and release commit are checked against the validated snapshot. Later merges to main do not change the release: builds, notes and the tag remain tied to the dispatched commit, and later commits remain eligible for a subsequent release. A narrow adapter atomically creates the version tag through GitHub and verifies its target before publication. An existing release or tag, changed version, failed verification or invalid approval stops the run. The adapter never overwrites an existing tag or release.
+
+Breaking headers such as `feat!:`, `fix!:`, and `fix(api)!:` or exact uppercase footers `BREAKING CHANGE:` and `BREAKING-CHANGE:` calculate a major release. Lowercase or mixed-case footer text does not. Inspect an unexpected major before authorizing it. Docs/chore/test alone produce no release. Tags are the version source; no bot version commits are made.
+
+Unity EditMode tests and Windows/Linux builds run after planning. Packaging retains the launcher, smoke checks, installers, feeds and Delta verification. Publication waits for all required jobs. Linux startup uses Xvfb; this is not a graphical installation test.
+
+### Interrupted release recovery
+
+semantic-release treats an existing reachable version tag as a release boundary, even if publication failed. Do not blindly rerun or move/delete a tag. Inspect the original run, tag target, GitHub Release, uploaded assets and feeds, and preserve the original artifacts. Determine a manual recovery with explicit authorization; do not publish incomplete assets or overwrite a release. A rerun uses the original workflow commit, not later fixes. Builds remain unsigned until signing is configured.
 
 ## Public download assets
 
@@ -137,7 +138,7 @@ Actual installation and N -> N+1 updates on Windows/Linux still require verifica
 Follow [the first release test runbook](../RELEASE-TEST.md) and record both platforms' actual results.
 
 ## Setup status
-Unity activation secrets are configured. The setup PR tracks final Windows/Linux validation.
+Unity Personal account credentials (`UNITY_EMAIL`, `UNITY_PASSWORD`) are configured. The old `UNITY_LICENSE` secret is unused and may be removed after successful account-only CI validation. The setup PR tracks final Windows/Linux validation.
 Ready PRs automatically trigger Prepare merge checks; Draft PRs skip them. Release remains separately and manually triggered.
 Release tooling audit reports transitive braces/micromatch and npm/ip-address advisories even with current direct dependencies. Recheck before the first release.
 

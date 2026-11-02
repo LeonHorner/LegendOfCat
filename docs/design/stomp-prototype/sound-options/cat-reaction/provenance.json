@@ -1,0 +1,19 @@
+{
+  "title": "Angry Cat Meow",
+  "creator": "bevibeldesign",
+  "sourcePage": "https://freesound.org/people/bevibeldesign/sounds/350411/",
+  "downloadUrl": "https://cdn.freesound.org/previews/350/350411_4557960-hq.mp3",
+  "license": "CC0 1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "retrieved": "2026-10-31",
+  "generatorModel": null,
+  "sourceDescription": "Pitch-bent human voice, authored as a cat reaction to being trampled; not a real animal distress recording.",
+  "sourceFile": "source-preview.mp3",
+  "derivedFile": "short-reaction.wav",
+  "edits": "Keep 0.045-0.465 seconds, mono PCM16 at 48000 Hz; 3 ms attack and 35 ms release fades; peak target 0.35. No further pitch change.",
+  "reviewStatus": "Rejected: too short and insufficiently cat-like. Not enabled in gameplay.",
+  "sha256": {
+    "short-reaction.wav": "e324f0b772c44c2a99f747a289d9f7ee9ca411ec5abf1d3e1786f4a4d3da443e",
+    "source-preview.mp3": "1e5b460804ce05e45196d8c0900479b6c4ae153e6781b410e55c28cc42d2c29b"
+  }
+}
