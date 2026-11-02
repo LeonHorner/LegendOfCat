@@ -52,8 +52,8 @@ public static class GoldenRiverReview
         var scenery = root.GetComponentInChildren<SceneryRenderer>();
         var presentation = cat.GetComponentInChildren<MikaSpritePresentation>();
         var previousTarget = RenderTexture.active;
-        var points = new[] { new Vector2(49, 1.52f), new Vector2(84, .52f), new Vector2(211, .27f), new Vector2(342, .27f), new Vector2(121, 1.52f), new Vector2(246, 1.52f), new Vector2(156, 1.52f), new Vector2(100, 1.02f), new Vector2(302.5f, -.48f), new Vector2(202, -.23f) };
-        var names = new[] { "suspended-steps", "watermill", "aqueduct", "willow", "watermill-edge", "aqueduct-edge", "masonry-sequence", "watermill-base", "low-root-crossing", "low-masonry-crossing" };
+        var points = new[] { new Vector2(49, 1.52f), new Vector2(84, .52f), new Vector2(211, .27f), new Vector2(342, .27f), new Vector2(121, 1.52f), new Vector2(246, 1.52f), new Vector2(156, 1.52f), new Vector2(100, 1.02f), new Vector2(302.5f, -.48f), new Vector2(202, -.23f), new Vector2(-3, .52f), new Vector2(30, .52f), new Vector2(431, .52f), new Vector2(503, .52f), new Vector2(100, 1.02f), new Vector2(238, 2.27f), new Vector2(440, 1.02f), new Vector2(499, .52f) };
+        var names = new[] { "suspended-steps", "watermill", "aqueduct", "willow", "watermill-edge", "aqueduct-edge", "masonry-sequence", "watermill-base", "low-root-crossing", "low-masonry-crossing", "panorama-start", "first-banks", "panorama-late", "panorama-exit", "watching-fish", "cat-king", "no-cats-sign", "cat-rock" };
         try {
             for (int index = 0; index < points.Length; index++) {
                 cat.RespawnAt(points[index]);
@@ -80,6 +80,37 @@ public static class GoldenRiverReview
                         pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0);
                         pixels.Apply();
                         File.WriteAllBytes($"{output}/{names[index]}-{width}.png", pixels.EncodeToPNG());
+                        if (width == 640 && names[index] == "watching-fish") {
+                            const string frames = "Logs/watching-fish-frames";
+                            Directory.CreateDirectory(frames);
+                            camera.orthographicSize = 2.25f;
+                            scenery.ApplyView(96, -3.05f);
+                            for (int frame = 0; frame < 60; frame++) {
+                                scenery.SetWaterTime(frame / 12f);
+                                camera.Render();
+                                RenderTexture.active = target;
+                                pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0); pixels.Apply();
+                                File.WriteAllBytes($"{frames}/frame-{frame:000}.png", pixels.EncodeToPNG());
+                            }
+                            camera.orthographicSize = 5.5f;
+                            follow.Snap(); follow.SendMessage("LateUpdate");
+                            scenery.ApplyView(camera.transform.position.x, camera.transform.position.y);
+                            scenery.SetWaterTime(12);
+                            camera.Render(); RenderTexture.active = target;
+                            pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0); pixels.Apply();
+                        }
+                        if (width == 640 && names[index] == "cat-king") {
+                            var oldPosition = camera.transform.position;
+                            var king = scenery.transform.Find("Easter egg cat king");
+                            camera.orthographicSize = 1.6f;
+                            camera.transform.position = new Vector3(king.position.x, king.position.y - 0.35f, oldPosition.z);
+                            camera.Render(); RenderTexture.active = target;
+                            pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0); pixels.Apply();
+                            File.WriteAllBytes($"{output}/cat-king-detail.png", pixels.EncodeToPNG());
+                            camera.orthographicSize = 5.5f; camera.transform.position = oldPosition;
+                            camera.Render(); RenderTexture.active = target;
+                            pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0); pixels.Apply();
+                        }
                         if (width == 640) {
                             var colors = pixels.GetPixels();
                             for (int i = 0; i < colors.Length; i++) {

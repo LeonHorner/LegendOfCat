@@ -410,3 +410,93 @@ output: `Builds/GoldenRiverHillPreview/LegendOfCatPreview.exe --preview-view lev
 Earlier preview folders are superseded. Final Linux/player-launcher packaging,
 exact-head merge validation, PR #61 integration and user acceptance remain pending;
 no release was performed.
+
+## Continuous scenery and matching platform shapes - 2026-11-02
+
+The user reported obvious repetition in the scenery immediately ahead of the
+clouds, mismatch between some suspended and grounded platforms, and excessive
+reuse of scaled copies. The inspected valley and canopy sources both contained
+recognizable ruins and were each mirrored/recycled. Golden River now uses one
+new continuous valley painting and one continuous canopy painting, with distinct
+once-only ruins and no duplicated panels. The user clarified that ruins should
+be varied rather than removed, and explicitly requested a larger ruin too. The existing .14/.08 distance factors are
+preserved; sky .05 and foreground water are unchanged. Movement Lab keeps its
+existing selected rendering for comparison.
+
+The valley strip is 104 course units wide, the canopy strip 80, covering current
+start-to-exit parallax travel without mirroring or wrapping. Both retain their
+native 3:1 source aspect. Cropping lower content shifts it beneath the viewport;
+no broad crossfades or warped landmark strips are introduced. These cover the
+current -5..507 course extent; later course expansion needs further authored
+landscape rather than automatically stretching or recycling these images.
+
+Three newly drawn grounded forms are selected for narrow (<10), medium (10..<18)
+and broad (>=18) collision spans. Their rock, limestone, grass and light match the
+suspended-root reference. New compact root and compact masonry drawings have
+stout distinct silhouettes, while longer spans retain the existing long versions.
+Seven terrain sources now supply the route: three grounded, two rooted and two
+masonry. Each connected suspended sequence retains one material family. The old
+independent shore-foot ornaments are omitted for this course because their
+previous yellow foliage/rock style no longer fits the new continuous bank art.
+New terrain is not mirrored. Contact coordinates, low crossings, collision widths,
+Mika/motor/jump rules, checkpoints, exit and supported landmark hills are unchanged.
+
+The new GPU-imported assets are listed in BuildScenery.GoldenRiverArt and included
+in packed-art validation. ASSETS.md and continuity-prompts.md record original
+sources, built-in generation/edit calls, model disclosure and license policy.
+Runtime tests check seven distinct terrain bindings, single positive-scale
+panorama panels, native aspect and complete viewport coverage at multiple route
+positions and on reversal.
+
+### Four authorized one-off easter eggs
+
+The user authorized all four proposed finds and asked to distribute them across
+sections, rather than putting everything in the introduction. Further feedback
+required physically plausible sleeping-cat support, drifting fish and a larger
+unique ruin. Their integrated locations/behavior are documented below.
+
+## Unique ruins and one-off easter eggs - 2026-11-02
+
+The user clarified that the ruins were liked; the correction is unique varied
+ruins without repeated copies, not removal of architecture. The valley panorama
+contains a left broken arch/pier group, one larger asymmetric ruined keep and a
+right circular-window remnant. The canopy has one different unequal-tower ruin
+partly hidden among the right grove. Each source is still rendered once without
+mirroring/wrapping over the current course. The castle/cat statue registration
+uses the valley painting's coordinate frame and preserves the selected .14 travel.
+
+Four decorative finds are instantiated once per course, with no collision,
+interaction, collectible, save state, UI notification or gameplay prerequisite:
+
+| Find | Placement | Behavior |
+| --- | --- | --- |
+| Stone cat king | On a right battlement of the larger distant keep, around the middle of the introduction | Small fixed statue, registered to the unique valley panorama. |
+| Two watching fish | River gap at x=96 by the mill | Two independently phased heads drift/bob/tilt, lower bodies occluded by the existing foreground river; pause freezes drift. |
+| "No cats" noticeboard | x=440, after checkpoint 1 | Sleeping cat rests on a broad timber rain roof supported by two stout posts; original thin-edge sign was rejected and is unused. |
+| Cat-shaped rock | x=499 near the exit | Small matching stone embedded into the bank front, discoverable by its subtle ear/eye-like cracks. |
+
+The fish use two UV regions of one original pair painting, keeping their native
+proportions but allowing independent bob/tilt phases. The pair's bounded horizontal
+drift stays inside the river gap. They render behind the existing foreground water,
+not on a second painted water strip. No new swimming/water-recovery system is added.
+Retries/restarts do not instantiate another set; scenic phase is session-only.
+The sign and cat rock remain in the later sections when sizing the remaining route.
+Future layout changes must move these anchors with their intended sections.
+
+`GoldenRiverReview.Record` includes a numerical-time five-second fish detail
+sequence under Logs/watching-fish-frames (12 fps) for encoding. This is an actual
+Unity rendering/animation review, explicitly a detail zoom and scripted water clock,
+not a player-input or normal-framing capture. Center/entry/exit and egg locations
+are also captured at the normal fixed gameplay framing.
+
+The watching fish now lose ground gradually to the current and recover with short, staggered swimming strokes every 2.4 seconds. Each turns its painted head silhouette and inclines toward Mika within nine horizontal units (eleven units of total distance); outside that range both attend upstream. The existing painting has no independently animated pupils. Pause freezes the animation. Attention, stroke recovery and pause are covered by the Easter egg integration test.
+
+2026-11-02 local preview validation: 30/30 scoped EditMode tests passed after fish attention/stroke changes. Windows development preview built successfully at Builds/GoldenRiverDiscoveryPreview/LegendOfCatPreview.exe; packed-art validation confirmed 25 active paintings. This does not replace the remaining exact-head Windows/Linux merge gates or player-input playtest.
+
+The user rejected the separate stone-king cutout as visually disconnected. It is now painted directly into the unique central castle panorama; its runtime object is only a non-rendering review anchor. This guarantees shared depth, filtering, fog and physical masonry support. The original cutout is excluded from player resources.
+
+The latest user review supersedes the pale limestone and flat-mountain variants: broad banks now reuse the original painted bank, other bank forms derive directly from it, and the valley restores forested cliffs and waterfalls. River tiles alternate the original boulder painting with an authored flat slab/split-stone/pebble variant, selected by absolute tile index so returning does not reshuffle them. The round blue/gold fish now swim horizontally below the surface with turquoise attenuation and translucent water over their bodies. Their nearby-Mika reaction uses whole-head silhouette turning, not independent pupils.
+
+Latest original-style revision: 30/30 scoped Unity EditMode tests passed in Temp/restored-style-tests-final.xml. Eighteen normal-framing positions were captured at 960/640 widths, with grayscale companions, plus a five-second fish detail GIF. These are scripted scenery reviews, not full player-input playtest evidence.
+
+The Windows development preview at Builds/GoldenRiverPaintedPreview/LegendOfCatPreview.exe built successfully and passed packed-art auditing (25 active paintings; archive excluded). Full Windows/Linux player/launcher gates remain pending while PR #77 is a draft.

@@ -314,3 +314,31 @@ that border below the camera. Original cutouts are archived with Unity metadata;
 experimental shader opacity controls are removed. Keep the existing independent
 foreground river, 2D movement, low suspended crossings and unique reversible
 landmark anchors. New hill artwork still requires in-game user review.
+
+
+### Continuous distance scenery and terrain family - 2026-11-02
+
+The user found strong repetition in the layer ahead of the clouds, inconsistent
+suspended/grounded platform appearance and too much scaling of a few shapes.
+Golden River replaces mirrored valley/canopy ruins with single nonrepeating
+natural panoramas over the current route, preserving the selected distance
+factors and existing clouds. Three grounded and four suspended source shapes
+share slate/limestone, muted moss and grass lighting, with distinct compact vs
+long anatomy. Connected suspended groups keep one family. Supported landmark
+hills remain the local anchors. This is a bounded user-requested correction;
+final scenery and remaining long-route composition still require review.
+
+
+### Unique ruins and sparse decorative jokes - 2026-11-02
+
+The user clarified that ruins are welcome, including a larger ruin, provided they
+are different and do not repeat. The continuous panoramas now contain distinct
+once-only structures, including a larger asymmetric keep. The user also authorized
+four once-only easter eggs across sections: stone cat king, watching fish pair,
+"No cats" sign with a sleeping cat and subtle cat-shaped rock. The sign must support
+the cat on a broad roof; fish should independently drift/bob in the water. Keep the
+sign/rock beyond the intro, avoid collision/collectible behavior and maintain clear
+landing silhouettes. These additions still require in-game review.
+
+### Golden River style restoration — 2026-11-02
+The user prefers the original painted platforms and forested background. Variety means new silhouettes, geology and distinct ruins within that style, not replacing it with pale realistic limestone or broad bare mountains. Keep golden leafy edges, blue-violet shaded rock and deep ivy. Round fish are preferred over slender trout; render them swimming beneath the water. River rocks need distinct authored formations.

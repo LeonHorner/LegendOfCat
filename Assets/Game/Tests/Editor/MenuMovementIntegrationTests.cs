@@ -49,6 +49,18 @@ public class MenuMovementIntegrationTests
         return owned;
     }
 
+    static string[] BoundTextureNames(MeshFilter[] meshes)
+    {
+        var names = new System.Collections.Generic.HashSet<string>();
+        foreach (var mesh in meshes) {
+            var block = new MaterialPropertyBlock();
+            mesh.GetComponent<MeshRenderer>().GetPropertyBlock(block);
+            Assert.That(block.GetTexture("_MainTex"), Is.Not.Null);
+            names.Add(block.GetTexture("_MainTex").name);
+        }
+        return names.ToArray();
+    }
+
     [UnityTest]
     public IEnumerator LevelOneUsesDistinctShelvesAndNonRepeatingLandmarks()
     {
@@ -60,14 +72,32 @@ public class MenuMovementIntegrationTests
         Call(screen, "OpenLevelOne");
         var course = (Component)Field(screen, "course");
         var scenery = course.GetComponentInChildren(RuntimeType("SceneryRenderer"));
-        var roots = course.GetComponentsInChildren<MeshFilter>().Where(f => f.name == "Root island").ToArray();
-        var masonry = course.GetComponentsInChildren<MeshFilter>().Where(f => f.name == "Masonry shelf").ToArray();
+        var roots = course.GetComponentsInChildren<MeshFilter>().Where(f => f.name.StartsWith("Root island")).ToArray();
+        var masonry = course.GetComponentsInChildren<MeshFilter>().Where(f => f.name.StartsWith("Masonry shelf")).ToArray();
         Assert.That(roots.Length, Is.GreaterThan(0));
         Assert.That(masonry.Length, Is.GreaterThan(0));
-        foreach (var pair in new[] { (roots[0], "shelf-root"), (masonry[0], "shelf-masonry") }) {
-            var block = new MaterialPropertyBlock();
-            pair.Item1.GetComponent<MeshRenderer>().GetPropertyBlock(block);
-            Assert.That(block.GetTexture("_MainTex"), Is.SameAs(Resources.Load<Texture2D>("GoldenRiver/" + pair.Item2)));
+        var bankArt = course.GetComponentsInChildren<MeshFilter>().Where(f => f.name == "Painted grounded bank").ToArray();
+        var rootArtNames = BoundTextureNames(roots);
+        var masonryArtNames = BoundTextureNames(masonry);
+        Assert.That(rootArtNames, Is.EquivalentTo(new[] { "shelf-root", "shelf-root-compact-v3" }));
+        Assert.That(masonryArtNames, Is.EquivalentTo(new[] { "shelf-masonry", "shelf-masonry-compact-v3" }));
+        Assert.That(BoundTextureNames(bankArt), Is.EquivalentTo(new[] { "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3" }));
+        var panoramas = course.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Continuous ")).ToArray();
+        var waterTiles = course.GetComponentsInChildren<MeshFilter>().Where(t => t.name.StartsWith("Foreground water tile ")).ToArray();
+        Assert.That(BoundTextureNames(waterTiles), Is.EquivalentTo(new[] { "foreground-river", "river-stones-slab-v1" }),
+            "The river must use different authored rock formations rather than only scaling one painting.");
+        Assert.That(panoramas, Has.Length.EqualTo(2));
+        var panoramaApply = scenery.GetType().GetMethod("ApplyView");
+        foreach (float x in new[] { -3f, 84f, 216f, 342f, 503f, 84f }) {
+            panoramaApply.Invoke(scenery, new object[] { x, 1f });
+            foreach (var panorama in panoramas) {
+                Assert.That(panorama.localScale.x, Is.GreaterThan(0), "No panorama mirroring.");
+                Assert.That(panorama.parent.childCount, Is.EqualTo(1), "No duplicated/recycled panorama panels.");
+                var bounds = panorama.GetComponent<MeshRenderer>().bounds;
+                Assert.That(bounds.min.x, Is.LessThanOrEqualTo(x - 5.5f * 16 / 9));
+                Assert.That(bounds.max.x, Is.GreaterThanOrEqualTo(x + 5.5f * 16 / 9));
+                Assert.That(panorama.localScale.x / panorama.localScale.y, Is.EqualTo(3).Within(0.001f));
+            }
         }
         var floatingIndices = (int[])course.GetType().GetField("LevelOneFloatingPlatforms").GetValue(null);
         var rootIndices = (int[])course.GetType().GetField("LevelOneRootPlatforms").GetValue(null);
@@ -106,6 +136,77 @@ public class MenuMovementIntegrationTests
         var platforms = course.GetComponentsInChildren<BoxCollider2D>().Where(c => c.name == "Standable platform").ToArray();
         Assert.That(platforms.Max(c => c.transform.position.y) - platforms.Min(c => c.transform.position.y), Is.GreaterThan(1.5f));
         Assert.That(platforms.Select(c => c.transform.localScale.x).Distinct().Count(), Is.GreaterThanOrEqualTo(8));
+    }
+
+    [UnityTest]
+    public IEnumerator EasterEggsOccurOnceAcrossSectionsAndFishDriftWithPause()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        host = new GameObject("Easter egg behavior test");
+        var screen = host.AddComponent(RuntimeType("StarterScreen"));
+        yield return null;
+        Call(screen, "OpenLevelOne");
+        var course = (Component)Field(screen, "course");
+        var scenery = course.GetComponentInChildren(RuntimeType("SceneryRenderer"));
+        var eggs = course.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Easter egg ")).ToArray();
+        Assert.That(eggs, Has.Length.EqualTo(4));
+        Assert.That(eggs.Select(t => t.name).Distinct().Count(), Is.EqualTo(4));
+        foreach (var egg in eggs) Assert.That(egg.GetComponentsInChildren<Collider2D>(), Is.Empty);
+        var sign = eggs.First(t => t.name == "Easter egg no cats sign");
+        var rock = eggs.First(t => t.name == "Easter egg cat rock");
+        Assert.That(sign.localPosition.x, Is.GreaterThan(420));
+        Assert.That(rock.localPosition.x, Is.GreaterThan(470));
+        var fish = eggs.First(t => t.name == "Easter egg watching fish");
+        Assert.That(fish.childCount, Is.EqualTo(2));
+        var capture = scenery.GetType().GetMethod("SetWaterTime");
+        capture.Invoke(scenery, new object[] { -1f });
+        var before = fish.GetChild(0).localPosition;
+        for (int tick = 0; tick < 30; tick++) Call(scenery, "FixedUpdate");
+        Assert.That(Vector3.Distance(before, fish.GetChild(0).localPosition), Is.GreaterThan(0.01f));
+        Assert.That(fish.GetChild(0).localPosition.y, Is.Not.EqualTo(fish.GetChild(1).localPosition.y));
+        Assert.That(fish.localPosition.y, Is.EqualTo(-3.38f));
+        var fishProperties = new MaterialPropertyBlock();
+        fish.GetChild(0).GetComponent<Renderer>().GetPropertyBlock(fishProperties);
+        Assert.That(fishProperties.GetFloat("_Submerged"), Is.EqualTo(1), "Water must attenuate the submerged fish paint.");
+        Assert.That(Mathf.Abs(fish.localPosition.x - 96), Is.LessThanOrEqualTo(0.18f));
+        var cat = (Component)scenery.GetType().GetProperty("Cat").GetValue(scenery);
+        var originalPosition = cat.transform.position;
+        cat.transform.position = new Vector3(99, 0, 0);
+        capture.Invoke(scenery, new object[] { 0f });
+        Assert.That(fish.GetChild(0).localScale.x, Is.LessThan(0));
+        Assert.That(fish.GetChild(1).localScale.x, Is.LessThan(0));
+        cat.transform.position = new Vector3(93, 0, 0);
+        capture.Invoke(scenery, new object[] { 0f });
+        Assert.That(fish.GetChild(0).localScale.x, Is.GreaterThan(0));
+        Assert.That(fish.GetChild(1).localScale.x, Is.GreaterThan(0));
+        cat.transform.position = new Vector3(120, 0, 0);
+        capture.Invoke(scenery, new object[] { 0f });
+        Assert.That(fish.GetChild(0).localScale.x, Is.GreaterThan(0), "Distant Mika must not attract their attention.");
+        capture.Invoke(scenery, new object[] { 1.8f });
+        float downstream = fish.GetChild(0).localPosition.x;
+        capture.Invoke(scenery, new object[] { 2.3f });
+        Assert.That(fish.GetChild(0).localPosition.x, Is.LessThan(downstream - 0.08f), "A swimming stroke must recover the downstream drift.");
+        cat.transform.position = originalPosition;
+        capture.Invoke(scenery, new object[] { -1f });
+        course.GetType().GetMethod("TogglePause").Invoke(course, null);
+        var paused = fish.GetChild(0).localPosition;
+        for (int tick = 0; tick < 30; tick++) Call(scenery, "FixedUpdate");
+        Assert.That(fish.GetChild(0).localPosition, Is.EqualTo(paused));
+        course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
+        course.GetType().GetMethod("RestartRun").Invoke(course, null);
+        Assert.That(course.GetComponentsInChildren<Transform>().Count(t => t.name.StartsWith("Easter egg ")), Is.EqualTo(4));
+        foreach (float x in new[] { 503f, -3f, 239f })
+            scenery.GetType().GetMethod("ApplyView").Invoke(scenery, new object[] { x, 1f });
+        Assert.That(sign.localPosition.x, Is.EqualTo(440));
+        Assert.That(rock.localPosition.x, Is.EqualTo(499));
+        var king = eggs.First(t => t.name == "Easter egg cat king");
+        Assert.That(king.GetComponentsInChildren<Renderer>(), Is.Empty,
+            "The stone king must be part of the valley painting, never a separate floating cutout.");
+        float kingHeight = king.localPosition.y;
+        scenery.GetType().GetMethod("ApplyView").Invoke(scenery, new object[] { 239f, 2f });
+        Assert.That(king.localPosition.y, Is.EqualTo(kingHeight + 1).Within(0.001f),
+            "The statue must retain its registration with the vertically placed valley layer.");
     }
 
     [UnityTest]

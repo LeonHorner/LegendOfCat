@@ -31,17 +31,25 @@ public static class BuildScenery
         foreach (string name in new[] { "background-material", "terrain-material", "water-material" })
             if (!paths.Contains(ResourcesDirectory + name + ".mat"))
                 throw new BuildFailedException("Missing scenery shader-reference material: " + name);
-        Debug.Log("Packed scenery verified: nine active paintings and three shader-reference materials; historical art excluded.");
+        Debug.Log("Packed scenery verified: " + (ActiveLayers.Length + GoldenRiverArt.Length) + " active paintings and three shader-reference materials; historical art excluded.");
     }
 
     public static readonly string[] GoldenRiverArt = {
-        "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2"
+        "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2",
+        "valley-panorama-v3", "canopy-panorama-v3", "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3",
+        "shelf-root-compact-v3", "shelf-masonry-compact-v3",
+        "egg-watching-fish", "egg-no-cats-sign", "egg-cat-rock", "river-stones-slab-v1"
     };
 
     [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]
     public static void ImportGoldenRiverArt()
     {
         ArchiveLandmarkCutouts();
+        const string rejectedKing = "Assets/Game/Resources/GoldenRiver/egg-cat-king.png";
+        if (AssetDatabase.LoadAssetAtPath<Texture2D>(rejectedKing)) {
+            string error = AssetDatabase.MoveAsset(rejectedKing, "Assets/Game/Art/GoldenRiverArchive/egg-cat-king.png");
+            if (!string.IsNullOrEmpty(error)) throw new System.InvalidOperationException(error);
+        }
         foreach (string name in GoldenRiverArt) {
             var importer = (TextureImporter)AssetImporter.GetAtPath("Assets/Game/Resources/GoldenRiver/" + name + ".png");
             importer.textureCompression = TextureImporterCompression.Uncompressed;
@@ -49,7 +57,8 @@ public static class BuildScenery
             importer.isReadable = false;
             importer.alphaIsTransparency = true;
             importer.wrapMode = TextureWrapMode.Clamp;
-            importer.maxTextureSize = 2048;
+            importer.npotScale = TextureImporterNPOTScale.None;
+            importer.maxTextureSize = name.Contains("panorama") ? 4096 : 2048;
             importer.SaveAndReimport();
         }
         AssetDatabase.SaveAssets();

@@ -1,6 +1,6 @@
 Shader "LegendOfCat/BackgroundStudy"
 {
-    Properties { _MainTex ("Painted layer", 2D) = "white" {} _Cutout ("Use authored alpha", Float) = 0 _Brightness ("Paint brightness", Float) = 1 _Fog ("Atmospheric tint", Float) = 0.23 _Saturation ("Paint saturation", Float) = 1 _Corner ("Foreground tint", Float) = 0 _CornerSide ("Corner half", Float) = 0 _AtlasCount ("Atlas columns", Float) = 1 _AtlasIndex ("Atlas column", Float) = 0 }
+    Properties { _MainTex ("Painted layer", 2D) = "white" {} _Submerged ("Underwater fish tint", Float) = 0 _Cutout ("Use authored alpha", Float) = 0 _Brightness ("Paint brightness", Float) = 1 _Fog ("Atmospheric tint", Float) = 0.23 _Saturation ("Paint saturation", Float) = 1 _Corner ("Foreground tint", Float) = 0 _CornerSide ("Corner half", Float) = 0 _AtlasCount ("Atlas columns", Float) = 1 _AtlasIndex ("Atlas column", Float) = 0 }
     SubShader {
         Tags { "Queue"="Transparent" "RenderType"="Transparent" }
         Blend SrcAlpha OneMinusSrcAlpha
@@ -11,7 +11,7 @@ Shader "LegendOfCat/BackgroundStudy"
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            sampler2D _MainTex; float _Cutout, _Brightness, _Fog, _Saturation, _Corner, _CornerSide, _AtlasCount, _AtlasIndex;
+            sampler2D _MainTex; float _Submerged, _Cutout, _Brightness, _Fog, _Saturation, _Corner, _CornerSide, _AtlasCount, _AtlasIndex;
             struct Input { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
             struct Output { float4 vertex : SV_POSITION; float2 uv : TEXCOORD0; };
             Output vert(Input v) { Output o; o.vertex = UnityObjectToClipPos(v.vertex); o.uv = v.uv; return o; }
@@ -27,6 +27,8 @@ Shader "LegendOfCat/BackgroundStudy"
                 // No screen-height blend: transparent sky reveals the independent far layer.
                 c.a = _Cutout > 0.5 ? smoothstep(0.5, 0.95, c.a) : 1;
                 c.rgb *= _Brightness;
+                c.rgb = lerp(c.rgb, float3(0.12, 0.48, 0.49), _Submerged * 0.55);
+                c.a *= 1 - _Submerged * 0.48;
                 if (_Corner > 0.5) {
                     c.rgb *= 0.72;
                 }
