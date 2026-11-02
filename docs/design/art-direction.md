@@ -156,6 +156,13 @@ The accepted model and non-run actions are unchanged. Review the new revision 3
 side and three-quarter loops at normal/slowed speed before acceptance. The
 reference GIF is not redistributed; its creator/license are unverified.
 
+On 2026-11-02 the user approved publishing the current rig/run and requested
+PR #51 leave draft status. Its deliverable is the editable Blender character,
+rig and exported motion baseline. [Issue #78](https://github.com/LeonHorner/LegendOfCat/issues/78)
+continues animation improvements, varied runs with random selection, walking,
+idle actions and Unity/gameplay integration. This publication approval does not
+establish actual-game acceptance or accept every exploratory action.
+
 ### Terrain system correction — 2026-10-28
 
 The user rejected the latest tall-wall preview, especially its right platform,

@@ -2,8 +2,13 @@
 
 Review-only continuation of the accepted [v3 look study](../mika-v3/README.md)
 for [issue #49](https://github.com/LeonHorner/LegendOfCat/issues/49).
-The accepted source file is unchanged. These motions have **not** received visual
-approval and do not replace the playable 2D character.
+The accepted source file is unchanged. On 2026-11-02 the user approved publishing
+the current running revision and making PR #51 ready as a Blender authoring
+deliverable. This does not establish acceptance of every action or actual-game
+integration. The playable 2D character is unchanged. Follow-up
+[issue #78](https://github.com/LeonHorner/LegendOfCat/issues/78) tracks motion
+refinement, varied runs and random selection, walking, idle animations and
+Unity/gameplay integration.
 
 The user rejected the first running candidate on 2026-11-01 as unnatural and
 found revision 2 better, but requested stronger whole-body movement to match the
@@ -14,7 +19,7 @@ head, and the tail follows the pelvis. Supported paws constrain body height;
 recovering paws stay within limb reach. The model and other 12 actions are unchanged.
 
 Review `run-v3-normal.gif`, `run-v3-slow.gif` and the matching
-`run-oblique-*.gif` views. This is a new review candidate, not an accepted result.
+`run-oblique-*.gif` views. The user approved publishing this revision as the follow-up starting point.
 Revision 2 remains in Git history at `97ee6b1`; the first loop is at `615a775`.
 The user-supplied running-cat GIF was inspected locally for the sequence of
 extension, forelimb support, spinal gathering and hindlimb push-off. Its creator
@@ -97,7 +102,8 @@ the accepted source, rather than an export hole.
 
 Unity 6000.3.27f2 is installed locally, but batch import stopped because no Editor
 license was active. Unity tests and Windows/Linux player builds are unrun. Keep
-PR #51 draft and issue #49 incomplete.
+issue #49 open; issue #78 carries the remaining animation and integration work.
+PR #51 is ready for the repository's exact-head merge validation.
 
 Source: CC0 Grab3D Tabby Cat, AI-assisted Meshy base as disclosed in the preserved
 v3 source manifest. Local surface preparation, UV/texture bake, rig and keyed

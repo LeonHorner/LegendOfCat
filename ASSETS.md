@@ -266,6 +266,12 @@ RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
   capture data was extracted; the animation curves are locally authored. Actual
   Blender renders show the revised candidate. Visual acceptance remains pending.
 
+- Publication decision, 2026-11-02: the user approved pushing the current rig/run
+  and moving PR #51 out of draft. Issue #78 records further motion improvements,
+  varied runs with random selection, walking, idle animations and integration.
+  Existing source, license and generator disclosures remain unchanged. This is
+  approval of the authoring deliverable, not a Unity/gameplay validation result.
+
 ## Golden River background study — 2026-10-24
 
 `Assets/Game/Resources/BackgroundStudy/painted-atlas.png` is original generated
