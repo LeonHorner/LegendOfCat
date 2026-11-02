@@ -166,8 +166,9 @@ establish actual-game acceptance or accept every exploratory action.
 The next review on 2026-11-02 identified a stiff running tail. Local revision 4
 adds delayed flexion increasing toward the tip and slight lateral follow-through.
 The current run's body and paw animation remain intact. Normal/slowed previews
-and baked tail-joint verification accompany the candidate; publication and visual
-acceptance of this tail revision remain pending.
+and baked tail-joint verification accompany the candidate. The user reviewed it
+and approved adding the tail refinement to PR #51 on 2026-11-02; further work
+on #78 is deferred until later.
 
 ### Terrain system correction — 2026-10-28
 

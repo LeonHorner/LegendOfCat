@@ -25,7 +25,7 @@ The user-supplied running-cat GIF was inspected locally for the sequence of
 extension, forelimb support, spinal gathering and hindlimb push-off. Its creator
 and redistribution license are unverified, so it is not included in the repository.
 
-### Tail revision 4 — local review, 2026-11-02
+### Tail revision 4 — approved for publication, 2026-11-02
 
 The user found the published running tail too stiff. This revision increases
 flexion progressively along the tail and delays each joint relative to its
@@ -38,8 +38,9 @@ Native comparisons confirm all non-tail curves and skin/weights are identical.
 The tail loop closes, and all five tail-joint positions are checked through
 every half-frame of the exported run. For a run-only render refresh, use
 `python art/blender/mika-rig/assemble_review.py --run-only`.
-This local change awaits visual review before publication. Prior PR validation
-applies to the published revision, not these new animation files.
+The user reviewed the result and approved adding this tail refinement to PR #51
+on 2026-11-02. Further animation expansion remains deferred to #78. Automatic
+merge validation must pass again for the newly published revision.
 
 ## Files and use
 

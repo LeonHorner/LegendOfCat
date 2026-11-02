@@ -276,7 +276,8 @@ RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
   and Blender 5.2.3 LTS authored progressively delayed joint flexion and subtle
   sideways follow-through. Only the Run tail curves changed; the same CC0-derived
   skin and textures are used. No external artwork or new generation was used.
-  New actual Blender previews are local review candidates pending acceptance.
+  The user reviewed the actual Blender previews and approved adding the tail
+  refinement to the original PR on 2026-11-02.
 
 ## Golden River background study — 2026-10-24
 
