@@ -38,7 +38,7 @@ public static class BuildScenery
         "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2",
         "valley-panorama-v3", "canopy-panorama-v3", "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3",
         "shelf-root-compact-v3", "shelf-masonry-compact-v3",
-        "egg-watching-fish", "egg-no-cats-sign", "egg-cat-rock", "river-water-v2", "river-rock-groups-v1"
+        "egg-watching-fish", "egg-no-cats-sign", "river-water-v2", "river-rock-groups-v1", "river-rock-groups-v2"
     };
 
     [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]

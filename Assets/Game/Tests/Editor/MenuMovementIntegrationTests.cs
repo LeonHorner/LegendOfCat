@@ -87,8 +87,8 @@ public class MenuMovementIntegrationTests
         Assert.That(waterTiles, Has.Length.EqualTo(3));
         Assert.That(waterTiles[0].GetComponent<Renderer>().sharedMaterial.mainTexture.name, Is.EqualTo("river-water-v2"));
         var rocks = course.GetComponentsInChildren<MeshFilter>().Where(t => t.name.StartsWith("Unique river rock group ")).ToArray();
-        Assert.That(rocks, Has.Length.EqualTo(6));
-        Assert.That(rocks.Select(t => t.sharedMesh.uv[0]).Distinct().Count(), Is.EqualTo(6),
+        Assert.That(rocks, Has.Length.EqualTo(12));
+        Assert.That(rocks.Select(t => (BoundTextureNames(new[] { t })[0], t.sharedMesh.uv[0])).Distinct().Count(), Is.EqualTo(12),
             "Each rock painting must appear once, independently of recycled wave tiles.");
         foreach (var rock in rocks) Assert.That(rock.GetComponents<Collider2D>(), Is.Empty);
         var waterPixels = new Texture2D(2, 2);
@@ -105,7 +105,7 @@ public class MenuMovementIntegrationTests
         } finally { UnityEngine.Object.Destroy(waterPixels); }
         Assert.That(panoramas, Has.Length.EqualTo(2));
         var panoramaApply = scenery.GetType().GetMethod("ApplyView");
-        foreach (float x in new[] { -3f, 84f, 216f, 342f, 503f, 84f }) {
+        foreach (float x in new[] { -7.2f, -3f, 84f, 216f, 342f, 503f, 509.2f, 84f }) {
             panoramaApply.Invoke(scenery, new object[] { x, 1f });
             foreach (var panorama in panoramas) {
                 Assert.That(panorama.localScale.x, Is.GreaterThan(0), "No panorama mirroring.");
@@ -167,13 +167,11 @@ public class MenuMovementIntegrationTests
         var course = (Component)Field(screen, "course");
         var scenery = course.GetComponentInChildren(RuntimeType("SceneryRenderer"));
         var eggs = course.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Easter egg ")).ToArray();
-        Assert.That(eggs, Has.Length.EqualTo(4));
-        Assert.That(eggs.Select(t => t.name).Distinct().Count(), Is.EqualTo(4));
+        Assert.That(eggs, Has.Length.EqualTo(3));
+        Assert.That(eggs.Select(t => t.name).Distinct().Count(), Is.EqualTo(3));
         foreach (var egg in eggs) Assert.That(egg.GetComponentsInChildren<Collider2D>(), Is.Empty);
         var sign = eggs.First(t => t.name == "Easter egg no cats sign");
-        var rock = eggs.First(t => t.name == "Easter egg cat rock");
         Assert.That(sign.localPosition.x, Is.GreaterThan(420));
-        Assert.That(rock.localPosition.x, Is.GreaterThan(470));
         var fish = eggs.First(t => t.name == "Easter egg watching fish");
         Assert.That(fish.childCount, Is.EqualTo(2));
         var capture = scenery.GetType().GetMethod("SetWaterTime");
@@ -182,7 +180,7 @@ public class MenuMovementIntegrationTests
         for (int tick = 0; tick < 30; tick++) Call(scenery, "FixedUpdate");
         Assert.That(Vector3.Distance(before, fish.GetChild(0).localPosition), Is.GreaterThan(0.01f));
         Assert.That(fish.GetChild(0).localPosition.y, Is.Not.EqualTo(fish.GetChild(1).localPosition.y));
-        Assert.That(fish.localPosition.y, Is.EqualTo(-3.38f));
+        Assert.That(fish.localPosition.y, Is.EqualTo(-3.30f));
         var fishProperties = new MaterialPropertyBlock();
         fish.GetChild(0).GetComponent<Renderer>().GetPropertyBlock(fishProperties);
         Assert.That(fishProperties.GetFloat("_Submerged"), Is.EqualTo(1), "Water must attenuate the submerged fish paint.");
@@ -212,11 +210,10 @@ public class MenuMovementIntegrationTests
         Assert.That(fish.GetChild(0).localPosition, Is.EqualTo(paused));
         course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
         course.GetType().GetMethod("RestartRun").Invoke(course, null);
-        Assert.That(course.GetComponentsInChildren<Transform>().Count(t => t.name.StartsWith("Easter egg ")), Is.EqualTo(4));
+        Assert.That(course.GetComponentsInChildren<Transform>().Count(t => t.name.StartsWith("Easter egg ")), Is.EqualTo(3));
         foreach (float x in new[] { 503f, -3f, 239f })
             scenery.GetType().GetMethod("ApplyView").Invoke(scenery, new object[] { x, 1f });
         Assert.That(sign.localPosition.x, Is.EqualTo(440));
-        Assert.That(rock.localPosition.x, Is.EqualTo(499));
         var king = eggs.First(t => t.name == "Easter egg cat king");
         Assert.That(king.GetComponentsInChildren<Renderer>(), Is.Empty,
             "The stone king must be part of the valley painting, never a separate floating cutout.");
@@ -224,6 +221,29 @@ public class MenuMovementIntegrationTests
         scenery.GetType().GetMethod("ApplyView").Invoke(scenery, new object[] { 239f, 2f });
         Assert.That(king.localPosition.y, Is.EqualTo(kingHeight + 1).Within(0.001f),
             "The statue must retain its registration with the vertically placed valley layer.");
+    }
+
+    [UnityTest]
+    public IEnumerator LevelOneCameraShowsBothTerminalCliffEdges()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        host = new GameObject("Route boundary camera test");
+        var screen = host.AddComponent(RuntimeType("StarterScreen"));
+        yield return null;
+        Call(screen, "OpenLevelOne");
+        var course = (Component)Field(screen, "course");
+        var cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
+        var follow = course.GetComponentInChildren(RuntimeType("CatCamera"));
+        var camera = follow.GetComponent<Camera>();
+        foreach (float edge in new[] { -5f, 507f }) {
+            cat.transform.position = course.transform.TransformPoint(new Vector3(edge, 0.52f));
+            follow.GetType().GetMethod("Snap").Invoke(follow, null);
+            Call(follow, "LateUpdate");
+            float visibleEdge = camera.WorldToViewportPoint(course.transform.TransformPoint(new Vector3(edge, 0))).x;
+            Assert.That(visibleEdge, Is.InRange(0.2f, 0.8f),
+                "The camera must show scenery beyond the final standable edge, rather than hide the end at the screen boundary.");
+        }
     }
 
     [UnityTest]
@@ -277,7 +297,8 @@ public class MenuMovementIntegrationTests
             cat.transform.position = body.position;
             camera.GetType().GetMethod("Snap").Invoke(camera, null);
             Call(camera, "LateUpdate");
-            Assert.That(camera.transform.position.x, Is.EqualTo(508f - 5.5f * 16 / 9).Within(0.01f));
+            Assert.That(camera.transform.position.x, Is.EqualTo(body.position.x + 2).Within(0.01f),
+                "The exit margin must let the camera keep following until the terminal cliff is visible.");
             course.GetType().GetMethod("TogglePause").Invoke(course, null);
             var stopped = body.position;
             Call(cat, "FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime);
@@ -290,7 +311,8 @@ public class MenuMovementIntegrationTests
             course.GetType().GetMethod("RestartRun").Invoke(course, null);
             Assert.That(body.position.x, Is.EqualTo(-3).Within(0.001f));
             Call(camera, "LateUpdate");
-            Assert.That(camera.transform.position.x, Is.EqualTo(-5f + 5.5f * 16 / 9).Within(0.01f));
+            Assert.That(camera.transform.position.x, Is.EqualTo(body.position.x + 2).Within(0.01f),
+                "Restart must preserve the scenery margin behind the starting bank.");
             Assert.That((float)course.GetType().GetProperty("IntroductionSeconds").GetValue(course), Is.EqualTo(-1));
             Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.Zero);
         } finally {

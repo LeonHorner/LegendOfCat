@@ -275,25 +275,26 @@ public sealed class SceneryRendererTests
         Assert.That(cat.GetComponentInChildren<SpriteRenderer>().sprite, Is.Not.Null);
         Tick(30);
         Assert.That(cat.transform.position.y, Is.InRange(0.4f, 0.6f), "Existing motor must settle onto world-space starting ground.");
-        var waterMaterial = frontWater[0].sharedMaterial;
         var runMotion = cat.GetType().GetField("Motion").GetValue(cat);
         foreach (float direction in new[] { 1f, -1f }) {
             cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(0, 0.48f) });
             Tick(30);
-            Assert.That(waterMaterial.GetFloat("_RunAmount"), Is.Zero.Within(0.001f));
-            float startPhase = waterMaterial.GetFloat("_RunTimeOffset");
+            Study.GetMethod("SetWaterTime").Invoke(study, new object[] { 4f });
+            var calm = SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null ? null : Snapshot(view);
             runMotion.GetType().GetMethod("SetMove").Invoke(runMotion, new object[] { direction });
             Tick(30);
             Assert.That(Mathf.Abs(cat.GetComponent<Rigidbody2D>().linearVelocity.x), Is.GreaterThan(6));
-            Assert.That(waterMaterial.GetFloat("_RunAmount"), Is.GreaterThan(0.9f), "Actual running must increase wave density.");
-            Assert.That(waterMaterial.GetFloat("_RunTimeOffset") - startPhase, Is.GreaterThan(0.3f),
-                "Running must add continuous flow time in both directions.");
-            float runningPhase = waterMaterial.GetFloat("_RunTimeOffset");
             runMotion.GetType().GetMethod("SetMove").Invoke(runMotion, new object[] { 0f });
             Tick(30);
-            Assert.That(waterMaterial.GetFloat("_RunAmount"), Is.Zero.Within(0.001f), "Stopping should restore calm water smoothly.");
-            Assert.That(waterMaterial.GetFloat("_RunTimeOffset"), Is.GreaterThanOrEqualTo(runningPhase),
-                "Stopping must not reset the wave phase.");
+            if (calm != null) {
+                var stopped = Snapshot(view);
+                int differences = 0;
+                for (int pixel = 0; pixel < 640 * 70; pixel++)
+                    if (!calm[pixel].Equals(stopped[pixel])) differences++;
+                Assert.That(differences, Is.Zero,
+                    "At a fixed river time, running and stopping must not alter any foreground-water pixels.");
+            }
+            Study.GetMethod("SetWaterTime").Invoke(study, new object[] { -1f });
         }
         // Verify the real presentation anchor at the raised bank platform as well as flat ground.
         cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(15f, 1.48f) });

@@ -170,7 +170,8 @@ public sealed class MovementCourse : MonoBehaviour
         follow.courseRoot = transform;
         follow.fixedHeight = true;
         var last = ActivePlatforms[ActivePlatforms.Length - 1];
-        follow.rightBoundary = last.x + last.z * 0.5f + 1;
+        follow.leftBoundary = LevelOne ? -17 : -5;
+        follow.rightBoundary = last.x + last.z * 0.5f + (LevelOne ? 12 : 1);
         Cat.ReturnedToStart += follow.Snap;
         var scenery = new GameObject("Golden River scenery");
         scenery.transform.SetParent(transform, false);

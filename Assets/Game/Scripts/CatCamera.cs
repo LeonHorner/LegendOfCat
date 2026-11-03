@@ -4,6 +4,7 @@ public sealed class CatCamera : MonoBehaviour
 {
     public Transform target;
     public bool fixedHeight;
+    public float leftBoundary = -5;
     public float rightBoundary = 48;
     public Transform courseRoot;
     bool snap = true;
@@ -15,7 +16,7 @@ public sealed class CatCamera : MonoBehaviour
         float scale = courseRoot ? courseRoot.lossyScale.x : 1;
         if (courseRoot) camera.orthographicSize = 5.5f * scale;
         float halfWidth = camera.orthographicSize * (16f / 9f);
-        float left = courseRoot ? courseRoot.TransformPoint(new Vector3(-5, 0)).x : -5;
+        float left = courseRoot ? courseRoot.TransformPoint(new Vector3(leftBoundary, 0)).x : leftBoundary;
         float right = courseRoot ? courseRoot.TransformPoint(new Vector3(rightBoundary, 0)).x : rightBoundary;
         float floor = courseRoot ? courseRoot.TransformPoint(new Vector3(0, SceneryRenderer.CameraFloor)).y : SceneryRenderer.CameraFloor;
         var desired = new Vector3(Mathf.Clamp(target.position.x + 2 * scale, halfWidth + left, right - halfWidth),

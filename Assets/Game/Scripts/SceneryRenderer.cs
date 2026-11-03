@@ -15,16 +15,14 @@ public sealed class SceneryRenderer : MonoBehaviour
     readonly Transform[] landmarks = new Transform[3];
     public static readonly float[] LandmarkAnchors = { 84, 216, 342 };
     Material landmarkMaterial;
-    readonly Transform[] easterEggs = new Transform[4];
+    readonly Transform[] easterEggs = new Transform[3];
     float fishClock, waterCaptureTime = -1;
-    Rigidbody2D catBody;
     readonly Transform[] layers = new Transform[3];
     readonly Material[] materials = new Material[3];
     readonly System.Collections.Generic.List<Mesh> terrainMeshes = new System.Collections.Generic.List<Mesh>();
     Material terrainMaterial, cornerMaterial, riverFrontMaterial;
     Transform riverFront;
     Mesh quadMesh;
-    float waterRunAmount, waterRunOffset;
     bool initialized;
     Vector3[] coursePlatforms;
     static readonly float[] TravelFactors = { SkyTravel, ValleyTravel, CanopyTravel };
@@ -33,7 +31,6 @@ public sealed class SceneryRenderer : MonoBehaviour
     {
         View = camera;
         Cat = cat;
-        catBody = cat.GetComponent<Rigidbody2D>();
         coursePlatforms = platforms;
         Initialize();
     }
@@ -251,13 +248,13 @@ public sealed class SceneryRenderer : MonoBehaviour
         easterEggs[0] = king.transform;
         var fish = new GameObject("Easter egg watching fish");
         fish.transform.SetParent(transform, false);
-        fish.transform.localPosition = new Vector3(96, -3.38f, -2.2f);
+        fish.transform.localPosition = new Vector3(96, -3.30f, -2.2f);
         easterEggs[1] = fish.transform;
         for (int i = 0; i < 2; i++) {
             var item = Quad();
             item.name = i == 0 ? "Drifting fish left" : "Drifting fish right";
             item.transform.SetParent(fish.transform, false);
-            item.transform.localScale = new Vector3(0.70f, 0.70f, 1);
+            item.transform.localScale = new Vector3(0.95f, 0.95f, 1);
             var mesh = Instantiate(quadMesh);
             mesh.name = item.name + " mesh";
             float left = i * 0.5f, right = left + 0.5f;
@@ -273,7 +270,6 @@ public sealed class SceneryRenderer : MonoBehaviour
         }
         // These two belong after the introduction, without blocking the playable plane.
         easterEggs[2] = Egg("no cats sign", "egg-no-cats-sign", new Vector3(440, 1.54f, 3), new Vector2(2.2f, 2.2f), true);
-        easterEggs[3] = Egg("cat rock", "egg-cat-rock", new Vector3(499, -0.55f, 1.5f), new Vector2(1.25f, 1.25f), true);
         UpdateFish(fishClock);
     }
 
@@ -295,7 +291,7 @@ public sealed class SceneryRenderer : MonoBehaviour
     void UpdateFish(float seconds)
     {
         if (!easterEggs[1]) return;
-        easterEggs[1].localPosition = new Vector3(96 + 0.18f * Mathf.Sin(seconds * 0.7f), -3.38f, -2.2f);
+        easterEggs[1].localPosition = new Vector3(96 + 0.18f * Mathf.Sin(seconds * 0.7f), -3.30f, -2.2f);
         for (int i = 0; i < 2; i++) {
             float phase = seconds * 1.6f + i * 1.8f;
             var fish = easterEggs[1].GetChild(i);
@@ -303,7 +299,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             float cycle = Mathf.Repeat(seconds / 2.4f + i * 0.43f, 1);
             float recovery = Mathf.SmoothStep(0, 1, Mathf.Clamp01((cycle - 0.76f) / 0.24f));
             float drift = 0.16f * (cycle - recovery);
-            fish.localPosition = new Vector3((i == 0 ? -0.34f : 0.34f) + drift,
+            fish.localPosition = new Vector3((i == 0 ? -0.48f : 0.48f) + drift,
                 0.055f * Mathf.Sin(phase), 0);
             Vector3 target = Cat ? transform.InverseTransformPoint(Cat.transform.position) : Vector3.zero;
             Vector3 position = easterEggs[1].localPosition + fish.localPosition;
@@ -311,7 +307,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             float facing = watching ? (target.x >= position.x ? 1 : -1) : -1;
             // Both painted heads look upward; turn the silhouette and incline the head toward Mika.
             float nativeFacing = -1;
-            fish.localScale = new Vector3(0.70f * facing * nativeFacing, 0.70f, 1);
+            fish.localScale = new Vector3(0.95f * facing * nativeFacing, 0.95f, 1);
             float gaze = watching ? Mathf.Clamp((target.x - position.x) * -2, -12, 12) : 0;
             float stroke = Mathf.Sin(recovery * Mathf.PI) * 6;
             fish.localRotation = Quaternion.Euler(0, 0, gaze + facing * stroke + 3 * Mathf.Sin(phase * 0.8f));
@@ -320,7 +316,7 @@ public sealed class SceneryRenderer : MonoBehaviour
 
     void CreateRiverRocks()
     {
-        float[] anchors = { 22, 78, 163, 273, 394, 487 };
+        float[] anchors = { 22, 78, 163, 273, 394, 487, 43, 120, 212, 327, 425, 511 };
         for (int i = 0; i < anchors.Length; i++) {
             var rock = Quad();
             rock.name = "Unique river rock group " + i;
@@ -330,14 +326,15 @@ public sealed class SceneryRenderer : MonoBehaviour
             var mesh = Instantiate(quadMesh);
             mesh.name = rock.name + " mesh";
             float left = (i % 3) / 3f, right = left + 1f / 3;
-            float bottom = i < 3 ? 0.5f : 0, top = bottom + 0.5f;
+            float bottom = i % 6 < 3 ? 0.5f : 0, top = bottom + 0.5f;
             mesh.uv = new[] { new Vector2(left, bottom), new Vector2(right, bottom),
                 new Vector2(left, top), new Vector2(right, top) };
             terrainMeshes.Add(mesh);
             rock.GetComponent<MeshFilter>().sharedMesh = mesh;
             rock.GetComponent<MeshRenderer>().sharedMaterial = landmarkMaterial;
             var properties = new MaterialPropertyBlock();
-            properties.SetTexture("_MainTex", Resources.Load<Texture2D>("GoldenRiver/river-rock-groups-v1"));
+            properties.SetTexture("_MainTex", Resources.Load<Texture2D>(i < 6 ? "GoldenRiver/river-rock-groups-v1" : "GoldenRiver/river-rock-groups-v2"));
+            if (i >= 6) properties.SetFloat("_AlphaFloor", 0.85f);
             properties.SetFloat("_Fog", 0.08f);
             properties.SetFloat("_Brightness", 0.9f);
             rock.GetComponent<MeshRenderer>().SetPropertyBlock(properties);
@@ -431,18 +428,12 @@ public sealed class SceneryRenderer : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!Cat || !catBody || !riverFrontMaterial) return;
+        if (!Cat || Cat.Paused) return;
         if (RouteLandmarks && !Cat.Paused) {
             fishClock += Time.fixedDeltaTime;
             if (waterCaptureTime < 0) UpdateFish(fishClock);
         }
-        float target = Cat.Grounded && catBody.simulated
-            ? Mathf.Clamp01(Mathf.Abs(catBody.linearVelocity.x) / CatMotion.Speed) : 0;
-        waterRunAmount = Mathf.MoveTowards(waterRunAmount, target, 2.5f * Time.fixedDeltaTime);
-        // Add travel time rather than multiplying the clock, avoiding phase jumps on start/stop.
-        waterRunOffset += waterRunAmount * 1.2f * Time.fixedDeltaTime;
-        riverFrontMaterial.SetFloat("_RunAmount", waterRunAmount);
-        riverFrontMaterial.SetFloat("_RunTimeOffset", waterRunOffset);
+
     }
 
     void LateUpdate()
