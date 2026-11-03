@@ -19,3 +19,9 @@ Original hand-painted game sprite atlas, transparent 3:2 canvas, exactly SIX sep
 The second rock atlas was generated with the built-in image tool. The original prompt was:
 
 > Transparent 3:2 game atlas, precisely 3 columns by 2 rows, 6 separate river rock formations each fully within its square cell with margins. Painterly golden-hour blue-violet limestone, teal moss. Distinct formations: broken ring of small stones, low stair-step strata, tilted blade with tiny pebble, broad double-deck shelf, three uneven flat stepping slabs, crooked fractured boulder with a low spur. Side view, thin localized white foam at feet only. No background, water sheet, text or glow.
+
+The third rock atlas was generated with the built-in image tool from this prompt:
+
+> Game sprite atlas with true transparent background, 3 columns by 2 rows in a 3:2 canvas, each of six hand painted river rock groups wholly inside its own cell. Distinct shapes: scatter of small flat gravel, two nested crescent ledges, split flat slab, low chain of rounded cobbles, broad mossy outcrop with a notch, uneven diagonal cluster of angular chunks. Blue-violet limestone with warm ochre sunset highlights, teal moss, painted Golden River style. Thin foam only at contact with water. No opaque background, no fog or glow, no grid lines or text, clear alpha between every group.
+
+The statue cutout was trimmed in PhotoCraft at the right foreleg and left ear. The flattened panorama was rebuilt from the corrected layer on the same stone parapet.

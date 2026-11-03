@@ -316,25 +316,36 @@ public sealed class SceneryRenderer : MonoBehaviour
 
     void CreateRiverRocks()
     {
-        float[] anchors = { 22, 78, 163, 273, 394, 487, 43, 120, 212, 327, 425, 511 };
+        float[] anchors = { 22, 78, 163, 273, 394, 487, 43, 120, 212, 327, 425, 511, 55, 138, 235, 303, 365, 455 };
+        var atlases = new[] {
+            Resources.Load<Texture2D>("GoldenRiver/river-rock-groups-v1"),
+            Resources.Load<Texture2D>("GoldenRiver/river-rock-groups-v2"),
+            Resources.Load<Texture2D>("GoldenRiver/river-rock-groups-v3")
+        };
+        float[] extraWidths = { 2.6f, 1.85f, 2.4f, 2.8f, 2.1f, 2.65f };
+        float[] extraColumns = { 0, 490f / 1536, 1018f / 1536, 1 };
         for (int i = 0; i < anchors.Length; i++) {
             var rock = Quad();
             rock.name = "Unique river rock group " + i;
             rock.transform.SetParent(transform, false);
-            rock.transform.localPosition = new Vector3(anchors[i], -4.47f, -2.3f);
-            rock.transform.localScale = new Vector3(2.2f, 2.2f, 1);
+            int cell = i % 6;
+            bool extra = i >= 12;
+            rock.transform.localPosition = new Vector3(anchors[i], extra ? -3.82f : -4.47f, -2.3f);
+            rock.transform.localScale = extra ? new Vector3(extraWidths[cell], 1.65f, 1) : new Vector3(2.2f, 2.2f, 1);
             var mesh = Instantiate(quadMesh);
             mesh.name = rock.name + " mesh";
-            float left = (i % 3) / 3f, right = left + 1f / 3;
-            float bottom = i % 6 < 3 ? 0.5f : 0, top = bottom + 0.5f;
+            int column = cell % 3;
+            float left = extra ? extraColumns[column] : column / 3f;
+            float right = extra ? extraColumns[column + 1] : (column + 1) / 3f;
+            float bottom = cell < 3 ? 0.5f : 0, top = bottom + 0.5f;
             mesh.uv = new[] { new Vector2(left, bottom), new Vector2(right, bottom),
                 new Vector2(left, top), new Vector2(right, top) };
             terrainMeshes.Add(mesh);
             rock.GetComponent<MeshFilter>().sharedMesh = mesh;
             rock.GetComponent<MeshRenderer>().sharedMaterial = landmarkMaterial;
             var properties = new MaterialPropertyBlock();
-            properties.SetTexture("_MainTex", Resources.Load<Texture2D>(i < 6 ? "GoldenRiver/river-rock-groups-v1" : "GoldenRiver/river-rock-groups-v2"));
-            if (i >= 6) properties.SetFloat("_AlphaFloor", 0.85f);
+            properties.SetTexture("_MainTex", atlases[i / 6]);
+            if (i >= 6 && i < 12) properties.SetFloat("_AlphaFloor", 0.85f);
             properties.SetFloat("_Fog", 0.08f);
             properties.SetFloat("_Brightness", 0.9f);
             rock.GetComponent<MeshRenderer>().SetPropertyBlock(properties);

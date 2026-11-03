@@ -87,8 +87,8 @@ public class MenuMovementIntegrationTests
         Assert.That(waterTiles, Has.Length.EqualTo(3));
         Assert.That(waterTiles[0].GetComponent<Renderer>().sharedMaterial.mainTexture.name, Is.EqualTo("river-water-v2"));
         var rocks = course.GetComponentsInChildren<MeshFilter>().Where(t => t.name.StartsWith("Unique river rock group ")).ToArray();
-        Assert.That(rocks, Has.Length.EqualTo(12));
-        Assert.That(rocks.Select(t => (BoundTextureNames(new[] { t })[0], t.sharedMesh.uv[0])).Distinct().Count(), Is.EqualTo(12),
+        Assert.That(rocks, Has.Length.EqualTo(18));
+        Assert.That(rocks.Select(t => (BoundTextureNames(new[] { t })[0], t.sharedMesh.uv[0])).Distinct().Count(), Is.EqualTo(18),
             "Each rock painting must appear once, independently of recycled wave tiles.");
         foreach (var rock in rocks) Assert.That(rock.GetComponents<Collider2D>(), Is.Empty);
         var waterPixels = new Texture2D(2, 2);
