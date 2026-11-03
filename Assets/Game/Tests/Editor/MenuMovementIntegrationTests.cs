@@ -147,6 +147,12 @@ public class MenuMovementIntegrationTests
         var apply = scenery.GetType().GetMethod("ApplyView");
         apply.Invoke(scenery, new object[] { 84f, 1f });
         var positions = landmarks.Select(t => t.localPosition).ToArray();
+        apply.Invoke(scenery, new object[] { 94f, 1f });
+        var screenTravel = new float[landmarks.Length];
+        for (int i = 0; i < landmarks.Length; i++)
+            screenTravel[i] = 10 - (landmarks[i].localPosition.x - positions[i].x);
+        Assert.That(screenTravel[0], Is.GreaterThan(screenTravel[2]));
+        Assert.That(screenTravel[2], Is.GreaterThan(screenTravel[1]));
         foreach (float x in new[] { 1000f, -200f, 342f, 84f }) apply.Invoke(scenery, new object[] { x, 1f });
         Assert.That(landmarks.Select(t => t.localPosition).ToArray(), Is.EqualTo(positions),
             "Landmarks must retain their unique anchors after travel, reversal and teleport.");

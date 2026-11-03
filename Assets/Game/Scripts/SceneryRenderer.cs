@@ -14,6 +14,8 @@ public sealed class SceneryRenderer : MonoBehaviour
     public bool RouteLandmarks;
     readonly Transform[] landmarks = new Transform[3];
     public static readonly float[] LandmarkAnchors = { 84, 216, 342 };
+    // Travel is the fraction of the camera motion seen on screen.
+    static readonly float[] LandmarkTravel = { 0.48f, 0.19f, 0.32f };
     Material landmarkMaterial;
     readonly Transform[] easterEggs = new Transform[3];
     float fishClock, waterCaptureTime = -1;
@@ -66,23 +68,45 @@ public sealed class SceneryRenderer : MonoBehaviour
             materials[i] = PaintedMaterial("background-material", "LegendOfCat/BackgroundStudy");
             materials[i].mainTexture = textures[i];
             materials[i].SetFloat("_Cutout", i == 0 ? 0 : 1);
-            if (i == 1) { materials[i].SetFloat("_Fog", 0.32f); materials[i].SetFloat("_Saturation", 0.8f); }
-            if (i == 2) { materials[i].SetFloat("_Fog", 0.42f); materials[i].SetFloat("_Saturation", 0.75f); }
+            if (i == 1) {
+                materials[i].SetFloat("_Fog", RouteLandmarks ? 0.40f : 0.32f);
+                materials[i].SetFloat("_Saturation", RouteLandmarks ? 0.72f : 0.8f);
+                if (RouteLandmarks) materials[i].SetColor("_FogTint", new Color(0.72f, 0.73f, 0.81f));
+            }
+            if (i == 2) {
+                materials[i].SetFloat("_Fog", 0.42f);
+                materials[i].SetFloat("_Saturation", 0.75f);
+                if (RouteLandmarks) materials[i].SetColor("_FogTint", new Color(0.62f, 0.65f, 0.81f));
+            }
             if (RouteLandmarks && i > 0) {
                 // One authored strip covers the whole route's parallax travel, without recycling.
-                materials[i].mainTexture = Resources.Load<Texture2D>("GoldenRiver/" + (i == 1 ? "valley-panorama-v3" : "canopy-panorama-v3"));
+                materials[i].mainTexture = Resources.Load<Texture2D>("GoldenRiver/" + (i == 1 ? "valley-panorama-v3" : "far-valley-panorama-v4"));
                 float panoramaWidth = i == 1 ? 104 : 80;
                 float crop = i == 1 ? 0.10f : 0.12f;
                 var panorama = Quad();
                 panorama.name = i == 1 ? "Continuous valley panorama" : "Continuous canopy panorama";
                 panorama.transform.SetParent(layers[i], false);
-                panorama.transform.localPosition = new Vector3(i == 1 ? 35 : 20, i == 1 ? 10 : 7, i == 1 ? 16 : 24);
+                panorama.transform.localPosition = new Vector3(i == 1 ? 35 : 20, i == 1 ? 8.2f : 11.8f, i == 1 ? 16 : 24);
                 panorama.transform.localScale = new Vector3(panoramaWidth, panoramaWidth / 3, 1);
                 // Crop lower terrain below the camera while retaining the painting's native aspect.
                 var mesh = Instantiate(quadMesh);
                 mesh.name = panorama.name + " mesh";
-                mesh.uv = new[] { new Vector2(0, crop), new Vector2(1, crop),
-                    new Vector2(0, 1 + crop), new Vector2(1, 1 + crop) };
+                if (i == 1) {
+                    // Move the keep away from the aqueduct vista while keeping both strip edges anchored.
+                    mesh.vertices = new[] {
+                        new Vector3(-0.5f, -0.5f), new Vector3(0.10f, -0.5f), new Vector3(0.5f, -0.5f),
+                        new Vector3(-0.5f, 0.5f), new Vector3(0.10f, 0.5f), new Vector3(0.5f, 0.5f)
+                    };
+                    mesh.uv = new[] {
+                        new Vector2(0, crop), new Vector2(0.5f, crop), new Vector2(1, crop),
+                        new Vector2(0, 1 + crop), new Vector2(0.5f, 1 + crop), new Vector2(1, 1 + crop)
+                    };
+                    mesh.triangles = new[] { 0, 3, 1, 1, 3, 4, 1, 4, 2, 2, 4, 5 };
+                    mesh.RecalculateBounds();
+                } else {
+                    mesh.uv = new[] { new Vector2(0, crop), new Vector2(1, crop),
+                        new Vector2(0, 1 + crop), new Vector2(1, 1 + crop) };
+                }
                 terrainMeshes.Add(mesh);
                 panorama.GetComponent<MeshFilter>().sharedMesh = mesh;
                 panorama.GetComponent<MeshRenderer>().sharedMaterial = materials[i];
@@ -221,20 +245,32 @@ public sealed class SceneryRenderer : MonoBehaviour
         landmarkMaterial.SetFloat("_Fog", 0.24f);
         landmarkMaterial.SetFloat("_Saturation", 0.72f);
         var names = new[] { "waterwheel", "viaduct", "willow" };
-        var brightness = new[] { 0.87f, 0.89f, 0.72f };
-        var fog = new[] { 0.24f, 0.28f, 0.16f };
+        var brightness = new[] { 0.91f, 0.91f, 0.80f };
+        var fog = new[] { 0.15f, 0.48f, 0.28f };
+        var saturation = new[] { 0.83f, 0.56f, 0.72f };
+        var depth = new[] { 6f, 13f, 9f };
+        var width = new[] { 30f, 34f, 29f };
+        var fogTint = new[] {
+            new Color(0.80f, 0.79f, 0.73f),
+            new Color(0.60f, 0.65f, 0.80f),
+            new Color(0.71f, 0.74f, 0.77f)
+        };
         for (int i = 0; i < names.Length; i++) {
             var item = Quad();
             item.name = "Unique landmark " + names[i];
             item.transform.SetParent(transform, false);
-            item.transform.localPosition = new Vector3(LandmarkAnchors[i], -0.5f, 8);
+            item.transform.localPosition = new Vector3(LandmarkAnchors[i], -0.5f, depth[i]);
             // The opaque hillside continues below the viewport; its sides descend under the river.
-            item.transform.localScale = new Vector3(30, 20, 1);
+            item.transform.localScale = new Vector3(width[i], width[i] * 2 / 3, 1);
             item.GetComponent<MeshRenderer>().sharedMaterial = landmarkMaterial;
             var properties = new MaterialPropertyBlock();
             properties.SetTexture("_MainTex", Resources.Load<Texture2D>("GoldenRiver/landmark-" + names[i] + "-hill-v2"));
             properties.SetFloat("_Brightness", brightness[i]);
             properties.SetFloat("_Fog", fog[i]);
+            properties.SetColor("_FogTint", fogTint[i]);
+            properties.SetFloat("_Saturation", saturation[i]);
+            properties.SetFloat("_MillMotion", i == 0 ? 1 : 0);
+            properties.SetFloat("_WillowMotion", i == 2 ? 1 : 0);
             item.GetComponent<MeshRenderer>().SetPropertyBlock(properties);
             landmarks[i] = item.transform;
         }
@@ -401,11 +437,11 @@ public sealed class SceneryRenderer : MonoBehaviour
             for (int i = 0; i < landmarks.Length; i++) {
                 var position = landmarks[i].localPosition;
                 // Each landmark has one fixed anchor, never participates in tile recycling.
-                position.x = LandmarkAnchors[i] + (localView.x - LandmarkAnchors[i]) * 0.65f;
+                position.x = LandmarkAnchors[i] + (localView.x - LandmarkAnchors[i]) * (1 - LandmarkTravel[i]);
                 landmarks[i].localPosition = position;
             }
             // Register the small statue with the right-hand battlement in the valley painting.
-            easterEggs[0].localPosition = new Vector3(Offset(localView.x, ValleyTravel) + 34.9f, localView.y + 4.37f, 12);
+            easterEggs[0].localPosition = new Vector3(Offset(localView.x, ValleyTravel) + 45.28f, localView.y + 2.57f, 12);
             UpdateFish(waterCaptureTime >= 0 ? waterCaptureTime : fishClock);
         }
         PositionForegroundWater(localView.x);
