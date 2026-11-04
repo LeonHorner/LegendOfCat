@@ -5,7 +5,7 @@ public sealed class CatCamera : MonoBehaviour
     public Transform target;
     public bool fixedHeight;
     public bool ascent;
-    float trackedHeight = 1;
+    float trackedHeight = 1, verticalVelocity;
     public float leftBoundary = -5;
     public float rightBoundary = 48;
     public Transform courseRoot;
@@ -36,10 +36,12 @@ public sealed class CatCamera : MonoBehaviour
             fixedHeight ? floor : Mathf.Clamp(target.position.y + 1.2f, 2.5f, 5), -10);
         var next = Vector3.Lerp(transform.position, desired, 1 - Mathf.Exp(-8 * Time.deltaTime));
         if (ascent) {
-            float verticalSpeed = desired.y > transform.position.y ? 16 : 10;
-            next.y = Mathf.Lerp(transform.position.y, desired.y, 1 - Mathf.Exp(-verticalSpeed * Time.deltaTime));
+            float smoothTime = desired.y > transform.position.y ? 0.22f : 0.12f;
+            next.y = Mathf.SmoothDamp(transform.position.y, desired.y, ref verticalVelocity,
+                smoothTime, 24 * scale, Time.deltaTime);
         }
         transform.position = snap ? desired : next;
+        if (snap) verticalVelocity = 0;
         snap = false;
     }
 }

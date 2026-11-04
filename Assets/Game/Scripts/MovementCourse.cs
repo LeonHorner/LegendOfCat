@@ -155,8 +155,10 @@ public sealed class MovementCourse : MonoBehaviour
         texture = new Texture2D(1, 1);
         texture.SetPixel(0, 0, Color.white); texture.Apply();
         square = Sprite.Create(texture, new Rect(0, 0, 1, 1), Vector2.one * 0.5f, 1);
+        var platformObjects = new System.Collections.Generic.List<GameObject>();
         foreach (var p in ActivePlatforms) {
             var platform = Block("Standable platform", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.22f, 0.28f, 0.28f));
+            platformObjects.Add(platform);
             var collider = platform.AddComponent<BoxCollider2D>();
             int ascentIndex = System.Array.IndexOf(AscentPlatforms, p);
             if (LevelOne && ascentIndex >= 0) {
@@ -239,6 +241,9 @@ public sealed class MovementCourse : MonoBehaviour
             sceneryRenderer.RouteLandmarks = true;
         }
         sceneryRenderer.InitializeForCourse(courseCamera, Cat, ActivePlatforms);
+        if (LevelOne)
+            for (int i = 0; i < platformObjects.Count; i++)
+                if (sceneryRenderer.FloatingAt(i)) SceneryRenderer.MatchFloatingCollider(platformObjects[i], sceneryRenderer.TerrainVisuals[i]);
         foreach (var support in supports) {
             support.Cat = Cat;
             support.Visual = sceneryRenderer.TerrainVisuals[System.Array.IndexOf(ActivePlatforms,
@@ -257,6 +262,7 @@ public sealed class MovementCourse : MonoBehaviour
                 catchCollider.size = new Vector2(1, 2.2f);
                 catchCollider.offset = new Vector2(0, -0.6f);
                 sceneryRenderer.AddRecoveryTerrain(new Vector3(catchPoint.x, catchPoint.y - 0.5f, catchPoint.z));
+                SceneryRenderer.MatchFloatingCollider(catchFloor, sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count - 1]);
             }
         }
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {

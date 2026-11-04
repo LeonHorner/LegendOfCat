@@ -12,6 +12,7 @@ public sealed class CatController : MonoBehaviour
     Rigidbody2D body;
     BoxCollider2D shape;
     readonly RaycastHit2D[] hits = new RaycastHit2D[8];
+    readonly ContactPoint2D[] sideContacts = new ContactPoint2D[8];
     int leaveGroundSteps;
     Vector2 supportVelocity;
     Vector2 spawn;
@@ -67,6 +68,19 @@ public sealed class CatController : MonoBehaviour
         body.linearVelocity = Motion.Step(Time.fixedDeltaTime, Grounded, relativeVelocity);
         supportVelocity = Grounded && !Motion.Jumped ? nextSupportVelocity : Vector2.zero;
         body.linearVelocity += supportVelocity;
+        if (!Grounded && relativeVelocity.y <= 0.1f) {
+            int contacts = shape.GetContacts(filter, sideContacts);
+            for (int i = 0; i < contacts; i++) {
+                var contact = sideContacts[i];
+                // Driving into a steep foot-level bevel must not counteract gravity indefinitely.
+                if (contact.normal.y > 0.01f && contact.normal.y < 0.7f &&
+                    contact.point.y <= shape.bounds.min.y + 0.12f &&
+                    contact.normal.x * body.linearVelocity.x < 0) {
+                    body.linearVelocity = new Vector2(0, body.linearVelocity.y);
+                    break;
+                }
+            }
+        }
         if (Motion.Jumped) { Grounded = false; leaveGroundSteps = 2; }
         float fallY = fallReference ? fallReference.InverseTransformPoint(body.position).y : body.position.y;
         if (fallY < -7) {

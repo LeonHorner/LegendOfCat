@@ -363,6 +363,15 @@ public class MenuMovementIntegrationTests
         var supports = course.GetComponentsInChildren(RuntimeType("MovingSupport"));
         Assert.That(supports.Length, Is.EqualTo(2));
         Assert.That(course.GetComponentsInChildren<PlatformEffector2D>(), Is.Empty, "Course platforms must be solid from below.");
+        var shaped = course.GetComponentsInChildren<PolygonCollider2D>();
+        Assert.That(shaped.Length, Is.GreaterThan(20));
+        foreach (var polygon in shaped) {
+            var bounds = polygon.bounds;
+            Assert.That(polygon.OverlapPoint(new Vector2(bounds.center.x, bounds.max.y - 0.03f)), Is.True,
+                "The registered landing surface must remain solid.");
+            Assert.That(polygon.OverlapPoint(new Vector2(bounds.min.x + 0.01f, bounds.min.y + 0.01f)), Is.False,
+                "Empty lower corners must not remain rectangular collision blocks.");
+        }
         yield return null;
         var previousMode = Physics2D.simulationMode;
         Physics2D.simulationMode = SimulationMode2D.Script;

@@ -156,7 +156,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         var platforms = coursePlatforms;
         for (int index = 0; index < platforms.Length; index++) {
             var p = platforms[index];
-            Terrain(p, RouteLandmarks && index >= MovementCourse.LevelOnePlatforms.Length && p.z < 10 || (FloatingPlatforms == null ? IsFloating(index) : System.Array.IndexOf(FloatingPlatforms, index) >= 0), index);
+            Terrain(p, FloatingAt(index), index);
         }
         if (RouteLandmarks) {
             CreateLandmarks();
@@ -197,6 +197,36 @@ public sealed class SceneryRenderer : MonoBehaviour
     }
 
     public readonly System.Collections.Generic.List<Transform> TerrainVisuals = new System.Collections.Generic.List<Transform>();
+    public bool FloatingAt(int index) => RouteLandmarks && index >= MovementCourse.LevelOnePlatforms.Length && coursePlatforms[index].z < 10 ||
+        (FloatingPlatforms == null ? IsFloating(index) : System.Array.IndexOf(FloatingPlatforms, index) >= 0);
+
+    public static void MatchFloatingCollider(GameObject platform, Transform visual)
+    {
+        var properties = new MaterialPropertyBlock(); visual.GetComponent<MeshRenderer>().GetPropertyBlock(properties);
+        string name = properties.GetTexture("_MainTex").name;
+        Vector2[] underside;
+        switch (name) {
+            case "shelf-root": underside = new[] { new Vector2(.96f,.60f), new Vector2(.89f,.48f), new Vector2(.73f,.32f), new Vector2(.58f,.20f), new Vector2(.38f,.35f), new Vector2(.19f,.50f), new Vector2(.06f,.55f) }; break;
+            case "shelf-root-compact-v3": underside = new[] { new Vector2(.95f,.58f), new Vector2(.81f,.40f), new Vector2(.63f,.25f), new Vector2(.42f,.13f), new Vector2(.24f,.24f), new Vector2(.10f,.43f), new Vector2(.05f,.57f) }; break;
+            case "shelf-masonry-compact-v3": underside = new[] { new Vector2(.95f,.53f), new Vector2(.87f,.35f), new Vector2(.76f,.22f), new Vector2(.63f,.23f), new Vector2(.53f,.29f), new Vector2(.40f,.20f), new Vector2(.30f,.18f), new Vector2(.13f,.32f), new Vector2(.05f,.53f) }; break;
+            case "shelf-ascent-masonry-v1": underside = new[] { new Vector2(.97f,.49f), new Vector2(.91f,.37f), new Vector2(.76f,.31f), new Vector2(.61f,.24f), new Vector2(.42f,.22f), new Vector2(.24f,.22f), new Vector2(.10f,.23f), new Vector2(.04f,.46f) }; break;
+            case "shelf-masonry": underside = new[] { new Vector2(.98f,.55f), new Vector2(.92f,.43f), new Vector2(.85f,.29f), new Vector2(.66f,.31f), new Vector2(.58f,.36f), new Vector2(.42f,.36f), new Vector2(.34f,.39f), new Vector2(.22f,.30f), new Vector2(.12f,.35f), new Vector2(.02f,.55f) }; break;
+            default: return;
+        }
+        var old = platform.GetComponent<BoxCollider2D>(); old.enabled = false;
+        var polygon = platform.AddComponent<PolygonCollider2D>();
+        var points = new Vector2[underside.Length + 2];
+        points[0] = new Vector2(-.5f,.5f); points[1] = new Vector2(.5f,.5f);
+        var bounds = visual.GetComponent<MeshFilter>().sharedMesh.bounds;
+        for (int i = 0; i < underside.Length; i++) {
+            Vector2 uv = underside[i];
+            var painted = new Vector3(Mathf.Lerp(bounds.min.x, bounds.max.x, uv.x), Mathf.Lerp(bounds.min.y, bounds.max.y, uv.y), 0);
+            points[i + 2] = platform.transform.InverseTransformPoint(visual.TransformPoint(painted));
+        }
+        polygon.points = points;
+        Object.Destroy(old);
+    }
+
     public void AddRecoveryTerrain(Vector3 platform) => Terrain(platform, true, 0);
 
     void Terrain(Vector3 platform, bool floating, int variant)

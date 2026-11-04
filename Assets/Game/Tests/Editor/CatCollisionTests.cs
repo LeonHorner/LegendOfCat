@@ -40,6 +40,41 @@ public class CatCollisionTests
         UnityEngine.Object.DestroyImmediate(material); Physics2D.simulationMode = previousMode;
     }
     [Test]
+    public void SteepBevelCannotHoldMikaInMidair()
+    {
+        var bevel = new GameObject("Steep shelf bevel");
+        try {
+            bevel.AddComponent<PolygonCollider2D>().points = new[] {
+                new Vector2(0,0), new Vector2(3,0), new Vector2(3,2), new Vector2(60f / 55f,2)
+            };
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(.2f,1.65f) });
+            Physics2D.SyncTransforms(); Input("SetMove",1f);
+            for (int tick = 0; tick < 100; tick++) Tick();
+            bool grounded = (bool)controller.GetType().GetProperty("Grounded").GetValue(controller);
+            Assert.That(grounded || body.position.y < 1.35f, Is.True, "Mika remained wedged at " + body.position);
+        } finally { UnityEngine.Object.DestroyImmediate(bevel); }
+    }
+
+    [Test]
+    public void PressingIntoShelfCornersCannotHoldMikaAirborne()
+    {
+        var ledge = new GameObject("Shelf corner regression");
+        try {
+            ledge.transform.position = new Vector2(2, 1);
+            ledge.AddComponent<BoxCollider2D>().size = new Vector2(2, 2);
+            foreach (float x in new[] { 0.52f, 0.54f, 0.55f, 0.56f })
+            foreach (float y in new[] { 2.32f, 2.40f, 2.44f, 2.46f }) {
+                controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(x, y) });
+                Physics2D.SyncTransforms(); Input("SetMove", 1f);
+                for (int tick = 0; tick < 100; tick++) Tick();
+                bool grounded = (bool)controller.GetType().GetProperty("Grounded").GetValue(controller);
+                Assert.That(grounded || body.position.y < 1.8f, Is.True,
+                    "Airborne corner hold from " + x + ", " + y + " at " + body.position);
+            }
+        } finally { UnityEngine.Object.DestroyImmediate(ledge); }
+    }
+
+    [Test]
     public void SolidShelfBlocksJumpFromBelowWithoutGroundingOnItsUnderside()
     {
         var ceiling = new GameObject("Solid shelf underside");
