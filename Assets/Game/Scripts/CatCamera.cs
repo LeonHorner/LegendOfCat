@@ -24,15 +24,22 @@ public sealed class CatCamera : MonoBehaviour
         if (ascent) {
             float localY = courseRoot.InverseTransformPoint(target.position).y;
             float localX = courseRoot.InverseTransformPoint(target.position).x;
-            float desiredHeight = localX < 425 ? 1 : Mathf.Max(1, localY + 0.8f);
-            if (snap) trackedHeight = desiredHeight;
-            else if (desiredHeight > trackedHeight + 1.0f) trackedHeight = desiredHeight - 1.0f;
-            else if (desiredHeight < trackedHeight - 1.0f) trackedHeight = desiredHeight + 1.0f;
+            // Follow near the upper edge, leaving ordinary jumps inside a broad resting zone.
+            const float upperEdge = 2.6f, lowerEdge = -2.2f;
+            if (localX < 425) trackedHeight = 1;
+            else if (snap) trackedHeight = Mathf.Max(1, localY - upperEdge);
+            else if (localY > trackedHeight + upperEdge) trackedHeight = localY - upperEdge;
+            else if (localY < trackedHeight + lowerEdge) trackedHeight = Mathf.Max(1, localY - lowerEdge);
             floor = courseRoot.TransformPoint(new Vector3(0, trackedHeight)).y;
         }
         var desired = new Vector3(Mathf.Clamp(target.position.x + 2 * scale, halfWidth + left, right - halfWidth),
             fixedHeight ? floor : Mathf.Clamp(target.position.y + 1.2f, 2.5f, 5), -10);
-        transform.position = snap ? desired : Vector3.Lerp(transform.position, desired, 1 - Mathf.Exp(-8 * Time.deltaTime));
+        var next = Vector3.Lerp(transform.position, desired, 1 - Mathf.Exp(-8 * Time.deltaTime));
+        if (ascent) {
+            float verticalSpeed = desired.y > transform.position.y ? 16 : 10;
+            next.y = Mathf.Lerp(transform.position.y, desired.y, 1 - Mathf.Exp(-verticalSpeed * Time.deltaTime));
+        }
+        transform.position = snap ? desired : next;
         snap = false;
     }
 }

@@ -414,10 +414,22 @@ public class MenuMovementIntegrationTests
             cat.transform.localPosition = new Vector3(900, 14);
             var follow = course.GetComponentInChildren(RuntimeType("CatCamera"));
             follow.GetType().GetMethod("Snap").Invoke(follow, null); Call(follow, "LateUpdate");
-            Assert.That(follow.transform.position.y, Is.GreaterThan(12));
+            Assert.That(follow.transform.position.y, Is.EqualTo(11.4f).Within(0.01f));
             course.GetType().GetMethod("RestartRun").Invoke(course, null);
             Call(follow, "LateUpdate");
             Assert.That(follow.transform.position.y, Is.EqualTo(1).Within(0.01f));
+            cat.transform.localPosition = new Vector3(500, 3.5f);
+            for (int tick = 0; tick < 30; tick++) Call(follow, "LateUpdate");
+            Assert.That(follow.transform.position.y, Is.EqualTo(1).Within(0.01f), "Ordinary jumps stay inside the resting zone.");
+            cat.transform.localPosition = new Vector3(500, 4.2f);
+            for (int tick = 0; tick < 60; tick++) Call(follow, "LateUpdate");
+            Assert.That(follow.transform.position.y, Is.EqualTo(1.6f).Within(0.03f));
+            cat.transform.localPosition = new Vector3(500, 1f);
+            for (int tick = 0; tick < 30; tick++) Call(follow, "LateUpdate");
+            Assert.That(follow.transform.position.y, Is.EqualTo(1.6f).Within(0.03f), "Landing must not pull the camera straight back down.");
+            cat.transform.localPosition = new Vector3(500, -1f);
+            for (int tick = 0; tick < 60; tick++) Call(follow, "LateUpdate");
+            Assert.That(follow.transform.position.y, Is.EqualTo(1.2f).Within(0.03f), "Falls engage the lower edge.");
         } finally { Physics2D.simulationMode = previousMode; }
     }
 
