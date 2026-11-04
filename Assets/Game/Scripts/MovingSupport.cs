@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Carries only a standing rider. Jump velocity remains owned by CatMotion.
+// Kinematic motion and rider velocity share the physics clock and interpolation.
 [DefaultExecutionOrder(-100)]
 public sealed class MovingSupport : MonoBehaviour
 {
@@ -8,10 +8,18 @@ public sealed class MovingSupport : MonoBehaviour
     public Transform Visual;
     public Vector2 Axis = Vector2.right;
     public float Amplitude = 0.8f;
-    Vector3 origin, visualOrigin, previousOffset, currentOffset;
+    public Vector2 Velocity { get; private set; }
+    public float Phase => clock;
+    Rigidbody2D body;
+    Vector3 origin, visualOrigin;
     float clock;
     bool ready;
-    public float Phase => clock;
+    void Awake()
+    {
+        body = gameObject.AddComponent<Rigidbody2D>();
+        body.bodyType = RigidbodyType2D.Kinematic;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+    }
     void Start()
     {
         if (ready) return;
@@ -22,34 +30,26 @@ public sealed class MovingSupport : MonoBehaviour
     public void ResetPhase()
     {
         if (!ready) return;
-        clock = 0;
-        previousOffset = currentOffset = Vector3.zero;
+        clock = 0; Velocity = Vector2.zero;
+        body.linearVelocity = Vector2.zero;
+        body.position = transform.parent.TransformPoint(origin);
         transform.localPosition = origin;
         if (Visual) Visual.localPosition = visualOrigin;
         Physics2D.SyncTransforms();
     }
     void LateUpdate()
     {
-        if (!ready || !Visual || Cat && Cat.Paused) return;
-        float blend = Mathf.Clamp01((Time.time - Time.fixedTime) / Time.fixedDeltaTime);
-        Visual.localPosition = visualOrigin + Vector3.Lerp(previousOffset, currentOffset, blend);
+        if (!ready || !Visual) return;
+        Visual.localPosition = visualOrigin + transform.localPosition - origin;
     }
     void FixedUpdate()
     {
-        if (!ready || !Cat || Cat.Paused) return;
-        var body = Cat.GetComponent<Rigidbody2D>();
-        var bounds = GetComponent<BoxCollider2D>().bounds;
-        var feet = Cat.GetComponent<BoxCollider2D>().bounds;
-        bool riding = Cat.Grounded && body.linearVelocity.y <= 0.1f &&
-            Mathf.Abs(feet.min.y - bounds.max.y) < 0.12f &&
-            feet.max.x > bounds.min.x && feet.min.x < bounds.max.x;
+        if (!ready || !Cat) return;
+        if (Cat.Paused) { body.linearVelocity = Vector2.zero; Velocity = Vector2.zero; return; }
         clock += Time.fixedDeltaTime;
         var offset = (Vector3)(Axis * (Amplitude * Mathf.Sin(clock * Mathf.PI * 2 / 5)));
-        previousOffset = currentOffset; currentOffset = offset;
-        var previous = transform.position;
-        transform.localPosition = origin + offset;
-        if (Visual) Visual.localPosition = visualOrigin + offset;
-        if (riding) body.position += (Vector2)(transform.position - previous);
-        Physics2D.SyncTransforms();
+        Vector2 destination = transform.parent.TransformPoint(origin + offset);
+        Velocity = (destination - body.position) / Time.fixedDeltaTime;
+        body.MovePosition(destination);
     }
 }

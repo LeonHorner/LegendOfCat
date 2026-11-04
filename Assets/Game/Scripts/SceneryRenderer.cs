@@ -94,17 +94,20 @@ public sealed class SceneryRenderer : MonoBehaviour
                 if (i == 1) {
                     // Move the keep away from the aqueduct vista while keeping both strip edges anchored.
                     mesh.vertices = new[] {
-                        new Vector3(-0.5f, -0.5f), new Vector3(0.10f, -0.5f), new Vector3(0.5f, -0.5f),
+                        new Vector3(-0.5f, -0.5f - crop), new Vector3(0.10f, -0.5f - crop), new Vector3(0.5f, -0.5f - crop),
                         new Vector3(-0.5f, 0.5f), new Vector3(0.10f, 0.5f), new Vector3(0.5f, 0.5f)
                     };
                     mesh.uv = new[] {
-                        new Vector2(0, crop), new Vector2(0.5f, crop), new Vector2(1, crop),
+                        new Vector2(0, 0), new Vector2(0.5f, 0), new Vector2(1, 0),
                         new Vector2(0, 1 + crop), new Vector2(0.5f, 1 + crop), new Vector2(1, 1 + crop)
                     };
                     mesh.triangles = new[] { 0, 3, 1, 1, 3, 4, 1, 4, 2, 2, 4, 5 };
                     mesh.RecalculateBounds();
                 } else {
-                    mesh.uv = new[] { new Vector2(0, crop), new Vector2(1, crop),
+                    mesh.vertices = new[] { new Vector3(-0.5f, -0.5f - crop), new Vector3(0.5f, -0.5f - crop),
+                        new Vector3(-0.5f, 0.5f), new Vector3(0.5f, 0.5f) };
+                    mesh.RecalculateBounds();
+                    mesh.uv = new[] { new Vector2(0, 0), new Vector2(1, 0),
                         new Vector2(0, 1 + crop), new Vector2(1, 1 + crop) };
                 }
                 terrainMeshes.Add(mesh);
@@ -223,11 +226,17 @@ public sealed class SceneryRenderer : MonoBehaviour
             landingFraction = floating ? 0.90f : bank ? 0.89f : 0.76f;
         }
         bool ascentShelf = distinctShelf && variant >= MovementCourse.LevelOnePlatforms.Length && !compactShelf;
-        if (ascentShelf) { texturePath = "GoldenRiver/shelf-ascent-masonry-v1"; contactUV = 0.62f; landingFraction = 0.97f; }
+        if (ascentShelf) { texturePath = "GoldenRiver/shelf-ascent-masonry-v1"; contactUV = 0.62f; landingFraction = 0.90f; }
+        bool tallBank = variedCourse && !floating && platform.x > 425 && contact >= 1.5f;
+        if (tallBank) { texturePath = "GoldenRiver/bank-tall-ascent-v1"; contactUV = 0.918f; landingFraction = 0.86f; }
         float width = platform.z / landingFraction;
         float sourceAspect = compactShelf ? 2 : 3;
-        float bottom = distinctShelf ? contact - width / sourceAspect * contactUV : floating ? contact - 0.90f : -4.5f;
-        float crown = distinctShelf ? contact + width / sourceAspect * (1 - contactUV) : contact + (floating ? 0.35f : 0.60f);
+        if (tallBank) {
+            var source = Resources.Load<Texture2D>(texturePath);
+            sourceAspect = (float)source.width / source.height;
+        }
+        float bottom = distinctShelf || tallBank ? contact - width / sourceAspect * contactUV : floating ? contact - 0.90f : -4.5f;
+        float crown = distinctShelf || tallBank ? contact + width / sourceAspect * (1 - contactUV) : contact + (floating ? 0.35f : 0.60f);
         float half = width * 0.5f;
         var vertices = new[] {
             new Vector3(-half, bottom, 2), new Vector3(half, bottom, 2),
@@ -235,7 +244,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             new Vector3(-half, crown, 2), new Vector3(half, crown, 2)
         };
         bool mirror = !variedCourse && variant % 3 == 1;
-        float left = ascentShelf ? 0.16f : mirror ? 1 : 0, right = ascentShelf ? 1 : 1 - left;
+        float left = mirror ? 1 : 0, right = 1 - left;
         var mesh = new Mesh { name = distinctShelf ? (rootShelf ? "Root island" : "Masonry shelf") + (compactShelf ? " compact" : " long") : variedCourse ? "Painted grounded bank" : floating ? "Painted floating rock" : "Painted grounded cliff" };
         mesh.vertices = vertices;
         mesh.uv = new[] { new Vector2(left, 0), new Vector2(right, 0),
@@ -263,8 +272,8 @@ public sealed class SceneryRenderer : MonoBehaviour
         landmarkMaterial.SetFloat("_Saturation", 0.72f);
         var names = new[] { "waterwheel", "viaduct", "willow" };
         var brightness = new[] { 0.91f, 0.91f, 0.80f };
-        var fog = new[] { 0.15f, 0.48f, 0.28f };
-        var saturation = new[] { 0.83f, 0.56f, 0.72f };
+        var fog = new[] { 0.15f, 0.30f, 0.20f };
+        var saturation = new[] { 0.83f, 0.85f, 0.88f };
         var depth = new[] { 6f, 13f, 9f };
         var width = new[] { 30f, 34f, 29f };
         var fogTint = new[] {

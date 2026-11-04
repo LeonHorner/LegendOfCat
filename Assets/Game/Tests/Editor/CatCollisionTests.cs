@@ -39,6 +39,35 @@ public class CatCollisionTests
         UnityEngine.Object.DestroyImmediate(cat); UnityEngine.Object.DestroyImmediate(floor);
         UnityEngine.Object.DestroyImmediate(material); Physics2D.simulationMode = previousMode;
     }
+    [Test]
+    public void OneWayUndersideCannotBecomeGroundOrBlockHorizontalTravel()
+    {
+        var shelf = new GameObject("One-way underside regression");
+        try {
+            shelf.transform.position = new Vector2(0, 1.2f);
+            var collider = shelf.AddComponent<BoxCollider2D>();
+            collider.size = new Vector2(3, 0.12f); collider.usedByEffector = true;
+            shelf.AddComponent<PlatformEffector2D>().surfaceArc = 120;
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(0, 1.1f) });
+            Physics2D.SyncTransforms(); Tick();
+            Assert.That((bool)controller.GetType().GetProperty("Grounded").GetValue(controller), Is.False);
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(-2.5f, 0.46f) });
+            Input("SetMove", 1f);
+            for (int tick = 0; tick < 45; tick++) Tick();
+            Assert.That(body.position.x, Is.GreaterThan(2), "No invisible side wall below the shelf.");
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(0, 0.46f) });
+            for (int tick = 0; tick < 10; tick++) Tick();
+            Input("PressJump");
+            bool roseThrough = false;
+            for (int tick = 0; tick < 80; tick++) {
+                Tick();
+                if (body.position.y > 2) roseThrough = true;
+            }
+            Assert.That(roseThrough, Is.True);
+            Assert.That(body.position.y, Is.EqualTo(1.72f).Within(0.04f));
+        } finally { UnityEngine.Object.DestroyImmediate(shelf); }
+    }
+
     [Test] public void CatLandsAndCanJumpAgainWithoutHeldAutoJump()
     {
         Assert.That((bool)controller.GetType().GetProperty("Grounded").GetValue(controller), Is.True);

@@ -71,7 +71,7 @@ public sealed class MovementCourse : MonoBehaviour
             new[] { 10f, 5f, 9f, 5f, 12f }, new[] { 6f, 4f, 7f, 3.5f, 10f },
             new[] { 8f, 3f, 5f, 4f, 12f }, new[] { 7f, 4f, 6f, 3f, 11f },
             new[] { 10f, 5f, 8f, 4f, 12f }, new[] { 6f, 3.5f, 7f, 3f, 10f },
-            new[] { 7f, 3f, 6f, 4f, 12f }, new[] { 8f, 4f, 5f, 3.5f, 10f },
+            new[] { 7f, 3f, 6f, 4f, 12f }, new[] { 8f, 4f, 5f, 3.5f, 12f },
             new[] { 6f, 3f, 7f, 4f, 12f }
         };
         float[][] heights = {
@@ -160,8 +160,10 @@ public sealed class MovementCourse : MonoBehaviour
             var collider = platform.AddComponent<BoxCollider2D>();
             int ascentIndex = System.Array.IndexOf(AscentPlatforms, p);
             if (LevelOne && ascentIndex >= 0) {
+                collider.size = new Vector2(1, 0.08f);
+                collider.offset = new Vector2(0, 0.46f);
                 collider.usedByEffector = true;
-                platform.AddComponent<PlatformEffector2D>().useOneWay = true;
+                platform.AddComponent<PlatformEffector2D>().surfaceArc = 120;
                 if (ascentIndex == 31 || ascentIndex == 51) {
                     var support = platform.AddComponent<MovingSupport>();
                     support.Axis = ascentIndex == 31 ? Vector2.right : Vector2.up;
@@ -243,11 +245,6 @@ public sealed class MovementCourse : MonoBehaviour
                 new Vector3(support.transform.localPosition.x, support.transform.localPosition.y, support.transform.localScale.x))];
         }
         if (LevelOne) {
-            foreach (var support in supports) {
-                var guide = Block("Non-standable stone guide", support.transform.localPosition,
-                    support.Axis.x > 0 ? new Vector2(7, 0.045f) : new Vector2(0.045f, 4), new Color(0.28f, 0.25f, 0.20f));
-                guide.transform.localPosition += Vector3.forward * 3;
-            }
             follow.ascent = true;
             for (int i = 0; i < AscentPlatforms.Length - 5; i += 5) {
                 var first = AscentPlatforms[i]; var lastInGroup = AscentPlatforms[i + 4];

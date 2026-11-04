@@ -81,11 +81,19 @@ public class MenuMovementIntegrationTests
         var masonryArtNames = BoundTextureNames(masonry);
         Assert.That(rootArtNames, Is.EquivalentTo(new[] { "shelf-root", "shelf-root-compact-v3" }));
         Assert.That(masonryArtNames, Is.EquivalentTo(new[] { "shelf-masonry", "shelf-masonry-compact-v3", "shelf-ascent-masonry-v1" }));
-        Assert.That(BoundTextureNames(bankArt), Is.EquivalentTo(new[] { "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3" }));
+        Assert.That(BoundTextureNames(bankArt), Is.EquivalentTo(new[] { "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3", "bank-tall-ascent-v1" }));
         var panoramas = course.GetComponentsInChildren<Transform>().Where(t => t.name.StartsWith("Continuous ")).ToArray();
         var waterTiles = course.GetComponentsInChildren<MeshFilter>().Where(t => t.name.StartsWith("Foreground water tile ")).ToArray();
         Assert.That(waterTiles, Has.Length.EqualTo(3));
         Assert.That(waterTiles[0].GetComponent<Renderer>().sharedMaterial.mainTexture.name, Is.EqualTo("river-water-v2"));
+        foreach (var bank in bankArt) {
+            var properties = new MaterialPropertyBlock(); bank.GetComponent<MeshRenderer>().GetPropertyBlock(properties);
+            var source = (Texture2D)properties.GetTexture("_MainTex");
+            if (source.name != "bank-tall-ascent-v1") continue;
+            var bounds = bank.sharedMesh.bounds;
+            Assert.That(bounds.size.x / bounds.size.y, Is.EqualTo((float)source.width / source.height).Within(0.001f));
+            Assert.That(bounds.min.y, Is.LessThan(-4.5f), "Tall cliff feet must extend below the river.");
+        }
         var rocks = course.GetComponentsInChildren<MeshFilter>().Where(t => t.name.StartsWith("Unique river rock group ")).ToArray();
         Assert.That(rocks, Has.Length.EqualTo(18));
         Assert.That(rocks.Select(t => (BoundTextureNames(new[] { t })[0], t.sharedMesh.uv[0])).Distinct().Count(), Is.EqualTo(18),
@@ -375,6 +383,25 @@ public class MenuMovementIntegrationTests
                 Assert.That(support.transform.position, Is.EqualTo(stopped));
                 course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
                 Assert.That(support.transform.position, Is.EqualTo(origin));
+            }
+            var ascent = (Vector3[])course.GetType().GetField("AscentPlatforms").GetValue(null);
+            var motor = cat.GetType().GetField("Motion").GetValue(cat);
+            foreach (int group in new[] { 4, 10, 13 }) {
+                var bank = ascent[group * 5]; var shelf = ascent[group * 5 + 1];
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(shelf.x, bank.y - 0.69f) });
+                SettleCourse(cat, course);
+                var body = cat.GetComponent<Rigidbody2D>();
+                bool jumped = false, recovered = false;
+                for (int tick = 0; tick < 180; tick++) {
+                    motor.GetType().GetMethod("SetMove").Invoke(motor, new object[] { body.position.x > bank.x ? -1f : 0f });
+                    if (!jumped && body.position.x <= bank.x + bank.z / 2 + 2.4f) {
+                        cat.GetType().GetMethod("PressJump").Invoke(cat, null); jumped = true;
+                    }
+                    Call(cat, "FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime);
+                    if (jumped && (bool)cat.GetType().GetProperty("Grounded").GetValue(cat) &&
+                        body.position.y > bank.y + 1.15f) { recovered = true; break; }
+                }
+                Assert.That(recovered, Is.True, "Recovery terrace must permit a short return in group " + group);
             }
             cat.transform.localPosition = new Vector3(900, 14);
             var follow = course.GetComponentInChildren(RuntimeType("CatCamera"));
