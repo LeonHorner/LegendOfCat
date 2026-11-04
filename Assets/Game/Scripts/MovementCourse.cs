@@ -80,7 +80,7 @@ public sealed class MovementCourse : MonoBehaviour
             new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.55f, 1.2f, 0.5f, 0f },
             new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.8f, 0.2f, 1f, 0f },
             new[] { 0f, 1f, 1.4f, 0.4f, 0f }, new[] { 0f, 0.8f, 1.3f, 0.7f, 0f },
-            new[] { 0f, 1.2f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.7f, 0.2f, 0.9f, 0f },
+            new[] { 0f, 1.2f, 3.6f, 2.2f, 1.05f }, new[] { 0f, 0.7f, 0.2f, 0.9f, 0f },
             new[] { 0f, 1f, 1.5f, 0.6f, 0f }, new[] { 0f, 0.8f, 1.2f, 0.7f, 0f },
             new[] { 0f, 0.8f, 1.4f, 0.5f, 0f }
         };

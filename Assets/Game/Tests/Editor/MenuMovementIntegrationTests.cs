@@ -300,8 +300,12 @@ public class MenuMovementIntegrationTests
                 bool grounded = (bool)cat.GetType().GetProperty("Grounded").GetValue(cat);
                 while (next < platforms.Length - 1 && body.position.x > platforms[next].x + platforms[next].z / 2)
                     next++;
-                motion.GetType().GetMethod("SetMove").Invoke(motion, new object[] { !grounded && next >= 43 && body.position.x >= platforms[next].x && body.position.x < platforms[next].x + platforms[next].z / 2 - 1 ? 0f : 1f });
-                if (grounded && next < platforms.Length - 1 &&
+                float axis = !grounded && next >= 43 && body.position.x >= platforms[next].x && body.position.x < platforms[next].x + platforms[next].z / 2 - 1 ? 0f : 1f;
+                bool waitForLift = next == 94 && grounded && platforms[next + 1].y - platforms[next].y > 1.8f;
+                if (waitForLift && body.position.x > platforms[next].x + platforms[next].z / 2 - 1.5f)
+                    axis = 0;
+                motion.GetType().GetMethod("SetMove").Invoke(motion, new object[] { axis });
+                if (grounded && !waitForLift && next < platforms.Length - 1 &&
                     body.position.x >= platforms[next].x + platforms[next].z / 2 - 0.7f)
                     cat.GetType().GetMethod("PressJump").Invoke(cat, null);
                 Call(cat, "FixedUpdate");
@@ -400,6 +404,26 @@ public class MenuMovementIntegrationTests
                 Assert.That(body.position.y, Is.GreaterThan(start + 1));
             }
             var ascent = (Vector3[])course.GetType().GetField("AscentPlatforms").GetValue(null);
+            foreach (int phaseSteps in new[] { 187, 63 }) {
+                mover.GetType().GetMethod("ResetPhase").Invoke(mover,null);
+                for (int tick = 0; tick < phaseSteps; tick++) { Call(mover,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
+                mover.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+                var bounds = mover.GetComponent<PolygonCollider2D>().bounds;
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[] { new Vector2(bounds.max.x - .7f, bounds.max.y + .46f) });
+                SettleCourse(cat,course);
+                motor.GetType().GetMethod("SetMove").Invoke(motor,new object[] { 1f });
+                cat.GetType().GetMethod("PressJump").Invoke(cat,null);
+                bool reached = false;
+                var destination = ascent[52];
+                for (int tick = 0; tick < 90; tick++) {
+                    if (body.position.x >= destination.x) motor.GetType().GetMethod("SetMove").Invoke(motor,new object[] { 0f });
+                    Call(cat,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime);
+                    if ((bool)cat.GetType().GetProperty("Grounded").GetValue(cat) &&
+                        body.position.x > destination.x - destination.z / 2 &&
+                        Mathf.Abs(body.position.y - destination.y - 1.2f) < .08f) { reached = true; break; }
+                }
+                Assert.That(reached, Is.EqualTo(phaseSteps == 63), "The upper landing must require the lift's high phase.");
+            }
             foreach (int group in new[] { 2, 5, 7, 9, 10, 13 }) {
                 mover.GetType().GetMethod("ResetPhase").Invoke(mover,null);
                 for (int tick = 0; tick < 187; tick++) { Call(mover,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
