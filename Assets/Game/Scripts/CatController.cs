@@ -52,19 +52,22 @@ public sealed class CatController : MonoBehaviour
         var filter = new ContactFilter2D { useTriggers = false };
         var count = shape.Cast(Vector2.down, filter, hits, 0.04f);
         Vector2 nextSupportVelocity = Vector2.zero;
-        if (leaveGroundSteps == 0 && body.linearVelocity.y - supportVelocity.y <= 0.1f)
+        if (leaveGroundSteps == 0)
             for (int i = 0; i < count; i++) {
                 var hit = hits[i];
                 if (hit.normal.y <= 0.7f) continue;
+                var moving = hit.collider.GetComponent<MovingSupport>();
+                Vector2 candidateVelocity = moving ? moving.Velocity : Vector2.zero;
+                // A newly landed rider can rise in world space while resting on an ascending lift.
+                if (body.linearVelocity.y - candidateVelocity.y > 0.1f) continue;
                 // Casts do not apply one-way collision rules. An overlapping underside is not ground.
                 if (hit.collider.usedByEffector && shape.bounds.min.y < hit.collider.bounds.max.y - 0.07f) continue;
                 Grounded = true;
-                var moving = hit.collider.GetComponent<MovingSupport>();
-                if (moving) nextSupportVelocity = moving.Velocity;
+                nextSupportVelocity = candidateVelocity;
                 break;
             }
         if (leaveGroundSteps > 0) leaveGroundSteps--;
-        var relativeVelocity = body.linearVelocity - supportVelocity;
+        var relativeVelocity = body.linearVelocity - (Grounded ? nextSupportVelocity : supportVelocity);
         body.linearVelocity = Motion.Step(Time.fixedDeltaTime, Grounded, relativeVelocity);
         supportVelocity = Grounded && !Motion.Jumped ? nextSupportVelocity : Vector2.zero;
         body.linearVelocity += supportVelocity;

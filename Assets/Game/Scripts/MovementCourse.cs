@@ -76,12 +76,12 @@ public sealed class MovementCourse : MonoBehaviour
         };
         float[][] heights = {
             new[] { 0f, 0.5f, 1.2f, 0.4f, 0f }, new[] { 0f, 0.8f, 0.2f, 0.6f, 0f },
-            new[] { 0f, 0.4f, 1f, 0.5f, 0f }, new[] { 0f, 1f, 0.3f, 0.8f, 0f },
-            new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.3f, 1.2f, 0.5f, 0f },
-            new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.6f, 0.2f, 1f, 0f },
-            new[] { 0f, 1f, 1.4f, 0.4f, 0f }, new[] { 0f, 0.4f, 1.3f, 0.7f, 0f },
-            new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.7f, 0.2f, 0.9f, 0f },
-            new[] { 0f, 1f, 1.5f, 0.6f, 0f }, new[] { 0f, 0.4f, 1.2f, 0.7f, 0f },
+            new[] { 0f, 0.8f, 1f, 0.5f, 0f }, new[] { 0f, 1f, 0.3f, 0.8f, 0f },
+            new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.55f, 1.2f, 0.5f, 0f },
+            new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.8f, 0.2f, 1f, 0f },
+            new[] { 0f, 1f, 1.4f, 0.4f, 0f }, new[] { 0f, 0.8f, 1.3f, 0.7f, 0f },
+            new[] { 0f, 1.2f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.7f, 0.2f, 0.9f, 0f },
+            new[] { 0f, 1f, 1.5f, 0.6f, 0f }, new[] { 0f, 0.8f, 1.2f, 0.7f, 0f },
             new[] { 0f, 0.8f, 1.4f, 0.5f, 0f }
         };
         float[] gaps = { 1.8f, 2f, 1.6f, 2.2f, 1.8f };
@@ -345,12 +345,18 @@ public sealed class MovementCourse : MonoBehaviour
         }
     }
 
-    public void StartAscentPreview()
+    public void StartAscentPreview() => StartPreviewAt(LevelOneCheckpointSpawns[0]);
+    public void StartVerticalLiftPreview()
     {
-        Run.TryActivateCheckpoint(1, LevelOneCheckpointSpawns[0], true);
+        var bank = AscentPlatforms[50];
+        StartPreviewAt(new Vector2(bank.x, bank.y + 1.27f));
+    }
+    void StartPreviewAt(Vector2 spawn)
+    {
+        Run.TryActivateCheckpoint(1, spawn, true);
         IntroductionSeconds = 0;
         ascentStarted = Run.ElapsedSeconds;
-        Cat.RespawnAt(transform.TransformPoint(LevelOneCheckpointSpawns[0]));
+        Cat.RespawnAt(transform.TransformPoint(spawn));
     }
     public void RetryCheckpoint() { if (LevelOne && Run.Checkpoint == 1) ascentStarted = Run.ElapsedSeconds; foreach (var support in supports) support.ResetPhase(); HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Retry())); }
     public void RestartRun() { ascentStarted = ascentFinished = -1; foreach (var support in supports) support.ResetPhase(); IntroductionSeconds = -1; HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Restart())); }

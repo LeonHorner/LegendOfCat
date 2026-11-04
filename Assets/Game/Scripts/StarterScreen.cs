@@ -289,9 +289,10 @@ public sealed partial class StarterScreen : MonoBehaviour
                 course.TogglePause();
             }
         }
-        else if (view == "level-one" || view == "level-one-ascent") {
+        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift") {
             OpenLevelOne();
             if (view == "level-one-ascent") course.StartAscentPreview();
+            if (view == "level-one-lift") course.StartVerticalLiftPreview();
         }
         else if (view == "menu" || view == "settings" || view == "play") page = view;
         else if (!string.IsNullOrEmpty(view)) {
