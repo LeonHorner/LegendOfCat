@@ -16,14 +16,14 @@ public sealed class SceneryRenderer : MonoBehaviour
     public static readonly float[] LandmarkAnchors = { 84, 216, 342 };
     // Travel is the fraction of the camera motion seen on screen.
     static readonly float[] LandmarkTravel = { 0.48f, 0.19f, 0.32f };
-    Material landmarkMaterial;
+    Material landmarkMaterial, fortressMaterial;
     readonly Transform[] easterEggs = new Transform[3];
     float fishClock, waterCaptureTime = -1;
     readonly Transform[] layers = new Transform[3];
     readonly Material[] materials = new Material[3];
     readonly System.Collections.Generic.List<Mesh> terrainMeshes = new System.Collections.Generic.List<Mesh>();
     Material terrainMaterial, cornerMaterial, riverFrontMaterial;
-    Transform riverFront;
+    Transform riverFront, hillside;
     Mesh quadMesh;
     bool initialized;
     Vector3[] coursePlatforms;
@@ -153,10 +153,21 @@ public sealed class SceneryRenderer : MonoBehaviour
         var platforms = coursePlatforms;
         for (int index = 0; index < platforms.Length; index++) {
             var p = platforms[index];
-            Terrain(p, FloatingPlatforms == null ? IsFloating(index) : System.Array.IndexOf(FloatingPlatforms, index) >= 0, index);
+            Terrain(p, RouteLandmarks && index >= MovementCourse.LevelOnePlatforms.Length && p.z < 10 || (FloatingPlatforms == null ? IsFloating(index) : System.Array.IndexOf(FloatingPlatforms, index) >= 0), index);
         }
         if (RouteLandmarks) {
             CreateLandmarks();
+            var fortress = Quad();
+            fortress.name = "Unique hillside fortress";
+            hillside = fortress.transform;
+            hillside.SetParent(transform, false);
+            hillside.localPosition = new Vector3(800, 7, 10);
+            hillside.localScale = new Vector3(70, 70f / 1.5f, 1);
+            fortressMaterial = new Material(landmarkMaterial);
+            fortressMaterial.mainTexture = Resources.Load<Texture2D>("GoldenRiver/landmark-hillside-fortress-v1");
+            fortressMaterial.SetFloat("_Fog", 0.35f);
+            fortressMaterial.SetFloat("_Saturation", 0.72f);
+            fortress.GetComponent<MeshRenderer>().sharedMaterial = fortressMaterial;
             CreateEasterEggs();
             CreateRiverRocks();
         }
@@ -181,6 +192,9 @@ public sealed class SceneryRenderer : MonoBehaviour
         ApplyViewport(Screen.width, Screen.height);
         ApplyView(6, CameraFloor);
     }
+
+    public readonly System.Collections.Generic.List<Transform> TerrainVisuals = new System.Collections.Generic.List<Transform>();
+    public void AddRecoveryTerrain(Vector3 platform) => Terrain(platform, true, 0);
 
     void Terrain(Vector3 platform, bool floating, int variant)
     {
@@ -208,6 +222,8 @@ public sealed class SceneryRenderer : MonoBehaviour
             contactUV = floating ? 0.66f : bank ? 0.587f : 0.748f;
             landingFraction = floating ? 0.90f : bank ? 0.89f : 0.76f;
         }
+        bool ascentShelf = distinctShelf && variant >= MovementCourse.LevelOnePlatforms.Length && !compactShelf;
+        if (ascentShelf) { texturePath = "GoldenRiver/shelf-ascent-masonry-v1"; contactUV = 0.62f; landingFraction = 0.97f; }
         float width = platform.z / landingFraction;
         float sourceAspect = compactShelf ? 2 : 3;
         float bottom = distinctShelf ? contact - width / sourceAspect * contactUV : floating ? contact - 0.90f : -4.5f;
@@ -219,7 +235,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             new Vector3(-half, crown, 2), new Vector3(half, crown, 2)
         };
         bool mirror = !variedCourse && variant % 3 == 1;
-        float left = mirror ? 1 : 0, right = 1 - left;
+        float left = ascentShelf ? 0.16f : mirror ? 1 : 0, right = ascentShelf ? 1 : 1 - left;
         var mesh = new Mesh { name = distinctShelf ? (rootShelf ? "Root island" : "Masonry shelf") + (compactShelf ? " compact" : " long") : variedCourse ? "Painted grounded bank" : floating ? "Painted floating rock" : "Painted grounded cliff" };
         mesh.vertices = vertices;
         mesh.uv = new[] { new Vector2(left, 0), new Vector2(right, 0),
@@ -230,6 +246,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         var visual = new GameObject(mesh.name); visual.transform.SetParent(transform, false);
         visual.transform.localPosition = new Vector3(platform.x, 0, 0);
         visual.AddComponent<MeshFilter>().sharedMesh = mesh;
+        TerrainVisuals.Add(visual.transform);
         var renderer = visual.AddComponent<MeshRenderer>(); renderer.sharedMaterial = terrainMaterial;
         var parameters = new MaterialPropertyBlock();
         parameters.SetTexture("_MainTex", Resources.Load<Texture2D>(texturePath));
@@ -305,7 +322,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             item.GetComponent<MeshRenderer>().SetPropertyBlock(properties);
         }
         // These two belong after the introduction, without blocking the playable plane.
-        easterEggs[2] = Egg("no cats sign", "egg-no-cats-sign", new Vector3(440, 1.54f, 3), new Vector2(2.2f, 2.2f), true);
+        easterEggs[2] = Egg("no cats sign", "egg-no-cats-sign", new Vector3(MovementCourse.LevelOneCheckpointSpawns[1].x - 3, 13.64f, 3), new Vector2(2.2f, 2.2f), true);
         UpdateFish(fishClock);
     }
 
@@ -419,7 +436,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         // Distant scenery has no physical join to the world-space terrain or foreground water.
         for (int i = 0; i < 3; i++) {
             if (RouteLandmarks && i > 0) {
-                layers[i].localPosition = new Vector3(Offset(localView.x, TravelFactors[i]), localView.y, 0);
+                layers[i].localPosition = new Vector3(Offset(Mathf.Min(localView.x, 500), TravelFactors[i]) + Mathf.Max(0, localView.x - 500) * 0.992f, localView.x <= 425 ? localView.y : 1 + (localView.y - 1) * 0.75f, 0);
                 continue;
             }
             float width = LayerWidth(i);
@@ -442,6 +459,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             }
             // Register the small statue with the right-hand battlement in the valley painting.
             easterEggs[0].localPosition = new Vector3(Offset(localView.x, ValleyTravel) + 45.28f, localView.y + 2.57f, 12);
+            hillside.localPosition = new Vector3(800 + (localView.x - 800) * 0.75f, 7, 10);
             UpdateFish(waterCaptureTime >= 0 ? waterCaptureTime : fishClock);
         }
         PositionForegroundWater(localView.x);
@@ -495,7 +513,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         foreach (var material in materials) Release(material);
         foreach (var mesh in terrainMeshes) Release(mesh);
         Release(quadMesh);
-        Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial); Release(landmarkMaterial);
+        Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial); Release(landmarkMaterial); Release(fortressMaterial);
     }
 
     static void Release(Object owned)

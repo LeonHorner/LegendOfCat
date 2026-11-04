@@ -58,23 +58,63 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector3(398f, 0.75f, 4f),
         new Vector3(404f, 0f, 4f),
         new Vector3(417f, -0.75f, 16f),
-        new Vector3(431f, -0.75f, 8f),
-        new Vector3(441f, -0.25f, 6f),
-        new Vector3(450f, 0.25f, 6f),
-        new Vector3(459f, -0.25f, 6f),
-        new Vector3(470f, -0.75f, 12f),
-        new Vector3(481f, -0.25f, 6f),
-        new Vector3(490f, 0.25f, 6f),
-        new Vector3(501f, -0.75f, 12f)
     };
+    public static readonly Vector3[] AscentPlatforms = BuildAscent();
+    static Vector3[] BuildAscent()
+    {
+        var result = new System.Collections.Generic.List<Vector3>();
+        float edge = 425;
+        float[][] widths = {
+            new[] { 9f, 5f, 7f, 4f, 10f }, new[] { 7f, 4f, 6f, 5f, 11f },
+            new[] { 8f, 4f, 6f, 3.5f, 10f }, new[] { 6f, 3.5f, 7f, 4f, 12f },
+            new[] { 5f, 4f, 8f, 3f, 10f }, new[] { 7f, 3f, 5f, 4f, 11f },
+            new[] { 10f, 5f, 9f, 5f, 12f }, new[] { 6f, 4f, 7f, 3.5f, 10f },
+            new[] { 8f, 3f, 5f, 4f, 12f }, new[] { 7f, 4f, 6f, 3f, 11f },
+            new[] { 10f, 5f, 8f, 4f, 12f }, new[] { 6f, 3.5f, 7f, 3f, 10f },
+            new[] { 7f, 3f, 6f, 4f, 12f }, new[] { 8f, 4f, 5f, 3.5f, 10f },
+            new[] { 6f, 3f, 7f, 4f, 12f }
+        };
+        float[][] heights = {
+            new[] { 0f, 0.5f, 1.2f, 0.4f, 0f }, new[] { 0f, 0.8f, 0.2f, 0.6f, 0f },
+            new[] { 0f, 0.4f, 1f, 0.5f, 0f }, new[] { 0f, 1f, 0.3f, 0.8f, 0f },
+            new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.3f, 1.2f, 0.5f, 0f },
+            new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.6f, 0.2f, 1f, 0f },
+            new[] { 0f, 1f, 1.4f, 0.4f, 0f }, new[] { 0f, 0.4f, 1.3f, 0.7f, 0f },
+            new[] { 0f, 0.8f, 1.4f, 0.6f, 0f }, new[] { 0f, 0.7f, 0.2f, 0.9f, 0f },
+            new[] { 0f, 1f, 1.5f, 0.6f, 0f }, new[] { 0f, 0.4f, 1.2f, 0.7f, 0f },
+            new[] { 0f, 0.8f, 1.4f, 0.5f, 0f }
+        };
+        float[] gaps = { 1.8f, 2f, 1.6f, 2.2f, 1.8f };
+        for (int group = 0; group < 15; group++) {
+            float baseline = group < 3 ? 0 : (group - 2) * 1.05f;
+            for (int step = 0; step < 5; step++) {
+                float width = widths[group][step];
+                float height = baseline + heights[group][step];
+                if (group == 1) height -= 1.2f;
+                edge += group == 6 || group == 10 ? 1.8f : gaps[(step + group) % gaps.Length];
+                result.Add(new Vector3(edge + width / 2, height - 0.75f, width));
+                edge += width;
+            }
+        }
+        result.Add(new Vector3(edge + 10, 11.85f, 16));
+        return result.ToArray();
+    }
+    static Vector3[] FullRoute()
+    {
+        var result = new Vector3[LevelOnePlatforms.Length + AscentPlatforms.Length];
+        LevelOnePlatforms.CopyTo(result, 0);
+        AscentPlatforms.CopyTo(result, LevelOnePlatforms.Length);
+        return result;
+    }
+    public static readonly Vector3[] CompletePlatforms = FullRoute();
     public static readonly int[] LevelOneFloatingPlatforms = { 3, 4, 8, 9, 10, 14, 15, 16, 19, 20, 22, 23, 24, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
     // Keep each connected suspended sequence in one material family.
     public static readonly int[] LevelOneRootPlatforms = { 3, 4, 8, 9, 10, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
     // Reserved broad ground for the upper-route owner; no detour is required here.
-    public static readonly Vector2 UpperRouteEntrance = new Vector2(431, 0.52f);
-    public static readonly Vector2 UpperRouteRejoin = new Vector2(470, 0.52f);
-    public static readonly Vector2 LevelOneExit = new Vector2(503, 0.52f);
-    Vector3[] ActivePlatforms => LevelOne ? LevelOnePlatforms : Platforms;
+    public static readonly Vector2 UpperRouteEntrance = new Vector2(AscentPlatforms[10].x, AscentPlatforms[10].y + 1.27f);
+    public static readonly Vector2 UpperRouteRejoin = new Vector2(AscentPlatforms[75].x, 13.12f);
+    public static readonly Vector2 LevelOneExit = new Vector2(AscentPlatforms[75].x + 4, 13.12f);
+    Vector3[] ActivePlatforms => LevelOne ? CompletePlatforms : Platforms;
     public CatController Cat { get; private set; }
     public RunLifecycle Run { get; private set; }
     public static readonly Vector2[] CheckpointSpawns = {
@@ -82,7 +122,7 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector2(65, 1.52f), new Vector2(83, 0.52f)
     };
     public static readonly Vector2[] LevelOneCheckpointSpawns = {
-        new Vector2(420, 0.52f), new Vector2(470, 0.52f)
+        new Vector2(420, 0.52f), new Vector2(AscentPlatforms[75].x, 13.12f)
     };
     // Configure before enabling the object. The movement lab retains its original course.
     public bool LevelOne;
@@ -90,8 +130,12 @@ public sealed class MovementCourse : MonoBehaviour
     public bool HasReachedExit { get; private set; }
     // Session time includes retries, excludes pauses; frozen on the first checkpoint.
     public float IntroductionSeconds { get; private set; } = -1;
+    float ascentFinished = -1, ascentStarted = -1;
+    public float AscentSeconds => IntroductionSeconds < 0 ? -1 :
+        ascentFinished >= 0 ? ascentFinished : Mathf.Max(0, Run.ElapsedSeconds - ascentStarted);
     Vector2[] ActiveCheckpoints => LevelOne ? LevelOneCheckpointSpawns : CheckpointSpawns;
     public System.Action BackToMenu;
+    readonly System.Collections.Generic.List<MovingSupport> supports = new System.Collections.Generic.List<MovingSupport>();
     Sprite square;
     Texture2D texture;
     Camera courseCamera;
@@ -113,7 +157,18 @@ public sealed class MovementCourse : MonoBehaviour
         square = Sprite.Create(texture, new Rect(0, 0, 1, 1), Vector2.one * 0.5f, 1);
         foreach (var p in ActivePlatforms) {
             var platform = Block("Standable platform", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.22f, 0.28f, 0.28f));
-            platform.AddComponent<BoxCollider2D>();
+            var collider = platform.AddComponent<BoxCollider2D>();
+            int ascentIndex = System.Array.IndexOf(AscentPlatforms, p);
+            if (LevelOne && ascentIndex >= 0) {
+                collider.usedByEffector = true;
+                platform.AddComponent<PlatformEffector2D>().useOneWay = true;
+                if (ascentIndex == 31 || ascentIndex == 51) {
+                    var support = platform.AddComponent<MovingSupport>();
+                    support.Axis = ascentIndex == 31 ? Vector2.right : Vector2.up;
+                    support.Amplitude = ascentIndex == 31 ? 0.8f : 0.7f;
+                    supports.Add(support);
+                }
+            }
             platform.GetComponent<SpriteRenderer>().enabled = false;
         }
         var player = new GameObject("Mika prototype");
@@ -182,6 +237,29 @@ public sealed class MovementCourse : MonoBehaviour
             sceneryRenderer.RouteLandmarks = true;
         }
         sceneryRenderer.InitializeForCourse(courseCamera, Cat, ActivePlatforms);
+        foreach (var support in supports) {
+            support.Cat = Cat;
+            support.Visual = sceneryRenderer.TerrainVisuals[System.Array.IndexOf(ActivePlatforms,
+                new Vector3(support.transform.localPosition.x, support.transform.localPosition.y, support.transform.localScale.x))];
+        }
+        if (LevelOne) {
+            foreach (var support in supports) {
+                var guide = Block("Non-standable stone guide", support.transform.localPosition,
+                    support.Axis.x > 0 ? new Vector2(7, 0.045f) : new Vector2(0.045f, 4), new Color(0.28f, 0.25f, 0.20f));
+                guide.transform.localPosition += Vector3.forward * 3;
+            }
+            follow.ascent = true;
+            for (int i = 0; i < AscentPlatforms.Length - 5; i += 5) {
+                var first = AscentPlatforms[i]; var lastInGroup = AscentPlatforms[i + 4];
+                var landing = AscentPlatforms[i + 1];
+                var catchPoint = new Vector3(landing.x, first.y - 1.4f, 10);
+                var catchFloor = Block("Recovery terrace", catchPoint, new Vector2(catchPoint.z, 0.5f), Color.gray);
+                catchFloor.GetComponent<SpriteRenderer>().enabled = false;
+                catchFloor.AddComponent<BoxCollider2D>().usedByEffector = true;
+                catchFloor.AddComponent<PlatformEffector2D>().useOneWay = true;
+                sceneryRenderer.AddRecoveryTerrain(new Vector3(catchPoint.x, catchPoint.y - 0.5f, catchPoint.z));
+            }
+        }
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
@@ -195,12 +273,14 @@ public sealed class MovementCourse : MonoBehaviour
             Label("OVER THE RUINS", new Vector2(145, 2.4f));
             Label("WILLOW BANK", new Vector2(337, 1.8f));
             Label("INTRODUCTION COMPLETE", new Vector2(420, 2.4f));
-            Label("SHALLOW STEPS", new Vector2(431, 1.8f));
-            Label("PUT IT TOGETHER", new Vector2(470, 2.2f));
+            Label("RIVER TERRACES", new Vector2(435, 2.2f));
+            Label("RIDE / JUMP", new Vector2(AscentPlatforms[31].x, AscentPlatforms[31].y + 3));
+            Label("UP THROUGH THE RUINS", new Vector2(AscentPlatforms[51].x, AscentPlatforms[51].y + 3));
+            Label("HIGH VALLEY OVERLOOK", LevelOneCheckpointSpawns[1] + Vector2.up * 2);
             Label("GOLDEN RIVER EXIT", LevelOneExit + Vector2.up * 1.5f);
             // Two posts frame a visibly distinct exit without blocking movement.
             foreach (float x in new[] { LevelOneExit.x - 1, LevelOneExit.x + 2 })
-                Block("Exit post", new Vector2(x, 0.9f), new Vector2(0.2f, 1.8f), new Color(0.95f, 0.75f, 0.36f));
+                Block("Exit post", new Vector2(x, LevelOneExit.y + 0.4f), new Vector2(0.2f, 1.8f), new Color(0.95f, 0.75f, 0.36f));
         } else Label("FINISH / return or retry", new Vector2(100, 1));
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
@@ -235,7 +315,7 @@ public sealed class MovementCourse : MonoBehaviour
         if (hudRefresh <= 0) {
             hudStatus = (Run.Paused ? "Paused | " : "") + "Checkpoint " + Run.Checkpoint + "/" + ActiveCheckpoints.Length
                 + (LevelOne ? " | Intro " + (IntroductionSeconds < 0 ? Run.ElapsedSeconds : IntroductionSeconds).ToString("F1")
-                    + "s" : " | R: retry | P: pause");
+                    + "s" + (IntroductionSeconds >= 0 ? " | Ascent " + AscentSeconds.ToString("F1") + "s" : "") : " | R: retry | P: pause");
             hudRefresh = 0.25f;
         }
         Run.Advance(Time.deltaTime);
@@ -247,8 +327,12 @@ public sealed class MovementCourse : MonoBehaviour
             // Only grounded main-route positions may activate a checkpoint.
             if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f &&
                 Run.TryActivateCheckpoint(i + 1, point, true) && LevelOne && i == 0)
+            {
                 IntroductionSeconds = Run.ElapsedSeconds;
+                ascentStarted = Run.ElapsedSeconds;
+            }
         }
+        if (LevelOne && Run.Checkpoint == 2 && ascentFinished < 0) ascentFinished = AscentSeconds;
         if (LevelOne && !HasReachedExit && position.x >= LevelOneExit.x - 1 && position.x <= LevelOneExit.x + 3 &&
             Mathf.Abs(position.y - LevelOneExit.y) <= 0.2f) {
             HasReachedExit = true;
@@ -256,8 +340,15 @@ public sealed class MovementCourse : MonoBehaviour
         }
     }
 
-    public void RetryCheckpoint() { HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Retry())); }
-    public void RestartRun() { IntroductionSeconds = -1; HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Restart())); }
+    public void StartAscentPreview()
+    {
+        Run.TryActivateCheckpoint(1, LevelOneCheckpointSpawns[0], true);
+        IntroductionSeconds = 0;
+        ascentStarted = Run.ElapsedSeconds;
+        Cat.RespawnAt(transform.TransformPoint(LevelOneCheckpointSpawns[0]));
+    }
+    public void RetryCheckpoint() { if (LevelOne && Run.Checkpoint == 1) ascentStarted = Run.ElapsedSeconds; foreach (var support in supports) support.ResetPhase(); HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Retry())); }
+    public void RestartRun() { ascentStarted = ascentFinished = -1; foreach (var support in supports) support.ResetPhase(); IntroductionSeconds = -1; HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Restart())); }
     public void TogglePause() => Cat.SetPaused(Run.TogglePause());
 
     void LateUpdate()

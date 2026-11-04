@@ -342,3 +342,6 @@ landing silhouettes. These additions still require in-game review.
 
 ### Golden River style restoration — 2026-11-02
 The user prefers the original painted platforms and forested background. Variety means new silhouettes, geology and distinct ruins within that style, not replacing it with pale realistic limestone or broad bare mountains. Keep golden leafy edges, blue-violet shaded rock and deep ivy. Round fish are preferred over slender trout; render them swimming beneath the water. River rocks need distinct authored formations.
+
+### Golden River ascent — 2026-11-04
+The approved next-section plan allows the camera to rise beyond the foreground river. Keep the river fixed in world space, preserve intro framing and maintain crisp visible landing edges through the height change. New supported fortress artwork and masonry shelf follow the restored golden foliage, violet stone and teal ivy direction. Far panoramas retain native proportions with reduced travel beyond the intro, and reduced vertical camera coupling reveals elevation. See golden-river-main-route/ascent.md and ASSETS.md. Final motion/art acceptance remains a player review gate.

@@ -35,7 +35,7 @@ public static class BuildScenery
     }
 
     public static readonly string[] GoldenRiverArt = {
-        "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2",
+        "shelf-ascent-masonry-v1", "landmark-hillside-fortress-v1", "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2",
         "valley-panorama-v3", "far-valley-panorama-v4", "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3",
         "shelf-root-compact-v3", "shelf-masonry-compact-v3",
         "egg-watching-fish", "egg-no-cats-sign", "river-water-v2", "river-rock-groups-v1", "river-rock-groups-v2", "river-rock-groups-v3"

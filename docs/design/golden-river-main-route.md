@@ -517,3 +517,6 @@ The river no longer reacts to Mika's movement speed or grounded state: removed r
 2026-11-03. Eighteen unique river-rock formations now occupy fixed positions. The latest six add gravel, ledges, cobbles and angular groups at a shallower depth. The statue silhouette uses the panorama behind its front leg and ear after stray sky pixels were removed.
 2026-11-03. The watermill, willow and aqueduct use near, middle and far parallax speeds with matching atmospheric color. The mill spokes turn inside the existing painted wheel and the outer willow leaves sway. The new distant panorama uses a wooded ridge, open valley and lower hills across the three regions.
 The near valley keeps both panorama boundaries anchored while shifting the keep away from the aqueduct view. The three landmark views and the statue were checked in the Unity capture. All 31 scoped EditMode tests passed and the Windows development preview built successfully.
+
+## Ascent revision — 2026-11-04
+The former short continuation is replaced by the ascent described in [ascent notes](golden-river-main-route/ascent.md). Earlier 51-platform geometry, exit/checkpoint coordinates and whole-route timing are historical. Intro geometry is retained. The 110–140-second ascent and 4–6-minute whole-level targets still need real player evidence.

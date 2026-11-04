@@ -20,3 +20,6 @@ Small coherent feature branches and PRs, with dependencies and user-facing accep
 
 ## Legacy reference
 Use the self-contained [Legacy gameplay reference](legacy-gameplay-reference.md) for historical controls, movement, checkpoints, bosses, weapon behavior, records and audiovisual context. No local Java source folder is required. This historical reference does not override the agreed redesign. If a needed detail is not documented, ask the user and record the decision instead of depending on a private disk path.
+
+## Golden River ascent decision — 2026-11-04
+The user approved a roughly two-minute ascent after the introduction, combining vertical exploration, tighter jumps and safely introduced moving platforms. The camera follows height and may leave the river below the viewport. Most errors should land on lower recovery terraces. This advances the moving-support introduction from the original later-level proposal. See golden-river-main-route/ascent.md.
