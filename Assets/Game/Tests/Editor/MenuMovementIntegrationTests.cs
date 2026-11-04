@@ -121,8 +121,15 @@ public class MenuMovementIntegrationTests
                 var bounds = panorama.GetComponent<MeshRenderer>().bounds;
                 Assert.That(bounds.min.x, Is.LessThanOrEqualTo(x - 5.5f * 16 / 9));
                 Assert.That(bounds.max.x, Is.GreaterThanOrEqualTo(x + 5.5f * 16 / 9));
-                Assert.That(panorama.localScale.x / panorama.localScale.y, Is.EqualTo(3).Within(0.001f));
+                Assert.That(panorama.localScale.x / panorama.localScale.y, Is.EqualTo(6).Within(0.001f));
             }
+        }
+        panoramaApply.Invoke(scenery, new object[] { 700f, 10f });
+        var beforeTravel = panoramas.Select(p => p.position.x).ToArray();
+        panoramaApply.Invoke(scenery, new object[] { 710f, 10f });
+        for (int i = 0; i < panoramas.Length; i++) {
+            float travel = 10 - (panoramas[i].position.x - beforeTravel[i]);
+            Assert.That(travel, Is.GreaterThan(0.7f), "Late scenery must keep perceptibly moving.");
         }
         var floatingIndices = (int[])course.GetType().GetField("LevelOneFloatingPlatforms").GetValue(null);
         var rootIndices = (int[])course.GetType().GetField("LevelOneRootPlatforms").GetValue(null);
@@ -355,6 +362,7 @@ public class MenuMovementIntegrationTests
         ((Behaviour)cat.GetComponent(RuntimeType("CatInput"))).enabled = false;
         var supports = course.GetComponentsInChildren(RuntimeType("MovingSupport"));
         Assert.That(supports.Length, Is.EqualTo(2));
+        Assert.That(course.GetComponentsInChildren<PlatformEffector2D>(), Is.Empty, "Course platforms must be solid from below.");
         yield return null;
         var previousMode = Physics2D.simulationMode;
         Physics2D.simulationMode = SimulationMode2D.Script;
@@ -388,13 +396,13 @@ public class MenuMovementIntegrationTests
             var motor = cat.GetType().GetField("Motion").GetValue(cat);
             foreach (int group in new[] { 4, 10, 13 }) {
                 var bank = ascent[group * 5]; var shelf = ascent[group * 5 + 1];
-                cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(shelf.x, bank.y - 0.69f) });
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(shelf.x, bank.y - 0.29f) });
                 SettleCourse(cat, course);
                 var body = cat.GetComponent<Rigidbody2D>();
                 bool jumped = false, recovered = false;
                 for (int tick = 0; tick < 180; tick++) {
                     motor.GetType().GetMethod("SetMove").Invoke(motor, new object[] { body.position.x > bank.x ? -1f : 0f });
-                    if (!jumped && body.position.x <= bank.x + bank.z / 2 + 2.4f) {
+                    if (!jumped && body.position.x <= bank.x + bank.z / 2 + 1.1f) {
                         cat.GetType().GetMethod("PressJump").Invoke(cat, null); jumped = true;
                     }
                     Call(cat, "FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime);

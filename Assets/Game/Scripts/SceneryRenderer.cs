@@ -80,28 +80,28 @@ public sealed class SceneryRenderer : MonoBehaviour
             }
             if (RouteLandmarks && i > 0) {
                 // One authored strip covers the whole route's parallax travel, without recycling.
-                materials[i].mainTexture = Resources.Load<Texture2D>("GoldenRiver/" + (i == 1 ? "valley-panorama-v3" : "far-valley-panorama-v4"));
-                float panoramaWidth = i == 1 ? 104 : 80;
+                materials[i].mainTexture = Resources.Load<Texture2D>("GoldenRiver/" + (i == 1 ? "near-extended-panorama-v1" : "far-extended-panorama-v1"));
+                float panoramaWidth = i == 1 ? 208 : 160;
                 float crop = i == 1 ? 0.10f : 0.12f;
                 var panorama = Quad();
                 panorama.name = i == 1 ? "Continuous valley panorama" : "Continuous canopy panorama";
                 panorama.transform.SetParent(layers[i], false);
-                panorama.transform.localPosition = new Vector3(i == 1 ? 35 : 20, i == 1 ? 8.2f : 11.8f, i == 1 ? 16 : 24);
-                panorama.transform.localScale = new Vector3(panoramaWidth, panoramaWidth / 3, 1);
+                panorama.transform.localPosition = new Vector3(i == 1 ? 87 : 60, i == 1 ? 8.2f : 11.8f, i == 1 ? 16 : 24);
+                panorama.transform.localScale = new Vector3(panoramaWidth, panoramaWidth / 6, 1);
                 // Crop lower terrain below the camera while retaining the painting's native aspect.
                 var mesh = Instantiate(quadMesh);
                 mesh.name = panorama.name + " mesh";
                 if (i == 1) {
                     // Move the keep away from the aqueduct vista while keeping both strip edges anchored.
                     mesh.vertices = new[] {
-                        new Vector3(-0.5f, -0.5f - crop), new Vector3(0.10f, -0.5f - crop), new Vector3(0.5f, -0.5f - crop),
-                        new Vector3(-0.5f, 0.5f), new Vector3(0.10f, 0.5f), new Vector3(0.5f, 0.5f)
+                        new Vector3(-0.5f, -0.5f - crop), new Vector3(-0.2f, -0.5f - crop), new Vector3(0, -0.5f - crop), new Vector3(0.5f, -0.5f - crop),
+                        new Vector3(-0.5f, 0.5f), new Vector3(-0.2f, 0.5f), new Vector3(0, 0.5f), new Vector3(0.5f, 0.5f)
                     };
                     mesh.uv = new[] {
-                        new Vector2(0, 0), new Vector2(0.5f, 0), new Vector2(1, 0),
-                        new Vector2(0, 1 + crop), new Vector2(0.5f, 1 + crop), new Vector2(1, 1 + crop)
+                        new Vector2(0, 0), new Vector2(0.25f, 0), new Vector2(0.5f, 0), new Vector2(1, 0),
+                        new Vector2(0, 1 + crop), new Vector2(0.25f, 1 + crop), new Vector2(0.5f, 1 + crop), new Vector2(1, 1 + crop)
                     };
-                    mesh.triangles = new[] { 0, 3, 1, 1, 3, 4, 1, 4, 2, 2, 4, 5 };
+                    mesh.triangles = new[] { 0, 4, 1, 1, 4, 5, 1, 5, 2, 2, 5, 6, 2, 6, 3, 3, 6, 7 };
                     mesh.RecalculateBounds();
                 } else {
                     mesh.vertices = new[] { new Vector3(-0.5f, -0.5f - crop), new Vector3(0.5f, -0.5f - crop),
@@ -228,7 +228,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         bool ascentShelf = distinctShelf && variant >= MovementCourse.LevelOnePlatforms.Length && !compactShelf;
         if (ascentShelf) { texturePath = "GoldenRiver/shelf-ascent-masonry-v1"; contactUV = 0.62f; landingFraction = 0.90f; }
         bool tallBank = variedCourse && !floating && platform.x > 425 && contact >= 1.5f;
-        if (tallBank) { texturePath = "GoldenRiver/bank-tall-ascent-v1"; contactUV = 0.918f; landingFraction = 0.86f; }
+        if (tallBank) { texturePath = "GoldenRiver/bank-tall-ascent-v1"; contactUV = 0.914f; landingFraction = 0.86f; }
         float width = platform.z / landingFraction;
         float sourceAspect = compactShelf ? 2 : 3;
         if (tallBank) {
@@ -445,7 +445,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         // Distant scenery has no physical join to the world-space terrain or foreground water.
         for (int i = 0; i < 3; i++) {
             if (RouteLandmarks && i > 0) {
-                layers[i].localPosition = new Vector3(Offset(Mathf.Min(localView.x, 500), TravelFactors[i]) + Mathf.Max(0, localView.x - 500) * 0.992f, localView.x <= 425 ? localView.y : 1 + (localView.y - 1) * 0.75f, 0);
+                layers[i].localPosition = new Vector3(Offset(localView.x, TravelFactors[i]), localView.x <= 425 ? localView.y : 1 + (localView.y - 1) * 0.75f, 0);
                 continue;
             }
             float width = LayerWidth(i);

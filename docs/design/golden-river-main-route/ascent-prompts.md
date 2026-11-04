@@ -20,3 +20,21 @@ Edit this transparent side-view platform sprite. Preserve the canvas, warm paint
 ## Tall ascent cliff
 
 Original hand painted 2D side view game terrain sprite. Tall portrait 4:7 canvas, one massive natural cliff pillar, complete silhouette with transparent margin on left and right. Flat horizontal playable grassy top at y=8 percent, spanning x=6 to94 percent. High sheer blue-violet rock face down to95 percent canvas, NOT stretched vegetation: huge irregular angular rock strata, several offset buttresses, varied patches of dark teal ivy and golden foliage concentrated at top and a few cracks, clear painted facets. Massive naturally flared rocky foot at bottom, no flat cut. Golden upper left daylight matching illustrated Golden River ruins game, dark cool shaded front. Thin top perspective only. No water, ground, scene, sky, detached leaves, glow, text or characters. Entire cliff centered and visible, painted original storybook brushwork, not photoreal. True transparent background.
+
+## Extended near panorama
+
+Extend this transparent 3:1 landscape canvas to the RIGHT by exactly another full image width, producing a 6:1 panorama. Original composition occupies LEFT HALF, same relative height. Preserve all original structures and tiny statue in left half. Paint a continuous new RIGHT HALF joining its existing right edge naturally: a deeper wooded gorge, one distant broken asymmetric watchtower and a long forested ridgeline, distinct cliffs and a small waterfall ending in the lower forest. No copies or mirrored ruins. Same blue-violet rocks, deep teal forest, golden sunset foliage, hand painted brushwork. Keep sky genuinely transparent with irregular natural skyline, continuous opaque terrain all across bottom, no fade or rectangular seams. No characters or text.
+
+## Extended far panorama
+
+Extend this transparent 3:1 distant landscape canvas to the RIGHT by exactly a full image width, resulting in a 6:1 image. The original picture fills the LEFT HALF at the original height. Connect a new RIGHT HALF naturally to existing right edge with different forested hills, open valley notch and overlapping blue lavender distant ridges. Keep original storybook painted style, warm golden rim light, atmospheric cool distance, varied treetop contours. No buildings, repeated shapes, mirrored hills, flat cut edges, text or characters. Transparent sky above silhouette and fully opaque continuing ground across bottom.
+
+## Tall grass rim correction
+
+Edit only the top vegetation band of the tall cliff in image 1, using image 2 as the style reference. Preserve tall cliff canvas, silhouette, rock face, roots/base, scale and contact height. Replace the flat muted green moss carpet with the rich golden leafy grass rim, small white daisies, dark teal ivy hanging over the edge and crisp painterly foliage of image 2. The playable contact remains a thin continuous horizontal line at original height, no broad flat top face or perspective slab. Vegetation must naturally continue down the existing cliff cracks. Keep complete transparent background and native tall proportions. No other changes.
+
+## Landscape join repairs
+
+Two localized edits used PhotoCraft crops around the compositing joins. Near prompt: Repair ONLY the abrupt vertical seam at the center of this transparent landscape strip. Paint a coherent continuous hillside and trees connecting both sides, blending their shapes by actually redrawing consistent rocks and branches, no blurry fade. Preserve the outer left/right 15 percent pixel composition, full canvas, original skyline at both outside edges and opaque bottom terrain. Match hand-painted blue violet gorge, dark teal woodland and golden foliage. Keep transparent sky. No new structures or text.
+
+Far prompt: Repair ONLY the abrupt vertical seam in the middle of this transparent landscape strip. Connect the high wooded hill on left to lower rolling hills on right with one naturally descending ridge and overlapping foliage. Redraw coherent trees across the junction, no straight cutoff or blurry fade. Preserve outer left and right 15 percent of composition and their skyline/contact positions, full canvas and opaque bottom terrain. Same atmospheric painted blue lavender distance, warm golden foliage, transparent sky. No buildings or text.

@@ -160,10 +160,10 @@ public sealed class MovementCourse : MonoBehaviour
             var collider = platform.AddComponent<BoxCollider2D>();
             int ascentIndex = System.Array.IndexOf(AscentPlatforms, p);
             if (LevelOne && ascentIndex >= 0) {
-                collider.size = new Vector2(1, 0.08f);
-                collider.offset = new Vector2(0, 0.46f);
-                collider.usedByEffector = true;
-                platform.AddComponent<PlatformEffector2D>().surfaceArc = 120;
+                float thickness = p.z >= 10 ? 1.5f : p.z / (p.z <= 4.5f ? 0.96f : 0.9f) /
+                    (p.z <= 4.5f ? 2 : 3) * (p.z <= 4.5f ? 0.46f : 0.42f);
+                collider.size = new Vector2(1, thickness / 1.5f);
+                collider.offset = new Vector2(0, (0.75f - thickness / 2) / 1.5f);
                 if (ascentIndex == 31 || ascentIndex == 51) {
                     var support = platform.AddComponent<MovingSupport>();
                     support.Axis = ascentIndex == 31 ? Vector2.right : Vector2.up;
@@ -247,13 +247,15 @@ public sealed class MovementCourse : MonoBehaviour
         if (LevelOne) {
             follow.ascent = true;
             for (int i = 0; i < AscentPlatforms.Length - 5; i += 5) {
+                if (i == 30) continue; // The easy horizontal-support crossing needs no catch shelf.
                 var first = AscentPlatforms[i]; var lastInGroup = AscentPlatforms[i + 4];
                 var landing = AscentPlatforms[i + 1];
-                var catchPoint = new Vector3(landing.x, first.y - 1.4f, 10);
+                var catchPoint = new Vector3(landing.x, first.y - 1f, 10);
                 var catchFloor = Block("Recovery terrace", catchPoint, new Vector2(catchPoint.z, 0.5f), Color.gray);
                 catchFloor.GetComponent<SpriteRenderer>().enabled = false;
-                catchFloor.AddComponent<BoxCollider2D>().usedByEffector = true;
-                catchFloor.AddComponent<PlatformEffector2D>().useOneWay = true;
+                var catchCollider = catchFloor.AddComponent<BoxCollider2D>();
+                catchCollider.size = new Vector2(1, 2.2f);
+                catchCollider.offset = new Vector2(0, -0.6f);
                 sceneryRenderer.AddRecoveryTerrain(new Vector3(catchPoint.x, catchPoint.y - 0.5f, catchPoint.z));
             }
         }

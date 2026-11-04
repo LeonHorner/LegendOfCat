@@ -40,6 +40,22 @@ public class CatCollisionTests
         UnityEngine.Object.DestroyImmediate(material); Physics2D.simulationMode = previousMode;
     }
     [Test]
+    public void SolidShelfBlocksJumpFromBelowWithoutGroundingOnItsUnderside()
+    {
+        var ceiling = new GameObject("Solid shelf underside");
+        try {
+            ceiling.transform.position = new Vector2(0, 1.5f);
+            ceiling.AddComponent<BoxCollider2D>().size = new Vector2(4, 0.5f);
+            Physics2D.SyncTransforms();
+            Input("PressJump");
+            float peak = body.position.y;
+            for (int tick = 0; tick < 70; tick++) { Tick(); peak = Mathf.Max(peak, body.position.y); }
+            Assert.That(peak, Is.LessThan(0.83f));
+            Assert.That(body.position.y, Is.InRange(0.43f, 0.49f));
+        } finally { UnityEngine.Object.DestroyImmediate(ceiling); }
+    }
+
+    [Test]
     public void OneWayUndersideCannotBecomeGroundOrBlockHorizontalTravel()
     {
         var shelf = new GameObject("One-way underside regression");

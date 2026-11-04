@@ -60,7 +60,7 @@ public static class GoldenRiverReview
         var names = new[] { "suspended-steps", "watermill", "aqueduct", "willow", "watermill-edge", "aqueduct-edge", "masonry-sequence", "watermill-base", "low-root-crossing", "low-masonry-crossing", "panorama-start", "first-banks", "panorama-late", "panorama-exit", "watching-fish", "cat-king", "no-cats-sign", "cat-rock", "river-rock-0", "river-rock-1", "river-rock-2", "river-rock-3", "river-rock-4", "river-rock-5", "water-boundary-before", "water-boundary-after", "route-start-edge", "route-exit-edge", "river-rock-12", "river-rock-13", "river-rock-14", "river-rock-15", "river-rock-16", "river-rock-17" };
         if (System.Array.IndexOf(args, "-ascentReview") >= 0) {
             var ascent = MovementCourse.AscentPlatforms;
-            points = new Vector2[9]; names = new string[9];
+            points = new Vector2[10]; names = new string[10];
             for (int i = 0; i < 6; i++) {
                 var p = ascent[new[] { 0, 10, 31, 45, 51, 75 }[i]];
                 points[i] = new Vector2(p.x, p.y + 1.22f); names[i] = "ascent-" + i;
@@ -69,6 +69,7 @@ public static class GoldenRiverReview
             names[6] = "ascent-cliff-foot";
             points[7] = new Vector2(216, 0.52f); names[7] = "aqueduct-color";
             points[8] = new Vector2(342, 0.52f); names[8] = "willow-color";
+            points[9] = new Vector2(ascent[20].x, ascent[20].y + 1.22f); names[9] = "landscape-join";
         }
         try {
             for (int index = 0; index < points.Length; index++) {
