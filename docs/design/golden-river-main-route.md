@@ -3,6 +3,12 @@
 Issue #71 is in progress. These notes describe the starting point and the work
 needed to turn it into Level 1; they are not evidence of a finished route.
 
+The requested final 120–150-second section is planned in
+[The crown of the river ruins](golden-river-main-route/finale.md). It follows
+checkpoint 2 and relocates the provisional exit; implementation and player
+acceptance remain pending. Current main was merged normally on 2026-11-05;
+integration details and remaining water-recovery overlap are recorded there.
+
 ## Existing prototype
 
 The menu also opens `MovementCourse` as a 109-unit painted movement lab with fourteen
