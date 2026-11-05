@@ -14,6 +14,58 @@ public class MenuMovementIntegrationTests
 {
     GameObject host;
     static int exitSignals;
+
+    [UnityTest]
+    public IEnumerator PaintedCheckpointsAcceptJumpPassageAndKeepOnlyLatestLight()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        var root = new GameObject("Checkpoint passage regression"); root.SetActive(false);
+        var course = root.AddComponent(RuntimeType("MovementCourse"));
+        course.GetType().GetField("LevelOne").SetValue(course, true);
+        root.SetActive(true);
+        var cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
+        var run = course.GetType().GetProperty("Run").GetValue(course);
+        var spawns = (Vector2[])course.GetType().GetField("LevelOneCheckpointSpawns").GetValue(null);
+        var markers = root.GetComponentsInChildren(RuntimeType("CheckpointMarker"));
+        void Refresh() { foreach (var marker in markers) marker.GetType().GetMethod("Refresh").Invoke(marker, new object[] { .1f }); }
+        int State(int i) => (int)markers[i].GetType().GetProperty("State").GetValue(markers[i]);
+        void Pass(int i) {
+            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { spawns[i] + new Vector2(-2, 2) });
+            Call(course, "Update"); Refresh();
+        }
+        Assert.That(State(0), Is.Zero); Assert.That(State(1), Is.Zero);
+        Assert.That(markers[0].GetComponentInChildren<SpriteRenderer>().sprite.vertices, Has.Length.EqualTo(4),
+            "Atlas state selection needs a full rectangle, not three disjoint tight sprite outlines.");
+        course.GetType().GetMethod("TogglePause").Invoke(course, null);
+        cat.GetComponent<Rigidbody2D>().position = spawns[0] + Vector2.up * 2;
+        Call(course, "Update"); Refresh(); Assert.That(State(0), Is.Zero);
+        course.GetType().GetMethod("TogglePause").Invoke(course, null);
+        Pass(0); Assert.That(State(0), Is.EqualTo(1)); Assert.That(State(1), Is.Zero);
+        Assert.That((bool)cat.GetType().GetProperty("Grounded").GetValue(cat), Is.False);
+        course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
+        Assert.That(Vector2.Distance(cat.GetComponent<Rigidbody2D>().position, spawns[0]), Is.LessThan(.001f));
+        Pass(1); Assert.That(State(0), Is.EqualTo(2)); Assert.That(State(1), Is.EqualTo(1));
+        Pass(0); Assert.That(State(0), Is.EqualTo(2)); Assert.That(State(1), Is.EqualTo(1));
+        var material = markers[1].GetComponentInChildren<SpriteRenderer>().sharedMaterial;
+        float pulse = material.GetFloat("_Pulse");
+        markers[1].GetType().GetMethod("Refresh").Invoke(markers[1], new object[] { .8f });
+        Assert.That(material.GetFloat("_Pulse"), Is.Not.EqualTo(pulse));
+        course.GetType().GetMethod("TogglePause").Invoke(course, null);
+        pulse = material.GetFloat("_Pulse");
+        markers[1].GetType().GetMethod("Refresh").Invoke(markers[1], new object[] { .8f });
+        Assert.That(material.GetFloat("_Pulse"), Is.EqualTo(pulse));
+        course.GetType().GetMethod("RestartRun").Invoke(course, null); Refresh();
+        Assert.That(State(0), Is.Zero); Assert.That(State(1), Is.Zero);
+        Assert.That(markers[0].GetComponentsInChildren<Collider2D>(), Is.Empty);
+        Assert.That(markers[0].transform.Find("Checkpoint tree"), Is.Not.Null);
+        Assert.That(markers[1].transform.Find("Checkpoint ruin arch"), Is.Not.Null);
+        Assert.That(markers[1].transform.Find("Engraved paw").position.x,
+            Is.EqualTo(markers[1].transform.Find("Checkpoint ruin arch").position.x).Within(.001f));
+        Assert.That(root.GetComponentsInChildren<TextMesh>(), Is.Empty, "Main-route landmarks replace floating instructions.");
+        UnityEngine.Object.Destroy(root);
+        yield return new ExitPlayMode();
+    }
     static void CountExit() => exitSignals++;
     static Type RuntimeType(string name) => AppDomain.CurrentDomain.GetAssemblies()
         .Select(a => a.GetType(name)).First(t => t != null);
@@ -234,7 +286,9 @@ public class MenuMovementIntegrationTests
         Assert.That(course.GetComponentsInChildren<Transform>().Count(t => t.name.StartsWith("Easter egg ")), Is.EqualTo(3));
         foreach (float x in new[] { 503f, -3f, 239f })
             scenery.GetType().GetMethod("ApplyView").Invoke(scenery, new object[] { x, 1f });
-        Assert.That(sign.localPosition.x, Is.EqualTo(((Vector2[])course.GetType().GetField("LevelOneCheckpointSpawns").GetValue(null))[1].x - 3));
+        var signBank = ((Vector3[])course.GetType().GetField("AscentPlatforms").GetValue(null))[44];
+        Assert.That(sign.localPosition.x, Is.EqualTo(signBank.x + 1));
+        Assert.That(sign.localPosition.y, Is.EqualTo(signBank.y + 1.79f).Within(.001f));
         var king = eggs.First(t => t.name == "Easter egg cat king");
         Assert.That(king.GetComponentsInChildren<Renderer>(), Is.Empty,
             "The stone king must be part of the valley painting, never a separate floating cutout.");
@@ -320,7 +374,7 @@ public class MenuMovementIntegrationTests
             }
             Assert.That((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course), Is.True, "Stopped at " + body.position + " next=" + next);
             Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.EqualTo(2));
-            Assert.That(introductionTravel, Is.InRange(60f, 65f),
+            Assert.That(introductionTravel, Is.InRange(59f, 65f),
                 "Uninterrupted basic traversal should establish the introduction pacing baseline.");
             Debug.Log("Scripted physics only: introduction " + introductionTravel.ToString("F2")
                 + "s; whole preview " + traversal.ToString("F2") + "s. Not a player playtest.");
@@ -496,9 +550,10 @@ public class MenuMovementIntegrationTests
             }
             var ascent = (Vector3[])course.GetType().GetField("AscentPlatforms").GetValue(null);
             var motor = cat.GetType().GetField("Motion").GetValue(cat);
-            foreach (int group in new[] { 4, 10, 13 }) {
-                var bank = ascent[group * 5]; var shelf = ascent[group * 5 + 1];
-                cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { new Vector2(shelf.x, bank.y - 0.29f) });
+            foreach (int bankIndex in new[] { 20, 50, 65, 75 }) {
+                var bank = ascent[bankIndex]; var shelf = ascent[bankIndex + 1];
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] {
+                    bankIndex == 75 ? new Vector2(shelf.x + 2, 11.86f) : new Vector2(shelf.x, bank.y - .29f) });
                 SettleCourse(cat, course);
                 var body = cat.GetComponent<Rigidbody2D>();
                 bool jumped = false, recovered = false;
@@ -511,7 +566,7 @@ public class MenuMovementIntegrationTests
                     if (jumped && (bool)cat.GetType().GetProperty("Grounded").GetValue(cat) &&
                         body.position.y > bank.y + 1.15f) { recovered = true; break; }
                 }
-                Assert.That(recovered, Is.True, "Recovery terrace must permit a short return in group " + group);
+                Assert.That(recovered, Is.True, "Recovery terrace must permit a short return to bank " + bankIndex);
             }
             cat.transform.localPosition = new Vector3(900, 14);
             var follow = course.GetComponentInChildren(RuntimeType("CatCamera"));

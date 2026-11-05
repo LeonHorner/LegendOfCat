@@ -1,5 +1,7 @@
 # Golden River ascent — implementation and review
 
+Current checkpoint/pacing revision and the user's measured **62.2s intro / 92.6s ascent** are recorded in [checkpoint landmarks and pacing](checkpoints-and-pacing.md). The extension adds eighteen late traversal platforms before the relocated overlook. This supersedes the original platform count and pending-human-timing statements below. Historical implementation notes remain dated evidence, not the current collision/camera specification.
+
 The user approved bringing vertical exploration, precision landings and two moving supports into Level 1 on 2026-11-04. This deliberately advances the moving-support introduction from the later campaign proposal. No additional movement ability is required.
 
 The original introduction ends at x=425 and is preserved. Its short former continuation is replaced by fifteen terrace groups and a high overlook. Group widths are individually authored. Contacts rise from the river to 12.6 world units. Checkpoint 1 remains at (420, 0.52); checkpoint 2 and the provisional exit move to the overlook. The later final sequence remains unfinished. The target is 110–140 seconds for a first successful ascent including orientation, not a measured result or the completed 4–6-minute level.

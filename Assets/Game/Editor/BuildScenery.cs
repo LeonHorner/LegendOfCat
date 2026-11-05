@@ -35,6 +35,7 @@ public static class BuildScenery
     }
 
     public static readonly string[] GoldenRiverArt = {
+        "checkpoint-states-v1", "checkpoint-tree-v1", "checkpoint-arch-v1",
         "near-extended-panorama-v1", "far-extended-panorama-v1", "bank-tall-ascent-v1", "shelf-ascent-masonry-v1", "landmark-hillside-fortress-v1", "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2",
         "valley-panorama-v3", "far-valley-panorama-v4", "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3",
         "shelf-root-compact-v3", "shelf-masonry-compact-v3",
@@ -44,6 +45,9 @@ public static class BuildScenery
     [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]
     public static void ImportGoldenRiverArt()
     {
+        const string checkpointMaterial = "Assets/Game/Resources/GoldenRiver/checkpoint-material.mat";
+        if (!AssetDatabase.LoadAssetAtPath<Material>(checkpointMaterial))
+            AssetDatabase.CreateAsset(new Material(Shader.Find("LegendOfCat/Checkpoint")), checkpointMaterial);
         ArchiveLandmarkCutouts();
         const string repeatingStones = "Assets/Game/Resources/GoldenRiver/river-stones-slab-v1.png";
         if (AssetDatabase.LoadAssetAtPath<Texture2D>(repeatingStones)) {
@@ -63,7 +67,7 @@ public static class BuildScenery
             importer.alphaIsTransparency = true;
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.npotScale = TextureImporterNPOTScale.None;
-            importer.maxTextureSize = name.Contains("extended-panorama") ? 8192 : name.Contains("panorama") ? 4096 : 2048;
+            importer.maxTextureSize = name.Contains("extended-panorama") ? 8192 : name.Contains("panorama") || name == "checkpoint-states-v1" ? 4096 : 2048;
             importer.SaveAndReimport();
         }
         AssetDatabase.SaveAssets();

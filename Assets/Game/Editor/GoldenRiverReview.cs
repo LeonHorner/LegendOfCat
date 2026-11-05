@@ -62,7 +62,7 @@ public static class GoldenRiverReview
             var ascent = MovementCourse.AscentPlatforms;
             points = new Vector2[10]; names = new string[10];
             for (int i = 0; i < 6; i++) {
-                var p = ascent[new[] { 0, 10, 31, 45, 51, 75 }[i]];
+                var p = ascent[new[] { 0, 10, 31, 45, 51, MovementCourse.OverlookIndex }[i]];
                 points[i] = new Vector2(p.x, p.y + 1.22f); names[i] = "ascent-" + i;
             }
             points[6] = new Vector2(ascent[69].x + ascent[69].z / 2 + 1, -2);
@@ -71,8 +71,22 @@ public static class GoldenRiverReview
             points[8] = new Vector2(342, 0.52f); names[8] = "willow-color";
             points[9] = new Vector2(ascent[20].x, ascent[20].y + 1.22f); names[9] = "landscape-join";
         }
+        bool checkpointReview = System.Array.IndexOf(args, "-checkpointReview") >= 0;
+        if (checkpointReview) {
+            var a = MovementCourse.AscentPlatforms;
+            points = new[] { MovementCourse.LevelOneCheckpointSpawns[0], MovementCourse.LevelOneCheckpointSpawns[0],
+                MovementCourse.LevelOneCheckpointSpawns[0], MovementCourse.LevelOneCheckpointSpawns[1],
+                new Vector2(a[77].x, a[77].y + 1.22f), new Vector2(a[85].x, a[85].y + 1.22f), new Vector2(a[44].x, a[44].y + 1.22f) };
+            names = new[] { "checkpoint-first-unvisited", "checkpoint-first-active", "checkpoint-first-visited", "checkpoint-second-active", "broken-ruin-climb", "rooted-descent", "sleeping-cat-terrace" };
+        }
         try {
             for (int index = 0; index < points.Length; index++) {
+                if (checkpointReview) {
+                    course.Run.Restart();
+                    int state = index == 0 ? 0 : index == 1 || index > 3 ? 1 : 2;
+                    if (state > 0) course.Run.TryActivateCheckpoint(state, MovementCourse.LevelOneCheckpointSpawns[state - 1], true);
+                    foreach (var marker in root.GetComponentsInChildren<CheckpointMarker>()) marker.Refresh(0);
+                }
                 cat.RespawnAt(points[index]);
                 Physics2D.SyncTransforms();
                 for (int step = 0; step < 20; step++) {
@@ -97,6 +111,16 @@ public static class GoldenRiverReview
                         pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0);
                         pixels.Apply();
                         File.WriteAllBytes($"{output}/{names[index]}-{width}.png", pixels.EncodeToPNG());
+                        if (checkpointReview && width == 640 && index == 1) {
+                            string frames = output + "/pulse";
+                            Directory.CreateDirectory(frames);
+                            for (int frame = 0; frame < 48; frame++) {
+                                foreach (var marker in root.GetComponentsInChildren<CheckpointMarker>()) marker.Refresh(.075f);
+                                camera.Render(); RenderTexture.active = target;
+                                pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0); pixels.Apply();
+                                File.WriteAllBytes($"{frames}/frame-{frame:000}.png", pixels.EncodeToPNG());
+                            }
+                        }
                         if (width == 640 && names[index] == "watching-fish") {
                             const string frames = "Logs/watching-fish-frames";
                             Directory.CreateDirectory(frames);

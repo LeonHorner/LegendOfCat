@@ -40,6 +40,27 @@ public class CatCollisionTests
         UnityEngine.Object.DestroyImmediate(material); Physics2D.simulationMode = previousMode;
     }
     [Test]
+    public void HeldDirectionAgainstWallShowsIdleAndResumesWhenClear()
+    {
+        var wall = new GameObject("Animation obstruction");
+        try {
+            wall.transform.position = new Vector2(2, 1);
+            wall.AddComponent<BoxCollider2D>().size = new Vector2(1, 2);
+            Physics2D.SyncTransforms();
+            Input("SetMove", 1f);
+            for (int tick = 0; tick < 80; tick++) Tick();
+            Assert.That(controller.GetType().GetProperty("Pose").GetValue(controller), Is.EqualTo("Idle"));
+            var velocity = (Vector2)controller.GetType().GetProperty("PresentationVelocity").GetValue(controller);
+            Assert.That(Mathf.Abs(velocity.x), Is.LessThan(.1f));
+            wall.SetActive(false);
+            float stopped = body.position.x;
+            for (int tick = 0; tick < 15; tick++) Tick();
+            Assert.That(body.position.x, Is.GreaterThan(stopped + 1));
+            Assert.That(controller.GetType().GetProperty("Pose").GetValue(controller), Is.EqualTo("Run"));
+        } finally { UnityEngine.Object.DestroyImmediate(wall); }
+    }
+
+    [Test]
     public void SteepBevelCannotHoldMikaInMidair()
     {
         var bevel = new GameObject("Steep shelf bevel");

@@ -7,7 +7,8 @@ public sealed class CatController : MonoBehaviour
     public Transform fallReference;
     public readonly CatMotion Motion = new CatMotion();
     public bool Grounded { get; private set; }
-    public string Pose => Grounded ? (Mathf.Abs(Motion.Velocity.x) > 0.1f ? "Run" : "Idle")
+    public Vector2 PresentationVelocity => body ? body.linearVelocity - supportVelocity : Vector2.zero;
+    public string Pose => Grounded ? (Mathf.Abs(PresentationVelocity.x) > 0.1f ? "Run" : "Idle")
         : body.linearVelocity.y > 0 ? "Jump" : "Fall";
     Rigidbody2D body;
     BoxCollider2D shape;

@@ -23,3 +23,5 @@ Use the self-contained [Legacy gameplay reference](legacy-gameplay-reference.md)
 
 ## Golden River ascent decision — 2026-11-04
 The user approved a roughly two-minute ascent after the introduction, combining vertical exploration, tighter jumps and safely introduced moving platforms. The camera follows height and may leave the river below the viewport. Most errors should land on lower recovery terraces. This advances the moving-support introduction from the original later-level proposal. See golden-river-main-route/ascent.md.
+
+On 2026-11-05 the measured ascent was 92.6 seconds (intro 62.2). The user approved additional varied traversal toward 110–140 seconds and diegetic paw-carved checkpoints: a tree at the first, a distinct ruin arch at the second. Current paws glow warm gold with a gentle pulse; passed paws stay dark orange without emission. No checkpoint toast. See golden-river-main-route/checkpoints-and-pacing.md.

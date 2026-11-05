@@ -96,6 +96,18 @@ public sealed class MovementCourse : MonoBehaviour
                 edge += width;
             }
         }
+        // Two distinct late beats: broken climbing masonry, then a rooted dip and return.
+        float[][] extraWidths = { new[] { 7f, 3f, 4f, 3f, 6f, 4f, 3f, 14f },
+            new[] { 5f, 3.5f, 7f, 3f, 4f, 6f, 3f, 5f, 4f, 12f } };
+        float[][] extraHeights = { new[] { 0f, 1.1f, 2.2f, 1.4f, 2.7f, 1.7f, 3f, 1.6f },
+            new[] { .5f, -.8f, -2f, -.9f, .2f, 1.4f, .3f, 1.5f, .6f, 0f } };
+        for (int beat = 0; beat < extraWidths.Length; beat++)
+            for (int step = 0; step < extraWidths[beat].Length; step++) {
+                float width = extraWidths[beat][step];
+                edge += step % 2 == 0 ? 1.8f : 2.1f;
+                result.Add(new Vector3(edge + width / 2, 11.85f + extraHeights[beat][step], width));
+                edge += width;
+            }
         result.Add(new Vector3(edge + 10, 11.85f, 16));
         return result.ToArray();
     }
@@ -112,8 +124,9 @@ public sealed class MovementCourse : MonoBehaviour
     public static readonly int[] LevelOneRootPlatforms = { 3, 4, 8, 9, 10, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
     // Reserved broad ground for the upper-route owner; no detour is required here.
     public static readonly Vector2 UpperRouteEntrance = new Vector2(AscentPlatforms[10].x, AscentPlatforms[10].y + 1.27f);
-    public static readonly Vector2 UpperRouteRejoin = new Vector2(AscentPlatforms[75].x, 13.12f);
-    public static readonly Vector2 LevelOneExit = new Vector2(AscentPlatforms[75].x + 4, 13.12f);
+    public static readonly int OverlookIndex = AscentPlatforms.Length - 1;
+    public static readonly Vector2 UpperRouteRejoin = new Vector2(AscentPlatforms[OverlookIndex].x, 13.12f);
+    public static readonly Vector2 LevelOneExit = new Vector2(AscentPlatforms[OverlookIndex].x + 4, 13.12f);
     Vector3[] ActivePlatforms => LevelOne ? CompletePlatforms : Platforms;
     public CatController Cat { get; private set; }
     public RunLifecycle Run { get; private set; }
@@ -122,7 +135,7 @@ public sealed class MovementCourse : MonoBehaviour
         new Vector2(65, 1.52f), new Vector2(83, 0.52f)
     };
     public static readonly Vector2[] LevelOneCheckpointSpawns = {
-        new Vector2(420, 0.52f), new Vector2(AscentPlatforms[75].x, 13.12f)
+        new Vector2(420, 0.52f), new Vector2(AscentPlatforms[OverlookIndex].x, 13.12f)
     };
     // Configure before enabling the object. The movement lab retains its original course.
     public bool LevelOne;
@@ -149,6 +162,7 @@ public sealed class MovementCourse : MonoBehaviour
     GUIStyle hudStyle;
     string hudStatus;
     float hudRefresh, frameSeconds;
+    readonly System.Collections.Generic.List<CheckpointMarker> checkpointMarkers = new System.Collections.Generic.List<CheckpointMarker>();
 
     void Awake()
     {
@@ -251,7 +265,7 @@ public sealed class MovementCourse : MonoBehaviour
         }
         if (LevelOne) {
             follow.ascent = true;
-            for (int i = 0; i < AscentPlatforms.Length - 5; i += 5) {
+            for (int i = 0; i < 75; i += 5) {
                 if (i == 30) continue; // The easy horizontal-support crossing needs no catch shelf.
                 var first = AscentPlatforms[i]; var lastInGroup = AscentPlatforms[i + 4];
                 var landing = AscentPlatforms[i + 1];
@@ -264,29 +278,26 @@ public sealed class MovementCourse : MonoBehaviour
                 sceneryRenderer.AddRecoveryTerrain(new Vector3(catchPoint.x, catchPoint.y - 0.5f, catchPoint.z));
                 SceneryRenderer.MatchFloatingCollider(catchFloor, sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count - 1]);
             }
+            // A missed first precision landing costs height, with a short jump back to the entry shelf.
+            var lateCatch = new Vector3(AscentPlatforms[76].x + 2, 11.15f, 9);
+            var lateFloor = Block("Late ruin recovery", lateCatch, new Vector2(lateCatch.z, .5f), Color.gray);
+            lateFloor.GetComponent<SpriteRenderer>().enabled = false;
+            lateFloor.AddComponent<BoxCollider2D>();
+            sceneryRenderer.AddRecoveryTerrain(new Vector3(lateCatch.x, lateCatch.y - .5f, lateCatch.z));
+            SceneryRenderer.MatchFloatingCollider(lateFloor, sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count - 1]);
         }
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
+            if (LevelOne) {
+                checkpointMarkers.Add(CheckpointMarker.Create(transform, point, i + 1, Run));
+                continue;
+            }
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
                 new Vector2(0.14f, 0.9f), new Color(0.95f, 0.75f, 0.36f));
             Label("CHECKPOINT " + (i + 1), new Vector2(point.x, point.y + 1.2f));
         }
-        if (LevelOne) {
-            Label("RUN / STOP / TURN", new Vector2(4, 1.8f));
-            Label("JUMP TO THE BROAD BANK", new Vector2(17, 2.2f));
-            Label("OLD WATERMILL", new Vector2(84, 1.8f));
-            Label("OVER THE RUINS", new Vector2(145, 2.4f));
-            Label("WILLOW BANK", new Vector2(337, 1.8f));
-            Label("INTRODUCTION COMPLETE", new Vector2(420, 2.4f));
-            Label("RIVER TERRACES", new Vector2(435, 2.2f));
-            Label("RIDE / JUMP", new Vector2(AscentPlatforms[31].x, AscentPlatforms[31].y + 3));
-            Label("UP THROUGH THE RUINS", new Vector2(AscentPlatforms[51].x, AscentPlatforms[51].y + 3));
-            Label("HIGH VALLEY OVERLOOK", LevelOneCheckpointSpawns[1] + Vector2.up * 2);
-            Label("GOLDEN RIVER EXIT", LevelOneExit + Vector2.up * 1.5f);
-            // Two posts frame a visibly distinct exit without blocking movement.
-            foreach (float x in new[] { LevelOneExit.x - 1, LevelOneExit.x + 2 })
-                Block("Exit post", new Vector2(x, LevelOneExit.y + 0.4f), new Vector2(0.2f, 1.8f), new Color(0.95f, 0.75f, 0.36f));
-        } else Label("FINISH / return or retry", new Vector2(100, 1));
+        // Main-route landmarks and platform silhouettes communicate progression without floating labels.
+        if (!LevelOne) Label("FINISH / return or retry", new Vector2(100, 1));
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
     {
@@ -324,13 +335,16 @@ public sealed class MovementCourse : MonoBehaviour
             hudRefresh = 0.25f;
         }
         Run.Advance(Time.deltaTime);
-        if (Run.Paused || !Cat.Grounded) return;
+        foreach (var marker in checkpointMarkers) marker.Refresh(Time.deltaTime);
+        if (Run.Paused || (!LevelOne && !Cat.Grounded)) return;
         Vector2 position = transform.InverseTransformPoint(Cat.GetComponent<Rigidbody2D>().position);
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             Vector2 point = ActiveCheckpoints[i];
             // Marker/spawn follow the course transform when reused in another scene.
-            // Only grounded main-route positions may activate a checkpoint.
-            if (Mathf.Abs(position.x - point.x) <= 0.7f && Mathf.Abs(position.y - point.y) <= 0.2f &&
+            // The main route has a broad airborne passage; its saved spawn remains fixed on safe ground.
+            bool inside = LevelOne ? Mathf.Abs(position.x - point.x) <= 3.5f && position.y >= point.y - .25f && position.y <= point.y + 3.4f
+                : Mathf.Abs(position.x - point.x) <= .7f && Mathf.Abs(position.y - point.y) <= .2f;
+            if (inside &&
                 Run.TryActivateCheckpoint(i + 1, point, true) && LevelOne && i == 0)
             {
                 IntroductionSeconds = Run.ElapsedSeconds;
@@ -338,7 +352,7 @@ public sealed class MovementCourse : MonoBehaviour
             }
         }
         if (LevelOne && Run.Checkpoint == 2 && ascentFinished < 0) ascentFinished = AscentSeconds;
-        if (LevelOne && !HasReachedExit && position.x >= LevelOneExit.x - 1 && position.x <= LevelOneExit.x + 3 &&
+        if (LevelOne && Cat.Grounded && !HasReachedExit && position.x >= LevelOneExit.x - 1 && position.x <= LevelOneExit.x + 3 &&
             Mathf.Abs(position.y - LevelOneExit.y) <= 0.2f) {
             HasReachedExit = true;
             ExitReached?.Invoke();

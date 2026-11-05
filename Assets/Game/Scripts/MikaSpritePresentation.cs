@@ -74,7 +74,7 @@ public sealed class MikaSpritePresentation : MonoBehaviour
             for (int i = 0; i < count; i++)
                 if (contacts[i].normal.y > 0.7f) Animation.LandingSoon = true;
         }
-        Animation.Step(deltaTime, controller.Grounded, controller.Motion.Velocity,
+        Animation.Step(deltaTime, controller.Grounded, controller.PresentationVelocity,
             position.x - previousPosition.x);
         previousPosition = position;
         ApplyFrame();

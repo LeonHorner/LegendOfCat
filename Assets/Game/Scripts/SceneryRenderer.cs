@@ -237,7 +237,8 @@ public sealed class SceneryRenderer : MonoBehaviour
         // Register contact independently from the authored grass tufts above it.
         bool variedCourse = FloatingPlatforms != null;
         bool distinctShelf = floating && variedCourse;
-        bool rootShelf = distinctShelf && System.Array.IndexOf(RootPlatforms, variant) >= 0;
+        bool rootShelf = distinctShelf && (System.Array.IndexOf(RootPlatforms, variant) >= 0 ||
+            variant >= MovementCourse.LevelOnePlatforms.Length + 83 && variant < MovementCourse.LevelOnePlatforms.Length + MovementCourse.OverlookIndex);
         bool compactShelf = distinctShelf && platform.z <= (rootShelf ? 4.25f : 4.5f);
         string texturePath;
         float contactUV, landingFraction;
@@ -255,7 +256,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             contactUV = floating ? 0.66f : bank ? 0.587f : 0.748f;
             landingFraction = floating ? 0.90f : bank ? 0.89f : 0.76f;
         }
-        bool ascentShelf = distinctShelf && variant >= MovementCourse.LevelOnePlatforms.Length && !compactShelf;
+        bool ascentShelf = distinctShelf && variant >= MovementCourse.LevelOnePlatforms.Length && !compactShelf && !rootShelf;
         if (ascentShelf) { texturePath = "GoldenRiver/shelf-ascent-masonry-v1"; contactUV = 0.62f; landingFraction = 0.90f; }
         bool tallBank = variedCourse && !floating && platform.x > 425 && contact >= 1.5f;
         if (tallBank) { texturePath = "GoldenRiver/bank-tall-ascent-v1"; contactUV = 0.914f; landingFraction = 0.86f; }
@@ -361,7 +362,8 @@ public sealed class SceneryRenderer : MonoBehaviour
             item.GetComponent<MeshRenderer>().SetPropertyBlock(properties);
         }
         // These two belong after the introduction, without blocking the playable plane.
-        easterEggs[2] = Egg("no cats sign", "egg-no-cats-sign", new Vector3(MovementCourse.LevelOneCheckpointSpawns[1].x - 3, 13.64f, 3), new Vector2(2.2f, 2.2f), true);
+        var signBank = MovementCourse.AscentPlatforms[44];
+        easterEggs[2] = Egg("no cats sign", "egg-no-cats-sign", new Vector3(signBank.x + 1, signBank.y + 1.79f, 3), new Vector2(2.2f, 2.2f), true);
         UpdateFish(fishClock);
     }
 
