@@ -204,6 +204,81 @@ neighboring atlas speck and retain the accepted apex alignment (-2, -14 source
 pixels). The user accepted the in-game result after playtesting. Original visible
 RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
 
+## Mika natural look study, revision 3 — 2026-10-24
+
+- Files: `art/blender/mika-v3/`, including the original source GLB, native Blender
+  look study, editable material authoring script and actual Blender review renders.
+- Human direction: both prior Blender revisions were rejected. Prioritize a
+  natural-looking cat matching the concept art, especially anatomy, coat, eyes
+  and ears; add bones later after the appearance works.
+- Third-party source: Grab3D, **Tabby Cat**,
+  https://grab3d.com/models/animals/cat/ (downloaded 2026-10-24).
+  Source mesh and all source textures are dedicated to CC0 1.0. The original
+  `source/LICENSE.txt` and `source/manifest.json` are preserved verbatim.
+  The CC0 dedication permits modification and public source redistribution.
+- Generator/model disclosure: Grab3D identifies an AI-assisted Meshy image-to-3D
+  base, followed by cleanup, scaling, texturing and checking in Blender. Exact
+  model revision and prompt are not provided. This source is not represented as
+  original Codex sculpture or as a generation made from the user's concepts.
+- Local work: Codex/Blender 5.2.3 LTS material adaptation to ginger and cream,
+  preserving source facial colors and fur detail; slightly narrower trunk; packed
+  project concept references and studio cameras for full-body and face review.
+  Known concept-image provenance remains as recorded in the earlier entries.
+- Review: the user accepted the visible model on 2026-10-24 and requested a
+  work-in-progress push linked to issue #49. This acceptance covers appearance
+  only. Production topology, skeleton, animation, Unity validation and gameplay
+  integration remain unfinished. Previous Blender models remain rejected.
+
+## Mika Blender rig and motion candidates — 2026-10-31
+
+- Files: `art/blender/mika-rig/`, including the native rig, baked FBX, texture
+  maps, authoring/verification scripts and actual Blender motion review renders.
+- Source and license: the accepted revision 3 Grab3D Tabby Cat adaptation above;
+  its preserved CC0 license and Meshy AI-assisted source disclosure still apply.
+  No new external character or image generator was used.
+- Authoring: Codex and Blender 5.2.3 LTS, 2026-10-31. A working duplicate received
+  voxel cleanup, regular-quad un-subdivision, surface fitting, UV/texture baking,
+  skeleton, constrained heat weights, paw IK and keyed motion candidates. The
+  accepted dense look study remains unchanged. The working mesh has mixed
+  topology; it is not represented as anatomical hand retopology.
+- Human decisions: retain the accepted natural appearance, open eyes, four
+  resting paw contacts, independent ear/tail motion and editable Unity export.
+  Normal/slowed loops are rendered from the actual rig, not generated motion
+  illustrations. The inherited dark underarm marking remains visible.
+- Validation: normalized four-influence weights, native support measurements and
+  FBX reimport passed. Motion appearance, Unity import/materials and game
+  integration remain unaccepted/unverified. See the folder README and validation
+  report. Keep issue #49 incomplete and the existing 2D playable character intact.
+- Revision 2, 2026-11-01: the user rejected the first gait as unnatural. Codex and
+  Blender reauthored the run with pelvis/spine/shoulder coordination, forward
+  head/neck alignment, staggered contacts, gathered/extended recovery and a
+  trailing tail. New side/three-quarter loops are actual Blender renders. The
+  same CC0 source and editable skin are retained; no new generated imagery or
+  copied motion footage is used. Reference reading is linked in the folder
+  README. Visual acceptance and Unity validation remain pending.
+
+- Revision 3, 2026-11-01: human feedback requested stronger body movement for the
+  paired-leg run. Codex and Blender 5.2.3 LTS authored increased spinal flexion,
+  pelvic tuck/extension, body pitch/heave and tail follow-through on the same
+  CC0-derived skin. Local motion reference: user-supplied
+  `tumblr_n0r2iuDJRW1sg7h2jo1_1280-2378486781.gif`; creator and license unverified.
+  This reference is not redistributed, embedded or used as a texture. No motion
+  capture data was extracted; the animation curves are locally authored. Actual
+  Blender renders show the revised candidate. Visual acceptance remains pending.
+
+- Publication decision, 2026-11-02: the user approved pushing the current rig/run
+  and moving PR #51 out of draft. Issue #78 records further motion improvements,
+  varied runs with random selection, walking, idle animations and integration.
+  Existing source, license and generator disclosures remain unchanged. This is
+  approval of the authoring deliverable, not a Unity/gameplay validation result.
+
+- Tail revision 4, 2026-11-02: the user found the running tail too stiff. Codex
+  and Blender 5.2.3 LTS authored progressively delayed joint flexion and subtle
+  sideways follow-through. Only the Run tail curves changed; the same CC0-derived
+  skin and textures are used. No external artwork or new generation was used.
+  The user reviewed the actual Blender previews and approved adding the tail
+  refinement to the original PR on 2026-11-02.
+
 ## Golden River background study — 2026-10-24
 
 `Assets/Game/Resources/BackgroundStudy/painted-atlas.png` is original generated

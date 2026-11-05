@@ -116,6 +116,60 @@ See ASSETS.md. Images were produced with the built-in OpenAI image generation to
 ## Historical boss artwork
 See the [legacy boss design archive](references/legacy-bosses/README.md) for original sprite sheets, animation metadata and generation records. These references are optional inspiration, not fixed Unity designs.
 
+## Blender character study — 2026-10-24
+
+The user requested an editable 3D cat for Blender/Unity animation authoring, then
+rejected two procedural Blender models for their anatomy, colors, eyes and ears.
+The new instruction prioritizes natural appearance against the supplied concept
+art before adding bones. Those rejected local experiments are not included in
+the published candidate. The earlier cutout/optical-flow rejection still applies.
+
+The user accepted the appearance of the CC0-based natural cat study in
+[art/blender/mika-v3](../../art/blender/mika-v3/README.md) and requested publishing
+it as work in progress for [issue #49](https://github.com/LeonHorner/LegendOfCat/issues/49).
+Source, licensing, AI provenance and local adaptations are recorded in ASSETS.md.
+
+Acceptance covers the visible model only. It is a dense static sculpt requiring
+neutral-pose preparation, animation topology, a skeleton, skinning, authored
+motion and Unity validation. Keep the existing playable 2D baseline until the
+new animation output passes normal/slowed motion and actual-game review. The
+Blender authoring route does not approve replacing the game's 2D presentation
+with a 3D presentation. Issue #49 remains incomplete.
+
+The [2026-10-31 rig candidate](../../art/blender/mika-rig/README.md) adds a reduced
+working surface, editable skeleton/IK, baked FBX and actual motion review loops.
+The accepted v3 source is unchanged. Mechanical weight/contact/export checks do
+not approve the motions: inspect the shoulder/underarm deformation and natural
+gait at normal/slowed speed before any output enters gameplay. Unity activation
+currently blocks Editor validation. This work remains isolated outside `Assets`.
+
+On 2026-11-01 the user rejected that first running candidate as unnatural.
+Revision 2 reauthors the gait with coordinated body movement, forward gaze,
+gathered/extended phases and revised foot timing. Its side and three-quarter
+normal/slowed renders are a fresh review candidate; prior contact/export checks
+do not override the rejection. Do not integrate either run without acceptance.
+
+The user found revision 2 better but requested more body movement matching its
+paired-leg running gait, supplying a local animated reference. Revision 3 adds
+stronger spinal gather/extension, hip tuck, body pitch/heave and tail follow-through.
+The accepted model and non-run actions are unchanged. Review the new revision 3
+side and three-quarter loops at normal/slowed speed before acceptance. The
+reference GIF is not redistributed; its creator/license are unverified.
+
+On 2026-11-02 the user approved publishing the current rig/run and requested
+PR #51 leave draft status. Its deliverable is the editable Blender character,
+rig and exported motion baseline. [Issue #78](https://github.com/LeonHorner/LegendOfCat/issues/78)
+continues animation improvements, varied runs with random selection, walking,
+idle actions and Unity/gameplay integration. This publication approval does not
+establish actual-game acceptance or accept every exploratory action.
+
+The next review on 2026-11-02 identified a stiff running tail. Local revision 4
+adds delayed flexion increasing toward the tip and slight lateral follow-through.
+The current run's body and paw animation remain intact. Normal/slowed previews
+and baked tail-joint verification accompany the candidate. The user reviewed it
+and approved adding the tail refinement to PR #51 on 2026-11-02; further work
+on #78 is deferred until later.
+
 ### Terrain system correction — 2026-10-28
 
 The user rejected the latest tall-wall preview, especially its right platform,

@@ -1,0 +1,105 @@
+{
+  "normalized_weights": true,
+  "maximum_influences": 4,
+  "fbx_deform_bones": 25,
+  "fbx_meshes": 1,
+  "fbx_actions": [
+    "Mika_Rig|Mika_Rig|Airborne",
+    "Mika_Rig|Mika_Rig|Fall",
+    "Mika_Rig|Mika_Rig|Groom",
+    "Mika_Rig|Mika_Rig|Idle",
+    "Mika_Rig|Mika_Rig|JumpReview",
+    "Mika_Rig|Mika_Rig|Land",
+    "Mika_Rig|Mika_Rig|Listen",
+    "Mika_Rig|Mika_Rig|LookBack",
+    "Mika_Rig|Mika_Rig|Run",
+    "Mika_Rig|Mika_Rig|Stop",
+    "Mika_Rig|Mika_Rig|Stretch",
+    "Mika_Rig|Mika_Rig|TailTwitch",
+    "Mika_Rig|Mika_Rig|Takeoff"
+  ],
+  "native_motion_metrics": {
+    "Idle": {
+      "max_ik_target_error_m": 0.0015690742538877602,
+      "support_sole_min_m": -9.294203482568264e-05,
+      "support_sole_max_m": 0.0014636407140642405,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "LookBack": {
+      "max_ik_target_error_m": 0.0005711221845465769,
+      "support_sole_min_m": -1.63795193657279e-05,
+      "support_sole_max_m": 0.00046738400124013424,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "Listen": {
+      "max_ik_target_error_m": 0.0005711221845465769,
+      "support_sole_min_m": -1.63795193657279e-05,
+      "support_sole_max_m": 0.00046738400124013424,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "TailTwitch": {
+      "max_ik_target_error_m": 0.0005711221845465769,
+      "support_sole_min_m": -1.63795193657279e-05,
+      "support_sole_max_m": 0.00046738400124013424,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "Groom": {
+      "max_ik_target_error_m": 0.0005711221845465769,
+      "support_sole_min_m": -1.5700621247560775e-08,
+      "support_sole_max_m": 0.00046738400124013424,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "Stretch": {
+      "max_ik_target_error_m": 0.0005711221845465769,
+      "support_sole_min_m": -0.00015407265163958073,
+      "support_sole_max_m": 0.00046738400124013424,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "Run": {
+      "max_ik_target_error_m": 2.4845545971809866e-05,
+      "support_sole_min_m": -0.0001595979556441307,
+      "support_sole_max_m": 0.00030159461311995983,
+      "max_stance_displacement_per_frame_m": 6.691460343439821e-07,
+      "loop_seam_matrix_error": 0.0
+    },
+    "Takeoff": {
+      "max_ik_target_error_m": 0.000599860387394061,
+      "support_sole_min_m": null,
+      "support_sole_max_m": null,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "Airborne": {
+      "max_ik_target_error_m": 1.6186012098712522e-05,
+      "support_sole_min_m": null,
+      "support_sole_max_m": null,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "Fall": {
+      "max_ik_target_error_m": 0.001462869858100431,
+      "support_sole_min_m": null,
+      "support_sole_max_m": null,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "Land": {
+      "max_ik_target_error_m": 0.0005711221845465769,
+      "support_sole_min_m": null,
+      "support_sole_max_m": null,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "Stop": {
+      "max_ik_target_error_m": 0.0017571622376037416,
+      "support_sole_min_m": null,
+      "support_sole_max_m": null,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "JumpReview": {
+      "max_ik_target_error_m": 0.0005711221845465769,
+      "support_sole_min_m": null,
+      "support_sole_max_m": null,
+      "max_stance_displacement_per_frame_m": null
+    }
+  },
+  "max_fbx_sample_position_error_m": 4.4990110538197815e-07,
+  "unity_import_tested": false,
+  "visual_acceptance": false
+}
