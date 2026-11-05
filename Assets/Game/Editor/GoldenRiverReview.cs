@@ -76,8 +76,9 @@ public static class GoldenRiverReview
             var a = MovementCourse.AscentPlatforms;
             points = new[] { MovementCourse.LevelOneCheckpointSpawns[0], MovementCourse.LevelOneCheckpointSpawns[0],
                 MovementCourse.LevelOneCheckpointSpawns[0], MovementCourse.LevelOneCheckpointSpawns[1],
-                new Vector2(a[77].x, a[77].y + 1.22f), new Vector2(a[85].x, a[85].y + 1.22f), new Vector2(a[44].x, a[44].y + 1.22f) };
-            names = new[] { "checkpoint-first-unvisited", "checkpoint-first-active", "checkpoint-first-visited", "checkpoint-second-active", "broken-ruin-climb", "rooted-descent", "sleeping-cat-terrace" };
+                new Vector2(a[77].x, a[77].y + 1.22f), new Vector2(a[85].x, a[85].y + 1.22f), new Vector2(a[44].x, a[44].y + 1.22f),
+                new Vector2(a[50].x + 3, a[50].y + 1.22f) };
+            names = new[] { "checkpoint-first-unvisited", "checkpoint-first-active", "checkpoint-first-visited", "checkpoint-second-active", "broken-ruin-climb", "rooted-descent", "sleeping-cat-terrace", "lift-recovery-gap" };
         }
         try {
             for (int index = 0; index < points.Length; index++) {
@@ -111,6 +112,17 @@ public static class GoldenRiverReview
                         pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0);
                         pixels.Apply();
                         File.WriteAllBytes($"{output}/{names[index]}-{width}.png", pixels.EncodeToPNG());
+                        if (checkpointReview && width == 960 && index <= 3) {
+                            var savedPosition = camera.transform.position;
+                            var savedSize = camera.orthographicSize;
+                            var spawn = MovementCourse.LevelOneCheckpointSpawns[index == 3 ? 1 : 0];
+                            camera.orthographicSize = 2.5f;
+                            camera.transform.position = new Vector3(spawn.x - (index == 3 ? 0 : .8f), spawn.y + .43f, savedPosition.z);
+                            camera.Render(); RenderTexture.active = target;
+                            pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0); pixels.Apply();
+                            File.WriteAllBytes($"{output}/{names[index]}-detail.png", pixels.EncodeToPNG());
+                            camera.orthographicSize = savedSize; camera.transform.position = savedPosition;
+                        }
                         if (checkpointReview && width == 640 && index == 1) {
                             string frames = output + "/pulse";
                             Directory.CreateDirectory(frames);

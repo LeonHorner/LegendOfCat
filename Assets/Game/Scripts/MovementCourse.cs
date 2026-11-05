@@ -269,7 +269,7 @@ public sealed class MovementCourse : MonoBehaviour
                 if (i == 30) continue; // The easy horizontal-support crossing needs no catch shelf.
                 var first = AscentPlatforms[i]; var lastInGroup = AscentPlatforms[i + 4];
                 var landing = AscentPlatforms[i + 1];
-                var catchPoint = new Vector3(landing.x, first.y - 1f, 10);
+                var catchPoint = new Vector3(landing.x + (i == 50 ? 1.6f : 0), first.y - 1f, i == 50 ? 9 : 10);
                 var catchFloor = Block("Recovery terrace", catchPoint, new Vector2(catchPoint.z, 0.5f), Color.gray);
                 catchFloor.GetComponent<SpriteRenderer>().enabled = false;
                 var catchCollider = catchFloor.AddComponent<BoxCollider2D>();
@@ -289,7 +289,8 @@ public sealed class MovementCourse : MonoBehaviour
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
             if (LevelOne) {
-                checkpointMarkers.Add(CheckpointMarker.Create(transform, point, i + 1, Run));
+                int bankIndex = i == 0 ? LevelOnePlatforms.Length - 1 : CompletePlatforms.Length - 1;
+                checkpointMarkers.Add(CheckpointMarker.Create(transform, point, i + 1, Run, sceneryRenderer.TerrainVisuals[bankIndex]));
                 continue;
             }
             Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
@@ -341,8 +342,8 @@ public sealed class MovementCourse : MonoBehaviour
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             Vector2 point = ActiveCheckpoints[i];
             // Marker/spawn follow the course transform when reused in another scene.
-            // The main route has a broad airborne passage; its saved spawn remains fixed on safe ground.
-            bool inside = LevelOne ? Mathf.Abs(position.x - point.x) <= 3.5f && position.y >= point.y - .25f && position.y <= point.y + 3.4f
+            // Touching the stone activates it; the saved spawn remains fixed on safe ground.
+            bool inside = LevelOne ? checkpointMarkers[i].Touches(Cat.GetComponent<BoxCollider2D>())
                 : Mathf.Abs(position.x - point.x) <= .7f && Mathf.Abs(position.y - point.y) <= .2f;
             if (inside &&
                 Run.TryActivateCheckpoint(i + 1, point, true) && LevelOne && i == 0)

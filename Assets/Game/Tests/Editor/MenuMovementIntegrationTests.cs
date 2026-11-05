@@ -16,7 +16,7 @@ public class MenuMovementIntegrationTests
     static int exitSignals;
 
     [UnityTest]
-    public IEnumerator PaintedCheckpointsAcceptJumpPassageAndKeepOnlyLatestLight()
+    public IEnumerator PaintedCheckpointsRequireStoneContactAndKeepOnlyLatestLight()
     {
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         yield return new EnterPlayMode();
@@ -30,13 +30,19 @@ public class MenuMovementIntegrationTests
         var markers = root.GetComponentsInChildren(RuntimeType("CheckpointMarker"));
         void Refresh() { foreach (var marker in markers) marker.GetType().GetMethod("Refresh").Invoke(marker, new object[] { .1f }); }
         int State(int i) => (int)markers[i].GetType().GetProperty("State").GetValue(markers[i]);
-        void Pass(int i) {
-            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { spawns[i] + new Vector2(-2, 2) });
+        void Place(Vector2 point) {
+            cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { point });
+            Physics2D.SyncTransforms();
             Call(course, "Update"); Refresh();
         }
+        void Pass(int i) => Place((Vector2)markers[i].transform.Find("Engraved paw").position + Vector2.up * .3f);
         Assert.That(State(0), Is.Zero); Assert.That(State(1), Is.Zero);
         Assert.That(markers[0].GetComponentInChildren<SpriteRenderer>().sprite.vertices, Has.Length.EqualTo(4),
             "Atlas state selection needs a full rectangle, not three disjoint tight sprite outlines.");
+        Place(spawns[0] + new Vector2(-2.5f, 0));
+        Assert.That(State(0), Is.Zero, "Approaching the tree must not activate its stone.");
+        Place(spawns[0] + new Vector2(-.8f, 2.5f));
+        Assert.That(State(0), Is.Zero, "Jumping entirely above the stone must not activate it.");
         course.GetType().GetMethod("TogglePause").Invoke(course, null);
         cat.GetComponent<Rigidbody2D>().position = spawns[0] + Vector2.up * 2;
         Call(course, "Update"); Refresh(); Assert.That(State(0), Is.Zero);
@@ -57,7 +63,8 @@ public class MenuMovementIntegrationTests
         Assert.That(material.GetFloat("_Pulse"), Is.EqualTo(pulse));
         course.GetType().GetMethod("RestartRun").Invoke(course, null); Refresh();
         Assert.That(State(0), Is.Zero); Assert.That(State(1), Is.Zero);
-        Assert.That(markers[0].GetComponentsInChildren<Collider2D>(), Is.Empty);
+        Assert.That(markers[0].GetComponentsInChildren<Collider2D>().All(c => c.isTrigger), Is.True,
+            "The stone's touch region must not block running or jumping.");
         Assert.That(markers[0].transform.Find("Checkpoint tree"), Is.Not.Null);
         Assert.That(markers[1].transform.Find("Checkpoint ruin arch"), Is.Not.Null);
         Assert.That(markers[1].transform.Find("Engraved paw").position.x,
@@ -483,14 +490,15 @@ public class MenuMovementIntegrationTests
                 for (int tick = 0; tick < 187; tick++) { Call(mover,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
                 var shelf = ascent[group * 5 + 1];
                 var recovery = course.GetComponentsInChildren<PolygonCollider2D>().First(c =>
-                    c.name == "Recovery terrace" && Mathf.Abs(c.transform.localPosition.x - shelf.x) < .01f);
-                cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[] { new Vector2(shelf.x - 3.3f, recovery.bounds.max.y + .46f) });
+                    c.name == "Recovery terrace" && Mathf.Abs(c.transform.localPosition.x - shelf.x - (group == 10 ? 1.6f : 0)) < .01f);
+                float center = recovery.transform.localPosition.x;
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[] { new Vector2(center - 3.3f, recovery.bounds.max.y + .46f) });
                 Physics2D.SyncTransforms();
-                for (int tick = 0; tick < 65 && body.position.x < shelf.x + 3.3f; tick++) {
+                for (int tick = 0; tick < 65 && body.position.x < center + 3.3f; tick++) {
                     motor.GetType().GetMethod("SetMove").Invoke(motor,new object[] { 1f });
                     Call(mover,"FixedUpdate"); Call(cat,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime);
                 }
-                Assert.That(body.position.x, Is.GreaterThanOrEqualTo(shelf.x + 3.3f), "Blocked passage in group " + group);
+                Assert.That(body.position.x, Is.GreaterThanOrEqualTo(center + 3.3f), "Blocked passage in group " + group);
             }
         } finally { Physics2D.simulationMode = previous; }
     }
@@ -512,7 +520,7 @@ public class MenuMovementIntegrationTests
         Assert.That(course.GetComponentsInChildren<PlatformEffector2D>(), Is.Empty, "Course platforms must be solid from below.");
         var shaped = course.GetComponentsInChildren<PolygonCollider2D>();
         Assert.That(shaped.Length, Is.GreaterThan(20));
-        foreach (var polygon in shaped) {
+        foreach (var polygon in shaped.Where(p => !p.isTrigger)) {
             var bounds = polygon.bounds;
             Assert.That(polygon.OverlapPoint(new Vector2(bounds.center.x, bounds.max.y - 0.03f)), Is.True,
                 "The registered landing surface must remain solid.");

@@ -9,12 +9,20 @@ public sealed class CheckpointMarker : MonoBehaviour
     float clock;
     Material material;
     Sprite stoneSprite, frameSprite;
+    PolygonCollider2D touchZone;
+    Mesh footingMesh;
 
-    public static CheckpointMarker Create(Transform parent, Vector2 spawn, int sequence, RunLifecycle run)
+    public bool Touches(Collider2D cat)
+    {
+        var contact = touchZone.Distance(cat);
+        return contact.isValid && (contact.isOverlapped || contact.distance <= .01f);
+    }
+
+    public static CheckpointMarker Create(Transform parent, Vector2 spawn, int sequence, RunLifecycle run, Transform ground)
     {
         var root = new GameObject("Checkpoint waystone " + sequence);
         root.transform.SetParent(parent, false);
-        root.transform.localPosition = new Vector3(spawn.x - .8f, spawn.y - .52f, 1);
+        root.transform.localPosition = new Vector3(spawn.x - .8f, spawn.y - .60f, 1);
         var marker = root.AddComponent<CheckpointMarker>();
         marker.run = run; marker.sequence = sequence;
         var atlas = Resources.Load<Texture2D>("GoldenRiver/checkpoint-states-v1");
@@ -27,6 +35,14 @@ public sealed class CheckpointMarker : MonoBehaviour
         stone.sprite = marker.stoneSprite;
         marker.material = new Material(Resources.Load<Material>("GoldenRiver/checkpoint-material"));
         stone.sharedMaterial = marker.material;
+        float stoneX = sequence == 1 ? 0 : .8f;
+        marker.touchZone = root.AddComponent<PolygonCollider2D>();
+        marker.touchZone.isTrigger = true;
+        marker.touchZone.offset = new Vector2(stoneX, 0);
+        marker.touchZone.points = new[] {
+            new Vector2(-.6f, -.04f), new Vector2(.6f, -.04f), new Vector2(.48f, .65f),
+            new Vector2(.27f, 1.55f), new Vector2(.05f, 1.65f), new Vector2(-.2f, 1.48f), new Vector2(-.45f, .8f)
+        };
         string frameName = sequence == 1 ? "checkpoint-tree-v1" : "checkpoint-arch-v1";
         var frameTexture = Resources.Load<Texture2D>("GoldenRiver/" + frameName);
         marker.frameSprite = Sprite.Create(frameTexture, new Rect(0, 0, frameTexture.width, frameTexture.height),
@@ -39,8 +55,37 @@ public sealed class CheckpointMarker : MonoBehaviour
         frame.transform.localScale = Vector3.one * width;
         frame.transform.localPosition = new Vector3(sequence == 1 ? -.7f : .8f,
             -baseUV * width * frameTexture.height / frameTexture.width, 1);
+        marker.AddFooting(ground, spawn.x, sequence == 1 ? -7 : -2.6f, sequence == 1 ? .5f : 2.6f);
         marker.Refresh(0);
         return marker;
+    }
+
+    void AddFooting(Transform ground, float center, float left, float right)
+    {
+        // Sample the original bank's exact UVs: this is its grass edge in front of the embedded feet.
+        var source = ground.GetComponent<MeshFilter>().sharedMesh;
+        var vertices = source.vertices; var uv = source.uv;
+        float contact = vertices[2].y;
+        float x0 = center + left - ground.localPosition.x, x1 = center + right - ground.localPosition.x;
+        float u0 = Mathf.Lerp(uv[0].x, uv[1].x, Mathf.InverseLerp(vertices[0].x, vertices[1].x, x0));
+        float u1 = Mathf.Lerp(uv[0].x, uv[1].x, Mathf.InverseLerp(vertices[0].x, vertices[1].x, x1));
+        float bottom = contact - .5f, top = vertices[4].y;
+        float v0 = Mathf.Lerp(uv[0].y, uv[2].y, Mathf.InverseLerp(vertices[0].y, contact, bottom));
+        float v1 = Mathf.Lerp(uv[2].y, uv[4].y, Mathf.InverseLerp(contact, vertices[4].y, top));
+        footingMesh = new Mesh { name = "Registered checkpoint grass edge" };
+        footingMesh.vertices = new[] { new Vector3(x0,bottom), new Vector3(x1,bottom),
+            new Vector3(x0,contact), new Vector3(x1,contact), new Vector3(x0,top), new Vector3(x1,top) };
+        footingMesh.uv = new[] { new Vector2(u0,v0), new Vector2(u1,v0), new Vector2(u0,uv[2].y),
+            new Vector2(u1,uv[2].y), new Vector2(u0,v1), new Vector2(u1,v1) };
+        footingMesh.triangles = new[] { 0,2,1, 1,2,3, 2,4,3, 3,4,5 };
+        footingMesh.RecalculateBounds();
+        var edge = new GameObject("Checkpoint grass overlap", typeof(MeshFilter), typeof(MeshRenderer));
+        edge.transform.SetParent(transform, false);
+        edge.transform.position = ground.TransformPoint(new Vector3(0,0,.5f));
+        edge.GetComponent<MeshFilter>().sharedMesh = footingMesh;
+        edge.GetComponent<MeshRenderer>().sharedMaterial = ground.GetComponent<MeshRenderer>().sharedMaterial;
+        var properties = new MaterialPropertyBlock(); ground.GetComponent<MeshRenderer>().GetPropertyBlock(properties);
+        edge.GetComponent<MeshRenderer>().SetPropertyBlock(properties);
     }
 
     public void Refresh(float deltaTime)
@@ -53,7 +98,7 @@ public sealed class CheckpointMarker : MonoBehaviour
 
     void OnDestroy()
     {
-        if (Application.isPlaying) { Destroy(material); Destroy(stoneSprite); Destroy(frameSprite); }
-        else { DestroyImmediate(material); DestroyImmediate(stoneSprite); DestroyImmediate(frameSprite); }
+        if (Application.isPlaying) { Destroy(material); Destroy(stoneSprite); Destroy(frameSprite); Destroy(footingMesh); }
+        else { DestroyImmediate(material); DestroyImmediate(stoneSprite); DestroyImmediate(frameSprite); DestroyImmediate(footingMesh); }
     }
 }
