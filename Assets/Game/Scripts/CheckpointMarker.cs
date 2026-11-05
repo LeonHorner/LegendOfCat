@@ -11,6 +11,12 @@ public sealed class CheckpointMarker : MonoBehaviour
     Sprite stoneSprite, frameSprite;
     PolygonCollider2D touchZone;
     Mesh footingMesh;
+    Mesh sparkMesh;
+    Material sparkMaterial;
+    MeshRenderer sparkRenderer;
+    float activeLight, burstAge = 10;
+    readonly Vector3[] sparkVertices = new Vector3[56];
+    readonly Color[] sparkColors = new Color[56];
 
     public bool Touches(Collider2D cat)
     {
@@ -56,8 +62,53 @@ public sealed class CheckpointMarker : MonoBehaviour
         frame.transform.localPosition = new Vector3(sequence == 1 ? -.7f : .8f,
             -baseUV * width * frameTexture.height / frameTexture.width, 1);
         marker.AddFooting(ground, spawn.x, sequence == 1 ? -7 : -2.6f, sequence == 1 ? .5f : 2.6f);
+        marker.CreateSparks(stoneX);
         marker.Refresh(0);
         return marker;
+    }
+
+    void CreateSparks(float stoneX)
+    {
+        sparkMesh = new Mesh { name = "Checkpoint activation motes" };
+        var uv = new Vector2[56]; var triangles = new int[84];
+        for (int i = 0; i < 14; i++) {
+            int v = i * 4, t = i * 6;
+            uv[v] = Vector2.zero; uv[v+1] = Vector2.right; uv[v+2] = Vector2.up; uv[v+3] = Vector2.one;
+            triangles[t] = v; triangles[t+1] = v+2; triangles[t+2] = v+1;
+            triangles[t+3] = v+1; triangles[t+4] = v+2; triangles[t+5] = v+3;
+        }
+        sparkMesh.vertices = sparkVertices; sparkMesh.uv = uv; sparkMesh.triangles = triangles;
+        var sparks = new GameObject("Checkpoint sparks", typeof(MeshFilter), typeof(MeshRenderer));
+        sparks.transform.SetParent(transform, false);
+        sparks.transform.localPosition = new Vector3(stoneX,0,-.2f);
+        sparks.GetComponent<MeshFilter>().sharedMesh = sparkMesh;
+        sparkMaterial = new Material(material); sparkMaterial.SetFloat("_Spark",1);
+        sparkRenderer = sparks.GetComponent<MeshRenderer>(); sparkRenderer.sharedMaterial = sparkMaterial;
+        sparkRenderer.enabled = false;
+    }
+
+    void DrawSparks()
+    {
+        bool visible = State == 1 && burstAge < 2.2f;
+        sparkRenderer.enabled = visible;
+        if (!visible) return;
+        for (int i = 0; i < 14; i++) {
+            float seed = Mathf.Repeat(i * .618034f,1);
+            float age = burstAge - i * .035f;
+            float life = 1.1f + seed * .55f;
+            float progress = Mathf.Clamp01(age/life);
+            float alpha = age < 0 ? 0 : Mathf.Sin(progress * Mathf.PI) * .95f;
+            var center = new Vector3((seed-.5f)*.65f + Mathf.Sin(age*3+i)*progress*.18f,
+                .8f + (i%3)*.16f + progress*(.7f+seed*.5f));
+            float size = .035f + seed*.035f;
+            int v = i*4;
+            sparkVertices[v] = center + new Vector3(-size,-size);
+            sparkVertices[v+1] = center + new Vector3(size,-size);
+            sparkVertices[v+2] = center + new Vector3(-size,size);
+            sparkVertices[v+3] = center + new Vector3(size,size);
+            for (int j = 0; j < 4; j++) sparkColors[v+j] = new Color(1,.65f+seed*.2f,.15f,alpha);
+        }
+        sparkMesh.vertices = sparkVertices; sparkMesh.colors = sparkColors; sparkMesh.RecalculateBounds();
     }
 
     void AddFooting(Transform ground, float center, float left, float right)
@@ -90,15 +141,27 @@ public sealed class CheckpointMarker : MonoBehaviour
 
     public void Refresh(float deltaTime)
     {
-        State = run.Checkpoint < sequence ? 0 : run.Checkpoint == sequence ? 1 : 2;
-        if (!run.Paused) clock += deltaTime;
+        int next = run.Checkpoint < sequence ? 0 : run.Checkpoint == sequence ? 1 : 2;
+        if (next != State) {
+            if (next == 1) burstAge = 0;
+            if (next != 1) { activeLight = 0; burstAge = 10; }
+            State = next;
+        }
+        float dt = run.Paused ? 0 : Mathf.Max(0,deltaTime);
+        clock += dt; burstAge += dt;
+        activeLight = Mathf.MoveTowards(activeLight, State == 1 ? 1 : 0, dt / (State == 1 ? 1.15f : .8f));
         material.SetFloat("_State", State);
+        material.SetFloat("_Active", activeLight);
+        material.SetFloat("_Visited", State == 2 ? 1 : 0);
         material.SetFloat("_Pulse", .5f + .5f * Mathf.Sin(clock * Mathf.PI * 2 / 3.6f));
+        DrawSparks();
     }
 
     void OnDestroy()
     {
         if (Application.isPlaying) { Destroy(material); Destroy(stoneSprite); Destroy(frameSprite); Destroy(footingMesh); }
         else { DestroyImmediate(material); DestroyImmediate(stoneSprite); DestroyImmediate(frameSprite); DestroyImmediate(footingMesh); }
+        if (Application.isPlaying) { Destroy(sparkMesh); Destroy(sparkMaterial); }
+        else { DestroyImmediate(sparkMesh); DestroyImmediate(sparkMaterial); }
     }
 }

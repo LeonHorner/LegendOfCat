@@ -86,7 +86,7 @@ public static class GoldenRiverReview
                     course.Run.Restart();
                     int state = index == 0 ? 0 : index == 1 || index > 3 ? 1 : 2;
                     if (state > 0) course.Run.TryActivateCheckpoint(state, MovementCourse.LevelOneCheckpointSpawns[state - 1], true);
-                    foreach (var marker in root.GetComponentsInChildren<CheckpointMarker>()) marker.Refresh(0);
+                    foreach (var marker in root.GetComponentsInChildren<CheckpointMarker>()) marker.Refresh(2.5f);
                 }
                 cat.RespawnAt(points[index]);
                 Physics2D.SyncTransforms();
@@ -124,6 +124,14 @@ public static class GoldenRiverReview
                             camera.orthographicSize = savedSize; camera.transform.position = savedPosition;
                         }
                         if (checkpointReview && width == 640 && index == 1) {
+                            var savedPosition = camera.transform.position;
+                            var savedSize = camera.orthographicSize;
+                            var spawn = MovementCourse.LevelOneCheckpointSpawns[0];
+                            camera.orthographicSize = 2.5f;
+                            camera.transform.position = new Vector3(spawn.x-.8f,spawn.y+.43f,savedPosition.z);
+                            course.Run.Restart();
+                            foreach (var marker in root.GetComponentsInChildren<CheckpointMarker>()) marker.Refresh(0);
+                            course.Run.TryActivateCheckpoint(1, MovementCourse.LevelOneCheckpointSpawns[0], true);
                             string frames = output + "/pulse";
                             Directory.CreateDirectory(frames);
                             for (int frame = 0; frame < 48; frame++) {
@@ -132,6 +140,9 @@ public static class GoldenRiverReview
                                 pixels.ReadPixels(new Rect(0, 0, width, height), 0, 0); pixels.Apply();
                                 File.WriteAllBytes($"{frames}/frame-{frame:000}.png", pixels.EncodeToPNG());
                             }
+                            camera.orthographicSize = savedSize; camera.transform.position = savedPosition;
+                            camera.Render(); RenderTexture.active = target;
+                            pixels.ReadPixels(new Rect(0,0,width,height),0,0); pixels.Apply();
                         }
                         if (width == 640 && names[index] == "watching-fish") {
                             const string frames = "Logs/watching-fish-frames";
