@@ -1,0 +1,5 @@
+# Round swimming fish — 2026-11-02
+
+Built-in image-generation edit of the original generated fish pair. The user preferred round fish over a rejected slender-fish experiment. The round side-swimming pair replaces egg-watching-fish.png. Runtime water tint and translucency keep the bodies beneath the surface; they still react to Mika and recover downstream drift.
+
+Edit target: this transparent pair of round storybook fish. Preserve their appealing rounded bodies, blue-grey left fish and golden right fish, painted scales and expressive but modest eyes. Change only their pose to swimming horizontally in side/three-quarter profile, heads pointing LEFT with gaze angled slightly upward. Short plump rounded river fish, not slender trout. Reduce the oversized bulging eyes slightly and close mouths. Bodies and tails extend horizontally instead of standing upright. Exactly two separate fish, one centered in each half of a 2:1 transparent sprite sheet, ample transparent padding; no water or backgrounds. Retain hand-painted storybook style, warm natural lighting, original characters. The runtime will render them mostly beneath the water, so do not paint a waterline.

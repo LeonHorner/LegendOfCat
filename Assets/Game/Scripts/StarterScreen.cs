@@ -91,6 +91,17 @@ public sealed partial class StarterScreen : MonoBehaviour
         course.BackToMenu = CloseCourse;
     }
 
+    void OpenLevelOne()
+    {
+        if (course != null || stompArena != null || popup || applying) return;
+        var root = new GameObject("Golden River main route");
+        root.SetActive(false);
+        course = root.AddComponent<MovementCourse>();
+        course.LevelOne = true;
+        course.BackToMenu = CloseCourse;
+        root.SetActive(true);
+    }
+
     void OpenStompArena()
     {
         if (course != null || stompArena != null || popup || applying) return;
@@ -277,6 +288,11 @@ public sealed partial class StarterScreen : MonoBehaviour
                 yield return new WaitForSecondsRealtime(0.3f);
                 course.TogglePause();
             }
+        }
+        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift") {
+            OpenLevelOne();
+            if (view == "level-one-ascent") course.StartAscentPreview();
+            if (view == "level-one-lift") course.StartVerticalLiftPreview();
         }
         else if (view == "menu" || view == "settings" || view == "play") page = view;
         else if (!string.IsNullOrEmpty(view)) {

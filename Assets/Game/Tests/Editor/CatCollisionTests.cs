@@ -39,6 +39,107 @@ public class CatCollisionTests
         UnityEngine.Object.DestroyImmediate(cat); UnityEngine.Object.DestroyImmediate(floor);
         UnityEngine.Object.DestroyImmediate(material); Physics2D.simulationMode = previousMode;
     }
+    [Test]
+    public void HeldDirectionAgainstWallShowsIdleAndResumesWhenClear()
+    {
+        var wall = new GameObject("Animation obstruction");
+        try {
+            wall.transform.position = new Vector2(2, 1);
+            wall.AddComponent<BoxCollider2D>().size = new Vector2(1, 2);
+            Physics2D.SyncTransforms();
+            Input("SetMove", 1f);
+            for (int tick = 0; tick < 80; tick++) Tick();
+            Assert.That(controller.GetType().GetProperty("Pose").GetValue(controller), Is.EqualTo("Idle"));
+            var velocity = (Vector2)controller.GetType().GetProperty("PresentationVelocity").GetValue(controller);
+            Assert.That(Mathf.Abs(velocity.x), Is.LessThan(.1f));
+            wall.SetActive(false);
+            float stopped = body.position.x;
+            for (int tick = 0; tick < 15; tick++) Tick();
+            Assert.That(body.position.x, Is.GreaterThan(stopped + 1));
+            Assert.That(controller.GetType().GetProperty("Pose").GetValue(controller), Is.EqualTo("Run"));
+        } finally { UnityEngine.Object.DestroyImmediate(wall); }
+    }
+
+    [Test]
+    public void SteepBevelCannotHoldMikaInMidair()
+    {
+        var bevel = new GameObject("Steep shelf bevel");
+        try {
+            bevel.AddComponent<PolygonCollider2D>().points = new[] {
+                new Vector2(0,0), new Vector2(3,0), new Vector2(3,2), new Vector2(60f / 55f,2)
+            };
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(.2f,1.65f) });
+            Physics2D.SyncTransforms(); Input("SetMove",1f);
+            for (int tick = 0; tick < 100; tick++) Tick();
+            bool grounded = (bool)controller.GetType().GetProperty("Grounded").GetValue(controller);
+            Assert.That(grounded || body.position.y < 1.35f, Is.True, "Mika remained wedged at " + body.position);
+        } finally { UnityEngine.Object.DestroyImmediate(bevel); }
+    }
+
+    [Test]
+    public void PressingIntoShelfCornersCannotHoldMikaAirborne()
+    {
+        var ledge = new GameObject("Shelf corner regression");
+        try {
+            ledge.transform.position = new Vector2(2, 1);
+            ledge.AddComponent<BoxCollider2D>().size = new Vector2(2, 2);
+            foreach (float x in new[] { 0.52f, 0.54f, 0.55f, 0.56f })
+            foreach (float y in new[] { 2.32f, 2.40f, 2.44f, 2.46f }) {
+                controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(x, y) });
+                Physics2D.SyncTransforms(); Input("SetMove", 1f);
+                for (int tick = 0; tick < 100; tick++) Tick();
+                bool grounded = (bool)controller.GetType().GetProperty("Grounded").GetValue(controller);
+                Assert.That(grounded || body.position.y < 1.8f, Is.True,
+                    "Airborne corner hold from " + x + ", " + y + " at " + body.position);
+            }
+        } finally { UnityEngine.Object.DestroyImmediate(ledge); }
+    }
+
+    [Test]
+    public void SolidShelfBlocksJumpFromBelowWithoutGroundingOnItsUnderside()
+    {
+        var ceiling = new GameObject("Solid shelf underside");
+        try {
+            ceiling.transform.position = new Vector2(0, 1.5f);
+            ceiling.AddComponent<BoxCollider2D>().size = new Vector2(4, 0.5f);
+            Physics2D.SyncTransforms();
+            Input("PressJump");
+            float peak = body.position.y;
+            for (int tick = 0; tick < 70; tick++) { Tick(); peak = Mathf.Max(peak, body.position.y); }
+            Assert.That(peak, Is.LessThan(0.83f));
+            Assert.That(body.position.y, Is.InRange(0.43f, 0.49f));
+        } finally { UnityEngine.Object.DestroyImmediate(ceiling); }
+    }
+
+    [Test]
+    public void OneWayUndersideCannotBecomeGroundOrBlockHorizontalTravel()
+    {
+        var shelf = new GameObject("One-way underside regression");
+        try {
+            shelf.transform.position = new Vector2(0, 1.2f);
+            var collider = shelf.AddComponent<BoxCollider2D>();
+            collider.size = new Vector2(3, 0.12f); collider.usedByEffector = true;
+            shelf.AddComponent<PlatformEffector2D>().surfaceArc = 120;
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(0, 1.1f) });
+            Physics2D.SyncTransforms(); Tick();
+            Assert.That((bool)controller.GetType().GetProperty("Grounded").GetValue(controller), Is.False);
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(-2.5f, 0.46f) });
+            Input("SetMove", 1f);
+            for (int tick = 0; tick < 45; tick++) Tick();
+            Assert.That(body.position.x, Is.GreaterThan(2), "No invisible side wall below the shelf.");
+            controller.GetType().GetMethod("RespawnAt").Invoke(controller, new object[] { new Vector2(0, 0.46f) });
+            for (int tick = 0; tick < 10; tick++) Tick();
+            Input("PressJump");
+            bool roseThrough = false;
+            for (int tick = 0; tick < 80; tick++) {
+                Tick();
+                if (body.position.y > 2) roseThrough = true;
+            }
+            Assert.That(roseThrough, Is.True);
+            Assert.That(body.position.y, Is.EqualTo(1.72f).Within(0.04f));
+        } finally { UnityEngine.Object.DestroyImmediate(shelf); }
+    }
+
     [Test] public void CatLandsAndCanJumpAgainWithoutHeldAutoJump()
     {
         Assert.That((bool)controller.GetType().GetProperty("Grounded").GetValue(controller), Is.True);
