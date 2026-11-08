@@ -13,6 +13,8 @@ public static class FinaleRoute
     public static int DiagonalIndex { get; private set; }
     public static int CourtyardTurn { get; private set; }
     public static int CrownTurn { get; private set; }
+    public static int TowerStart { get; private set; }
+    public static int TowerTurn { get; private set; }
     public static Vector3[] Platforms { get; private set; }
     public static Vector3 Last => Platforms[Platforms.Length - 1];
     public static float StartX { get; private set; }
@@ -98,7 +100,30 @@ public static class FinaleRoute
         Add(5,14.7f,2.5f,Form.Wall);
         // Axis (1,.75), amplitude 1: both endpoints remain close to fixed approaches.
         Add(9,17.1f,2.5f,Form.Wall);
-        Catch(DiagonalIndex-1,route[DiagonalIndex].x+1,11.7f,8);
+        Catch(DiagonalIndex-1,route[DiagonalIndex].x-1,11.7f,8);
+        // The collapsed watchtower adds decisions and a short reversal, not lift waiting.
+        TowerStart=route.Count;
+        Add(6,16.2f,2,Form.Root);
+        Add(4,15.3f,2,Form.Root);
+        Add(8,14.4f,2,Form.Root);
+        Add(5,15.3f,2,Form.Garden);
+        Add(7,14.5f,2,Form.Garden);
+        Add(14,16.2f,2,Form.Garden);
+        int towerBank=route.Count-1;
+        float tower=edge;
+        Add(4,17.7f,2,Form.Pier);
+        TowerTurn=route.Count;
+        route.Add(new Vector3(tower-3,18.45f,4)); Forms.Add(Form.Wall);
+        route.Add(new Vector3(tower-10,19.95f,4)); Forms.Add(Form.Wall);
+        route.Add(new Vector3(tower-3,21.45f,4)); Forms.Add(Form.Wall);
+        route.Add(new Vector3(tower+4,21.45f,5)); Forms.Add(Form.Wall);
+        edge=tower+6.5f;
+        // A supported flank is too tall to bypass from the lower approach.
+        Add(18,20.3f,2,Form.Garden);
+        Catch(towerBank,tower+3,14.6f,6);
+        float[] towerWidths={3,7,4,8,3.5f,6,4,9,3,7};
+        float[] towerHeights={19.1f,18.1f,19,20,18.9f,17.8f,18.7f,17.6f,16.5f,17.1f};
+        for(int i=0;i<towerWidths.Length;i++) Add(towerWidths[i],towerHeights[i],i%3==0?2.2f:1.9f,Form.Wall);
         BeatStarts[4]=route.Count;
         Add(6,16.2f,2,Form.Root);
         Add(4,15.3f,2,Form.Root);

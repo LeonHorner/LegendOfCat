@@ -76,7 +76,7 @@ public static class GoldenRiverReview
             var a=FinaleRoute.Platforms;
             int[] indices={0,9,FinaleRoute.CourtyardTurn-1,FinaleRoute.CourtyardTurn,FinaleRoute.CourtyardTurn+1,
                 FinaleRoute.LiftIndex-1,FinaleRoute.LiftIndex,FinaleRoute.CrownTurn-1,FinaleRoute.CrownTurn+1,
-                FinaleRoute.DiagonalIndex-1,FinaleRoute.DiagonalIndex,FinaleRoute.DiagonalIndex+1,a.Length-1,FinaleRoute.CourtyardTurn+4,FinaleRoute.CrownTurn+4};
+                FinaleRoute.DiagonalIndex-1,FinaleRoute.DiagonalIndex,FinaleRoute.DiagonalIndex+1,a.Length-1,FinaleRoute.CourtyardTurn+4,FinaleRoute.CrownTurn+4,FinaleRoute.TowerStart,FinaleRoute.TowerTurn-1,FinaleRoute.TowerTurn,FinaleRoute.TowerTurn+1,FinaleRoute.TowerTurn+4,FinaleRoute.TowerTurn+8};
             points=new Vector2[indices.Length];names=new string[indices.Length];
             for(int i=0;i<indices.Length;i++){var p=a[indices[i]];points[i]=new Vector2(p.x,p.y+1.22f);names[i]="finale-"+i;}
             course.StartFinalePreview();

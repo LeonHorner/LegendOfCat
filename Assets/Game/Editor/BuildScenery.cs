@@ -35,7 +35,7 @@ public static class BuildScenery
     }
 
     public static readonly string[] GoldenRiverArt = {
-        "finale-rubble-v1", "finale-hillside-v1", "finale-gate-v1", "finale-guide-v1", "finale-vertical-guide-v1", "finale-wall-v1", "finale-pier-v1", "finale-garden-v1",
+        "finale-watchtower-v1", "finale-rubble-v1", "finale-hillside-v1", "finale-gate-v1", "finale-guide-v1", "finale-vertical-guide-v1", "finale-wall-v1", "finale-pier-v1", "finale-garden-v1",
         "checkpoint-states-v1", "checkpoint-tree-v1", "checkpoint-arch-v1",
         "near-extended-panorama-v1", "far-extended-panorama-v1", "bank-tall-ascent-v1", "shelf-ascent-masonry-v1", "landmark-hillside-fortress-v1", "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2",
         "valley-panorama-v3", "far-valley-panorama-v4", "bank-narrow-v3", "bank-medium-v3", "bank-wide-v3",

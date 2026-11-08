@@ -99,7 +99,7 @@ public sealed class SceneryRenderer : MonoBehaviour
                 mesh.name = panorama.name + " mesh";
                 if (i == 1) {
                     // Preserve the original introduction/ascent mapping while appending new pixels.
-                    float retained=8688f/12784;
+                    float retained=8688f/panoramaTexture.width;
                     float[] columns={-17,45.4f,87,191,panoramaLeft+panoramaWidth};
                     float[] u={0,.25f*retained,.5f*retained,retained,1};
                     var positions=new Vector3[10]; var coordinates=new Vector2[10]; var triangles=new int[24];
@@ -354,6 +354,9 @@ public sealed class SceneryRenderer : MonoBehaviour
         }
         float anchor=(FinaleRoute.StartX+FinaleRoute.Last.x)/2;
         finaleSite=Painting("Unique crown hillside","finale-hillside-v1",new Vector3(anchor,7,9),70,.28f);
+        var tower=FinaleRoute.Platforms[FinaleRoute.TowerTurn];
+        // Full wall foundations continue behind the supported bank, never end in open air.
+        Painting("Collapsed watchtower", "finale-watchtower-v1",new Vector3(tower.x+3,8,3),50,.14f);
         var last=FinaleRoute.Last;
         Painting("Sunlit final gateway","finale-gate-v1",new Vector3(last.x+1,last.y+.75f+10f/3-.22f,1),10,.03f);
         var diagonal=FinaleRoute.Platforms[FinaleRoute.DiagonalIndex];

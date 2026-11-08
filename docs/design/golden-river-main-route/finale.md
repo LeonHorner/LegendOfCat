@@ -122,3 +122,19 @@ The follow-up Windows preview build succeeded with 43 packed paintings audited, 
 Player feedback exposed idle sliding and upward deflection against the rubble's sloped contact outline. Its collision now follows horizontal stone treads and vertical risers, preserving the grounded painted silhouette without changing Mika's shared movement motor. Real course regressions drop Mika onto the center and both side steps, verify stable idle contact, and cross all three piles in both directions with held movement and a normal jump. The original contour failed the idle regression (0.196 world units of unwanted drift over one second).
 
 Validation: all 62 scoped Unity regressions passed after this correction (`Logs/rubble-step-fix.xml`); the pre-fix reproduction failed (`Logs/rubble-repro.xml`).
+
+
+### Watchtower pacing extension — 2026-11-08
+
+The player measured the finale at 100 seconds and approved an additional 25–35 seconds of interesting traversal. After the diagonal carrier, a broken watchtower adds varied masonry approaches, a short leftward climb, a return over a solid collapsed flank, and alternating narrow/broad departures before the preserved safe gate approach. This adds 22 surfaces without another mover, checkpoint, ability or mandatory wait. The lower flank is taller than Mika's jump envelope, so the upper turn is required. A sixth catch terrace returns to the broad watchtower approach; the shared actual-physics recovery regression covers it. Existing intro/ascent geometry and timers are unchanged. The new timing target requires another human run.
+
+A single original watchtower painting sits behind the physical shelves at native aspect ratio. Its full foundations continue below river height; window holes expose the existing continuous valley. Its stone and ivy palette matches the playable masonry. It has no collision or decorative decks that falsely advertise a route. The existing final gateway remains unique and retains its safe exit contract.
+
+The extension now contains 114 main-route surfaces, six catch terraces and three required switchbacks. A supported 18-unit flank keeps its native-aspect rocky foot below the river. The diagonal catch was shifted two units left so its return jump starts outside the carrier's underside; the old recovery depended on its phase after the previous route timing. Targeted actual traversal and all six return checks passed. The new scripted baseline is 334.14 seconds overall / 151.56 seconds finale, versus 305.68 / 123.10 before the extension: an additional 28.46 seconds. These remain automated command timings, not a replacement for the player's reported 100 seconds or a prediction of the next human run.
+
+The near panorama extends from 12784 to 14332 pixels without changing retained intro/ascent coordinates or parallax speed. The far landscape already covers the new exit. Layered source and generation decisions are in `finale-art.md`; the once-only tower and existing gateway are not tiled or repeated.
+
+
+Final local validation of this extension: 62/62 scoped Unity regressions passed (`Logs/watchtower-final-tests.xml`). The refreshed review adds six tower viewpoints to the existing fifteen, in 960×540, 640×360 and grayscale. Direct command-pilot finale recording takes 149.12 seconds; the full-route pilot takes 151.56 seconds for the finale because the support phases differ. Neither is human input. Player timing, falls, waiting and replay costs still need the next test. The draft PR and issue #71 remain open; water-recovery integration and final production Windows/Linux gates remain outstanding.
+
+The Windows development preview build succeeded and audited 44 active paintings plus three shader-reference materials. Its actual direct-finale player entry exited with code 0 after capture, without observed managed exceptions or shader errors. Updated launch helpers and player are in `Builds/GoldenRiverWatchtowerPreview`; this remains a development preview.

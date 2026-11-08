@@ -458,6 +458,9 @@ public class MenuMovementIntegrationTests
         int courtyard=(int)type.GetProperty("CourtyardTurn").GetValue(null), crown=(int)type.GetProperty("CrownTurn").GetValue(null);
         Assert.That(route[courtyard+4].y-route[courtyard-1].y,Is.GreaterThan(2.4f),"Forward jumping must not bypass the courtyard stair.");
         Assert.That(route[crown+4].y-route[crown-1].y,Is.GreaterThan(2.4f),"Forward jumping must not bypass the crown stair.");
+        int tower=(int)type.GetProperty("TowerTurn").GetValue(null);
+        Assert.That(route[tower+4].y-route[tower-1].y,Is.GreaterThan(2.4f),"The collapsed tower flank must require the upper detour.");
+        Assert.That(route[tower+1].x,Is.LessThan(route[tower].x),"The watchtower must contain an actual leftward turn.");
         var catches=(System.Collections.IList)type.GetField("Recoveries").GetValue(null);
         var entries=(System.Collections.IList)type.GetField("RecoveryEntries").GetValue(null);
         var movers=course.GetComponentsInChildren(RuntimeType("MovingSupport"));
