@@ -8,6 +8,7 @@ public sealed class CatCamera : MonoBehaviour
     float trackedHeight = 1, verticalVelocity, lookAhead = 2, lookVelocity;
     int facing = 1;
     CatController rider;
+    Camera view;
     public float leftBoundary = -5;
     public float rightBoundary = 48;
     public Transform courseRoot;
@@ -18,7 +19,8 @@ public sealed class CatCamera : MonoBehaviour
     public void Follow(float deltaSeconds)
     {
         // Read the interpolated render transform, never the fixed-step Rigidbody position.
-        var camera = GetComponent<Camera>();
+        if(!view) view=GetComponent<Camera>();
+        var camera=view;
         float scale = courseRoot ? courseRoot.lossyScale.x : 1;
         if (courseRoot) camera.orthographicSize = 5.5f * scale;
         float halfWidth = camera.orthographicSize * (16f / 9f);

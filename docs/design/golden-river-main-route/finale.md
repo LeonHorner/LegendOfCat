@@ -1,5 +1,9 @@
 # Finale proposal: the crown of the river ruins
 
+## Current acceptance — 2026-11-08
+
+The owner confirmed a complete playthrough and accepted the level. No additional human-input gameplay recording is required. Earlier measured section times and scripted baselines remain historical evidence, not a newly measured human full-run time. PR #61 will integrate independently later and update itself against main; it is not a blocker for #71. Required exact-head Windows/Linux CI and merge-ready status remain the normal pre-merge gate. The dated implementation and remaining-work statements below document earlier revisions and are superseded by this decision where they differ.
+
 ## Scope and status
 
 Requested on 2026-11-05: a final **120â€“150-second** first-success section after the second checkpoint. The first implementation was added on 2026-11-08; the design below remains the acceptance target, not a claim of human timing or final approval. The introduction, extended ascent, approved movement, camera scale and exactly two recovery checkpoints are preserved. The former provisional exit on the second checkpoint terrace moves to the actual end.
@@ -145,3 +149,12 @@ The Windows development preview build succeeded and audited 44 active paintings 
 The diagonal recovery floor now extends two units farther right, enclosing the previously overhanging right bearing. Its left return edge stays fixed. The focused bearing-bounds regression failed before the change; both affected regressions now pass (`Logs/diagonal-footing-tests.xml`), covering actual full-route traversal, all six recovery returns, diagonal carry/walking/jumps, both reversals, pause and retry. Scripted traversal timing remains 334.14 seconds overall / 151.56 seconds finale. Updated diagonal stills at both resolutions and grayscale replace views 9–11; the complete scripted video remains the preceding watchtower baseline and predates this localized floor-width correction. No new bitmap or movement rule is introduced.
 
 The updated Windows development build succeeded with the 44-painting packed-art audit. The current local preview and launch helpers are in `Builds/GoldenRiverFootingPreview`.
+
+
+### Maintainability cleanup — 2026-11-08
+
+Finale authors now edit named, immutable platform/recovery records and paired width/contact-height steps. Geometry arrays are derived for the existing course/capture interface. Material and recovery entries no longer depend on parallel mutable lists. Movers and their recovery colliders bind directly to created scene objects, and grass receives the actual floor/bank visual rather than searching X coordinates. The recovery reference points to the generated polygon, never the disabled temporary box queued for destruction. TerrainArtProfile keeps texture registration and cached stone contours together; component references used during course/camera updates are cached. No general level framework, save schema, movement constant, new artwork or route change is introduced.
+
+The approved pre-cleanup geometry/material/checkpoint/exit snapshot is in the Editor test fixtures. RouteLayoutTests checks it alongside actual physics/lifecycle tests so this cleanup cannot silently redesign the accepted level. Full player acceptance remains the owner's playthrough above.
+
+Cleanup validation: all 63 scoped Unity regressions passed (`Logs/route-cleanup-final-tests.xml`), including the approved-layout snapshot and actual full-route traversal, with the same 334.14 / 151.56-second scripted baseline. Color/grayscale review at both resolutions was refreshed in `Logs/cleanup-review`. No new human test or recording is required by the accepted owner decision above; production CI remains the final merge gate.

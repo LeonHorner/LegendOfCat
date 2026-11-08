@@ -461,13 +461,13 @@ public class MenuMovementIntegrationTests
         int tower=(int)type.GetProperty("TowerTurn").GetValue(null);
         Assert.That(route[tower+4].y-route[tower-1].y,Is.GreaterThan(2.4f),"The collapsed tower flank must require the upper detour.");
         Assert.That(route[tower+1].x,Is.LessThan(route[tower].x),"The watchtower must contain an actual leftward turn.");
-        var catches=(System.Collections.IList)type.GetField("Recoveries").GetValue(null);
-        var entries=(System.Collections.IList)type.GetField("RecoveryEntries").GetValue(null);
+        var catches=(System.Collections.IList)type.GetProperty("Recoveries").GetValue(null);
         var movers=course.GetComponentsInChildren(RuntimeType("MovingSupport"));
 
             for(int i=0;i<catches.Count;i++) {
                 var floor=course.GetComponentsInChildren<PolygonCollider2D>().Single(c=>c.name=="Finale recovery "+i);
-                var landing=route[(int)entries[i]];
+                int returnIndex=(int)catches[i].GetType().GetProperty("ReturnPlatformIndex").GetValue(catches[i]);
+                var landing=route[returnIndex];
                 cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[]{new Vector2(floor.bounds.min.x+.7f,floor.bounds.max.y+.46f)});
                 for(int step=0;step<8;step++){Call(cat,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);}
                 motor.GetType().GetMethod("SetMove").Invoke(motor,new object[]{-1f});Call(cat,"PressJump");
@@ -525,7 +525,8 @@ public class MenuMovementIntegrationTests
             var axis=(Vector2)m.GetType().GetField("Axis").GetValue(m); return axis.x>0 && axis.y>0;
         });
         var guide=course.GetComponentsInChildren<MeshRenderer>().Single(r=>r.name=="Inclined counterweight bearings");
-        var footing=course.GetComponentsInChildren<PolygonCollider2D>().Single(c=>c.name=="Finale recovery 4");
+        var footing=(Collider2D)mover.GetType().GetProperty("RecoveryFloor").GetValue(mover);
+        Assert.That(footing,Is.Not.Null,"The carrier must reference its authored recovery floor.");
         Assert.That(footing.bounds.min.x,Is.LessThanOrEqualTo(guide.bounds.min.x-.1f),"The left bearing must rest within the recovery floor.");
         Assert.That(footing.bounds.max.x,Is.GreaterThanOrEqualTo(guide.bounds.max.x+.1f),"The right bearing must rest within the recovery floor, not hang below its edge.");
         yield return null;

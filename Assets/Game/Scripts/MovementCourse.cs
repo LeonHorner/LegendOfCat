@@ -156,6 +156,8 @@ public sealed class MovementCourse : MonoBehaviour
     Sprite square;
     Texture2D texture;
     Camera courseCamera;
+    Rigidbody2D catBody;
+    BoxCollider2D catShape;
     Transform visual;
     Transform[] feet = new Transform[4];
     float stride, facing = 1;
@@ -174,11 +176,15 @@ public sealed class MovementCourse : MonoBehaviour
         texture.SetPixel(0, 0, Color.white); texture.Apply();
         square = Sprite.Create(texture, new Rect(0, 0, 1, 1), Vector2.one * 0.5f, 1);
         var platformObjects = new System.Collections.Generic.List<GameObject>();
-        foreach (var p in ActivePlatforms) {
+        var platforms=ActivePlatforms;
+        var supportIndices=new System.Collections.Generic.Dictionary<MovingSupport,int>();
+        int finaleStart=LevelOnePlatforms.Length+AscentPlatforms.Length;
+        for(int platformIndex=0;platformIndex<platforms.Length;platformIndex++) {
+            var p=platforms[platformIndex];
             var platform = Block("Standable platform", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.22f, 0.28f, 0.28f));
             platformObjects.Add(platform);
             var collider = platform.AddComponent<BoxCollider2D>();
-            int ascentIndex = System.Array.IndexOf(AscentPlatforms, p);
+            int ascentIndex=LevelOne && platformIndex>=LevelOnePlatforms.Length && platformIndex<finaleStart?platformIndex-LevelOnePlatforms.Length:-1;
             if (LevelOne && ascentIndex >= 0) {
                 float thickness = p.z >= 10 ? 1.5f : p.z / (p.z <= 4.5f ? 0.96f : 0.9f) /
                     (p.z <= 4.5f ? 2 : 3) * (p.z <= 4.5f ? 0.46f : 0.42f);
@@ -188,11 +194,11 @@ public sealed class MovementCourse : MonoBehaviour
                     var support = platform.AddComponent<MovingSupport>();
                     support.Axis = ascentIndex == 31 ? Vector2.right : Vector2.up;
                     support.Amplitude = ascentIndex == 31 ? 0.8f : 0.7f;
-                    supports.Add(support);
+                    supports.Add(support); supportIndices.Add(support,platformIndex);
                 }
             }
-            int finaleIndex = System.Array.IndexOf(FinaleRoute.Platforms, p);
-            if(LevelOne && finaleIndex>=0 && FinaleRoute.Forms[finaleIndex]==FinaleRoute.Form.Garden && p.z>=14) {
+            int finaleIndex=LevelOne && platformIndex>=finaleStart?platformIndex-finaleStart:-1;
+            if(LevelOne && finaleIndex>=0 && FinaleRoute.Definitions[finaleIndex].Material==FinaleRoute.Form.Garden && p.z>=14) {
                 float height=p.y+.75f+8;
                 collider.size=new Vector2(1,height/1.5f);
                 collider.offset=new Vector2(0,(.75f-height/2)/1.5f);
@@ -201,15 +207,15 @@ public sealed class MovementCourse : MonoBehaviour
                 var support = platform.AddComponent<MovingSupport>();
                 support.Axis = finaleIndex == FinaleRoute.LiftIndex ? Vector2.up : new Vector2(1,.75f);
                 support.Amplitude = finaleIndex == FinaleRoute.LiftIndex ? .7f : 1;
-                supports.Add(support);
+                supports.Add(support); supportIndices.Add(support,platformIndex);
             }
             platform.GetComponent<SpriteRenderer>().enabled = false;
         }
         var player = new GameObject("Mika prototype");
         player.transform.SetParent(transform, false);
         player.transform.localPosition = new Vector3(-3, 0.48f);
-        player.AddComponent<Rigidbody2D>();
-        player.AddComponent<BoxCollider2D>().size = new Vector2(0.9f, 0.9f);
+        catBody=player.AddComponent<Rigidbody2D>();
+        catShape=player.AddComponent<BoxCollider2D>(); catShape.size=new Vector2(.9f,.9f);
         Cat = player.AddComponent<CatController>();
         Cat.fallReference = transform;
         // Session spawn coordinates belong to this course, not its current world placement.
@@ -276,8 +282,7 @@ public sealed class MovementCourse : MonoBehaviour
                 if (sceneryRenderer.FloatingAt(i)) SceneryRenderer.MatchFloatingCollider(platformObjects[i], sceneryRenderer.TerrainVisuals[i]);
         foreach (var support in supports) {
             support.Cat = Cat;
-            support.Visual = sceneryRenderer.TerrainVisuals[System.Array.IndexOf(ActivePlatforms,
-                new Vector3(support.transform.localPosition.x, support.transform.localPosition.y, support.transform.localScale.x))];
+            support.Visual = sceneryRenderer.TerrainVisuals[supportIndices[support]];
         }
         if (LevelOne) {
             follow.ascent = true;
@@ -304,24 +309,27 @@ public sealed class MovementCourse : MonoBehaviour
         }
         if (LevelOne) {
             for (int i=0;i<FinaleRoute.Recoveries.Count;i++) {
-                var p = FinaleRoute.Recoveries[i];
+                var recovery=FinaleRoute.Recoveries[i];
+                var p=recovery.Floor.Geometry;
                 var floor = Block("Finale recovery " + i, p, new Vector2(p.z,1.5f), Color.gray);
                 floor.GetComponent<SpriteRenderer>().enabled=false;
                 floor.AddComponent<BoxCollider2D>();
-                sceneryRenderer.AddRecoveryTerrain(p);
-                SceneryRenderer.MatchFloatingCollider(floor, sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count-1]);
+                var floorVisual=sceneryRenderer.AddRecoveryTerrain(p);
+                SceneryRenderer.MatchFloatingCollider(floor,floorVisual);
+                sceneryRenderer.GroundRecovery(floorVisual);
+                if(recovery.SupportPlatformIndex>=0)
+                    platformObjects[finaleStart+recovery.SupportPlatformIndex].GetComponent<MovingSupport>().RecoveryFloor=floor.GetComponent<PolygonCollider2D>();
             }
-            foreach(int index in new[]{0,9,FinaleRoute.BeatStarts[2]}) {
+            foreach(int index in FinaleRoute.ObstacleBanks) {
                 var bank=FinaleRoute.Platforms[index];
                 var p=new Vector3(bank.x+1.7f,bank.y+.82f,3);
                 var rubble=Block("Solid fallen masonry",p,new Vector2(p.z,1.5f),Color.gray);
                 rubble.GetComponent<SpriteRenderer>().enabled=false;
                 rubble.AddComponent<BoxCollider2D>();
-                sceneryRenderer.AddFinaleObstacle(p);
-                SceneryRenderer.MatchFloatingCollider(rubble,sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count-1]);
-                sceneryRenderer.GroundFinaleObstacle(index);
+                var rubbleVisual=sceneryRenderer.AddFinaleObstacle(p);
+                SceneryRenderer.MatchFloatingCollider(rubble,rubbleVisual);
+                sceneryRenderer.GroundFinaleObstacle(sceneryRenderer.TerrainVisuals[finaleStart+index]);
             }
-            sceneryRenderer.GroundFinaleMechanisms();
             // The terminal cliff is visible beyond the gate; scenery continues past its edge.
 
         }
@@ -377,12 +385,12 @@ public sealed class MovementCourse : MonoBehaviour
         Run.Advance(Time.deltaTime);
         foreach (var marker in checkpointMarkers) marker.Refresh(Time.deltaTime);
         if (Run.Paused || (!LevelOne && !Cat.Grounded)) return;
-        Vector2 position = transform.InverseTransformPoint(Cat.GetComponent<Rigidbody2D>().position);
+        Vector2 position = transform.InverseTransformPoint(catBody.position);
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             Vector2 point = ActiveCheckpoints[i];
             // Marker/spawn follow the course transform when reused in another scene.
             // Touching the stone activates it; the saved spawn remains fixed on safe ground.
-            bool inside = LevelOne ? checkpointMarkers[i].Touches(Cat.GetComponent<BoxCollider2D>())
+            bool inside = LevelOne ? checkpointMarkers[i].Touches(catShape)
                 : Mathf.Abs(position.x - point.x) <= .7f && Mathf.Abs(position.y - point.y) <= .2f;
             if (inside &&
                 Run.TryActivateCheckpoint(i + 1, point, true) && LevelOne && i == 0)

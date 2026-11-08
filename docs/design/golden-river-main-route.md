@@ -2,6 +2,8 @@
 
 Start with the concise [level design guide](level-design-guide.md) for reusable lessons and a task-based map of the detailed references. The older revisions below are history, not the current route specification.
 
+The owner accepted a complete playthrough on 2026-11-08. No extra human-input recording is required; PR #61 integrates later independently. See the current acceptance and cleanup notes in [Finale](golden-river-main-route/finale.md). Final merge readiness still requires the normal exact-head CI gates.
+
 Issue #71 is in progress. These notes describe the starting point and the work
 needed to turn it into Level 1; they are not evidence of a finished route.
 

@@ -8,6 +8,7 @@ public sealed class MovingSupport : MonoBehaviour
     public Transform Visual;
     public Vector2 Axis = Vector2.right;
     public float Amplitude = 0.8f;
+    public Collider2D RecoveryFloor { get; internal set; }
     public Vector2 Velocity { get; private set; }
     public float Phase => clock;
     Rigidbody2D body;

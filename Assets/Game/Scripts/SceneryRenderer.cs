@@ -211,7 +211,7 @@ public sealed class SceneryRenderer : MonoBehaviour
     {
         int finaleIndex=index-MovementCourse.LevelOnePlatforms.Length-MovementCourse.AscentPlatforms.Length;
         if(RouteLandmarks && finaleIndex>=0)
-            return FinaleRoute.Forms[finaleIndex]!=FinaleRoute.Form.Garden || coursePlatforms[index].z<14;
+            return FinaleRoute.Definitions[finaleIndex].Material!=FinaleRoute.Form.Garden || coursePlatforms[index].z<14;
         return RouteLandmarks && index>=MovementCourse.LevelOnePlatforms.Length && coursePlatforms[index].z<10 ||
             (FloatingPlatforms==null?IsFloating(index):System.Array.IndexOf(FloatingPlatforms,index)>=0);
     }
@@ -221,33 +221,22 @@ public sealed class SceneryRenderer : MonoBehaviour
     {
         var properties = new MaterialPropertyBlock(); visual.GetComponent<MeshRenderer>().GetPropertyBlock(properties);
         string name = properties.GetTexture("_MainTex").name;
-        Vector2[] underside;
-        switch (name) {
-            // Flat stone treads avoid converting horizontal input into upward impulses or idle sliding.
-            case "finale-rubble-v1": underside=new[]{new Vector2(.64f,.50f),new Vector2(.71f,.50f),new Vector2(.71f,.40f),new Vector2(.87f,.40f),new Vector2(.87f,.34f),new Vector2(.94f,.34f),new Vector2(.94f,.17f),new Vector2(.06f,.17f),new Vector2(.06f,.32f),new Vector2(.15f,.32f),new Vector2(.15f,.42f),new Vector2(.25f,.42f),new Vector2(.25f,.53f),new Vector2(.37f,.53f)};break;
-            case "finale-wall-v1": underside = new[] { new Vector2(.97f,.51f),new Vector2(.90f,.32f),new Vector2(.80f,.25f),new Vector2(.67f,.23f),new Vector2(.50f,.22f),new Vector2(.32f,.24f),new Vector2(.17f,.24f),new Vector2(.05f,.46f) }; break;
-            case "finale-garden-v1": underside = new[] {new Vector2(.97f,.54f),new Vector2(.90f,.29f),new Vector2(.75f,.22f),new Vector2(.58f,.20f),new Vector2(.40f,.22f),new Vector2(.23f,.25f),new Vector2(.06f,.47f)}; break;
-            case "finale-pier-v1": underside = new[] {new Vector2(.95f,.58f),new Vector2(.86f,.28f),new Vector2(.70f,.18f),new Vector2(.51f,.16f),new Vector2(.30f,.19f),new Vector2(.14f,.28f),new Vector2(.05f,.56f)}; break;
-            case "shelf-root": underside = new[] { new Vector2(.96f,.60f), new Vector2(.89f,.48f), new Vector2(.73f,.32f), new Vector2(.58f,.20f), new Vector2(.38f,.35f), new Vector2(.19f,.50f), new Vector2(.06f,.55f) }; break;
-            case "shelf-root-compact-v3": underside = new[] { new Vector2(.95f,.58f), new Vector2(.81f,.40f), new Vector2(.63f,.25f), new Vector2(.42f,.13f), new Vector2(.24f,.24f), new Vector2(.10f,.43f), new Vector2(.05f,.57f) }; break;
-            case "shelf-masonry-compact-v3": underside = new[] { new Vector2(.95f,.53f), new Vector2(.87f,.35f), new Vector2(.76f,.22f), new Vector2(.63f,.23f), new Vector2(.53f,.29f), new Vector2(.40f,.20f), new Vector2(.30f,.18f), new Vector2(.13f,.32f), new Vector2(.05f,.53f) }; break;
-            case "shelf-ascent-masonry-v1": underside = new[] { new Vector2(.97f,.49f), new Vector2(.91f,.37f), new Vector2(.76f,.31f), new Vector2(.61f,.24f), new Vector2(.42f,.22f), new Vector2(.24f,.22f), new Vector2(.10f,.23f), new Vector2(.04f,.46f) }; break;
-            case "shelf-masonry": underside = new[] { new Vector2(.98f,.55f), new Vector2(.92f,.43f), new Vector2(.85f,.29f), new Vector2(.66f,.31f), new Vector2(.58f,.36f), new Vector2(.42f,.36f), new Vector2(.34f,.39f), new Vector2(.22f,.30f), new Vector2(.12f,.35f), new Vector2(.02f,.55f) }; break;
-            default: return;
-        }
+        var profile=TerrainArtProfile.Find(name);
+        if(profile==null) return;
+        var underside=profile.Underside;
         var old = platform.GetComponent<BoxCollider2D>(); old.enabled = false;
         var polygon = platform.AddComponent<PolygonCollider2D>();
-        var points = new Vector2[underside.Length + 2];
+        var points = new Vector2[underside.Count + 2];
         points[0] = new Vector2(-.5f,.5f); points[1] = new Vector2(.5f,.5f);
         var bounds = visual.GetComponent<MeshFilter>().sharedMesh.bounds;
-        for (int i = 0; i < underside.Length; i++) {
+        for (int i = 0; i < underside.Count; i++) {
             Vector2 uv = underside[i];
             var painted = new Vector3(Mathf.Lerp(bounds.min.x, bounds.max.x, uv.x), Mathf.Lerp(bounds.min.y, bounds.max.y, uv.y), 0);
             points[i + 2] = platform.transform.InverseTransformPoint(visual.TransformPoint(painted));
         }
-        if(name=="finale-rubble-v1") {
+        if(profile.TopLeftUV.HasValue) {
             for(int i=0;i<2;i++) {
-                var uv=new Vector2(i==0?.37f:.64f,.665f);
+                var uv=i==0?profile.TopLeftUV.Value:profile.TopRightUV.Value;
                 var painted=new Vector3(Mathf.Lerp(bounds.min.x,bounds.max.x,uv.x),Mathf.Lerp(bounds.min.y,bounds.max.y,uv.y),0);
                 points[i]=platform.transform.InverseTransformPoint(visual.TransformPoint(painted));
             }
@@ -256,11 +245,12 @@ public sealed class SceneryRenderer : MonoBehaviour
         Object.Destroy(old);
     }
 
-    public void AddFinaleObstacle(Vector3 platform) => Terrain(platform,true,-2,true);
-    public void GroundFinaleObstacle(int index) => RegisteredFinaleGrass(TerrainVisuals[MovementCourse.LevelOnePlatforms.Length+MovementCourse.AscentPlatforms.Length+index],"Rubble footing grass");
-    public void AddRecoveryTerrain(Vector3 platform) => Terrain(platform, true, 0);
+    public Transform AddFinaleObstacle(Vector3 platform) => Terrain(platform,true,-2,true);
+    public void GroundFinaleObstacle(Transform bank) => RegisteredFinaleGrass(bank,"Rubble footing grass");
+    public Transform AddRecoveryTerrain(Vector3 platform) => Terrain(platform,true,0);
+    public void GroundRecovery(Transform floor) => RegisteredFinaleGrass(floor,"Counterweight footing grass");
 
-    void Terrain(Vector3 platform, bool floating, int variant, bool rubble=false)
+    Transform Terrain(Vector3 platform, bool floating, int variant, bool rubble=false)
     {
         // Artwork owns its silhouette; the collider owns the exact standable span.
         bool bank = platform.z >= 6;
@@ -271,15 +261,14 @@ public sealed class SceneryRenderer : MonoBehaviour
         bool rootShelf = distinctShelf && (System.Array.IndexOf(RootPlatforms, variant) >= 0 ||
             variant >= MovementCourse.LevelOnePlatforms.Length + 83 && variant < MovementCourse.LevelOnePlatforms.Length + MovementCourse.OverlookIndex);
         int finaleIndex = variant - MovementCourse.LevelOnePlatforms.Length - MovementCourse.AscentPlatforms.Length;
-        if (RouteLandmarks && finaleIndex >= 0 && finaleIndex < FinaleRoute.Forms.Count)
-            rootShelf = distinctShelf && FinaleRoute.Forms[finaleIndex] == FinaleRoute.Form.Root;
+        if (RouteLandmarks && finaleIndex >= 0 && finaleIndex < FinaleRoute.Definitions.Count)
+            rootShelf = distinctShelf && FinaleRoute.Definitions[finaleIndex].Material == FinaleRoute.Form.Root;
         bool compactShelf = distinctShelf && platform.z <= (rootShelf ? 4.25f : 4.5f);
         string texturePath;
         float contactUV, landingFraction;
         if (distinctShelf) {
-            texturePath = "GoldenRiver/" + (rootShelf ? "shelf-root" : "shelf-masonry") + (compactShelf ? "-compact-v3" : "");
-            contactUV = rootShelf ? (compactShelf ? 0.70f : 0.68f) : 0.66f;
-            landingFraction = rootShelf ? 0.90f : 0.96f;
+            var shelf=TerrainArtProfile.Find((rootShelf?"shelf-root":"shelf-masonry")+(compactShelf?"-compact-v3":""));
+            texturePath=shelf.TexturePath; contactUV=shelf.ContactUV; landingFraction=shelf.LandingFraction;
         } else if (variedCourse) {
             string form = platform.z >= 18 ? "wide" : platform.z >= 10 ? "medium" : "narrow";
             texturePath = "GoldenRiver/bank-" + form + "-v3";
@@ -291,17 +280,17 @@ public sealed class SceneryRenderer : MonoBehaviour
             landingFraction = floating ? 0.90f : bank ? 0.89f : 0.76f;
         }
         bool ascentShelf = distinctShelf && variant >= MovementCourse.LevelOnePlatforms.Length && !compactShelf && !rootShelf;
-        if (ascentShelf) { texturePath = "GoldenRiver/shelf-ascent-masonry-v1"; contactUV = 0.62f; landingFraction = 0.90f; }
+        if (ascentShelf) texturePath = "GoldenRiver/shelf-ascent-masonry-v1";
         bool tallBank = variedCourse && !floating && platform.x > 425 && contact >= 1.5f;
         if (tallBank) { texturePath = "GoldenRiver/bank-tall-ascent-v1"; contactUV = 0.914f; landingFraction = 0.86f; }
-        bool finaleArt = RouteLandmarks && finaleIndex >= 0 && finaleIndex < FinaleRoute.Forms.Count && distinctShelf && !rootShelf;
-        if(finaleArt) {
-            var form=FinaleRoute.Forms[finaleIndex];
-            texturePath="GoldenRiver/finale-"+(form==FinaleRoute.Form.Garden?"garden":form==FinaleRoute.Form.Pier?"pier":"wall")+"-v1";
-            contactUV=form==FinaleRoute.Form.Garden?.655f:form==FinaleRoute.Form.Pier?.675f:.60f;
-            landingFraction=form==FinaleRoute.Form.Pier?.92f:.94f;
+        bool finaleArt = RouteLandmarks && finaleIndex >= 0 && finaleIndex < FinaleRoute.Definitions.Count && distinctShelf && !rootShelf;
+        TerrainArtProfile profile=null;
+        if(finaleArt) profile=TerrainArtProfile.ForFinale(FinaleRoute.Definitions[finaleIndex].Material);
+        else if(rubble) profile=TerrainArtProfile.Find("finale-rubble-v1");
+        else if(distinctShelf) profile=TerrainArtProfile.Find(texturePath.Substring("GoldenRiver/".Length));
+        if(profile!=null) {
+            texturePath=profile.TexturePath; contactUV=profile.ContactUV; landingFraction=profile.LandingFraction;
         }
-        if(rubble) { texturePath="GoldenRiver/finale-rubble-v1"; contactUV=.665f; landingFraction=.90f; }
         float width = platform.z / landingFraction;
         float sourceAspect = compactShelf ? 2 : 3;
         if (tallBank || finaleArt || rubble) {
@@ -325,7 +314,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             new Vector2(left, 1), new Vector2(right, 1) };
         mesh.triangles = new[] { 0, 2, 1, 1, 2, 3, 2, 4, 3, 3, 4, 5 };
         mesh.RecalculateBounds(); terrainMeshes.Add(mesh);
-        if(finaleArt) mesh.name="Finale " + FinaleRoute.Forms[finaleIndex] + " terrain";
+        if(finaleArt) mesh.name="Finale " + FinaleRoute.Definitions[finaleIndex].Material + " terrain";
         if(rubble) mesh.name="Grounded rubble";
         var visual = new GameObject(mesh.name); visual.transform.SetParent(transform, false);
         visual.transform.localPosition = new Vector3(platform.x, 0, 0);
@@ -337,6 +326,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         renderer.SetPropertyBlock(parameters);
         if (!variedCourse && !floating && (variant == 0 || variant == 2 || variant == 6 || variant == 10 || variant == 13))
             ShoreFoot(platform, variant == 0 || variant == 10 ? -1 : 1);
+        return visual.transform;
     }
 
     void CreateFinaleScenery()
@@ -366,14 +356,6 @@ public sealed class SceneryRenderer : MonoBehaviour
         // The registered bank crown covers gateway foot seams, using the original pixels.
         var ground=TerrainVisuals[MovementCourse.CompletePlatforms.Length-1];
         RegisteredFinaleGrass(ground,"Gateway ground overlap");
-    }
-
-    public void GroundFinaleMechanisms()
-    {
-        foreach(var p in FinaleRoute.Recoveries) {
-            foreach(var ground in TerrainVisuals)
-                if(Mathf.Abs(ground.localPosition.x-p.x)<.01f) RegisteredFinaleGrass(ground,"Counterweight footing grass");
-        }
     }
 
     void RegisteredFinaleGrass(Transform ground,string name)
