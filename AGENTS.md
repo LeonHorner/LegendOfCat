@@ -50,6 +50,7 @@
 - A normal merge from main into a feature branch is allowed to update its base; merging a feature into main is squash-only.
 
 ## Design references
+- For level layout, terrain, platform collision, moving supports, camera corridors or scenic landmarks, start with [Level design: start here](docs/design/level-design-guide.md). It summarizes tested player-feedback lessons and points to the relevant decisions, code and checks.
 - For Mika animation work, first read the 2026-10-24 rejection and replacement workflow in docs/design/art-direction.md and docs/design/mika-animation/README.md. The cutout/IK rig and optical-flow run experiments were rejected; passing contact tests does not make their artwork accepted. Follow the recorded run-loop review gate before gameplay integration.
 - Before gameplay or visual work, read docs/design/game-direction.md, docs/design/art-direction.md and the linked implementation plan. Preserve the agreed readability requirements and ask about unresolved product choices before locking them in.
 - Track issue dependencies using native GitHub blocked-by relationships, not dependency lists in issue bodies. Read those relationships before starting work.

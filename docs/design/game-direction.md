@@ -13,6 +13,8 @@ Difficulty is experiential: compare learning load, jump precision, attack densit
 ## Current implementation boundary
 Inspected origin/main ab70aa45faf945828df38d94afd5f8b1f4b79f3e (PR #7). StarterScreen already supplies start menu, settings/update views and update-service integration. UpdatePolicy and VersionedJsonFile supply policy and versioned persistence. Restyle those views through a dedicated issue; preserve their existing behavior and launcher ownership. Do not recreate the update system. New gameplay must integrate with that foundation.
 
+For level-building tasks, use the concise [level design guide](level-design-guide.md) to find reusable player-feedback lessons and the relevant implementation and review references.
+
 ## Delivery strategy
 
 The [six-level adventure proposal](six-level-adventure.md) describes campaign pacing, checkpoint policy and the user decision gate. Its approval status is recorded in that document; concept themes and boss placement do not become production requirements implicitly.
@@ -20,3 +22,10 @@ Small coherent feature branches and PRs, with dependencies and user-facing accep
 
 ## Legacy reference
 Use the self-contained [Legacy gameplay reference](legacy-gameplay-reference.md) for historical controls, movement, checkpoints, bosses, weapon behavior, records and audiovisual context. No local Java source folder is required. This historical reference does not override the agreed redesign. If a needed detail is not documented, ask the user and record the decision instead of depending on a private disk path.
+
+## Golden River ascent decision — 2026-11-04
+The user approved a roughly two-minute ascent after the introduction, combining vertical exploration, tighter jumps and safely introduced moving platforms. The camera follows height and may leave the river below the viewport. Most errors should land on lower recovery terraces. This advances the moving-support introduction from the original later-level proposal. See golden-river-main-route/ascent.md.
+
+On 2026-11-05 the measured ascent was 92.6 seconds (intro 62.2). The user approved additional varied traversal toward 110–140 seconds and diegetic paw-carved checkpoints: a tree at the first, a distinct ruin arch at the second. Current paws glow warm gold with a gentle pulse; passed paws stay dark orange without emission. No checkpoint toast. See golden-river-main-route/checkpoints-and-pacing.md.
+
+The user subsequently approved planning and implementing a 120–150-second final traversal after checkpoint 2: roof gardens, courtyard and crown switchbacks, physical rubble/wall obstacles, vertical and diagonal counterweight supports, and a safe sunlit gateway. Both the playable surfaces and the background express those places in the retained painted style. No enemies, abilities, third checkpoint or additional Easter Eggs are introduced. See golden-river-main-route/finale.md for implementation and acceptance boundaries.

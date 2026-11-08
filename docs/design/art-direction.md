@@ -283,6 +283,18 @@ The fixed Subtle distance factors, cliff/stone positions, alpha waterline and
 gameplay physics are unchanged. Tests exercise actual motor movement in both
 directions, slowing back to calm water and monotonic flow phase.
 
+### Stable foreground-water animation — 2026-11-08
+
+The current Level 1 main route and Movement Lab use continuous, time-driven
+foreground-water animation at a consistent intensity, independent of Mika's
+running speed or direction. Running and stopping do not add wave activity or
+change the shader's flow rate. This intentional owner-approved decision in
+PR #77 supersedes the 2026-10-30 **Water response while running** behavior above;
+that section remains as historical design context. The `_RunAmount` and
+`_RunTimeOffset` shader controls have been removed. Normal water animation
+continues, while a fixed capture time lets rendering tests verify that player
+motion alone does not change the water pixels.
+
 ### Checkpoint prototype scenery integration - 2026-10-30
 
 The user requested merging current main into the feature branch and applying the
@@ -312,3 +324,93 @@ Water geometry omits empty source space without changing its authored mapping or
 animation. Measurements do not establish an FPS gain or explain the user's low
 Editor frame rate. See background-study/extended-prototype/README.md for evidence,
 regressions and limits. The earlier seven-platform integration record is historical.
+
+
+### Golden River introduction variety - 2026-11-01
+
+The user timed the expanded introduction at 61 seconds but rejected it as very
+boring. The requested correction is different platform heights, much more varied
+platform sizes, different drawings for floating supports and significant unique
+background locations. Duration alone did not meet the gameplay goal.
+
+The scoped route revision introduces gentle rising/descending groups and smaller
+suspended landings between broad banks. Original rooted-island and broken-masonry
+paintings distinguish suspended structures. A single watermill, aqueduct and
+willow create unique local landmarks with absolute, reversible parallax. This
+bounded prototype refinement is authorized in #71; final whole-level scenic polish
+and visual acceptance remain #73/#16. Keep the approved motor, 2D presentation,
+Mika baseline and independent foreground river; do not restore rejected scenery
+experiments or introduce new abilities. See the route notes and ASSETS.md.
+
+
+### Golden River landmark and platform-family correction - 2026-11-01
+
+The next user run took 60.7 seconds. Mill/aqueduct edges looked pasted or cut out,
+connected floating sequences mixed styles, and the willow was too bright. Preserve
+the authored translucent atmospheric boundaries of landmark paintings rather
+than applying the existing crisp foliage alpha threshold. Use restrained local
+brightness/fog grading, particularly a darker willow. One connected floating
+sequence should use one material family; change families at grounded section
+boundaries. This feedback does not approve the previous composition as final.
+
+
+### Landmark bases and lower suspended supports - 2026-11-01
+
+The user circled detached lower mist/ground patches and requested the equivalent
+correction on the other background landmarks. The three landmark paintings share
+an artwork-local base/side opacity transition so their painted ground skirts
+recede into the valley. Source pixels, distant repeating-layer policy and
+foreground water remain unchanged. The user also explicitly requested suspended
+supports below grounded banks and nearer the water; two descending crossings now
+use contacts down to -1 and retain reachable rising exits. Keep families consistent
+within each crossing and verify the low landings against actual water/readability.
+
+
+### Supported background hills replace opacity blending - 2026-11-01
+
+The user rejected the latest faded landmark foot as stranger than before. The
+requested replacement is a real supporting ground plane on that background layer,
+with a hillside descending out of view and naturally painted contours, without
+abrupt cutoffs or soft blur. This supersedes the prior base/side alpha-feathering
+and partial-alpha mist preservation as the active landmark treatment.
+
+The new mill/aqueduct/willow paintings include complete continuous hills, with
+solid ground reaching the lower source border. The expanded landscape places
+that border below the camera. Original cutouts are archived with Unity metadata;
+experimental shader opacity controls are removed. Keep the existing independent
+foreground river, 2D movement, low suspended crossings and unique reversible
+landmark anchors. New hill artwork still requires in-game user review.
+
+
+### Continuous distance scenery and terrain family - 2026-11-02
+
+The user found strong repetition in the layer ahead of the clouds, inconsistent
+suspended/grounded platform appearance and too much scaling of a few shapes.
+Golden River replaces mirrored valley/canopy ruins with single nonrepeating
+natural panoramas over the current route, preserving the selected distance
+factors and existing clouds. Three grounded and four suspended source shapes
+share slate/limestone, muted moss and grass lighting, with distinct compact vs
+long anatomy. Connected suspended groups keep one family. Supported landmark
+hills remain the local anchors. This is a bounded user-requested correction;
+final scenery and remaining long-route composition still require review.
+
+
+### Unique ruins and sparse decorative jokes - 2026-11-02
+
+The user clarified that ruins are welcome, including a larger ruin, provided they
+are different and do not repeat. The continuous panoramas now contain distinct
+once-only structures, including a larger asymmetric keep. The user also authorized
+four once-only easter eggs across sections: stone cat king, watching fish pair,
+"No cats" sign with a sleeping cat and subtle cat-shaped rock. The sign must support
+the cat on a broad roof; fish should independently drift/bob in the water. Keep the
+sign/rock beyond the intro, avoid collision/collectible behavior and maintain clear
+landing silhouettes. These additions still require in-game review.
+
+### Golden River style restoration — 2026-11-02
+The user prefers the original painted platforms and forested background. Variety means new silhouettes, geology and distinct ruins within that style, not replacing it with pale realistic limestone or broad bare mountains. Keep golden leafy edges, blue-violet shaded rock and deep ivy. Round fish are preferred over slender trout; render them swimming beneath the water. River rocks need distinct authored formations.
+
+### Golden River ascent — 2026-11-04
+The approved next-section plan allows the camera to rise beyond the foreground river. Keep the river fixed in world space, preserve intro framing and maintain crisp visible landing edges through the height change. New supported fortress artwork and masonry shelf follow the restored golden foliage, violet stone and teal ivy direction. Far panoramas retain native proportions with reduced travel beyond the intro, and reduced vertical camera coupling reveals elevation. See golden-river-main-route/ascent.md and ASSETS.md. Final motion/art acceptance remains a player review gate.
+
+### Grounded finale obstacles and perceptible landmark travel — 2026-11-08
+The user rejected a grass-topped floating pier painting placed on a roof terrace and reported the large background ruin appearing to stop. Ground obstacles now use their own low, flat-based fallen-masonry painting without a lawn or suspended underside, with matching stepped collision and source-registered grass at the foot. The unique finale ruin uses a constant 0.22 camera-travel factor instead of 0.08; it never switches to a frozen late segment and must remain perceptibly moving on forward and reverse travel. The far panorama's separate 0.08 factor is unchanged. See golden-river-main-route/finale-art.md for provenance and integration.
