@@ -283,6 +283,18 @@ The fixed Subtle distance factors, cliff/stone positions, alpha waterline and
 gameplay physics are unchanged. Tests exercise actual motor movement in both
 directions, slowing back to calm water and monotonic flow phase.
 
+### Stable foreground-water animation — 2026-11-08
+
+The current Level 1 main route and Movement Lab use continuous, time-driven
+foreground-water animation at a consistent intensity, independent of Mika's
+running speed or direction. Running and stopping do not add wave activity or
+change the shader's flow rate. This intentional owner-approved decision in
+PR #77 supersedes the 2026-10-30 **Water response while running** behavior above;
+that section remains as historical design context. The `_RunAmount` and
+`_RunTimeOffset` shader controls have been removed. Normal water animation
+continues, while a fixed capture time lets rendering tests verify that player
+motion alone does not change the water pixels.
+
 ### Checkpoint prototype scenery integration - 2026-10-30
 
 The user requested merging current main into the feature branch and applying the
