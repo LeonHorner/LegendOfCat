@@ -113,9 +113,11 @@ public sealed class MovementCourse : MonoBehaviour
     }
     static Vector3[] FullRoute()
     {
-        var result = new Vector3[LevelOnePlatforms.Length + AscentPlatforms.Length];
+        FinaleRoute.Initialize(AscentPlatforms[AscentPlatforms.Length-1].x+8);
+        var result = new Vector3[LevelOnePlatforms.Length + AscentPlatforms.Length + FinaleRoute.Platforms.Length];
         LevelOnePlatforms.CopyTo(result, 0);
         AscentPlatforms.CopyTo(result, LevelOnePlatforms.Length);
+        FinaleRoute.Platforms.CopyTo(result, LevelOnePlatforms.Length + AscentPlatforms.Length);
         return result;
     }
     public static readonly Vector3[] CompletePlatforms = FullRoute();
@@ -126,7 +128,7 @@ public sealed class MovementCourse : MonoBehaviour
     public static readonly Vector2 UpperRouteEntrance = new Vector2(AscentPlatforms[10].x, AscentPlatforms[10].y + 1.27f);
     public static readonly int OverlookIndex = AscentPlatforms.Length - 1;
     public static readonly Vector2 UpperRouteRejoin = new Vector2(AscentPlatforms[OverlookIndex].x, 13.12f);
-    public static readonly Vector2 LevelOneExit = new Vector2(AscentPlatforms[OverlookIndex].x + 4, 13.12f);
+    public static readonly Vector2 LevelOneExit = new Vector2(FinaleRoute.Last.x + 4.5f, FinaleRoute.Last.y + 1.27f);
     Vector3[] ActivePlatforms => LevelOne ? CompletePlatforms : Platforms;
     public CatController Cat { get; private set; }
     public RunLifecycle Run { get; private set; }
@@ -144,6 +146,8 @@ public sealed class MovementCourse : MonoBehaviour
     // Session time includes retries, excludes pauses; frozen on the first checkpoint.
     public float IntroductionSeconds { get; private set; } = -1;
     float ascentFinished = -1, ascentStarted = -1;
+    float finaleStarted = -1, finaleFinished = -1;
+    public float FinaleSeconds => finaleStarted < 0 ? -1 : finaleFinished >= 0 ? finaleFinished : Mathf.Max(0, Run.ElapsedSeconds - finaleStarted);
     public float AscentSeconds => IntroductionSeconds < 0 ? -1 :
         ascentFinished >= 0 ? ascentFinished : Mathf.Max(0, Run.ElapsedSeconds - ascentStarted);
     Vector2[] ActiveCheckpoints => LevelOne ? LevelOneCheckpointSpawns : CheckpointSpawns;
@@ -186,6 +190,18 @@ public sealed class MovementCourse : MonoBehaviour
                     support.Amplitude = ascentIndex == 31 ? 0.8f : 0.7f;
                     supports.Add(support);
                 }
+            }
+            int finaleIndex = System.Array.IndexOf(FinaleRoute.Platforms, p);
+            if(LevelOne && finaleIndex>=0 && FinaleRoute.Forms[finaleIndex]==FinaleRoute.Form.Garden && p.z>=14) {
+                float height=p.y+.75f+8;
+                collider.size=new Vector2(1,height/1.5f);
+                collider.offset=new Vector2(0,(.75f-height/2)/1.5f);
+            }
+            if (LevelOne && (finaleIndex == FinaleRoute.LiftIndex || finaleIndex == FinaleRoute.DiagonalIndex)) {
+                var support = platform.AddComponent<MovingSupport>();
+                support.Axis = finaleIndex == FinaleRoute.LiftIndex ? Vector2.up : new Vector2(1,.75f);
+                support.Amplitude = finaleIndex == FinaleRoute.LiftIndex ? .7f : 1;
+                supports.Add(support);
             }
             platform.GetComponent<SpriteRenderer>().enabled = false;
         }
@@ -286,10 +302,32 @@ public sealed class MovementCourse : MonoBehaviour
             sceneryRenderer.AddRecoveryTerrain(new Vector3(lateCatch.x, lateCatch.y - .5f, lateCatch.z));
             SceneryRenderer.MatchFloatingCollider(lateFloor, sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count - 1]);
         }
+        if (LevelOne) {
+            for (int i=0;i<FinaleRoute.Recoveries.Count;i++) {
+                var p = FinaleRoute.Recoveries[i];
+                var floor = Block("Finale recovery " + i, p, new Vector2(p.z,1.5f), Color.gray);
+                floor.GetComponent<SpriteRenderer>().enabled=false;
+                floor.AddComponent<BoxCollider2D>();
+                sceneryRenderer.AddRecoveryTerrain(p);
+                SceneryRenderer.MatchFloatingCollider(floor, sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count-1]);
+            }
+            foreach(int index in new[]{0,9,FinaleRoute.BeatStarts[2]}) {
+                var bank=FinaleRoute.Platforms[index];
+                var p=new Vector3(bank.x+1.7f,bank.y+.85f,3);
+                var rubble=Block("Solid fallen masonry",p,new Vector2(p.z,1.5f),Color.gray);
+                rubble.GetComponent<SpriteRenderer>().enabled=false;
+                rubble.AddComponent<BoxCollider2D>();
+                sceneryRenderer.AddFinaleObstacle(p);
+                SceneryRenderer.MatchFloatingCollider(rubble,sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count-1]);
+            }
+            sceneryRenderer.GroundFinaleMechanisms();
+            // The terminal cliff is visible beyond the gate; scenery continues past its edge.
+
+        }
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
             if (LevelOne) {
-                int bankIndex = i == 0 ? LevelOnePlatforms.Length - 1 : CompletePlatforms.Length - 1;
+                int bankIndex = i == 0 ? LevelOnePlatforms.Length - 1 : LevelOnePlatforms.Length + OverlookIndex;
                 checkpointMarkers.Add(CheckpointMarker.Create(transform, point, i + 1, Run, sceneryRenderer.TerrainVisuals[bankIndex]));
                 continue;
             }
@@ -332,7 +370,7 @@ public sealed class MovementCourse : MonoBehaviour
         if (hudRefresh <= 0) {
             hudStatus = (Run.Paused ? "Paused | " : "") + "Checkpoint " + Run.Checkpoint + "/" + ActiveCheckpoints.Length
                 + (LevelOne ? " | Intro " + (IntroductionSeconds < 0 ? Run.ElapsedSeconds : IntroductionSeconds).ToString("F1")
-                    + "s" + (IntroductionSeconds >= 0 ? " | Ascent " + AscentSeconds.ToString("F1") + "s" : "") : " | R: retry | P: pause");
+                    + "s" + (IntroductionSeconds >= 0 ? " | Ascent " + AscentSeconds.ToString("F1") + "s" : "") + (FinaleSeconds >= 0 ? " | Finale " + FinaleSeconds.ToString("F1") + "s" : "") : " | R: retry | P: pause");
             hudRefresh = 0.25f;
         }
         Run.Advance(Time.deltaTime);
@@ -352,14 +390,21 @@ public sealed class MovementCourse : MonoBehaviour
                 ascentStarted = Run.ElapsedSeconds;
             }
         }
-        if (LevelOne && Run.Checkpoint == 2 && ascentFinished < 0) ascentFinished = AscentSeconds;
+        if (LevelOne && Run.Checkpoint == 2 && ascentFinished < 0) { ascentFinished = Mathf.Max(0,AscentSeconds); finaleStarted = Run.ElapsedSeconds; }
         if (LevelOne && Cat.Grounded && !HasReachedExit && position.x >= LevelOneExit.x - 1 && position.x <= LevelOneExit.x + 3 &&
             Mathf.Abs(position.y - LevelOneExit.y) <= 0.2f) {
             HasReachedExit = true;
+            finaleFinished = FinaleSeconds;
             ExitReached?.Invoke();
         }
     }
 
+    public void StartFinalePreview() {
+        StartAscentPreview();
+        Run.TryActivateCheckpoint(2, LevelOneCheckpointSpawns[1], true);
+        ascentFinished=0; finaleStarted=Run.ElapsedSeconds; finaleFinished=-1;
+        Cat.RespawnAt(transform.TransformPoint(LevelOneCheckpointSpawns[1]));
+    }
     public void StartAscentPreview() => StartPreviewAt(LevelOneCheckpointSpawns[0]);
     public void StartVerticalLiftPreview()
     {
@@ -373,8 +418,8 @@ public sealed class MovementCourse : MonoBehaviour
         ascentStarted = Run.ElapsedSeconds;
         Cat.RespawnAt(transform.TransformPoint(spawn));
     }
-    public void RetryCheckpoint() { if (LevelOne && Run.Checkpoint == 1) ascentStarted = Run.ElapsedSeconds; foreach (var support in supports) support.ResetPhase(); HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Retry())); }
-    public void RestartRun() { ascentStarted = ascentFinished = -1; foreach (var support in supports) support.ResetPhase(); IntroductionSeconds = -1; HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Restart())); }
+    public void RetryCheckpoint() { if (LevelOne && Run.Checkpoint == 2) { finaleStarted=Run.ElapsedSeconds; finaleFinished=-1; } if (LevelOne && Run.Checkpoint == 1) ascentStarted = Run.ElapsedSeconds; foreach (var support in supports) support.ResetPhase(); HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Retry())); }
+    public void RestartRun() { finaleStarted=finaleFinished=-1; ascentStarted = ascentFinished = -1; foreach (var support in supports) support.ResetPhase(); IntroductionSeconds = -1; HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Restart())); }
     public void TogglePause() => Cat.SetPaused(Run.TogglePause());
 
     void LateUpdate()

@@ -71,6 +71,16 @@ public static class GoldenRiverReview
             points[8] = new Vector2(342, 0.52f); names[8] = "willow-color";
             points[9] = new Vector2(ascent[20].x, ascent[20].y + 1.22f); names[9] = "landscape-join";
         }
+        bool finaleReview=System.Array.IndexOf(args,"-finaleReview")>=0;
+        if(finaleReview) {
+            var a=FinaleRoute.Platforms;
+            int[] indices={0,9,FinaleRoute.CourtyardTurn-1,FinaleRoute.CourtyardTurn,FinaleRoute.CourtyardTurn+1,
+                FinaleRoute.LiftIndex-1,FinaleRoute.LiftIndex,FinaleRoute.CrownTurn-1,FinaleRoute.CrownTurn+1,
+                FinaleRoute.DiagonalIndex-1,FinaleRoute.DiagonalIndex,FinaleRoute.DiagonalIndex+1,a.Length-1,FinaleRoute.CourtyardTurn+4,FinaleRoute.CrownTurn+4};
+            points=new Vector2[indices.Length];names=new string[indices.Length];
+            for(int i=0;i<indices.Length;i++){var p=a[indices[i]];points[i]=new Vector2(p.x,p.y+1.22f);names[i]="finale-"+i;}
+            course.StartFinalePreview();
+        }
         bool checkpointReview = System.Array.IndexOf(args, "-checkpointReview") >= 0;
         if (checkpointReview) {
             var a = MovementCourse.AscentPlatforms;
@@ -212,6 +222,7 @@ public static class GoldenRiverReview
                     }
                 }
             }
+            if(finaleReview && System.Array.IndexOf(args,"-finaleMotion")>=0) CaptureFinaleMotion(course,scene,camera,follow,scenery,presentation,output);
         } finally {
             RenderTexture.active = previousTarget;
             Object.Destroy(root);
@@ -219,4 +230,35 @@ public static class GoldenRiverReview
             SceneManager.UnloadSceneAsync(scene);
         }
     }
+    static void CaptureFinaleMotion(MovementCourse course,Scene scene,Camera camera,CatCamera follow,
+        SceneryRenderer scenery,MikaSpritePresentation presentation,string output)
+    {
+        var pilotType=System.Array.Find(System.AppDomain.CurrentDomain.GetAssemblies(),a=>a.GetType("FinalePhysicsPilot")!=null)?.GetType("FinalePhysicsPilot");
+        if(pilotType==null) throw new System.InvalidOperationException("Editor test pilot assembly must be loaded for a scripted physics recording.");
+        var pilot=System.Activator.CreateInstance(pilotType,new object[]{course});
+        course.StartFinalePreview();
+        var movers=course.GetComponentsInChildren<MovingSupport>();
+        foreach(var mover in movers){mover.SendMessage("Start");mover.ResetPhase();}
+        string frames=output+"/motion";Directory.CreateDirectory(frames);
+        var target=new RenderTexture(640,360,24);var pixels=new Texture2D(640,360,TextureFormat.RGB24,false);
+        camera.targetTexture=target;camera.rect=new Rect(0,0,1,1);follow.Snap();
+        try {
+            for(int tick=0;tick<12500;tick++) {
+                foreach(var mover in movers)mover.SendMessage("FixedUpdate");
+                pilotType.GetMethod("Command").Invoke(pilot,null);
+                course.Cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);
+                course.Cat.transform.position=course.Cat.GetComponent<Rigidbody2D>().position;
+                course.SendMessage("Update");follow.Follow(Time.fixedDeltaTime);
+                if(tick%4!=0)continue;
+                foreach(var mover in movers)mover.SendMessage("LateUpdate");
+                presentation.RenderPose(Time.fixedDeltaTime*4);
+                scenery.ApplyView(camera.transform.position.x,camera.transform.position.y);scenery.SetWaterTime(tick*Time.fixedDeltaTime);
+                camera.Render();RenderTexture.active=target;pixels.ReadPixels(new Rect(0,0,640,360),0,0);pixels.Apply();
+                File.WriteAllBytes($"{frames}/frame-{tick/4:00000}.png",pixels.EncodeToPNG());
+                if(course.HasReachedExit){Debug.Log("Scripted finale recording completed in "+(tick*Time.fixedDeltaTime).ToString("F2")+"s; not human-input evidence.");return;}
+            }
+            throw new System.InvalidOperationException("Scripted finale recording did not reach the exit: "+pilot);
+        } finally {camera.targetTexture=null;RenderTexture.active=null;target.Release();Object.Destroy(target);Object.Destroy(pixels);}
+    }
+
 }

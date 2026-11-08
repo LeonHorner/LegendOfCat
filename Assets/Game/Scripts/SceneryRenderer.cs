@@ -16,7 +16,8 @@ public sealed class SceneryRenderer : MonoBehaviour
     public static readonly float[] LandmarkAnchors = { 84, 216, 342 };
     // Travel is the fraction of the camera motion seen on screen.
     static readonly float[] LandmarkTravel = { 0.48f, 0.19f, 0.32f };
-    Material landmarkMaterial, fortressMaterial;
+    Material landmarkMaterial, fortressMaterial, finaleMaterial;
+    Transform finaleSite;
     readonly Transform[] easterEggs = new Transform[3];
     float fishClock, waterCaptureTime = -1;
     readonly Transform[] layers = new Transform[3];
@@ -81,28 +82,35 @@ public sealed class SceneryRenderer : MonoBehaviour
             if (RouteLandmarks && i > 0) {
                 // One authored strip covers the whole route's parallax travel, without recycling.
                 materials[i].mainTexture = Resources.Load<Texture2D>("GoldenRiver/" + (i == 1 ? "near-extended-panorama-v1" : "far-extended-panorama-v1"));
-                float panoramaWidth = i == 1 ? 208 : 160;
+                float panoramaHeight = i==1?208f/6:160f/6;
+                var panoramaTexture=(Texture2D)materials[i].mainTexture;
+                float panoramaWidth=panoramaHeight*panoramaTexture.width/panoramaTexture.height;
+                float panoramaLeft=i==1?-17:-20;
+                float panoramaCenter=panoramaLeft+panoramaWidth/2;
                 float crop = i == 1 ? 0.10f : 0.12f;
                 var panorama = Quad();
                 panorama.name = i == 1 ? "Continuous valley panorama" : "Continuous canopy panorama";
                 panorama.transform.SetParent(layers[i], false);
-                panorama.transform.localPosition = new Vector3(i == 1 ? 87 : 60, i == 1 ? 8.2f : 11.8f, i == 1 ? 16 : 24);
-                panorama.transform.localScale = new Vector3(panoramaWidth, panoramaWidth / 6, 1);
+                panorama.transform.localPosition = new Vector3(panoramaCenter, i == 1 ? 8.2f : 11.8f, i == 1 ? 16 : 24);
+                panorama.transform.localScale = new Vector3(panoramaWidth, panoramaHeight, 1);
                 // Crop lower terrain below the camera while retaining the painting's native aspect.
                 var mesh = Instantiate(quadMesh);
                 mesh.name = panorama.name + " mesh";
                 if (i == 1) {
-                    // Move the keep away from the aqueduct vista while keeping both strip edges anchored.
-                    mesh.vertices = new[] {
-                        new Vector3(-0.5f, -0.5f - crop), new Vector3(-0.2f, -0.5f - crop), new Vector3(0, -0.5f - crop), new Vector3(0.5f, -0.5f - crop),
-                        new Vector3(-0.5f, 0.5f), new Vector3(-0.2f, 0.5f), new Vector3(0, 0.5f), new Vector3(0.5f, 0.5f)
-                    };
-                    mesh.uv = new[] {
-                        new Vector2(0, 0), new Vector2(0.25f, 0), new Vector2(0.5f, 0), new Vector2(1, 0),
-                        new Vector2(0, 1 + crop), new Vector2(0.25f, 1 + crop), new Vector2(0.5f, 1 + crop), new Vector2(1, 1 + crop)
-                    };
-                    mesh.triangles = new[] { 0, 4, 1, 1, 4, 5, 1, 5, 2, 2, 5, 6, 2, 6, 3, 3, 6, 7 };
-                    mesh.RecalculateBounds();
+                    // Preserve the original introduction/ascent mapping while appending new pixels.
+                    float retained=8688f/12784;
+                    float[] columns={-17,45.4f,87,191,panoramaLeft+panoramaWidth};
+                    float[] u={0,.25f*retained,.5f*retained,retained,1};
+                    var positions=new Vector3[10]; var coordinates=new Vector2[10]; var triangles=new int[24];
+                    for(int j=0;j<5;j++) {
+                        float local=(columns[j]-panoramaCenter)/panoramaWidth;
+                        positions[j]=new Vector3(local,-.5f-crop); positions[j+5]=new Vector3(local,.5f);
+                        coordinates[j]=new Vector2(u[j],0); coordinates[j+5]=new Vector2(u[j],1+crop);
+                        if(j==4) continue;
+                        int t=j*6; triangles[t]=j;triangles[t+1]=j+5;triangles[t+2]=j+1;
+                        triangles[t+3]=j+1;triangles[t+4]=j+5;triangles[t+5]=j+6;
+                    }
+                    mesh.vertices=positions;mesh.uv=coordinates;mesh.triangles=triangles;mesh.RecalculateBounds();
                 } else {
                     mesh.vertices = new[] { new Vector3(-0.5f, -0.5f - crop), new Vector3(0.5f, -0.5f - crop),
                         new Vector3(-0.5f, 0.5f), new Vector3(0.5f, 0.5f) };
@@ -171,6 +179,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             fortressMaterial.SetFloat("_Fog", 0.35f);
             fortressMaterial.SetFloat("_Saturation", 0.72f);
             fortress.GetComponent<MeshRenderer>().sharedMaterial = fortressMaterial;
+            CreateFinaleScenery();
             CreateEasterEggs();
             CreateRiverRocks();
         }
@@ -197,8 +206,15 @@ public sealed class SceneryRenderer : MonoBehaviour
     }
 
     public readonly System.Collections.Generic.List<Transform> TerrainVisuals = new System.Collections.Generic.List<Transform>();
-    public bool FloatingAt(int index) => RouteLandmarks && index >= MovementCourse.LevelOnePlatforms.Length && coursePlatforms[index].z < 10 ||
-        (FloatingPlatforms == null ? IsFloating(index) : System.Array.IndexOf(FloatingPlatforms, index) >= 0);
+    public bool FloatingAt(int index)
+    {
+        int finaleIndex=index-MovementCourse.LevelOnePlatforms.Length-MovementCourse.AscentPlatforms.Length;
+        if(RouteLandmarks && finaleIndex>=0)
+            return FinaleRoute.Forms[finaleIndex]!=FinaleRoute.Form.Garden || coursePlatforms[index].z<14;
+        return RouteLandmarks && index>=MovementCourse.LevelOnePlatforms.Length && coursePlatforms[index].z<10 ||
+            (FloatingPlatforms==null?IsFloating(index):System.Array.IndexOf(FloatingPlatforms,index)>=0);
+    }
+
 
     public static void MatchFloatingCollider(GameObject platform, Transform visual)
     {
@@ -206,6 +222,9 @@ public sealed class SceneryRenderer : MonoBehaviour
         string name = properties.GetTexture("_MainTex").name;
         Vector2[] underside;
         switch (name) {
+            case "finale-wall-v1": underside = new[] { new Vector2(.97f,.51f),new Vector2(.90f,.32f),new Vector2(.80f,.25f),new Vector2(.67f,.23f),new Vector2(.50f,.22f),new Vector2(.32f,.24f),new Vector2(.17f,.24f),new Vector2(.05f,.46f) }; break;
+            case "finale-garden-v1": underside = new[] {new Vector2(.97f,.54f),new Vector2(.90f,.29f),new Vector2(.75f,.22f),new Vector2(.58f,.20f),new Vector2(.40f,.22f),new Vector2(.23f,.25f),new Vector2(.06f,.47f)}; break;
+            case "finale-pier-v1": underside = new[] {new Vector2(.95f,.58f),new Vector2(.86f,.28f),new Vector2(.70f,.18f),new Vector2(.51f,.16f),new Vector2(.30f,.19f),new Vector2(.14f,.28f),new Vector2(.05f,.56f)}; break;
             case "shelf-root": underside = new[] { new Vector2(.96f,.60f), new Vector2(.89f,.48f), new Vector2(.73f,.32f), new Vector2(.58f,.20f), new Vector2(.38f,.35f), new Vector2(.19f,.50f), new Vector2(.06f,.55f) }; break;
             case "shelf-root-compact-v3": underside = new[] { new Vector2(.95f,.58f), new Vector2(.81f,.40f), new Vector2(.63f,.25f), new Vector2(.42f,.13f), new Vector2(.24f,.24f), new Vector2(.10f,.43f), new Vector2(.05f,.57f) }; break;
             case "shelf-masonry-compact-v3": underside = new[] { new Vector2(.95f,.53f), new Vector2(.87f,.35f), new Vector2(.76f,.22f), new Vector2(.63f,.23f), new Vector2(.53f,.29f), new Vector2(.40f,.20f), new Vector2(.30f,.18f), new Vector2(.13f,.32f), new Vector2(.05f,.53f) }; break;
@@ -227,6 +246,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         Object.Destroy(old);
     }
 
+    public void AddFinaleObstacle(Vector3 platform) => Terrain(platform,true,MovementCourse.LevelOnePlatforms.Length+MovementCourse.AscentPlatforms.Length+FinaleRoute.CourtyardTurn-1);
     public void AddRecoveryTerrain(Vector3 platform) => Terrain(platform, true, 0);
 
     void Terrain(Vector3 platform, bool floating, int variant)
@@ -239,6 +259,9 @@ public sealed class SceneryRenderer : MonoBehaviour
         bool distinctShelf = floating && variedCourse;
         bool rootShelf = distinctShelf && (System.Array.IndexOf(RootPlatforms, variant) >= 0 ||
             variant >= MovementCourse.LevelOnePlatforms.Length + 83 && variant < MovementCourse.LevelOnePlatforms.Length + MovementCourse.OverlookIndex);
+        int finaleIndex = variant - MovementCourse.LevelOnePlatforms.Length - MovementCourse.AscentPlatforms.Length;
+        if (RouteLandmarks && finaleIndex >= 0 && finaleIndex < FinaleRoute.Forms.Count)
+            rootShelf = distinctShelf && FinaleRoute.Forms[finaleIndex] == FinaleRoute.Form.Root;
         bool compactShelf = distinctShelf && platform.z <= (rootShelf ? 4.25f : 4.5f);
         string texturePath;
         float contactUV, landingFraction;
@@ -260,9 +283,16 @@ public sealed class SceneryRenderer : MonoBehaviour
         if (ascentShelf) { texturePath = "GoldenRiver/shelf-ascent-masonry-v1"; contactUV = 0.62f; landingFraction = 0.90f; }
         bool tallBank = variedCourse && !floating && platform.x > 425 && contact >= 1.5f;
         if (tallBank) { texturePath = "GoldenRiver/bank-tall-ascent-v1"; contactUV = 0.914f; landingFraction = 0.86f; }
+        bool finaleArt = RouteLandmarks && finaleIndex >= 0 && finaleIndex < FinaleRoute.Forms.Count && distinctShelf && !rootShelf;
+        if(finaleArt) {
+            var form=FinaleRoute.Forms[finaleIndex];
+            texturePath="GoldenRiver/finale-"+(form==FinaleRoute.Form.Garden?"garden":form==FinaleRoute.Form.Pier?"pier":"wall")+"-v1";
+            contactUV=form==FinaleRoute.Form.Garden?.655f:form==FinaleRoute.Form.Pier?.675f:.60f;
+            landingFraction=form==FinaleRoute.Form.Pier?.92f:.94f;
+        }
         float width = platform.z / landingFraction;
         float sourceAspect = compactShelf ? 2 : 3;
-        if (tallBank) {
+        if (tallBank || finaleArt) {
             var source = Resources.Load<Texture2D>(texturePath);
             sourceAspect = (float)source.width / source.height;
         }
@@ -283,6 +313,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             new Vector2(left, 1), new Vector2(right, 1) };
         mesh.triangles = new[] { 0, 2, 1, 1, 2, 3, 2, 4, 3, 3, 4, 5 };
         mesh.RecalculateBounds(); terrainMeshes.Add(mesh);
+        if(finaleArt) mesh.name="Finale " + FinaleRoute.Forms[finaleIndex] + " terrain";
         var visual = new GameObject(mesh.name); visual.transform.SetParent(transform, false);
         visual.transform.localPosition = new Vector3(platform.x, 0, 0);
         visual.AddComponent<MeshFilter>().sharedMesh = mesh;
@@ -293,6 +324,54 @@ public sealed class SceneryRenderer : MonoBehaviour
         renderer.SetPropertyBlock(parameters);
         if (!variedCourse && !floating && (variant == 0 || variant == 2 || variant == 6 || variant == 10 || variant == 13))
             ShoreFoot(platform, variant == 0 || variant == 10 ? -1 : 1);
+    }
+
+    void CreateFinaleScenery()
+    {
+        finaleMaterial=PaintedMaterial("background-material","LegendOfCat/BackgroundStudy");
+        finaleMaterial.SetFloat("_Cutout",1);
+        finaleMaterial.SetFloat("_Fog",.28f); finaleMaterial.SetFloat("_Saturation",.86f);
+        Transform Painting(string name,string texture,Vector3 center,float width,float fog) {
+            var image=Resources.Load<Texture2D>("GoldenRiver/"+texture);
+            var item=Quad(); item.name=name; item.transform.SetParent(transform,false);
+            item.transform.localPosition=center; item.transform.localScale=new Vector3(width,width*image.height/image.width,1);
+            item.GetComponent<MeshRenderer>().sharedMaterial=finaleMaterial;
+            var block=new MaterialPropertyBlock();block.SetTexture("_MainTex",image);block.SetFloat("_Fog",fog);block.SetFloat("_Brightness",.96f);
+            item.GetComponent<MeshRenderer>().SetPropertyBlock(block);return item.transform;
+        }
+        float anchor=(FinaleRoute.StartX+FinaleRoute.Last.x)/2;
+        finaleSite=Painting("Unique crown hillside","finale-hillside-v1",new Vector3(anchor,7,9),70,.28f);
+        var last=FinaleRoute.Last;
+        Painting("Sunlit final gateway","finale-gate-v1",new Vector3(last.x+1,last.y+.75f+10f/3-.22f,1),10,.03f);
+        var diagonal=FinaleRoute.Platforms[FinaleRoute.DiagonalIndex];
+        Painting("Inclined counterweight bearings","finale-guide-v1",new Vector3(diagonal.x,diagonal.y+.08f,3),9,.12f);
+        var lift=FinaleRoute.Platforms[FinaleRoute.LiftIndex];
+        Painting("Vertical counterweight tower","finale-vertical-guide-v1",new Vector3(lift.x,lift.y+.85f,3),4,.12f);
+        // The registered bank crown covers gateway foot seams, using the original pixels.
+        var ground=TerrainVisuals[MovementCourse.CompletePlatforms.Length-1];
+        RegisteredFinaleGrass(ground,"Gateway ground overlap");
+    }
+
+    public void GroundFinaleMechanisms()
+    {
+        foreach(var p in FinaleRoute.Recoveries) {
+            foreach(var ground in TerrainVisuals)
+                if(Mathf.Abs(ground.localPosition.x-p.x)<.01f) RegisteredFinaleGrass(ground,"Counterweight footing grass");
+        }
+    }
+
+    void RegisteredFinaleGrass(Transform ground,string name)
+    {
+        var source=ground.GetComponent<MeshFilter>().sharedMesh;
+        var vertices=source.vertices;var uv=source.uv;
+        float bottom=vertices[2].y-.5f;
+        float bottomUV=Mathf.Lerp(uv[0].y,uv[2].y,Mathf.InverseLerp(vertices[0].y,vertices[2].y,bottom));
+        for(int j=0;j<vertices.Length;j++) vertices[j].z=.5f;
+        vertices[0].y=vertices[1].y=bottom;uv[0].y=uv[1].y=bottomUV;
+        var mesh=new Mesh{name="Registered gate grass"};mesh.vertices=vertices;mesh.uv=uv;mesh.triangles=source.triangles;mesh.RecalculateBounds();terrainMeshes.Add(mesh);
+        var grass=Quad();grass.name=name;grass.transform.SetParent(ground,false);
+        grass.GetComponent<MeshFilter>().sharedMesh=mesh;grass.GetComponent<MeshRenderer>().sharedMaterial=terrainMaterial;
+        var parameters=new MaterialPropertyBlock();ground.GetComponent<MeshRenderer>().GetPropertyBlock(parameters);grass.GetComponent<MeshRenderer>().SetPropertyBlock(parameters);
     }
 
     void CreateLandmarks()
@@ -500,6 +579,8 @@ public sealed class SceneryRenderer : MonoBehaviour
             }
             // Register the small statue with the right-hand battlement in the valley painting.
             easterEggs[0].localPosition = new Vector3(Offset(localView.x, ValleyTravel) + 45.28f, localView.y + 2.57f, 12);
+            float finaleAnchor=(FinaleRoute.StartX+FinaleRoute.Last.x)/2;
+            finaleSite.localPosition=new Vector3(finaleAnchor+(localView.x-finaleAnchor)*.92f,7,9);
             hillside.localPosition = new Vector3(800 + (localView.x - 800) * 0.75f, 7, 10);
             UpdateFish(waterCaptureTime >= 0 ? waterCaptureTime : fishClock);
         }
@@ -554,7 +635,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         foreach (var material in materials) Release(material);
         foreach (var mesh in terrainMeshes) Release(mesh);
         Release(quadMesh);
-        Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial); Release(landmarkMaterial); Release(fortressMaterial);
+        Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial); Release(landmarkMaterial); Release(fortressMaterial); Release(finaleMaterial);
     }
 
     static void Release(Object owned)

@@ -100,7 +100,7 @@ public class MenuMovementIntegrationTests
     static object Field(object target, string name) => target.GetType()
         .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
     static void Call(object target, string name) => target.GetType()
-        .GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, null);
+        .GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Invoke(target, null);
 
     static UnityEngine.Object[] SceneryResources(Component course)
     {
@@ -193,7 +193,7 @@ public class MenuMovementIntegrationTests
         } finally { UnityEngine.Object.Destroy(waterPixels); }
         Assert.That(panoramas, Has.Length.EqualTo(2));
         var panoramaApply = scenery.GetType().GetMethod("ApplyView");
-        foreach (float x in new[] { -7.2f, -3f, 84f, 216f, 342f, 503f, 509.2f, 700f, 900f, 1067f, 84f }) {
+        foreach (float x in new[] { -7.2f, -3f, 84f, 216f, 342f, 503f, 509.2f, 700f, 900f, 1067f, ((Vector2)course.GetType().GetField("LevelOneExit").GetValue(null)).x, 84f }) {
             panoramaApply.Invoke(scenery, new object[] { x, 1f });
             foreach (var panorama in panoramas) {
                 Assert.That(panorama.localScale.x, Is.GreaterThan(0), "No panorama mirroring.");
@@ -201,7 +201,7 @@ public class MenuMovementIntegrationTests
                 var bounds = panorama.GetComponent<MeshRenderer>().bounds;
                 Assert.That(bounds.min.x, Is.LessThanOrEqualTo(x - 5.5f * 16 / 9));
                 Assert.That(bounds.max.x, Is.GreaterThanOrEqualTo(x + 5.5f * 16 / 9));
-                Assert.That(panorama.localScale.x / panorama.localScale.y, Is.EqualTo(6).Within(0.001f));
+                Assert.That(panorama.localScale.x / panorama.localScale.y, Is.EqualTo(panorama.GetComponent<MeshRenderer>().sharedMaterial.mainTexture.width / (float)panorama.GetComponent<MeshRenderer>().sharedMaterial.mainTexture.height).Within(.01f));
             }
         }
         panoramaApply.Invoke(scenery, new object[] { 700f, 10f });
@@ -372,14 +372,18 @@ public class MenuMovementIntegrationTests
         try {
             Physics2D.SyncTransforms();
             int next = 0;
-            float introductionTravel = -1, traversal = 0;
-            for (int tick = 0; tick < 15000; tick++) {
+            float introductionTravel = -1, secondCheckpointTravel = -1, traversal = 0;
+            FinalePhysicsPilot finalePilot = null;
+            for (int tick = 0; tick < 25000; tick++) {
                 foreach (var mover in movers) {
                     Call(mover, "FixedUpdate");
                     int movingIndex = Array.FindIndex(platforms, p => Mathf.Abs(p.x - mover.transform.position.x) < 2 && Mathf.Abs(p.z - mover.transform.localScale.x) < 0.01f);
                     if (movingIndex >= 0) platforms[movingIndex] = new Vector3(mover.transform.position.x, mover.transform.position.y, mover.transform.localScale.x);
                 }
+                if ((int)run.GetType().GetProperty("Checkpoint").GetValue(run) == 2 && finalePilot == null) finalePilot = new FinalePhysicsPilot(course);
                 bool grounded = (bool)cat.GetType().GetProperty("Grounded").GetValue(cat);
+                if (finalePilot != null) finalePilot.Command();
+                else {
                 while (next < platforms.Length - 1 && body.position.x > platforms[next].x + platforms[next].z / 2)
                     next++;
                 float axis = !grounded && next >= 43 && body.position.x >= platforms[next].x && body.position.x < platforms[next].x + platforms[next].z / 2 - 1 ? 0f : 1f;
@@ -390,22 +394,27 @@ public class MenuMovementIntegrationTests
                 if (grounded && !waitForLift && next < platforms.Length - 1 &&
                     body.position.x >= platforms[next].x + platforms[next].z / 2 - 0.7f)
                     cat.GetType().GetMethod("PressJump").Invoke(cat, null);
+                }
                 Call(cat, "FixedUpdate");
                 Physics2D.Simulate(Time.fixedDeltaTime);
                 Call(course, "Update");
                 traversal = (tick + 1) * Time.fixedDeltaTime;
                 if (introductionTravel < 0 && (int)run.GetType().GetProperty("Checkpoint").GetValue(run) >= 1)
                     introductionTravel = traversal;
+                if(secondCheckpointTravel<0 && (int)run.GetType().GetProperty("Checkpoint").GetValue(run)>=2) secondCheckpointTravel=traversal;
                 Assert.That((int)run.GetType().GetProperty("Retries").GetValue(run), Is.Zero,
                     "Failed on platform " + next + " at " + body.position);
                 if ((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course)) break;
             }
-            Assert.That((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course), Is.True, "Stopped at " + body.position + " next=" + next);
+            Assert.That((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course), Is.True, "Stopped at " + body.position + " next=" + next + " finale=" + finalePilot);
             Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.EqualTo(2));
             Assert.That(introductionTravel, Is.InRange(59f, 65f),
                 "Uninterrupted basic traversal should establish the introduction pacing baseline.");
             Debug.Log("Scripted physics only: introduction " + introductionTravel.ToString("F2")
-                + "s; whole preview " + traversal.ToString("F2") + "s. Not a player playtest.");
+                + "s; whole preview " + traversal.ToString("F2") + "s; finale " + (traversal-secondCheckpointTravel).ToString("F2") + "s. Not a player playtest.");
+            var exitPosition=body.position;
+            CheckFinaleRecoveries(course,cat,body,motion);
+            cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[]{exitPosition});
             var camera = course.GetComponentInChildren(RuntimeType("CatCamera"));
             // Script simulation does not update the interpolated render transform.
             cat.transform.position = body.position;
@@ -432,6 +441,117 @@ public class MenuMovementIntegrationTests
         } finally {
             Physics2D.simulationMode = oldMode;
         }
+    }
+
+    static void CheckFinaleRecoveries(Component course,Component cat,Rigidbody2D body,object motor)
+    {
+        var type=RuntimeType("FinaleRoute");
+        var route=(Vector3[])type.GetProperty("Platforms").GetValue(null);
+        int courtyard=(int)type.GetProperty("CourtyardTurn").GetValue(null), crown=(int)type.GetProperty("CrownTurn").GetValue(null);
+        Assert.That(route[courtyard+4].y-route[courtyard-1].y,Is.GreaterThan(2.4f),"Forward jumping must not bypass the courtyard stair.");
+        Assert.That(route[crown+4].y-route[crown-1].y,Is.GreaterThan(2.4f),"Forward jumping must not bypass the crown stair.");
+        var catches=(System.Collections.IList)type.GetField("Recoveries").GetValue(null);
+        var entries=(System.Collections.IList)type.GetField("RecoveryEntries").GetValue(null);
+        var movers=course.GetComponentsInChildren(RuntimeType("MovingSupport"));
+
+            for(int i=0;i<catches.Count;i++) {
+                var floor=course.GetComponentsInChildren<PolygonCollider2D>().Single(c=>c.name=="Finale recovery "+i);
+                var landing=route[(int)entries[i]];
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[]{new Vector2(floor.bounds.min.x+.7f,floor.bounds.max.y+.46f)});
+                for(int step=0;step<8;step++){Call(cat,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);}
+                motor.GetType().GetMethod("SetMove").Invoke(motor,new object[]{-1f});Call(cat,"PressJump");
+                bool reached=false;
+                for(int step=0;step<180;step++) {
+                    if(body.position.x<landing.x) motor.GetType().GetMethod("SetMove").Invoke(motor,new object[]{0f});
+                    Call(cat,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);
+                    bool onRoof=Mathf.Abs(body.position.y-landing.y-1.2f)<.12f;
+                    bool onRubble=course.GetComponentsInChildren<PolygonCollider2D>().Any(c=>c.name=="Solid fallen masonry" &&
+                        Mathf.Abs(c.bounds.max.y+.45f-body.position.y)<.12f && c.bounds.min.x<landing.x+landing.z/2 && c.bounds.max.x>landing.x-landing.z/2);
+                    if((bool)cat.GetType().GetProperty("Grounded").GetValue(cat) && (onRoof||onRubble) && Mathf.Abs(body.position.x-landing.x)<landing.z/2+.4f){reached=true;break;}
+                }
+                Assert.That(reached,Is.True,"Recovery "+i+" could not rejoin at "+landing+"; stopped "+body.position);
+            }
+            var follow=course.GetComponentInChildren(RuntimeType("CatCamera"));var camera=follow.GetComponent<Camera>();
+            foreach(var mover in movers.Skip(2)) {
+                int index=(int)type.GetProperty(((Vector2)mover.GetType().GetField("Axis").GetValue(mover)).x==0?"LiftIndex":"DiagonalIndex").GetValue(null);
+                foreach(int phase in new[]{63,187}) {
+                    Call(mover,"ResetPhase");
+                    for(int step=0;step<phase;step++){Call(mover,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);}
+                    var bounds=mover.GetComponent<PolygonCollider2D>().bounds;
+                    cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[]{new Vector2(bounds.center.x,bounds.max.y+.46f)});
+                    Call(follow,"LateUpdate");
+                    var destination=route[index+1];
+                    var screenPoint=camera.WorldToViewportPoint(new Vector3(destination.x-destination.z/2+.5f,destination.y+1.2f));
+                    Assert.That(screenPoint.x,Is.InRange(.04f,.96f));Assert.That(screenPoint.y,Is.InRange(.08f,.96f),"Lift destination hidden at phase "+phase);
+                }
+            }
+            // Camera must follow a genuine fall instead of holding the final gate reveal forever.
+            cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[]{new Vector2(route.Last().x,-2)});
+            Call(follow,"LateUpdate");Assert.That(camera.transform.position.y,Is.LessThan(4));
+
+    }
+
+    [UnityTest]
+    public IEnumerator DiagonalSupportCarriesRunsJumpsAndResetsFinaleTimer()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        host = new GameObject("Diagonal finale regression");
+        var screen = host.AddComponent(RuntimeType("StarterScreen")); yield return null;
+        Call(screen,"OpenLevelOne");
+        var course=(Component)Field(screen,"course");
+        Call(course,"StartFinalePreview");
+        var cat=(Component)course.GetType().GetProperty("Cat").GetValue(course);
+        ((Behaviour)cat.GetComponent(RuntimeType("CatInput"))).enabled=false;
+        var run=course.GetType().GetProperty("Run").GetValue(course);
+        var body=cat.GetComponent<Rigidbody2D>(); body.interpolation=RigidbodyInterpolation2D.None;
+        var motor=cat.GetType().GetField("Motion").GetValue(cat);
+        var mover=course.GetComponentsInChildren(RuntimeType("MovingSupport")).Single(m => {
+            var axis=(Vector2)m.GetType().GetField("Axis").GetValue(m); return axis.x>0 && axis.y>0;
+        });
+        yield return null;
+        var previous=Physics2D.simulationMode; Physics2D.simulationMode=SimulationMode2D.Script;
+        try {
+            foreach(int phase in new[]{0,63,125,187}) {
+                Call(mover,"ResetPhase");
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[]{new Vector2(-3,.52f)});
+                for(int i=0;i<phase;i++){Call(mover,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);}
+                var bounds=mover.GetComponent<PolygonCollider2D>().bounds;
+                cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[]{new Vector2(bounds.center.x,bounds.max.y+1.1f)});
+                for(int i=0;i<30;i++){Call(mover,"FixedUpdate");Call(cat,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);}
+                Assert.That((bool)cat.GetType().GetProperty("Grounded").GetValue(cat),Is.True);
+                var offset=body.position-(Vector2)mover.transform.position;
+                for(int i=0;i<30;i++){Call(mover,"FixedUpdate");Call(cat,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);}
+                Assert.That(Vector2.Distance(body.position-(Vector2)mover.transform.position,offset),Is.LessThan(.12f));
+                var camera=course.GetComponentInChildren(RuntimeType("CatCamera"));
+                Call(camera,"Snap");Call(camera,"LateUpdate");
+                for(int i=0;i<60;i++){
+                    Call(mover,"FixedUpdate");Call(cat,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);
+                    cat.transform.position=body.position;Call(camera,"LateUpdate");
+                    Assert.That((float)Field(camera,"lookAhead"),Is.GreaterThan(1.5f),"Idle carrier drift must not flip the camera look direction.");
+                }
+                for(int i=0;i<24;i++){
+                    motor.GetType().GetMethod("SetMove").Invoke(motor,new object[]{i<12?1f:-1f});
+                    Call(mover,"FixedUpdate");Call(cat,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);
+                    Assert.That((bool)cat.GetType().GetProperty("Grounded").GetValue(cat),Is.True);
+                }
+                cat.GetType().GetMethod("PressJump").Invoke(cat,null);
+                Assert.That(body.linearVelocity.y,Is.EqualTo(12).Within(.05f));
+                Assert.That(Mathf.Abs(body.linearVelocity.x),Is.LessThanOrEqualTo(7.05f));
+                Call(course,"TogglePause"); var position=body.position; var platform=mover.transform.position;
+                Call(mover,"FixedUpdate");Call(cat,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);
+                Assert.That(body.position,Is.EqualTo(position));Assert.That(mover.transform.position,Is.EqualTo(platform));
+                Call(course,"TogglePause");
+            }
+            Assert.That((bool)course.GetType().GetProperty("HasReachedExit").GetValue(course),Is.False,"Checkpoint 2 is not the exit.");
+            run.GetType().GetMethod("Advance").Invoke(run,new object[]{9f});
+            Assert.That((float)course.GetType().GetProperty("FinaleSeconds").GetValue(course),Is.GreaterThan(8));
+            Call(course,"RetryCheckpoint");
+            Assert.That((float)course.GetType().GetProperty("FinaleSeconds").GetValue(course),Is.EqualTo(0));
+            Assert.That((float)mover.GetType().GetProperty("Phase").GetValue(mover),Is.Zero);
+            Call(course,"RestartRun");
+            Assert.That((float)course.GetType().GetProperty("FinaleSeconds").GetValue(course),Is.EqualTo(-1));
+        } finally {Physics2D.simulationMode=previous;}
     }
 
     [UnityTest]
@@ -537,7 +657,7 @@ public class MenuMovementIntegrationTests
         var cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
         ((Behaviour)cat.GetComponent(RuntimeType("CatInput"))).enabled = false;
         var supports = course.GetComponentsInChildren(RuntimeType("MovingSupport"));
-        Assert.That(supports.Length, Is.EqualTo(2));
+        Assert.That(supports.Length, Is.EqualTo(4));
         Assert.That(course.GetComponentsInChildren<PlatformEffector2D>(), Is.Empty, "Course platforms must be solid from below.");
         var shaped = course.GetComponentsInChildren<PolygonCollider2D>();
         Assert.That(shaped.Length, Is.GreaterThan(20));
