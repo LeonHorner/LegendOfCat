@@ -138,3 +138,10 @@ The near panorama extends from 12784 to 14332 pixels without changing retained i
 Final local validation of this extension: 62/62 scoped Unity regressions passed (`Logs/watchtower-final-tests.xml`). The refreshed review adds six tower viewpoints to the existing fifteen, in 960×540, 640×360 and grayscale. Direct command-pilot finale recording takes 149.12 seconds; the full-route pilot takes 151.56 seconds for the finale because the support phases differ. Neither is human input. Player timing, falls, waiting and replay costs still need the next test. The draft PR and issue #71 remain open; water-recovery integration and final production Windows/Linux gates remain outstanding.
 
 The Windows development preview build succeeded and audited 44 active paintings plus three shader-reference materials. Its actual direct-finale player entry exited with code 0 after capture, without observed managed exceptions or shader errors. Updated launch helpers and player are in `Builds/GoldenRiverWatchtowerPreview`; this remains a development preview.
+
+
+### Supported diagonal footing — 2026-11-08
+
+The diagonal recovery floor now extends two units farther right, enclosing the previously overhanging right bearing. Its left return edge stays fixed. The focused bearing-bounds regression failed before the change; both affected regressions now pass (`Logs/diagonal-footing-tests.xml`), covering actual full-route traversal, all six recovery returns, diagonal carry/walking/jumps, both reversals, pause and retry. Scripted traversal timing remains 334.14 seconds overall / 151.56 seconds finale. Updated diagonal stills at both resolutions and grayscale replace views 9–11; the complete scripted video remains the preceding watchtower baseline and predates this localized floor-width correction. No new bitmap or movement rule is introduced.
+
+The updated Windows development build succeeded with the 44-painting packed-art audit. The current local preview and launch helpers are in `Builds/GoldenRiverFootingPreview`.

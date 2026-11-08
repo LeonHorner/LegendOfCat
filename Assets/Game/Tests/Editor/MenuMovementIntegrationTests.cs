@@ -524,6 +524,10 @@ public class MenuMovementIntegrationTests
         var mover=course.GetComponentsInChildren(RuntimeType("MovingSupport")).Single(m => {
             var axis=(Vector2)m.GetType().GetField("Axis").GetValue(m); return axis.x>0 && axis.y>0;
         });
+        var guide=course.GetComponentsInChildren<MeshRenderer>().Single(r=>r.name=="Inclined counterweight bearings");
+        var footing=course.GetComponentsInChildren<PolygonCollider2D>().Single(c=>c.name=="Finale recovery 4");
+        Assert.That(footing.bounds.min.x,Is.LessThanOrEqualTo(guide.bounds.min.x-.1f),"The left bearing must rest within the recovery floor.");
+        Assert.That(footing.bounds.max.x,Is.GreaterThanOrEqualTo(guide.bounds.max.x+.1f),"The right bearing must rest within the recovery floor, not hang below its edge.");
         yield return null;
         var previous=Physics2D.simulationMode; Physics2D.simulationMode=SimulationMode2D.Script;
         try {

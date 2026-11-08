@@ -100,7 +100,8 @@ public static class FinaleRoute
         Add(5,14.7f,2.5f,Form.Wall);
         // Axis (1,.75), amplitude 1: both endpoints remain close to fixed approaches.
         Add(9,17.1f,2.5f,Form.Wall);
-        Catch(DiagonalIndex-1,route[DiagonalIndex].x-1,11.7f,8);
+        // Keep the return-jump edge fixed while supporting the complete right bearing.
+        Catch(DiagonalIndex-1,route[DiagonalIndex].x,11.7f,10);
         // The collapsed watchtower adds decisions and a short reversal, not lift waiting.
         TowerStart=route.Count;
         Add(6,16.2f,2,Form.Root);
