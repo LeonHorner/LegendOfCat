@@ -1,5 +1,7 @@
 # Golden River main route: integration notes
 
+Start with the concise [level design guide](level-design-guide.md) for reusable lessons and a task-based map of the detailed references. The older revisions below are history, not the current route specification.
+
 Issue #71 is in progress. These notes describe the starting point and the work
 needed to turn it into Level 1; they are not evidence of a finished route.
 

@@ -13,6 +13,8 @@ Difficulty is experiential: compare learning load, jump precision, attack densit
 ## Current implementation boundary
 Inspected origin/main ab70aa45faf945828df38d94afd5f8b1f4b79f3e (PR #7). StarterScreen already supplies start menu, settings/update views and update-service integration. UpdatePolicy and VersionedJsonFile supply policy and versioned persistence. Restyle those views through a dedicated issue; preserve their existing behavior and launcher ownership. Do not recreate the update system. New gameplay must integrate with that foundation.
 
+For level-building tasks, use the concise [level design guide](level-design-guide.md) to find reusable player-feedback lessons and the relevant implementation and review references.
+
 ## Delivery strategy
 
 The [six-level adventure proposal](six-level-adventure.md) describes campaign pacing, checkpoint policy and the user decision gate. Its approval status is recorded in that document; concept themes and boss placement do not become production requirements implicitly.
