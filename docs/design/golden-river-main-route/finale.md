@@ -116,3 +116,9 @@ All 62 scoped regressions passed after these corrections. The full command-pilot
 
 
 The follow-up Windows preview build succeeded with 43 packed paintings audited, and its direct-finale entry was captured in the actual player with exit code 0. Local output and launch helpers are now in `Builds/GoldenRiverGroundedPreview`. The refreshed evidence includes the grounded rubble and 0.22 ruin travel. No release, merge or production Windows/Linux acceptance is claimed.
+
+### Rubble contact correction — 2026-11-08
+
+Player feedback exposed idle sliding and upward deflection against the rubble's sloped contact outline. Its collision now follows horizontal stone treads and vertical risers, preserving the grounded painted silhouette without changing Mika's shared movement motor. Real course regressions drop Mika onto the center and both side steps, verify stable idle contact, and cross all three piles in both directions with held movement and a normal jump. The original contour failed the idle regression (0.196 world units of unwanted drift over one second).
+
+Validation: all 62 scoped Unity regressions passed after this correction (`Logs/rubble-step-fix.xml`); the pre-fix reproduction failed (`Logs/rubble-repro.xml`).

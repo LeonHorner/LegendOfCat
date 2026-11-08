@@ -688,6 +688,31 @@ public class MenuMovementIntegrationTests
             var bank=finale.Single(p=>Mathf.Abs(p.x+1.7f-rubble.transform.localPosition.x)<.01f && p.z>=10);
             float ground=course.transform.TransformPoint(new Vector3(bank.x,bank.y+.75f)).y;
             Assert.That(bounds.min.y,Is.EqualTo(ground).Within(.06f),"Rubble must rest on its terrace rather than float above it.");
+            var physicsMode=Physics2D.simulationMode;
+            Physics2D.simulationMode=SimulationMode2D.Script;
+            try {
+                var body=cat.GetComponent<Rigidbody2D>();
+                var motion=cat.GetType().GetField("Motion").GetValue(cat);
+                foreach(float offset in new[]{-.95f,0f,.95f}) {
+                    cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[]{new Vector2(bounds.center.x+offset,bounds.max.y+1)});
+                    Physics2D.SyncTransforms();
+                    for(int tick=0;tick<100;tick++) { Call(cat,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
+                    var resting=body.position;
+                    for(int tick=0;tick<50;tick++) { Call(cat,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
+                    Assert.That(Vector2.Distance(body.position,resting),Is.LessThan(.03f),"No idle slide after landing on rubble at offset "+offset);
+                    Assert.That((bool)cat.GetType().GetProperty("Grounded").GetValue(cat),Is.True);
+                }
+                foreach(float direction in new[]{-1f,1f}) {
+                    cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[]{new Vector2(bounds.center.x-direction*3,ground+.46f)});
+                    Physics2D.SyncTransforms();
+                    for(int tick=0;tick<10;tick++) { Call(cat,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
+                    motion.GetType().GetMethod("SetMove").Invoke(motion,new object[]{direction});
+                    cat.GetType().GetMethod("PressJump").Invoke(cat,null);
+                    for(int tick=0;tick<60;tick++) { Call(cat,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
+                    Assert.That((body.position.x-bounds.center.x)*direction,Is.GreaterThan(2),"Held movement must cross the rubble without rebound or locking.");
+                }
+            } finally { Physics2D.simulationMode=physicsMode; }
+
         }
         yield return null;
         var previousMode = Physics2D.simulationMode;

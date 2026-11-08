@@ -223,7 +223,8 @@ public sealed class SceneryRenderer : MonoBehaviour
         string name = properties.GetTexture("_MainTex").name;
         Vector2[] underside;
         switch (name) {
-            case "finale-rubble-v1": underside=new[]{new Vector2(.66f,.61f),new Vector2(.66f,.50f),new Vector2(.71f,.48f),new Vector2(.73f,.40f),new Vector2(.87f,.38f),new Vector2(.90f,.34f),new Vector2(.94f,.23f),new Vector2(.94f,.17f),new Vector2(.06f,.17f),new Vector2(.08f,.32f),new Vector2(.15f,.35f),new Vector2(.16f,.42f),new Vector2(.25f,.45f),new Vector2(.26f,.53f),new Vector2(.35f,.59f)};break;
+            // Flat stone treads avoid converting horizontal input into upward impulses or idle sliding.
+            case "finale-rubble-v1": underside=new[]{new Vector2(.64f,.50f),new Vector2(.71f,.50f),new Vector2(.71f,.40f),new Vector2(.87f,.40f),new Vector2(.87f,.34f),new Vector2(.94f,.34f),new Vector2(.94f,.17f),new Vector2(.06f,.17f),new Vector2(.06f,.32f),new Vector2(.15f,.32f),new Vector2(.15f,.42f),new Vector2(.25f,.42f),new Vector2(.25f,.53f),new Vector2(.37f,.53f)};break;
             case "finale-wall-v1": underside = new[] { new Vector2(.97f,.51f),new Vector2(.90f,.32f),new Vector2(.80f,.25f),new Vector2(.67f,.23f),new Vector2(.50f,.22f),new Vector2(.32f,.24f),new Vector2(.17f,.24f),new Vector2(.05f,.46f) }; break;
             case "finale-garden-v1": underside = new[] {new Vector2(.97f,.54f),new Vector2(.90f,.29f),new Vector2(.75f,.22f),new Vector2(.58f,.20f),new Vector2(.40f,.22f),new Vector2(.23f,.25f),new Vector2(.06f,.47f)}; break;
             case "finale-pier-v1": underside = new[] {new Vector2(.95f,.58f),new Vector2(.86f,.28f),new Vector2(.70f,.18f),new Vector2(.51f,.16f),new Vector2(.30f,.19f),new Vector2(.14f,.28f),new Vector2(.05f,.56f)}; break;
