@@ -313,12 +313,13 @@ public sealed class MovementCourse : MonoBehaviour
             }
             foreach(int index in new[]{0,9,FinaleRoute.BeatStarts[2]}) {
                 var bank=FinaleRoute.Platforms[index];
-                var p=new Vector3(bank.x+1.7f,bank.y+.85f,3);
+                var p=new Vector3(bank.x+1.7f,bank.y+.82f,3);
                 var rubble=Block("Solid fallen masonry",p,new Vector2(p.z,1.5f),Color.gray);
                 rubble.GetComponent<SpriteRenderer>().enabled=false;
                 rubble.AddComponent<BoxCollider2D>();
                 sceneryRenderer.AddFinaleObstacle(p);
                 SceneryRenderer.MatchFloatingCollider(rubble,sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count-1]);
+                sceneryRenderer.GroundFinaleObstacle(index);
             }
             sceneryRenderer.GroundFinaleMechanisms();
             // The terminal cliff is visible beyond the gate; scenery continues past its edge.

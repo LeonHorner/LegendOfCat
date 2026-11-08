@@ -5,6 +5,7 @@ using UnityEngine;
 public sealed class SceneryRenderer : MonoBehaviour
 {
     public const float SkyTravel = 0.05f, ValleyTravel = 0.14f, CanopyTravel = 0.08f;
+    public const float FinaleRuinTravel = .22f;
     public Camera View { get; private set; }
     public const float CameraFloor = 1f;
     public static bool IsFloating(int index) => index == 3 || index == 4 || index == 8 || index == 12;
@@ -222,6 +223,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         string name = properties.GetTexture("_MainTex").name;
         Vector2[] underside;
         switch (name) {
+            case "finale-rubble-v1": underside=new[]{new Vector2(.66f,.61f),new Vector2(.66f,.50f),new Vector2(.71f,.48f),new Vector2(.73f,.40f),new Vector2(.87f,.38f),new Vector2(.90f,.34f),new Vector2(.94f,.23f),new Vector2(.94f,.17f),new Vector2(.06f,.17f),new Vector2(.08f,.32f),new Vector2(.15f,.35f),new Vector2(.16f,.42f),new Vector2(.25f,.45f),new Vector2(.26f,.53f),new Vector2(.35f,.59f)};break;
             case "finale-wall-v1": underside = new[] { new Vector2(.97f,.51f),new Vector2(.90f,.32f),new Vector2(.80f,.25f),new Vector2(.67f,.23f),new Vector2(.50f,.22f),new Vector2(.32f,.24f),new Vector2(.17f,.24f),new Vector2(.05f,.46f) }; break;
             case "finale-garden-v1": underside = new[] {new Vector2(.97f,.54f),new Vector2(.90f,.29f),new Vector2(.75f,.22f),new Vector2(.58f,.20f),new Vector2(.40f,.22f),new Vector2(.23f,.25f),new Vector2(.06f,.47f)}; break;
             case "finale-pier-v1": underside = new[] {new Vector2(.95f,.58f),new Vector2(.86f,.28f),new Vector2(.70f,.18f),new Vector2(.51f,.16f),new Vector2(.30f,.19f),new Vector2(.14f,.28f),new Vector2(.05f,.56f)}; break;
@@ -242,14 +244,22 @@ public sealed class SceneryRenderer : MonoBehaviour
             var painted = new Vector3(Mathf.Lerp(bounds.min.x, bounds.max.x, uv.x), Mathf.Lerp(bounds.min.y, bounds.max.y, uv.y), 0);
             points[i + 2] = platform.transform.InverseTransformPoint(visual.TransformPoint(painted));
         }
+        if(name=="finale-rubble-v1") {
+            for(int i=0;i<2;i++) {
+                var uv=new Vector2(i==0?.37f:.64f,.665f);
+                var painted=new Vector3(Mathf.Lerp(bounds.min.x,bounds.max.x,uv.x),Mathf.Lerp(bounds.min.y,bounds.max.y,uv.y),0);
+                points[i]=platform.transform.InverseTransformPoint(visual.TransformPoint(painted));
+            }
+        }
         polygon.points = points;
         Object.Destroy(old);
     }
 
-    public void AddFinaleObstacle(Vector3 platform) => Terrain(platform,true,MovementCourse.LevelOnePlatforms.Length+MovementCourse.AscentPlatforms.Length+FinaleRoute.CourtyardTurn-1);
+    public void AddFinaleObstacle(Vector3 platform) => Terrain(platform,true,-2,true);
+    public void GroundFinaleObstacle(int index) => RegisteredFinaleGrass(TerrainVisuals[MovementCourse.LevelOnePlatforms.Length+MovementCourse.AscentPlatforms.Length+index],"Rubble footing grass");
     public void AddRecoveryTerrain(Vector3 platform) => Terrain(platform, true, 0);
 
-    void Terrain(Vector3 platform, bool floating, int variant)
+    void Terrain(Vector3 platform, bool floating, int variant, bool rubble=false)
     {
         // Artwork owns its silhouette; the collider owns the exact standable span.
         bool bank = platform.z >= 6;
@@ -290,9 +300,10 @@ public sealed class SceneryRenderer : MonoBehaviour
             contactUV=form==FinaleRoute.Form.Garden?.655f:form==FinaleRoute.Form.Pier?.675f:.60f;
             landingFraction=form==FinaleRoute.Form.Pier?.92f:.94f;
         }
+        if(rubble) { texturePath="GoldenRiver/finale-rubble-v1"; contactUV=.665f; landingFraction=.90f; }
         float width = platform.z / landingFraction;
         float sourceAspect = compactShelf ? 2 : 3;
-        if (tallBank || finaleArt) {
+        if (tallBank || finaleArt || rubble) {
             var source = Resources.Load<Texture2D>(texturePath);
             sourceAspect = (float)source.width / source.height;
         }
@@ -314,6 +325,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         mesh.triangles = new[] { 0, 2, 1, 1, 2, 3, 2, 4, 3, 3, 4, 5 };
         mesh.RecalculateBounds(); terrainMeshes.Add(mesh);
         if(finaleArt) mesh.name="Finale " + FinaleRoute.Forms[finaleIndex] + " terrain";
+        if(rubble) mesh.name="Grounded rubble";
         var visual = new GameObject(mesh.name); visual.transform.SetParent(transform, false);
         visual.transform.localPosition = new Vector3(platform.x, 0, 0);
         visual.AddComponent<MeshFilter>().sharedMesh = mesh;
@@ -580,7 +592,7 @@ public sealed class SceneryRenderer : MonoBehaviour
             // Register the small statue with the right-hand battlement in the valley painting.
             easterEggs[0].localPosition = new Vector3(Offset(localView.x, ValleyTravel) + 45.28f, localView.y + 2.57f, 12);
             float finaleAnchor=(FinaleRoute.StartX+FinaleRoute.Last.x)/2;
-            finaleSite.localPosition=new Vector3(finaleAnchor+(localView.x-finaleAnchor)*.92f,7,9);
+            finaleSite.localPosition=new Vector3(finaleAnchor+(localView.x-finaleAnchor)*(1-FinaleRuinTravel),7,9);
             hillside.localPosition = new Vector3(800 + (localView.x - 800) * 0.75f, 7, 10);
             UpdateFish(waterCaptureTime >= 0 ? waterCaptureTime : fishClock);
         }

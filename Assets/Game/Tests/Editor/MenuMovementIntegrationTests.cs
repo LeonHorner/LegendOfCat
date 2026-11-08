@@ -211,6 +211,14 @@ public class MenuMovementIntegrationTests
             float travel = 10 - (panoramas[i].position.x - beforeTravel[i]);
             Assert.That(travel, Is.GreaterThan(0.7f), "Late scenery must keep perceptibly moving.");
         }
+        var ruin=course.GetComponentsInChildren<Transform>().Single(t=>t.name=="Unique crown hillside");
+        float end=((Vector2)course.GetType().GetField("LevelOneExit").GetValue(null)).x;
+        foreach(float x in new[]{1200f,1350f,1500f,1700f,end,1500f,1200f}) {
+            panoramaApply.Invoke(scenery,new object[]{x,12f});float before=ruin.position.x;
+            panoramaApply.Invoke(scenery,new object[]{x+10,12f});
+            Assert.That(10-(ruin.position.x-before),Is.EqualTo(2.2f).Within(.002f),
+                "The large finale ruin must keep visibly travelling through the route and on return.");
+        }
         var floatingIndices = (int[])course.GetType().GetField("LevelOneFloatingPlatforms").GetValue(null);
         var rootIndices = (int[])course.GetType().GetField("LevelOneRootPlatforms").GetValue(null);
         var geometry = (Vector3[])course.GetType().GetField("CompletePlatforms").GetValue(null);
@@ -466,7 +474,11 @@ public class MenuMovementIntegrationTests
                     Call(cat,"FixedUpdate");Physics2D.Simulate(Time.fixedDeltaTime);
                     bool onRoof=Mathf.Abs(body.position.y-landing.y-1.2f)<.12f;
                     bool onRubble=course.GetComponentsInChildren<PolygonCollider2D>().Any(c=>c.name=="Solid fallen masonry" &&
-                        Mathf.Abs(c.bounds.max.y+.45f-body.position.y)<.12f && c.bounds.min.x<landing.x+landing.z/2 && c.bounds.max.x>landing.x-landing.z/2);
+                        c.bounds.min.x<landing.x+landing.z/2 && c.bounds.max.x>landing.x-landing.z/2 &&
+                        Enumerable.Range(0,3).Any(j=>{
+                            var feet=body.position+new Vector2((j-1)*.35f,-.45f);
+                            return (c.ClosestPoint(feet)-feet).sqrMagnitude<.0064f;
+                        }));
                     if((bool)cat.GetType().GetProperty("Grounded").GetValue(cat) && (onRoof||onRubble) && Mathf.Abs(body.position.x-landing.x)<landing.z/2+.4f){reached=true;break;}
                 }
                 Assert.That(reached,Is.True,"Recovery "+i+" could not rejoin at "+landing+"; stopped "+body.position);
@@ -661,12 +673,21 @@ public class MenuMovementIntegrationTests
         Assert.That(course.GetComponentsInChildren<PlatformEffector2D>(), Is.Empty, "Course platforms must be solid from below.");
         var shaped = course.GetComponentsInChildren<PolygonCollider2D>();
         Assert.That(shaped.Length, Is.GreaterThan(20));
-        foreach (var polygon in shaped.Where(p => !p.isTrigger)) {
+        foreach (var polygon in shaped.Where(p => !p.isTrigger && p.name!="Solid fallen masonry")) {
             var bounds = polygon.bounds;
             Assert.That(polygon.OverlapPoint(new Vector2(bounds.center.x, bounds.max.y - 0.03f)), Is.True,
                 "The registered landing surface must remain solid.");
             Assert.That(polygon.OverlapPoint(new Vector2(bounds.min.x + 0.01f, bounds.min.y + 0.01f)), Is.False,
                 "Empty lower corners must not remain rectangular collision blocks.");
+        }
+        var finale=(Vector3[])RuntimeType("FinaleRoute").GetProperty("Platforms").GetValue(null);
+        foreach(var rubble in shaped.Where(p=>p.name=="Solid fallen masonry")) {
+            var bounds=rubble.bounds;
+            Assert.That(rubble.OverlapPoint(new Vector2(bounds.center.x,bounds.min.y+.03f)),Is.True,"Grounded rubble must have a solid resting base.");
+            Assert.That(rubble.OverlapPoint(new Vector2(bounds.min.x+.01f,bounds.max.y-.03f)),Is.False,"Short rubble side stones must not become an invisible full-width cap.");
+            var bank=finale.Single(p=>Mathf.Abs(p.x+1.7f-rubble.transform.localPosition.x)<.01f && p.z>=10);
+            float ground=course.transform.TransformPoint(new Vector3(bank.x,bank.y+.75f)).y;
+            Assert.That(bounds.min.y,Is.EqualTo(ground).Within(.06f),"Rubble must rest on its terrace rather than float above it.");
         }
         yield return null;
         var previousMode = Physics2D.simulationMode;
