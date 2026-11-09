@@ -44,6 +44,15 @@ The [normal-speed loop](golden-river-upper-route/optional-loop.mp4) is a complet
 during traversal. This timing excludes choosing/learning the detour and is not a
 first-player completion time or performance measurement.
 
+The [complete beginning-to-exit run](golden-river-upper-route/whole-level.mp4)
+includes the upper loop, both main checkpoints and the accepted finale, without
+a retry. It covers 334.12 seconds of simulated game time at normal playback speed.
+This is a deterministic input recording, not a human 4-6 minute pacing result.
+Inspected entry/leftward choice, upper crossing, descent/rejoin and exit frames
+from this continuous recording as well as the focused loop. The
+[grayscale loop](golden-river-upper-route/optional-loop-gray.mp4) provides the same
+small-window motion without hue cues. No new timing or FPS target is inferred.
+
 Reviewed 960x540/640x360 color stills and 640x360 grayscale: crisp shelf tops,
 solid darker fronts, a visible first shelf beside broad ground, an arch grounded
 on the lookout, and the broad rejoin below the final shelf. The next descending
