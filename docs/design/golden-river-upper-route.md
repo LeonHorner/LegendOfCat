@@ -1,5 +1,29 @@
 # Golden River upper route
 
+## Player review - 2026-11-09
+
+The owner played the preview and rejected this first implementation as very
+boring and unspectacular. The geometry/physics checks below remain technical
+evidence only; they do not establish an accepted exploration experience.
+PR #79 is back in draft and #72 remains incomplete.
+
+The rejected layout adds seven largely repetitive floating shelves and a reused
+gate without a distinctive spatial experience or a compelling discovery. Its
+short extra traversal is not sufficient motivation to leave the main route.
+
+Revision direction: author a recognizable place with an entrance that teases its
+interior, varied traversal through that place, a discovery revealed by exploration,
+and a distinct return path. Preserve known movement, visible landings, safe falls
+and the accepted main route. Do not solve the feedback by lengthening the same
+shelf chain or adding an unapproved collectible or ability.
+
+Two bounded concepts are being offered for owner direction: an overgrown garden
+entered through a broken ruin wall, or an exterior/interior climb through a
+collapsed lookout tower. Neither is approved production content yet. Review the
+chosen spatial proposal before authoring a new artwork set or replacing gameplay.
+
+## First implementation (rejected)
+
 Issue #72 owns the optional platforms and lookout, scoped course/scenery attachment,
 behavior tests and review tooling. No overlapping active PR owns these platforms.
 The accepted #71 main geometry, checkpoint banks, finale and Movement Lab retain
