@@ -717,3 +717,8 @@ Issue #72 reuses the original generated shelf-masonry-compact-v3 and finale-gate
 ## Hidden ruin garden concept - 2026-11-09
 
 Review-only garden-concept-v1.png under docs/design/golden-river-upper-route was created with the built-in OpenAI image generation tool (exact model not exposed), using only the original project gameplay screenshot as palette/material reference. Source: exec-036b1e6c-f7fe-4abb-a495-665b268e5a48.png. Existing ASSET-LICENSE.md generated-art terms apply; no third-party asset was used. The owner chose the hidden overgrown garden after rejecting the shelf chain; Codex proposed the tree/fountain courtyard and side-arcade return. Full prompt, composition observations and gameplay limitations are in garden-concept.md and garden-concept-prompt.txt beside the image. Not approved production artwork or collision evidence.
+
+
+## Concealed garden storyboard - 2026-11-09
+
+Review-only garden-concept-v2-storyboard.png under docs/design/golden-river-upper-route uses the built-in OpenAI image generation tool (exact model not exposed). Source: exec-6686323a-954c-4a46-a711-fd1b29ea6bef.png. Reference: original project-generated garden-concept-v1.png for materials/mood only. Existing ASSET-LICENSE.md generated-art terms apply; no third-party source. Human direction explicitly requires a subtle entrance hint followed by complete disappearance of the main route from the viewport. Codex composed entrance, enclosed climb and secluded-garden camera views. Exact prompt and limitations are archived in garden-concept-v2-prompt.txt and garden-concept-v2.md. Not gameplay evidence or production acceptance.

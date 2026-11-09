@@ -1,5 +1,10 @@
 # Hidden ruin garden concept - 2026-11-09
 
+Superseded spatial composition: the owner subsequently required a subtle hint
+at the entrance and complete disappearance of the main route after entry. This
+open garden directly above a visible main route does not meet that requirement.
+Retain it only as a garden mood/material reference, not the proposed layout.
+
 Review-only spatial illustration, generated with the built-in OpenAI image
 generation tool; exact model identifier not exposed. Source output:
 exec-036b1e6c-f7fe-4abb-a495-665b268e5a48.png. The only input was the project's

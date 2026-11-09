@@ -22,6 +22,31 @@ wall into an overgrown, surprising place. The collapsed lookout alternative is
 not being pursued. This approves the concept direction; the spatial proposal
 and revised gameplay still require review.
 
+### Confirmed concealment requirement
+
+The owner clarified and confirmed that the entrance must be inconspicuous, with
+only a small visual hint. After entry, the normal route must disappear completely
+from the camera view. The garden itself must not be visible or advertised from
+the main route. Return to the main route happens later, after exploring the
+separate passage. This supersedes the exposed courtyard-over-main composition
+and the earlier proposal to tease the courtyard directly from below.
+
+Use a modest ivy-framed wall crack and a partly visible stone tread as the hint,
+without a sign, prompt, arrow, glow or conspicuous doorway. A sheltered climbing
+passage then gains enough separation from the main route for its geometry to
+leave the actual viewport at the existing zoom. It leads sideways around an
+enclosing ruin wall before revealing the garden. The return must be separately
+traversable and safe; it must not force a blind drop onto the unseen main route.
+Rejoin visibility is restored before the player commits to the final descent.
+Verify concealment with actual camera crops, not just decoration covering the
+main route in a concept picture. Preserve the optional choice and main recovery.
+
+The [three-view v2 storyboard](golden-river-upper-route/garden-concept-v2-storyboard.png)
+shows this progression without a main-route lane under the passage or garden.
+See [provenance and limitations](golden-river-upper-route/garden-concept-v2.md).
+
+### First garden proposal (superseded spatial layout)
+
 The first proposal has three beats: climb broken wall treads into a narrow breach,
 discover a sheltered courtyard with a living tree embracing a dry stone fountain,
 then return through a ruined side arcade and visible descending terraces. A
