@@ -712,3 +712,8 @@ The existing near panorama is extended to 14332×1448 using an original generated
 ## Optional upper lookout composition - 2026-11-09
 
 Issue #72 reuses the original generated shelf-masonry-compact-v3 and finale-gate-v1 paintings, with their existing provenance and ASSET-LICENSE.md terms. No new bitmap, external asset, generator call or model is introduced. Codex authored the bounded platform layout and placed the gate behind a solid lookout landing as temporary abandoned-arch scenery. Human direction comes from the approved optional exploration loop: a visibly discoverable environmental moment, safe rejoin, no collectible or new ability. Final art remains #73.
+
+
+## Hidden ruin garden concept - 2026-11-09
+
+Review-only garden-concept-v1.png under docs/design/golden-river-upper-route was created with the built-in OpenAI image generation tool (exact model not exposed), using only the original project gameplay screenshot as palette/material reference. Source: exec-036b1e6c-f7fe-4abb-a495-665b268e5a48.png. Existing ASSET-LICENSE.md generated-art terms apply; no third-party asset was used. The owner chose the hidden overgrown garden after rejecting the shelf chain; Codex proposed the tree/fountain courtyard and side-arcade return. Full prompt, composition observations and gameplay limitations are in garden-concept.md and garden-concept-prompt.txt beside the image. Not approved production artwork or collision evidence.

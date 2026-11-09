@@ -17,10 +17,26 @@ and a distinct return path. Preserve known movement, visible landings, safe fall
 and the accepted main route. Do not solve the feedback by lengthening the same
 shelf chain or adding an unapproved collectible or ability.
 
-Two bounded concepts are being offered for owner direction: an overgrown garden
-entered through a broken ruin wall, or an exterior/interior climb through a
-collapsed lookout tower. Neither is approved production content yet. Review the
-chosen spatial proposal before authoring a new artwork set or replacing gameplay.
+The owner selected the hidden ruin garden on 2026-11-09: enter through a breached
+wall into an overgrown, surprising place. The collapsed lookout alternative is
+not being pursued. This approves the concept direction; the spatial proposal
+and revised gameplay still require review.
+
+The first proposal has three beats: climb broken wall treads into a narrow breach,
+discover a sheltered courtyard with a living tree embracing a dry stone fountain,
+then return through a ruined side arcade and visible descending terraces. A
+glimpse of the courtyard invites entry from the main route. The main path remains
+independent below. The discovery is environmental, with no collectible, checkpoint
+override or new ability. A single painted overview is for concept review only;
+it is not collision, camera, gameplay or final-art evidence.
+
+See [garden spatial concept v1](golden-river-upper-route/garden-concept-v1.png).
+The image proposes enclosure, the reveal, material palette and return location.
+Its nearly continuous terrace is not the final traversal: the playable prototype
+must add deliberate short gaps, broken interior treads and a distinct descending
+return while preserving visible landings. Do not copy the illustration's lower
+route or tiny decorative gaps into the accepted main-route geometry. Exact
+artwork scale and screen coverage must be checked against the unchanged camera.
 
 ## First implementation (rejected)
 
