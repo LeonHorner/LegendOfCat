@@ -459,6 +459,14 @@ public sealed class SceneryRenderer : MonoBehaviour
         return item.transform;
     }
 
+    public void AddUpperLookout(Vector3 platform)
+    {
+        // Reused painted arch behind solid landing ground; no checkpoint or reward behavior.
+        var arch = Egg("upper lookout", "finale-gate-v1",
+            new Vector3(platform.x, platform.y + 2.05f, 3), new Vector2(3.2f, 2.6f), true);
+        arch.name = "Abandoned upper lookout";
+    }
+
     void UpdateFish(float seconds)
     {
         if (!easterEggs[1]) return;

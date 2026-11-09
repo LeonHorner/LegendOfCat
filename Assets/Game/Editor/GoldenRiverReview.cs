@@ -14,6 +14,13 @@ public static class GoldenRiverReview
         EditorApplication.EnterPlaymode();
     }
 
+    public static void ReimportPanoramas()
+    {
+        // A prior null-graphics import cannot initialize the 14k-wide panorama.
+        foreach (string name in new[] { "near-extended-panorama-v1", "far-extended-panorama-v1" })
+            AssetDatabase.ImportAsset("Assets/Game/Resources/GoldenRiver/" + name + ".png", ImportAssetOptions.ForceUpdate);
+    }
+
     [InitializeOnLoadMethod]
     static void Install()
     {
@@ -89,6 +96,13 @@ public static class GoldenRiverReview
                 new Vector2(a[77].x, a[77].y + 1.22f), new Vector2(a[85].x, a[85].y + 1.22f), new Vector2(a[44].x, a[44].y + 1.22f),
                 new Vector2(a[50].x + 3, a[50].y + 1.22f) };
             names = new[] { "checkpoint-first-unvisited", "checkpoint-first-active", "checkpoint-first-visited", "checkpoint-second-active", "broken-ruin-climb", "rooted-descent", "sleeping-cat-terrace", "lift-recovery-gap" };
+        }
+        bool upperReview = System.Array.IndexOf(args, "-upperReview") >= 0;
+        if (upperReview) {
+            var steps = UpperRoute.Platforms;
+            points = new[] { UpperRoute.Entrance, new Vector2(steps[2].x, steps[2].y + 1.22f),
+                new Vector2(steps[4].x, steps[4].y + 1.22f), new Vector2(steps[6].x, steps[6].y + 1.22f), UpperRoute.Rejoin };
+            names = new[] { "upper-entrance", "upper-turn", "upper-lookout", "upper-descent", "upper-rejoin" };
         }
         try {
             for (int index = 0; index < points.Length; index++) {
@@ -223,6 +237,7 @@ public static class GoldenRiverReview
                 }
             }
             if(finaleReview && System.Array.IndexOf(args,"-finaleMotion")>=0) CaptureFinaleMotion(course,scene,camera,follow,scenery,presentation,output);
+            if(upperReview) CaptureUpperMotion(course,scene,camera,follow,scenery,presentation,output);
         } finally {
             RenderTexture.active = previousTarget;
             Object.Destroy(root);
@@ -230,6 +245,44 @@ public static class GoldenRiverReview
             SceneManager.UnloadSceneAsync(scene);
         }
     }
+    static void CaptureUpperMotion(MovementCourse course,Scene scene,Camera camera,CatCamera follow,
+        SceneryRenderer scenery,MikaSpritePresentation presentation,string output)
+    {
+        bool full=System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"-fullUpperRun")>=0;
+        string pilotName=full?"UpperLevelPhysicsPilot":"UpperRoutePhysicsPilot";
+        var type=System.Array.Find(System.AppDomain.CurrentDomain.GetAssemblies(),a=>a.GetType(pilotName)!=null)?.GetType(pilotName);
+        if(type==null) throw new System.InvalidOperationException("Upper route test pilot must be loaded.");
+        var pilot=System.Activator.CreateInstance(type,new object[]{course});
+        course.RestartRun();
+        if(!full) course.Cat.RespawnAt(UpperRoute.Entrance);
+        var movers=course.GetComponentsInChildren<MovingSupport>();
+        foreach(var mover in movers){mover.SendMessage("Start");mover.ResetPhase();}
+        Physics2D.SyncTransforms();
+        string frames=output+"/motion";Directory.CreateDirectory(frames);
+        var target=new RenderTexture(640,360,24);var pixels=new Texture2D(640,360,TextureFormat.RGB24,false);
+        camera.targetTexture=target;camera.rect=new Rect(0,0,1,1);follow.Snap();
+        try {
+            for(int tick=0;tick<(full?25000:1800);tick++) {
+                foreach(var mover in movers)mover.SendMessage("FixedUpdate");
+                type.GetMethod("Command").Invoke(pilot,null);
+                course.Cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);
+                course.Cat.transform.position=course.Cat.GetComponent<Rigidbody2D>().position;
+                course.SendMessage("Update");follow.Follow(Time.fixedDeltaTime);
+                if(tick%4==0) {
+                    foreach(var mover in movers)mover.SendMessage("LateUpdate");
+                    presentation.RenderPose(Time.fixedDeltaTime*4);
+                    scenery.ApplyView(camera.transform.position.x,camera.transform.position.y);scenery.SetWaterTime(tick*Time.fixedDeltaTime);
+                    camera.Render();RenderTexture.active=target;pixels.ReadPixels(new Rect(0,0,640,360),0,0);pixels.Apply();
+                    File.WriteAllBytes($"{frames}/frame-{tick/4:00000}.png",pixels.EncodeToPNG());
+                }
+                if((bool)type.GetProperty("Complete").GetValue(pilot)) {
+                    Debug.Log("Scripted optional loop recording completed in "+(tick*Time.fixedDeltaTime).ToString("F2")+"s; not human-input evidence.");return;
+                }
+            }
+            throw new System.InvalidOperationException("Upper route recording stopped at "+course.Cat.transform.position);
+        } finally {camera.targetTexture=null;RenderTexture.active=null;target.Release();Object.Destroy(target);Object.Destroy(pixels);}
+    }
+
     static void CaptureFinaleMotion(MovementCourse course,Scene scene,Camera camera,CatCamera follow,
         SceneryRenderer scenery,MikaSpritePresentation presentation,string output)
     {

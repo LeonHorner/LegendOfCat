@@ -124,10 +124,10 @@ public sealed class MovementCourse : MonoBehaviour
     public static readonly int[] LevelOneFloatingPlatforms = { 3, 4, 8, 9, 10, 14, 15, 16, 19, 20, 22, 23, 24, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
     // Keep each connected suspended sequence in one material family.
     public static readonly int[] LevelOneRootPlatforms = { 3, 4, 8, 9, 10, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
-    // Reserved broad ground for the upper-route owner; no detour is required here.
+    // The optional loop uses early ascent banks; the later overlook still owns checkpoint 2.
     public static readonly Vector2 UpperRouteEntrance = new Vector2(AscentPlatforms[10].x, AscentPlatforms[10].y + 1.27f);
     public static readonly int OverlookIndex = AscentPlatforms.Length - 1;
-    public static readonly Vector2 UpperRouteRejoin = new Vector2(AscentPlatforms[OverlookIndex].x, 13.12f);
+    public static readonly Vector2 UpperRouteRejoin = new Vector2(AscentPlatforms[14].x, .52f);
     public static readonly Vector2 LevelOneExit = new Vector2(FinaleRoute.Last.x + 4.5f, FinaleRoute.Last.y + 1.27f);
     Vector3[] ActivePlatforms => LevelOne ? CompletePlatforms : Platforms;
     public CatController Cat { get; private set; }
@@ -332,6 +332,16 @@ public sealed class MovementCourse : MonoBehaviour
             }
             // The terminal cliff is visible beyond the gate; scenery continues past its edge.
 
+        }
+        if (LevelOne) {
+            foreach (var p in UpperRoute.Platforms) {
+                var floor = Block("Optional upper platform", p, new Vector2(p.z, 1.5f), Color.gray);
+                floor.GetComponent<SpriteRenderer>().enabled = false;
+                floor.AddComponent<BoxCollider2D>();
+                var paint = sceneryRenderer.AddRecoveryTerrain(p);
+                SceneryRenderer.MatchFloatingCollider(floor, paint);
+            }
+            sceneryRenderer.AddUpperLookout(UpperRoute.Platforms[UpperRoute.LookoutIndex]);
         }
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
