@@ -459,12 +459,37 @@ public sealed class SceneryRenderer : MonoBehaviour
         return item.transform;
     }
 
-    public void AddUpperLookout(Vector3 platform)
+    Transform GardenPainting(string name, string source, Vector3 center, float width)
     {
-        // Reused painted arch behind solid landing ground; no checkpoint or reward behavior.
-        var arch = Egg("upper lookout", "finale-gate-v1",
-            new Vector3(platform.x, platform.y + 2.05f, 3), new Vector2(3.2f, 2.6f), true);
-        arch.name = "Abandoned upper lookout";
+        var image = Resources.Load<Texture2D>("GoldenRiver/" + source);
+        var item = Egg(name, source, center, new Vector2(width, width * image.height / image.width), true);
+        item.name = name;
+        return item;
+    }
+
+    public Transform AddGardenCourt(Vector3 platform)
+    {
+        var image = Resources.Load<Texture2D>("GoldenRiver/garden-court-v1");
+        float height = platform.z * image.height / image.width;
+        // The original generated lawn is registered at 13.2% of source height.
+        return GardenPainting("Hidden garden courtyard", "garden-court-v1",
+            new Vector3(platform.x, platform.y + .75f + height * (.5f - .132f), 2), platform.z);
+    }
+
+    public void AddHiddenGarden(UpperGarden garden)
+    {
+        float x = UpperRoute.Entrance.x;
+        GardenPainting("Ivy wall entrance hint", "garden-wall-v1", new Vector3(x - 3, 2.3f, 3), 6);
+        // Enclosing masonry belongs behind actual treads, with no painted false ledges.
+        foreach (var p in new[] {new Vector3(x - 11, 3.5f, 16), new Vector3(x - 23, 7, 14), new Vector3(x - 42, 7, 18)}) {
+            var wall = GardenPainting("Enclosed garden passage", "garden-wall-v1", new Vector3(p.x, p.y, 5), p.z);
+            garden.Concealed.Add(wall.GetComponent<Renderer>());
+        }
+        for (int i = 12; i < UpperRoute.Platforms.Length; i++) {
+            var p = UpperRoute.Platforms[i];
+            var wall = GardenPainting("Garden return arcade", "garden-wall-v1", new Vector3(p.x, p.y - 5.25f, 5), 10);
+            garden.Concealed.Add(wall.GetComponent<Renderer>());
+        }
     }
 
     void UpdateFish(float seconds)

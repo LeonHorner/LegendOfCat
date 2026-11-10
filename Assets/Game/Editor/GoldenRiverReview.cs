@@ -100,8 +100,8 @@ public static class GoldenRiverReview
         bool upperReview = System.Array.IndexOf(args, "-upperReview") >= 0;
         if (upperReview) {
             var steps = UpperRoute.Platforms;
-            points = new[] { UpperRoute.Entrance, new Vector2(steps[2].x, steps[2].y + 1.22f),
-                new Vector2(steps[4].x, steps[4].y + 1.22f), new Vector2(steps[6].x, steps[6].y + 1.22f), UpperRoute.Rejoin };
+            points = new[] { UpperRoute.Entrance, new Vector2(steps[6].x, steps[6].y + 1.22f),
+                new Vector2(steps[8].x, steps[8].y + 1.22f), new Vector2(steps[20].x, steps[20].y + 1.22f), UpperRoute.Rejoin };
             names = new[] { "upper-entrance", "upper-turn", "upper-lookout", "upper-descent", "upper-rejoin" };
         }
         try {
@@ -120,6 +120,7 @@ public static class GoldenRiverReview
                 }
                 cat.transform.position = cat.GetComponent<Rigidbody2D>().position;
                 presentation.RenderPose(0);
+                root.GetComponent<UpperGarden>()?.Refresh();
                 follow.Snap();
                 follow.SendMessage("LateUpdate");
                 scenery.ApplyView(camera.transform.position.x, camera.transform.position.y);
@@ -262,12 +263,13 @@ public static class GoldenRiverReview
         var target=new RenderTexture(640,360,24);var pixels=new Texture2D(640,360,TextureFormat.RGB24,false);
         camera.targetTexture=target;camera.rect=new Rect(0,0,1,1);follow.Snap();
         try {
-            for(int tick=0;tick<(full?25000:1800);tick++) {
+            for(int tick=0;tick<(full?25000:5000);tick++) {
                 foreach(var mover in movers)mover.SendMessage("FixedUpdate");
                 type.GetMethod("Command").Invoke(pilot,null);
                 course.Cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);
                 course.Cat.transform.position=course.Cat.GetComponent<Rigidbody2D>().position;
                 course.SendMessage("Update");follow.Follow(Time.fixedDeltaTime);
+                course.GetComponent<UpperGarden>()?.Refresh();
                 if(tick%4==0) {
                     foreach(var mover in movers)mover.SendMessage("LateUpdate");
                     presentation.RenderPose(Time.fixedDeltaTime*4);

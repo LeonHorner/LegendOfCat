@@ -722,3 +722,8 @@ Review-only garden-concept-v1.png under docs/design/golden-river-upper-route was
 ## Concealed garden storyboard - 2026-11-09
 
 Review-only garden-concept-v2-storyboard.png under docs/design/golden-river-upper-route uses the built-in OpenAI image generation tool (exact model not exposed). Source: exec-6686323a-954c-4a46-a711-fd1b29ea6bef.png. Reference: original project-generated garden-concept-v1.png for materials/mood only. Existing ASSET-LICENSE.md generated-art terms apply; no third-party source. Human direction explicitly requires a subtle entrance hint followed by complete disappearance of the main route from the viewport. Codex composed entrance, enclosed climb and secluded-garden camera views. Exact prompt and limitations are archived in garden-concept-v2-prompt.txt and garden-concept-v2.md. Not gameplay evidence or production acceptance.
+
+
+## Hidden garden gameplay paintings - 2026-11-09
+
+Original generated transparent garden-court-v1.png and garden-wall-v1.png in Assets/Game/Resources/GoldenRiver were created with the built-in OpenAI image generation tool (exact model not exposed), referencing only the project-generated garden storyboard. Source outputs: exec-532bd831-9750-4258-9c77-56ed421e2676.png and exec-45f2c1fa-2f5b-4060-b2af-4b2865f917a8.png. Existing ASSET-LICENSE.md generated-art terms apply, with no third-party source. Human direction selected the hidden ruin garden, subtle entrance hint and complete main-route concealment after entry. Codex authored the tree/dry-fountain court, ivy wall, climbing route and return passage. Prompts, registration and creative decisions are archived in docs/design/golden-river-upper-route/garden-assets.md. Gameplay/visual acceptance remains pending.

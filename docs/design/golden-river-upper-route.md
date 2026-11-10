@@ -1,5 +1,59 @@
 # Golden River upper route
 
+## Concealed garden prototype - 2026-11-10
+
+The owner authorized implementation and a playable preview after confirming the
+subtle entrance and complete separation from the main-route camera. This is the
+current prototype; the exposed shelf chain and open garden illustrations below
+are superseded. Actual player review of this revision is pending; keep PR #79 draft.
+
+The branch leaves ascent bank 10 through a single small leftward tread beside an
+ordinary ivy-covered wall. Successive leftward climbing treads enter enclosing
+masonry and rise beyond the main camera corridor. The court sits at height 13,
+with a complete original tree/dry-fountain painting and solid registered floor.
+An upper return reverses through broken wall tops and descends to bank 14. There
+are no optional checkpoints, rewards or new abilities. The first main checkpoint
+remains the water-fall/manual-retry recovery point.
+
+UpperGarden reveals the enclosed passage and return scenery only after Mika
+chooses the first tread; the courtyard is not advertised from main-route ground.
+Its concealment resets on return/retry. All collision remains physical. Return
+treads stay above the nearby main-route jump envelope. The ordinary entrance wall
+and first tread are the only route-specific visuals visible while bypassing it.
+
+Scoped CatCamera framing shows the court/tree above its foundation at the same
+zoom, then reveals the broad main rejoin before the last descent. Main-route
+framing outside those upper-route position/height ranges is preserved. Tests
+exercise actual physics traversal, each-shelf falls, checkpoint/retry/restart,
+main-route bypass and real-camera exclusion of nearby main-platform contacts.
+
+Preview: build with BuildGame.BuildPreview and launch with
+`--preview-view level-one-garden`. This starts at the subtle entrance with the
+real checkpoint-1 recovery state. Move left and jump onto the ivy-side tread;
+continue left/up to discover the court. Explore its left side to find the upper
+return, then travel right/down. R retries checkpoint 1; Backspace restarts the
+whole level, P pauses, Escape returns to the existing menu.
+
+New art, source identifiers, exact prompts and registration decisions are in
+[garden-assets.md](golden-river-upper-route/garden-assets.md). Source PNGs and
+Unity-generated metadata are committed with this implementation. The old CI
+results and recordings below do not validate this redesign.
+
+Local validation: Unity 6000.3.27f2/D3D11 passed 30/30 scoped tests, no failures or
+skips (UpperRouteTests, MenuMovementIntegrationTests, CatCollisionTests and
+RunLifecycleTests). Both whole-level traversal with the garden and whole-level
+bypass completed. The new camera test confirms concealment at the entrance,
+no main-platform contact inside the climbing/court camera crops, and visibility
+of the rejoin before descent. The focused scripted garden run completed in 28.98
+seconds of simulated game time; this is not a human timing/difficulty measurement.
+
+Current [normal-speed garden loop](golden-river-upper-route/garden-evidence/garden-loop.mp4)
+and color/grayscale 960/640-pixel stills are in garden-evidence. Reviewed the
+ordinary-wall entrance, enclosed ascent, complete court/tree framing and visible
+rejoin. The local Windows development preview built successfully and its packed
+art audit verified 46 paintings plus three shader-reference materials. No current
+Linux build, full final CI or player acceptance is claimed for this draft revision.
+
 ## Player review - 2026-11-09
 
 The owner played the preview and rejected this first implementation as very

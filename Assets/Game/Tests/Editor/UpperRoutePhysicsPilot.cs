@@ -34,15 +34,34 @@ public sealed class UpperRoutePhysicsPilot
             Mathf.Abs(body.position.x - p.x) < p.z / 2) {
             Next++; settle = 0; launched = false; Move(0); return;
         }
+        if (Next == route.Length - 1) {
+            // Walk off the final terrace onto the visible overlapping broad bank below.
+            var source = route[Next - 1];
+            float direction = Mathf.Sign(p.x - source.x);
+            float exit = source.x + direction * (source.z / 2 + 1);
+            launched = true;
+            Move(Mathf.Abs(exit - body.position.x) > .2f ? Mathf.Sign(exit - body.position.x) : 0);
+            return;
+        }
         if (!launched) {
-            Move(0);
-            if (!grounded || ++settle < 10) return;
+            float launch = body.position.x;
+            if (Next > 0) {
+                var source = route[Next - 1];
+                float direction = Mathf.Sign(p.x - source.x);
+                launch = source.x + direction * (source.z / 2 - .8f);
+                if (Mathf.Abs(p.x - source.x) < (source.z + p.z) / 2)
+                    launch = p.x - direction * (p.z / 2 + 1.1f);
+            }
+            float approach = launch - body.position.x;
+            Move(grounded && Mathf.Abs(approach) > .18f ? Mathf.Sign(approach) : 0);
+            if (!grounded || Mathf.Abs(approach) > .35f) { settle = 0; return; }
+            if (++settle < 10) return;
             launched = true;
             cat.GetType().GetMethod("PressJump").Invoke(cat, null);
         }
         float target = p.x;
-        if (Next > 0 && Mathf.Abs(p.x - route[Next - 1].x) > 5)
-            target -= Mathf.Sign(p.x - route[Next - 1].x) * (p.z / 2 - .65f);
+        if (Next > 0 && p.z >= 4)
+            target -= Mathf.Sign(p.x - route[Next - 1].x) * (p.z / 2 - 1);
         float distance = target - body.position.x;
         Move(Mathf.Abs(distance) > .25f ? Mathf.Sign(distance) : 0);
     }

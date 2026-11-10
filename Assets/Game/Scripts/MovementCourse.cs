@@ -334,14 +334,26 @@ public sealed class MovementCourse : MonoBehaviour
 
         }
         if (LevelOne) {
-            foreach (var p in UpperRoute.Platforms) {
+            var garden = gameObject.AddComponent<UpperGarden>();
+            garden.Cat = Cat;
+            for (int i = 0; i < UpperRoute.Platforms.Length; i++) {
+                var p = UpperRoute.Platforms[i];
                 var floor = Block("Optional upper platform", p, new Vector2(p.z, 1.5f), Color.gray);
                 floor.GetComponent<SpriteRenderer>().enabled = false;
                 floor.AddComponent<BoxCollider2D>();
-                var paint = sceneryRenderer.AddRecoveryTerrain(p);
-                SceneryRenderer.MatchFloatingCollider(floor, paint);
+                var paint = i == UpperRoute.LookoutIndex ? sceneryRenderer.AddGardenCourt(p) : sceneryRenderer.AddRecoveryTerrain(p);
+                if (i == UpperRoute.LookoutIndex) {
+                    var image = Resources.Load<Texture2D>("GoldenRiver/garden-court-v1");
+                    float thickness = p.z * image.height / image.width * .132f;
+                    var shape = floor.GetComponent<BoxCollider2D>();
+                    shape.size = new Vector2(1, thickness / 1.5f);
+                    shape.offset = new Vector2(0, (.75f - thickness / 2) / 1.5f);
+                }
+                if (i != UpperRoute.LookoutIndex) SceneryRenderer.MatchFloatingCollider(floor, paint);
+                if (i > 0) garden.Concealed.Add(paint.GetComponent<Renderer>());
             }
-            sceneryRenderer.AddUpperLookout(UpperRoute.Platforms[UpperRoute.LookoutIndex]);
+            sceneryRenderer.AddHiddenGarden(garden);
+            garden.Refresh();
         }
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
@@ -425,6 +437,7 @@ public sealed class MovementCourse : MonoBehaviour
         Cat.RespawnAt(transform.TransformPoint(LevelOneCheckpointSpawns[1]));
     }
     public void StartAscentPreview() => StartPreviewAt(LevelOneCheckpointSpawns[0]);
+    public void StartGardenPreview() { StartAscentPreview(); Cat.RespawnAt(transform.TransformPoint(UpperRoute.Entrance)); }
     public void StartVerticalLiftPreview()
     {
         var bank = AscentPlatforms[50];

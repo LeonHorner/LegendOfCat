@@ -36,6 +36,12 @@ public sealed class CatCamera : MonoBehaviour
             else if (snap) trackedHeight = Mathf.Max(1, localY - upperEdge);
             else if (localY > trackedHeight + upperEdge) trackedHeight = localY - upperEdge;
             else if (localY < trackedHeight + lowerEdge) trackedHeight = Mathf.Max(1, localY - lowerEdge);
+            // Frame the secluded courtyard above its foundation, keeping the full tree reveal.
+            if (localX >= UpperRoute.Entrance.x - 51 && localX <= UpperRoute.Entrance.x - 33 && localY >= 12)
+                trackedHeight = Mathf.Max(trackedHeight, 15.2f);
+            // Reveal the broad main-route bank before committing to the garden's last drop.
+            if (localX >= UpperRoute.Entrance.x + 25 && localX <= UpperRoute.Rejoin.x + 5 && localY > 2 && localY < 8)
+                trackedHeight = Mathf.Min(trackedHeight, 3.2f);
             if(localX>=FinaleRoute.StartX && localY>10) trackedHeight=Mathf.Max(trackedHeight,FinaleRoute.CameraMinimum(localX));
             if(localX>FinaleRoute.Last.x-35 && localY>FinaleRoute.Last.y-1) {
                 float reveal=Mathf.SmoothStep(0,1,Mathf.InverseLerp(FinaleRoute.Last.x-35,FinaleRoute.Last.x-8,localX));
