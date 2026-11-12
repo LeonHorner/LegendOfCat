@@ -31,11 +31,21 @@ public static class BuildScenery
         foreach (string name in new[] { "background-material", "terrain-material", "water-material" })
             if (!paths.Contains(ResourcesDirectory + name + ".mat"))
                 throw new BuildFailedException("Missing scenery shader-reference material: " + name);
+        long descentBytes = GoldenRiverArt.Where(n => n.StartsWith("Descent/", System.StringComparison.Ordinal))
+            .Sum(n => UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(
+                AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Game/Resources/GoldenRiver/" + n + ".png")));
+        if (descentBytes > 128L * 1024 * 1024)
+            throw new BuildFailedException("Dry descent textures exceed the 128 MiB imported-memory budget.");
+        Debug.Log("Dry descent imported texture bytes: " + descentBytes);
         Debug.Log("Packed scenery verified: " + (ActiveLayers.Length + GoldenRiverArt.Length) + " active paintings and three shader-reference materials; historical art excluded.");
     }
 
     public static readonly string[] GoldenRiverArt = {
-        "garden-court-v1", "garden-wall-v1",
+        "Descent/entry-bank-v3", "Descent/cliff-stone-v2", "Descent/cave-edge-short-v2", "Descent/cave-edge-medium-v2", "Descent/cave-edge-wide-v2",
+        "Descent/entry-left-v1", "Descent/entry-overhang-v1", "Descent/inner-corner-v1", "Descent/ceiling-v1",
+        "Descent/rock-face-v1", "Descent/rooted-face-v1", "Descent/tread-short-v1", "Descent/tread-medium-v1",
+        "Descent/tread-wide-v1", "Descent/rear-rock-v1", "Descent/ruin-v1", "Descent/floor-v1",
+        "Descent/vegetation-v1", "Descent/shore-entry-v1", "Descent/shore-exit-v1",
         "finale-watchtower-v1", "finale-rubble-v1", "finale-hillside-v1", "finale-gate-v1", "finale-guide-v1", "finale-vertical-guide-v1", "finale-wall-v1", "finale-pier-v1", "finale-garden-v1",
         "checkpoint-states-v1", "checkpoint-tree-v1", "checkpoint-arch-v1",
         "near-extended-panorama-v1", "far-extended-panorama-v1", "bank-tall-ascent-v1", "shelf-ascent-masonry-v1", "landmark-hillside-fortress-v1", "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2",
@@ -47,6 +57,14 @@ public static class BuildScenery
     [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]
     public static void ImportGoldenRiverArt()
     {
+        foreach (string name in new[] { "garden-court-v1", "garden-wall-v1" }) {
+            string source = "Assets/Game/Resources/GoldenRiver/" + name + ".png";
+            if (!AssetDatabase.LoadAssetAtPath<Texture2D>(source)) continue;
+            const string archive = "Assets/Game/Art/GoldenRiverArchive";
+            if (!AssetDatabase.IsValidFolder(archive)) AssetDatabase.CreateFolder("Assets/Game/Art", "GoldenRiverArchive");
+            string error = AssetDatabase.MoveAsset(source, archive + "/" + name + ".png");
+            if (!string.IsNullOrEmpty(error)) throw new System.InvalidOperationException(error);
+        }
         const string checkpointMaterial = "Assets/Game/Resources/GoldenRiver/checkpoint-material.mat";
         if (!AssetDatabase.LoadAssetAtPath<Material>(checkpointMaterial))
             AssetDatabase.CreateAsset(new Material(Shader.Find("LegendOfCat/Checkpoint")), checkpointMaterial);
@@ -70,6 +88,16 @@ public static class BuildScenery
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.npotScale = TextureImporterNPOTScale.None;
             importer.maxTextureSize = name.Contains("extended-panorama") ? 16384 : name.Contains("panorama") || name == "checkpoint-states-v1" ? 4096 : 2048;
+            if (name.StartsWith("Descent/", System.StringComparison.Ordinal)) {
+                // Desktop block compression requires aligned dimensions. UV registration stays unchanged.
+                importer.npotScale = TextureImporterNPOTScale.ToNearest;
+                var platform = importer.GetPlatformTextureSettings("Standalone");
+                platform.overridden = true;
+                platform.maxTextureSize = 2048;
+                platform.format = TextureImporterFormat.BC7;
+                platform.compressionQuality = 100;
+                importer.SetPlatformTextureSettings(platform);
+            }
             importer.SaveAndReimport();
         }
         AssetDatabase.SaveAssets();

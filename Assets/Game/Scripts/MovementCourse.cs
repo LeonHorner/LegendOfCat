@@ -124,10 +124,10 @@ public sealed class MovementCourse : MonoBehaviour
     public static readonly int[] LevelOneFloatingPlatforms = { 3, 4, 8, 9, 10, 14, 15, 16, 19, 20, 22, 23, 24, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
     // Keep each connected suspended sequence in one material family.
     public static readonly int[] LevelOneRootPlatforms = { 3, 4, 8, 9, 10, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
-    // The optional loop uses early ascent banks; the later overlook still owns checkpoint 2.
+    // The cave advances to a later bank; the overlook still owns checkpoint 2.
     public static readonly Vector2 UpperRouteEntrance = new Vector2(AscentPlatforms[10].x, AscentPlatforms[10].y + 1.27f);
     public static readonly int OverlookIndex = AscentPlatforms.Length - 1;
-    public static readonly Vector2 UpperRouteRejoin = new Vector2(AscentPlatforms[14].x, .52f);
+    public static Vector2 UpperRouteRejoin => UpperRoute.Rejoin;
     public static readonly Vector2 LevelOneExit = new Vector2(FinaleRoute.Last.x + 4.5f, FinaleRoute.Last.y + 1.27f);
     Vector3[] ActivePlatforms => LevelOne ? CompletePlatforms : Platforms;
     public CatController Cat { get; private set; }
@@ -334,26 +334,15 @@ public sealed class MovementCourse : MonoBehaviour
 
         }
         if (LevelOne) {
-            var garden = gameObject.AddComponent<UpperGarden>();
-            garden.Cat = Cat;
-            for (int i = 0; i < UpperRoute.Platforms.Length; i++) {
-                var p = UpperRoute.Platforms[i];
-                var floor = Block("Optional upper platform", p, new Vector2(p.z, 1.5f), Color.gray);
-                floor.GetComponent<SpriteRenderer>().enabled = false;
-                floor.AddComponent<BoxCollider2D>();
-                var paint = i == UpperRoute.LookoutIndex ? sceneryRenderer.AddGardenCourt(p) : sceneryRenderer.AddRecoveryTerrain(p);
-                if (i == UpperRoute.LookoutIndex) {
-                    var image = Resources.Load<Texture2D>("GoldenRiver/garden-court-v1");
-                    float thickness = p.z * image.height / image.width * .132f;
-                    var shape = floor.GetComponent<BoxCollider2D>();
-                    shape.size = new Vector2(1, thickness / 1.5f);
-                    shape.offset = new Vector2(0, (.75f - thickness / 2) / 1.5f);
-                }
-                if (i != UpperRoute.LookoutIndex) SceneryRenderer.MatchFloatingCollider(floor, paint);
-                if (i > 0) garden.Concealed.Add(paint.GetComponent<Renderer>());
-            }
-            sceneryRenderer.AddHiddenGarden(garden);
-            garden.Refresh();
+            Cat.RecoveryBoundary = UpperRoute.ShouldRecover;
+            foreach (var p in UpperRoute.Platforms) CreateDescentFloor(p, sceneryRenderer, "Dry descent platform");
+            foreach (var p in UpperRoute.Recoveries) CreateDescentFloor(p, sceneryRenderer, "Descent recovery");
+            var garden = gameObject.AddComponent<DryDescent>();
+            garden.Initialize(Cat, sceneryRenderer);
+            var anchor = new GameObject("FutureCollectibleAnchor");
+            anchor.transform.SetParent(transform, false);
+            var room = UpperRoute.Platforms[UpperRoute.LookoutIndex];
+            anchor.transform.localPosition = new Vector3(room.x + 5, room.y + 1.2f, 0);
         }
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
@@ -368,6 +357,17 @@ public sealed class MovementCourse : MonoBehaviour
         }
         // Main-route landmarks and platform silhouettes communicate progression without floating labels.
         if (!LevelOne) Label("FINISH / return or retry", new Vector2(100, 1));
+    }
+    void CreateDescentFloor(Vector3 p, SceneryRenderer scenery, string name)
+    {
+        var floor = Block(name, p, new Vector2(p.z, 1.5f), Color.gray);
+        floor.GetComponent<SpriteRenderer>().enabled = false;
+        var collision = floor.AddComponent<BoxCollider2D>();
+        bool niche = p == UpperRoute.Platforms[UpperRoute.LookoutIndex];
+        float depth = niche ? 3 : .5f;
+        collision.size = new Vector2(1, depth / 1.5f);
+        collision.offset = new Vector2(0, (.75f-depth/2) / 1.5f);
+        scenery.AddDescentTerrain(p);
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
     {
@@ -437,7 +437,7 @@ public sealed class MovementCourse : MonoBehaviour
         Cat.RespawnAt(transform.TransformPoint(LevelOneCheckpointSpawns[1]));
     }
     public void StartAscentPreview() => StartPreviewAt(LevelOneCheckpointSpawns[0]);
-    public void StartGardenPreview() { StartAscentPreview(); Cat.RespawnAt(transform.TransformPoint(UpperRoute.Entrance)); }
+    public void StartDescentPreview() { StartAscentPreview(); Cat.RespawnAt(transform.TransformPoint(UpperRoute.Entrance)); }
     public void StartVerticalLiftPreview()
     {
         var bank = AscentPlatforms[50];

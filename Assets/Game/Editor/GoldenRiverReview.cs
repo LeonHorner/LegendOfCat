@@ -47,6 +47,15 @@ public static class GoldenRiverReview
             ? args[outputIndex + 1]
             : "docs/design/golden-river-main-route/variety-evidence";
         Directory.CreateDirectory(output);
+        long textureBytes = 0;
+        var textureAudit = new System.Text.StringBuilder("Name,Width,Height,RuntimeBytes,Format\n");
+        foreach (var texture in Resources.LoadAll<Texture2D>("GoldenRiver/Descent")) {
+            long bytes = UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(texture);
+            textureBytes += bytes;
+            textureAudit.AppendLine(texture.name + "," + texture.width + "," + texture.height + "," + bytes + "," + texture.format);
+        }
+        textureAudit.AppendLine("Total,,," + textureBytes);
+        File.WriteAllText(output + "/descent-texture-memory.csv", textureAudit.ToString());
         var previousScene = SceneManager.GetActiveScene();
         var scene = SceneManager.CreateScene("Golden River visual review", new CreateSceneParameters(LocalPhysicsMode.Physics2D));
         SceneManager.SetActiveScene(scene);
@@ -100,9 +109,11 @@ public static class GoldenRiverReview
         bool upperReview = System.Array.IndexOf(args, "-upperReview") >= 0;
         if (upperReview) {
             var steps = UpperRoute.Platforms;
-            points = new[] { UpperRoute.Entrance, new Vector2(steps[6].x, steps[6].y + 1.22f),
-                new Vector2(steps[8].x, steps[8].y + 1.22f), new Vector2(steps[20].x, steps[20].y + 1.22f), UpperRoute.Rejoin };
-            names = new[] { "upper-entrance", "upper-turn", "upper-lookout", "upper-descent", "upper-rejoin" };
+            points = new[] { UpperRoute.Entrance, new Vector2(steps[2].x, steps[2].y + 1.22f),
+                new Vector2(steps[UpperRoute.RiskIndex-1].x, steps[UpperRoute.RiskIndex-1].y + 1.22f),
+                new Vector2(UpperRoute.Recoveries[0].x, UpperRoute.Recoveries[0].y + 1.22f),
+                new Vector2(steps[UpperRoute.LookoutIndex].x, steps[UpperRoute.LookoutIndex].y + 1.22f), UpperRoute.Rejoin };
+            names = new[] { "descent-entrance", "descent-entry-bank", "descent-risk", "descent-catch", "descent-niche", "descent-rejoin" };
         }
         try {
             for (int index = 0; index < points.Length; index++) {
@@ -120,7 +131,6 @@ public static class GoldenRiverReview
                 }
                 cat.transform.position = cat.GetComponent<Rigidbody2D>().position;
                 presentation.RenderPose(0);
-                root.GetComponent<UpperGarden>()?.Refresh();
                 follow.Snap();
                 follow.SendMessage("LateUpdate");
                 scenery.ApplyView(camera.transform.position.x, camera.transform.position.y);
@@ -238,7 +248,7 @@ public static class GoldenRiverReview
                 }
             }
             if(finaleReview && System.Array.IndexOf(args,"-finaleMotion")>=0) CaptureFinaleMotion(course,scene,camera,follow,scenery,presentation,output);
-            if(upperReview) CaptureUpperMotion(course,scene,camera,follow,scenery,presentation,output);
+            if(upperReview && System.Array.IndexOf(args,"-stillReview")<0) CaptureUpperMotion(course,scene,camera,follow,scenery,presentation,output);
         } finally {
             RenderTexture.active = previousTarget;
             Object.Destroy(root);
@@ -250,12 +260,19 @@ public static class GoldenRiverReview
         SceneryRenderer scenery,MikaSpritePresentation presentation,string output)
     {
         bool full=System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"-fullUpperRun")>=0;
+        bool catchOnly=System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"-catchReview")>=0;
         string pilotName=full?"UpperLevelPhysicsPilot":"UpperRoutePhysicsPilot";
         var type=System.Array.Find(System.AppDomain.CurrentDomain.GetAssemblies(),a=>a.GetType(pilotName)!=null)?.GetType(pilotName);
         if(type==null) throw new System.InvalidOperationException("Upper route test pilot must be loaded.");
-        var pilot=System.Activator.CreateInstance(type,new object[]{course});
+        bool mainOnly = System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"-mainOnly") >= 0;
+        var pilot=full ? System.Activator.CreateInstance(type,new object[]{course,!mainOnly})
+            : System.Activator.CreateInstance(type,new object[]{course});
         course.RestartRun();
         if(!full) course.Cat.RespawnAt(UpperRoute.Entrance);
+        if (catchOnly) {
+            var takeoff = UpperRoute.Platforms[UpperRoute.RiskIndex - 1];
+            course.Cat.RespawnAt(new Vector2(takeoff.x, takeoff.y + 1.22f));
+        }
         var movers=course.GetComponentsInChildren<MovingSupport>();
         foreach(var mover in movers){mover.SendMessage("Start");mover.ResetPhase();}
         Physics2D.SyncTransforms();
@@ -265,11 +282,16 @@ public static class GoldenRiverReview
         try {
             for(int tick=0;tick<(full?25000:5000);tick++) {
                 foreach(var mover in movers)mover.SendMessage("FixedUpdate");
-                type.GetMethod("Command").Invoke(pilot,null);
+                if (catchOnly) {
+                    var takeoff = UpperRoute.Platforms[UpperRoute.RiskIndex - 1];
+                    float direction=Mathf.Sign(UpperRoute.Platforms[UpperRoute.RiskIndex].x-takeoff.x);
+                    float edge=takeoff.x+direction*(takeoff.z/2+.6f);
+                    course.Cat.Motion.SetMove(direction*(edge-course.Cat.transform.position.x)>.02f?direction:0);
+                } else type.GetMethod("Command").Invoke(pilot,null);
                 course.Cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);
                 course.Cat.transform.position=course.Cat.GetComponent<Rigidbody2D>().position;
                 course.SendMessage("Update");follow.Follow(Time.fixedDeltaTime);
-                course.GetComponent<UpperGarden>()?.Refresh();
+                course.GetComponent<DescentLight>()?.Advance(Time.fixedDeltaTime);
                 if(tick%4==0) {
                     foreach(var mover in movers)mover.SendMessage("LateUpdate");
                     presentation.RenderPose(Time.fixedDeltaTime*4);
@@ -277,7 +299,10 @@ public static class GoldenRiverReview
                     camera.Render();RenderTexture.active=target;pixels.ReadPixels(new Rect(0,0,640,360),0,0);pixels.Apply();
                     File.WriteAllBytes($"{frames}/frame-{tick/4:00000}.png",pixels.EncodeToPNG());
                 }
-                if((bool)type.GetProperty("Complete").GetValue(pilot)) {
+                bool complete = catchOnly ? tick > 150 && course.Cat.Grounded &&
+                    Mathf.Abs(course.Cat.transform.position.y-(UpperRoute.Recoveries[0].y+1.22f)) < .15f
+                    : (bool)type.GetProperty("Complete").GetValue(pilot);
+                if(complete) {
                     Debug.Log("Scripted optional loop recording completed in "+(tick*Time.fixedDeltaTime).ToString("F2")+"s; not human-input evidence.");return;
                 }
             }

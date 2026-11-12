@@ -681,7 +681,9 @@ public class MenuMovementIntegrationTests
         Assert.That(course.GetComponentsInChildren<PlatformEffector2D>(), Is.Empty, "Course platforms must be solid from below.");
         var shaped = course.GetComponentsInChildren<PolygonCollider2D>();
         Assert.That(shaped.Length, Is.GreaterThan(20));
-        foreach (var polygon in shaped.Where(p => !p.isTrigger && p.name!="Solid fallen masonry")) {
+        // This contact-profile assertion applies to suspended/main-route platforms, not solid cave volumes.
+        foreach (var polygon in shaped.Where(p => !p.isTrigger && (p.name=="Standable platform" ||
+            p.name=="Recovery terrace" || p.name=="Late ruin recovery" || p.name.StartsWith("Finale recovery ")))) {
             var bounds = polygon.bounds;
             Assert.That(polygon.OverlapPoint(new Vector2(bounds.center.x, bounds.max.y - 0.03f)), Is.True,
                 "The registered landing surface must remain solid.");

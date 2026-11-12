@@ -1,0 +1,11 @@
+{
+  "date": "2026-11-11",
+  "generator": "Built-in OpenAI image generation",
+  "model": "Not exposed",
+  "source": "exec-66479ffa-b02b-49f2-b94b-6ff129d92505.png",
+  "file": "Assets/Game/Resources/GoldenRiver/Descent/cliff-stone-v2.png",
+  "reference": "Assets/Game/Resources/GoldenRiver/Descent/rear-rock-v1.png",
+  "license": "ASSET-LICENSE.md generated-art policy",
+  "prompt": "Edit this original project-generated stone texture into a production seamless hand-painted cliff material for a charming 2D side-view cat adventure. Preserve its violet-gray stone palette and painted brushwork, but replace the regular diagonal slab pattern with varied massive irregular natural boulder faces, some craggy planes, softly shaded cracks and small cooler recessed crevices. Lighting is gentle warm from upper right, cool reflected shadows below. Stronger physical volume than the source, restrained contrast, readable large shapes at small game size. Square tile, completely opaque edge-to-edge stone, seamless matching left/right and top/bottom. No outer border, no silhouette, no sky, no scene, no ledges or grass contact lines painted into the texture, no moss flecks, no dots, no particles, no roots or identifiable unique motifs, no text. This will be mapped onto separately authored solid cliff geometry, never displayed as a floating rectangular painting.",
+  "creativeDecisions": "Replace slab repetition with irregular violet-gray boulder faces; map the painting onto authored solid cave geometry with native world scale. Keep the original source unchanged."
+}

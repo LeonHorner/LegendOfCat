@@ -13,7 +13,9 @@ public sealed class CatCamera : MonoBehaviour
     public float rightBoundary = 48;
     public Transform courseRoot;
     bool snap = true;
-    public void Snap() => snap = true;
+    bool descentFollowing;
+    float descentHeight;
+    public void Snap() { snap = true; descentFollowing = false; }
     void LateUpdate() => Follow(Time.deltaTime);
 
     public void Follow(float deltaSeconds)
@@ -32,16 +34,26 @@ public sealed class CatCamera : MonoBehaviour
             float localX = courseRoot.InverseTransformPoint(target.position).x;
             // Follow near the upper edge, leaving ordinary jumps inside a broad resting zone.
             const float upperEdge = 2.6f, lowerEdge = -2.2f;
-            if (localX < 425) trackedHeight = 1;
-            else if (snap) trackedHeight = Mathf.Max(1, localY - upperEdge);
-            else if (localY > trackedHeight + upperEdge) trackedHeight = localY - upperEdge;
-            else if (localY < trackedHeight + lowerEdge) trackedHeight = Mathf.Max(1, localY - lowerEdge);
-            // Frame the secluded courtyard above its foundation, keeping the full tree reveal.
-            if (localX >= UpperRoute.Entrance.x - 51 && localX <= UpperRoute.Entrance.x - 33 && localY >= 12)
-                trackedHeight = Mathf.Max(trackedHeight, 15.2f);
-            // Reveal the broad main-route bank before committing to the garden's last drop.
-            if (localX >= UpperRoute.Entrance.x + 25 && localX <= UpperRoute.Rejoin.x + 5 && localY > 2 && localY < 8)
-                trackedHeight = Mathf.Min(trackedHeight, 3.2f);
+            bool wasDescending = descentFollowing;
+            var descentBounds = UpperRoute.MaskBounds;
+            if (localY >= -.5f || localX < UpperRoute.Origin + descentBounds.xMin || localX > UpperRoute.Origin + descentBounds.xMax) descentFollowing = false;
+            else if (localY < -3.2f && UpperRoute.IsDry(new Vector2(localX,localY))) descentFollowing = true;
+            if (!descentFollowing) {
+                if (localX < 425) trackedHeight = 1;
+                else if (snap) trackedHeight = Mathf.Max(1, localY - upperEdge);
+                else if (localY > trackedHeight + upperEdge) trackedHeight = localY - upperEdge;
+                else if (localY < trackedHeight + lowerEdge) trackedHeight = Mathf.Max(1, localY - lowerEdge);
+            }
+            if (descentFollowing) {
+                if (!rider) rider = target.GetComponent<CatController>();
+                float blend = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(-.5f, -3, localY));
+                float destination = UpperRoute.CameraHeight(new Vector2(localX,localY));
+                if (localX < UpperRoute.Origin + 30) destination = Mathf.Min(-7, destination);
+                if (!wasDescending || snap || rider && rider.Grounded) descentHeight = destination;
+                else if (localY > descentHeight + upperEdge) descentHeight = localY - upperEdge;
+                else if (localY < descentHeight + lowerEdge) descentHeight = destination;
+                trackedHeight = Mathf.Lerp(trackedHeight, descentHeight, blend);
+            }
             if(localX>=FinaleRoute.StartX && localY>10) trackedHeight=Mathf.Max(trackedHeight,FinaleRoute.CameraMinimum(localX));
             if(localX>FinaleRoute.Last.x-35 && localY>FinaleRoute.Last.y-1) {
                 float reveal=Mathf.SmoothStep(0,1,Mathf.InverseLerp(FinaleRoute.Last.x-35,FinaleRoute.Last.x-8,localX));
@@ -49,7 +61,7 @@ public sealed class CatCamera : MonoBehaviour
             }
             floor = courseRoot.TransformPoint(new Vector3(0, trackedHeight)).y;
         }
-        if (ascent && courseRoot.InverseTransformPoint(target.position).x >= FinaleRoute.StartX) {
+        if (ascent && (courseRoot.InverseTransformPoint(target.position).x >= FinaleRoute.StartX || descentFollowing)) {
             if(!rider) rider=target.GetComponent<CatController>();
             float movement=rider?rider.PresentationVelocity.x:0;
             // Carrier drift must not reverse the look-ahead while Mika stands still.

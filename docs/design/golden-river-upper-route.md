@@ -1,10 +1,18 @@
 # Golden River upper route
 
+## Current playable test candidate — 2026-11-12
+
+The forward enclosed cave candidate is built and open for player review. It now rejoins ascent bank 49, roughly 322 world units beyond entry, with a 60.48-second scripted traversal. See [test-run instructions, current evidence and validation](golden-river-upper-route/cave-test-run-evidence/README.md). The older progress notes and images below describe superseded prototypes. PR #79 stays draft during player review.
+
+## Current replacement: dry descent — 2026-11-10
+
+The elevated garden and its renderer reveal were rejected. The authorized replacement is the [permanent dry riverbank descent](golden-river-upper-route/dry-descent.md). Its entry and fountain references, spatial water contract, current implementation evidence and remaining acceptance supersede the historical sections below. Keep PR #79 draft during art and player review. Earlier passing tests and recordings do not validate the new route.
+
 ## Concealed garden prototype - 2026-11-10
 
 The owner authorized implementation and a playable preview after confirming the
 subtle entrance and complete separation from the main-route camera. This is the
-current prototype; the exposed shelf chain and open garden illustrations below
+historical rejected prototype; the exposed shelf chain and open garden illustrations below
 are superseded. Actual player review of this revision is pending; keep PR #79 draft.
 
 The branch leaves ascent bank 10 through a single small leftward tread beside an

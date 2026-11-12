@@ -727,3 +727,43 @@ Review-only garden-concept-v2-storyboard.png under docs/design/golden-river-uppe
 ## Hidden garden gameplay paintings - 2026-11-09
 
 Original generated transparent garden-court-v1.png and garden-wall-v1.png in Assets/Game/Resources/GoldenRiver were created with the built-in OpenAI image generation tool (exact model not exposed), referencing only the project-generated garden storyboard. Source outputs: exec-532bd831-9750-4258-9c77-56ed421e2676.png and exec-45f2c1fa-2f5b-4060-b2af-4b2865f917a8.png. Existing ASSET-LICENSE.md generated-art terms apply, with no third-party source. Human direction selected the hidden ruin garden, subtle entrance hint and complete main-route concealment after entry. Codex authored the tree/dry-fountain court, ivy wall, climbing route and return passage. Prompts, registration and creative decisions are archived in docs/design/golden-river-upper-route/garden-assets.md. Gameplay/visual acceptance remains pending.
+
+
+## Dry riverbank descent — 2026-11-10
+
+Original generated cutout artwork replaces the rejected elevated garden. Generator: built-in OpenAI image generation; model not exposed. Generated on 2026-11-10. Original project assets are distributed under ASSET-LICENSE.md; no third-party artwork is included. Exact prompts, source filenames and approved reference paths: docs/design/golden-river-upper-route/descent-assets.json.
+
+- entry-left: entry-left-v1.png; source exec-84dc29fb-1da8-43c0-8ca1-73155a803858.png.
+- entry-overhang: entry-overhang-v1.png; source exec-efc7b87a-4c0b-4860-8244-034265453cd1.png.
+- inner-corner: inner-corner-v1.png; source exec-4fcca15a-df74-429f-8420-6eb8146483e8.png.
+- ceiling: ceiling-v1.png; source exec-4aaebebb-3556-4a92-ab08-2530bad1d302.png.
+- rock-face: rock-face-v1.png; source exec-f78ca689-9c54-4c3f-ac1b-b0a51e510cfc.png.
+- rooted-face: rooted-face-v1.png; source exec-b2162bae-057f-4833-82a3-a7d92ae56273.png.
+- tread-short: tread-short-v1.png; source exec-61b0d155-102f-4e4e-b0e8-087cd4baf414.png.
+- tread-medium: tread-medium-v1.png; source exec-dc9c531d-9f60-438b-bece-630a6e9bf527.png.
+- tread-wide: tread-wide-v1.png; source exec-805e4bde-f78d-44ff-9cae-b31c64015593.png.
+- rear-rock: rear-rock-v1.png; source exec-9e9f945e-7c1a-4974-8796-c0665c84dbeb.png.
+- ruin: ruin-v1.png; source exec-7dde793a-c030-46d7-abbb-17208073137e.png.
+- floor: floor-v1.png; source exec-08b1a747-f327-422d-91d3-e8e874690dd6.png.
+- vegetation: vegetation-v1.png; source exec-025eb4d6-067a-45a5-9372-6a5432bce3a8.png.
+- shore-entry: shore-entry-v1.png; source exec-152f0afa-2d25-4d32-a51d-783262ca8b08.png.
+- shore-exit: shore-exit-v1.png; source exec-a117c3e8-177c-4dc6-b42c-91dc242d3966.png.
+
+Human creative decisions: subtle riverbank entry; violet natural rock and gold-green vegetation; separate collision-registered treads; a single rooted dry fountain and broken arch; cool dry passage, warm right-side light; no generated cat, sky panel or collectible. Rejected garden-court-v1 and garden-wall-v1 are archived outside Resources with original metadata.
+
+Two additional original procedural effect sources are authored in Assets/Game/Scripts/DescentLight.cs: a soft side-opening shaft and a radial dust sprite (twelve deterministic motes, paused with gameplay). The technical RGBA coverage mask is generated from the same two-dimensional world contours used for hazards in UpperRoute.CreateMask. These mathematical sources use no image model or external input. All generated textures are owned and released by their components.
+
+
+## Enclosed cave stone material - 2026-11-11
+
+Original built-in OpenAI image generation edit; exact model not exposed. Output exec-66479ffa-b02b-49f2-b94b-6ff129d92505.png becomes Assets/Game/Resources/GoldenRiver/Descent/cliff-stone-v2.png. The only input is the original project-generated rear-rock-v1.png. ASSET-LICENSE.md generated-art terms apply. Human direction requires an enclosed cave, irregular connected rock masses and no visible image cuts; the material is mapped onto matching authored render/collision contours. Exact prompt and provenance: docs/design/golden-river-upper-route/cave-stone-v2.json.
+
+
+## Cave edge replacement artwork - 2026-11-12
+
+Three original transparent cave-edge-short-v2, cave-edge-medium-v2 and cave-edge-wide-v2 paintings replace the old scalloped floating trims on the dry cave route. Built-in OpenAI image generation; exact model not exposed. References are only the corresponding original project-generated tread-v1 sources. ASSET-LICENSE.md generated-art terms apply. Source identifiers and exact prompts: docs/design/golden-river-upper-route/cave-edge-v2.json. Human decisions: connected natural rock lips, muted attached moss, no flowers or detached flecks, aligned contact lines and massive supporting geometry. Original source files remain preserved. CaveShading.cs generates original permanent contact-shadow/bevel distance textures from the authored solid collision outlines; no image model or external texture is used for these mathematical fields.
+
+
+## Entry bank replacement - 2026-11-12
+
+Original built-in OpenAI image generation, model not exposed, using only the original descent-entry-reference.png as material/style reference. Source exec-4baf8abb-275c-4d6e-8e39-3a7e7b780965.png is saved as Assets/Game/Resources/GoldenRiver/Descent/entry-bank-v3.png. ASSET-LICENSE.md generated-art terms apply. Human decision: a massive violet-stone bank with attached ivy, a registered grassy top and a naturally shaped cliff edge rather than an exposed rectangular wall. Exact prompt and source: docs/design/golden-river-upper-route/entry-bank-v3.json. Visual integration remains under review.

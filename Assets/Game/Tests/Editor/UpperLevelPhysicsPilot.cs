@@ -27,6 +27,7 @@ public sealed class UpperLevelPhysicsPilot
         entrance = ((Vector2)course.GetType().Assembly.GetType("UpperRoute").GetProperty("Entrance").GetValue(null)).x;
     }
     void Move(float value) => motion.GetType().GetMethod("SetMove").Invoke(motion, new object[] { value });
+    public UpperLevelPhysicsPilot(Component course, bool includeDescent) : this(course) { entered = !includeDescent; }
     public void Command()
     {
         if ((int)run.GetType().GetProperty("Retries").GetValue(run) != 0)

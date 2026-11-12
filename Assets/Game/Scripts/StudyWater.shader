@@ -6,6 +6,9 @@ Shader "LegendOfCat/StudyWater"
         [HideInInspector] _UseCaptureTime ("Use explicit capture clock", Float) = 0
         _Fog ("Atmospheric tint", Float) = 0.20
         _Saturation ("Paint saturation", Float) = 0.70
+        _DryMask ("Dry passage coverage", 2D) = "black" {}
+        _DryRect ("Coverage world rectangle", Vector) = (0,0,1,1)
+        _UseDryMask ("Use passage coverage", Float) = 0
     }
     SubShader {
         Tags { "Queue"="Transparent" "RenderType"="Transparent" }
@@ -17,6 +20,7 @@ Shader "LegendOfCat/StudyWater"
             #pragma fragment frag
             #include "UnityCG.cginc"
             sampler2D _MainTex;
+            sampler2D _DryMask; float4 _DryRect; float _UseDryMask;
             float _WaterTime, _UseCaptureTime, _Fog, _Saturation;
             struct Input { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
             struct Output { float4 vertex : SV_POSITION; float2 uv : TEXCOORD0; float2 world : TEXCOORD1; };
@@ -34,6 +38,9 @@ Shader "LegendOfCat/StudyWater"
             }
             fixed4 frag(Output i) : SV_Target {
                 fixed4 painted = tex2D(_MainTex, i.uv);
+                float2 dryUV = (i.world - _DryRect.xy) / _DryRect.zw;
+                float inBounds = step(0,dryUV.x)*step(dryUV.x,1)*step(0,dryUV.y)*step(dryUV.y,1);
+                float dry = tex2D(_DryMask, saturate(dryUV)).r * inBounds * _UseDryMask;
                 // Normal Play advances in the shader; capture/tests may supply an explicit time.
                 float time = (_UseCaptureTime > 0.5 ? _WaterTime : _Time.y);
                 float water = WaterMask(painted.rgb);
@@ -53,7 +60,7 @@ Shader "LegendOfCat/StudyWater"
                 color = lerp(color, float3(0.80, 0.79, 0.73), _Fog);
                 color = lerp(dot(color, float3(0.2126, 0.7152, 0.0722)).xxx, color, _Saturation);
                 // Keep the authored wave silhouette fixed at cliff feet; only the water interior flows.
-                return fixed4(color, smoothstep(0.5, 0.95, painted.a));
+                return fixed4(color, smoothstep(0.5, 0.95, painted.a) * (1-dry));
             }
             ENDCG
         }

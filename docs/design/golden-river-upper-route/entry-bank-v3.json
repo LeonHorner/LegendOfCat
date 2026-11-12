@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-12",
+  "generator": "Built-in OpenAI image generation",
+  "model": "Not exposed",
+  "license": "ASSET-LICENSE.md",
+  "prompt": "Create one production transparent cutout asset for the original 2D side-view game, using the attached original project concept as STYLE AND MATERIAL reference only. Isolate a massive LEFT RIVERBANK CLIFF BODY: flat short grassy golden moss top occupying the upper 12 percent, violet-gray large natural stone faces, teal attached ivy hanging down crevices, gentle warm light upper right. The right edge is a varied natural vertical rock face, slightly concave, no projecting extra platforms. The lower and left parts are continuing solid rock with muted edges intended to bury into matching cliff geometry; rock should fill most of the canvas. Flat side elevation, tall 2:3 composition. Image upper contact edge should be almost horizontal at 12 percent below the top of the canvas. Native painted scale matching reference, crisp material detail, dark solid front. NO cat, no skyline, no distant scenery, no water, no scene composition, no arch, no holes, no floating pebbles, no isolated leaves or particles, no yellow speckles, no glow, no rectangular panel outline. Every ivy leaf is attached to the rock. This will be registered to the existing bank collider, not used as a background picture. Real transparent alpha outside its natural silhouette.",
+  "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-4baf8abb-275c-4d6e-8e39-3a7e7b780965.png",
+  "file": "Assets/Game/Resources/GoldenRiver/Descent/entry-bank-v3.png"
+}

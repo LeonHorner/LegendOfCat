@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Painted parallax, terrain and water renderer for the playable course.
 [DefaultExecutionOrder(100)]
-public sealed class SceneryRenderer : MonoBehaviour
+public sealed partial class SceneryRenderer : MonoBehaviour
 {
     public const float SkyTravel = 0.05f, ValleyTravel = 0.14f, CanopyTravel = 0.08f;
     public const float FinaleRuinTravel = .22f;
@@ -459,37 +459,24 @@ public sealed class SceneryRenderer : MonoBehaviour
         return item.transform;
     }
 
-    Transform GardenPainting(string name, string source, Vector3 center, float width)
+    Texture2D descentCoverage;
+    public void SetDescentCoverage(Texture2D coverage)
     {
-        var image = Resources.Load<Texture2D>("GoldenRiver/" + source);
-        var item = Egg(name, source, center, new Vector2(width, width * image.height / image.width), true);
-        item.name = name;
-        return item;
+        descentCoverage = coverage;
+        terrainMaterial.SetTexture("_DryMask", coverage);
+        riverFrontMaterial.SetTexture("_DryMask", coverage);
+        terrainMaterial.SetFloat("_UseDryMask", 1);
+        riverFrontMaterial.SetFloat("_UseDryMask", 1);
     }
-
-    public Transform AddGardenCourt(Vector3 platform)
+    void UpdateDescentCoverage()
     {
-        var image = Resources.Load<Texture2D>("GoldenRiver/garden-court-v1");
-        float height = platform.z * image.height / image.width;
-        // The original generated lawn is registered at 13.2% of source height.
-        return GardenPainting("Hidden garden courtyard", "garden-court-v1",
-            new Vector3(platform.x, platform.y + .75f + height * (.5f - .132f), 2), platform.z);
-    }
-
-    public void AddHiddenGarden(UpperGarden garden)
-    {
-        float x = UpperRoute.Entrance.x;
-        GardenPainting("Ivy wall entrance hint", "garden-wall-v1", new Vector3(x - 3, 2.3f, 3), 6);
-        // Enclosing masonry belongs behind actual treads, with no painted false ledges.
-        foreach (var p in new[] {new Vector3(x - 11, 3.5f, 16), new Vector3(x - 23, 7, 14), new Vector3(x - 42, 7, 18)}) {
-            var wall = GardenPainting("Enclosed garden passage", "garden-wall-v1", new Vector3(p.x, p.y, 5), p.z);
-            garden.Concealed.Add(wall.GetComponent<Renderer>());
-        }
-        for (int i = 12; i < UpperRoute.Platforms.Length; i++) {
-            var p = UpperRoute.Platforms[i];
-            var wall = GardenPainting("Garden return arcade", "garden-wall-v1", new Vector3(p.x, p.y - 5.25f, 5), 10);
-            garden.Concealed.Add(wall.GetComponent<Renderer>());
-        }
+        if (!descentCoverage) return;
+        var bounds = UpperRoute.MaskBounds;
+        var minimum = transform.TransformPoint(new Vector3(UpperRoute.Origin + bounds.xMin, bounds.yMin));
+        var maximum = transform.TransformPoint(new Vector3(UpperRoute.Origin + bounds.xMax, bounds.yMax));
+        var rect = new Vector4(minimum.x, minimum.y, maximum.x - minimum.x, maximum.y - minimum.y);
+        terrainMaterial.SetVector("_DryRect", rect);
+        riverFrontMaterial.SetVector("_DryRect", rect);
     }
 
     void UpdateFish(float seconds)
@@ -579,6 +566,7 @@ public sealed class SceneryRenderer : MonoBehaviour
 
     public void ApplyView(float x, float y)
     {
+        UpdateDescentCoverage();
         // Keep the damp-foot tint registered with the placed shore/water grid too.
         terrainMaterial.SetFloat("_CourseOriginY", transform.position.y);
         terrainMaterial.SetFloat("_CourseScale", transform.lossyScale.y);
@@ -666,6 +654,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         foreach (var material in materials) Release(material);
         foreach (var mesh in terrainMeshes) Release(mesh);
         Release(quadMesh);
+        Release(caveDistances);
         Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial); Release(landmarkMaterial); Release(fortressMaterial); Release(finaleMaterial);
     }
 
