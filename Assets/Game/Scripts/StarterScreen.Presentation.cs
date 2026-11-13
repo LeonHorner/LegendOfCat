@@ -156,6 +156,8 @@ public sealed partial class StarterScreen
                 GUI.enabled = !popup;
                 Label("Resize the window by dragging its borders. F11 or Alt+Enter toggles fullscreen.", smallStyle);
             }
+            if (Button(ShowLevelProgress ? "Level progress bar: On" : "Level progress bar: Off"))
+                SetShowLevelProgress(!ShowLevelProgress);
             if (Button(string.IsNullOrEmpty(available) ? "Versions & updates" : "Versions & updates - Available")) page = "updates";
             if (Button("Back to menu")) page = "menu";
         } else {

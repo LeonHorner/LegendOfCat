@@ -780,3 +780,14 @@ The existing near panorama is extended to 14332×1448 using an original generated
 - Runtime atlas at `Assets/Game/Resources/WaterRecovery/shark-lunge-frames.png`.
 - Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP resized and exported the alpha atlas. Repository asset terms apply.
 - Human direction specified a jump scare with an attack from directly below Mika and an open-jaw lunge toward the camera. See [artwork and prompt](docs/design/water-recovery/shark-lunge-art.md).
+
+## Level progress HUD
+
+- **Golden River and Movement Lab progress artwork**, 2026-11-13. Original layered
+  PhotoCraft shape artwork authored for this project, with no external assets or image
+  generation model. The first concept was selected for implementation. Golden River
+  uses violet masonry, ivy, and gold pigment. Movement Lab uses rounded river stones
+  and a blue-green fill. Both use a diamond for the active checkpoint and a pennant
+  for the finish. The editable PhotoCraft review files live in
+  `docs/design/level-progress/`. Transparent runtime exports live in
+  `Assets/Game/Resources/LevelProgress/`. Licensed under the repository license.
