@@ -235,6 +235,7 @@ public sealed class MovementCourse : MonoBehaviour
             else DestroyImmediate(visual.gameObject);
             visual = Instantiate(original, player.transform).transform;
             visual.GetComponent<MikaSpritePresentation>().controller = Cat;
+            if (LevelOne && Application.isPlaying) visual.gameObject.AddComponent<MikaModelPreview>();
             originalMika = true;
         }
         if (!originalMika) {
