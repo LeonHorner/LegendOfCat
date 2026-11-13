@@ -821,3 +821,8 @@ the original mesh's eye socket coordinates. The forehead mask fades into the
 ear colors, and the cream whisker pads and shorter muzzle are shaped separately.
 Relaxed idle now bends the tail down from the rump and curls it back upward,
 following the idle sprite's silhouette.
+
+The detail pass restores fine fur relief from the existing tangent-space
+normal bake. Blender uses the normal map for surface lighting, and the color
+bake includes a restrained relief modulation for Unity's unlit material.
+The user directed preserving detail while matching the original sprite.

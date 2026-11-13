@@ -145,7 +145,23 @@ links.new(attrs[1].outputs["Color"],mix.inputs[0])
 links.new(attrs[0].outputs["Color"],mix.inputs[1])
 links.new(old,mix.inputs[2])
 emission = nodes.new("ShaderNodeEmission")
-links.new(mix.outputs[0],emission.inputs["Color"])
+# Carry fine fur relief into the color bake for Unity's unlit material.
+# The normal map's red channel supplies signed tangent-space relief.
+normal = next(node for node in nodes if node.type == "NORMAL_MAP")
+normal_texture = normal.inputs["Color"].links[0].from_socket
+channels = nodes.new("ShaderNodeSeparateColor")
+links.new(normal_texture, channels.inputs[0])
+relief = nodes.new("ShaderNodeMath")
+relief.operation = "MULTIPLY_ADD"
+links.new(channels.outputs["Red"], relief.inputs[0])
+relief.inputs[1].default_value = .48
+relief.inputs[2].default_value = .76
+textured = nodes.new("ShaderNodeMixRGB")
+textured.blend_type = "MULTIPLY"
+textured.inputs[0].default_value = 1
+links.new(mix.outputs[0], textured.inputs[1])
+links.new(relief.outputs[0], textured.inputs[2])
+links.new(textured.outputs[0], emission.inputs["Color"])
 links.new(emission.outputs[0],output.inputs["Surface"])
 image = bpy.data.images.new("Mika_SpritePalette",2048,2048,alpha=True)
 target = nodes.new("ShaderNodeTexImage")
@@ -170,7 +186,7 @@ links.new(base.outputs[0],output.inputs["Surface"])
 links.new(target.outputs["Color"],base.inputs["Base Color"])
 for node in nodes:
     if node.type == "NORMAL_MAP":
-        node.inputs["Strength"].default_value = .055
+        node.inputs["Strength"].default_value = .32
 
 bpy.ops.wm.save_as_mainfile(filepath=str(folder/"mika-rig.blend"))
 rig.animation_data.action = bpy.data.actions["IdleRelaxed"]
@@ -179,7 +195,7 @@ scene.camera.location = (.55,2,.34)
 scene.camera.rotation_euler = (Vector((-.07,0,.22))-scene.camera.location).to_track_quat("-Z","Y").to_euler()
 scene.camera.data.ortho_scale = .92
 scene.render.resolution_percentage = 75
-scene.render.filepath = "/tmp/mika-curved-tail.png"
+scene.render.filepath = "/tmp/mika-fur-detail.png"
 scene.view_settings.view_transform = "Standard"
 scene.cycles.samples = 12
 bpy.ops.render.render(write_still=True)
