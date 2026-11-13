@@ -44,7 +44,7 @@ course preview after offering to save the current scene, then enters Play; invok
 it again to drop Mika. R retries immediately; Backspace restarts the whole run;
 P pauses; Escape returns to the menu. Pause freezes the recovery clock. Movement
 and jump cannot interrupt submersion. Manual retry clears all recovery effects.
-The independent background-study lab uses its existing return-to-start behavior.
+Water recovery attaches to MovementCourse alongside SceneryRenderer, including the Golden River route.
 
 ## Implementation and limits
 

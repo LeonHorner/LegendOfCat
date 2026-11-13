@@ -120,7 +120,7 @@ public class MikaPresentationIntegrationTests
                 var cat = (Component)Read(component, "Cat");
                 ((Behaviour)cat.GetComponent(Runtime("CatInput"))).enabled = false;
                 var catBody = cat.GetComponent<Rigidbody2D>(); catBody.interpolation = RigidbodyInterpolation2D.None;
-                var scenery = placed.GetComponentInChildren(Runtime("BackgroundStudy"));
+                var scenery = placed.GetComponentInChildren(Runtime("SceneryRenderer"));
                 var camera = (Camera)Read(scenery, "View");
                 var platforms = (Vector3[])Runtime("MovementCourse").GetField("Platforms").GetValue(null);
                 void AssertContacts() {
@@ -268,7 +268,7 @@ public class MikaPresentationIntegrationTests
     public IEnumerator PaintedCourseKeepsCheckpointsFallsPauseAndFullRestart()
     {
         var component = course.GetComponent(Runtime("MovementCourse"));
-        var scenery = course.GetComponentInChildren(Runtime("BackgroundStudy"));
+        var scenery = course.GetComponentInChildren(Runtime("SceneryRenderer"));
         Assert.That(scenery, Is.Not.Null);
         Assert.That(Read(scenery, "Cat"), Is.SameAs(controller), "Scenery must reuse the checkpoint player.");
         Assert.That(course.GetComponentsInChildren(Runtime("CatController")), Has.Length.EqualTo(1));

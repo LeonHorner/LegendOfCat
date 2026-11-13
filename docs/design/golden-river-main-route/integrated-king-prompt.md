@@ -1,0 +1,8 @@
+# Integrated stone king — 2026-11-02
+
+Built-in image generation, two image edits. The first oversized result was rejected. The final image replaces valley-panorama-v3.png at the user's request. The separate cutout is archived through Unity with its metadata. The king now shares the panorama's lighting, filtering, fog and masonry support, occurring exactly once.
+
+Edit target: the supplied transparent 3:1 panoramic game background. Preserve the entire composition, original dimensions and alpha transparency, all mountain silhouettes, vegetation, three distinct ruins and existing painted detail. One tiny local addition only: a weathered stone cat king statue with subtle small stone crown, carved as part of the central castle's lower right wing parapet. It must sit solidly ON the masonry, no gap underneath; a small integrated stone plinth joins the wall. About the height of one window of the central tower, subtle enough to discover. Match the nearby castle's painterly softness, warm stone lighting, atmospheric contrast and perspective exactly. Not a crisp cutout, no floating statue, no foreground character. Keep everything else unchanged.
+
+Refinement:
+Edit this panorama only at the central castle cat statue: shrink the cat statue to ONE QUARTER its current height and width (about 15 pixels high in the full 2172-wide image), sitting on exactly the same right parapet with a tiny integrated stone plinth. Restore the mountain/sky behind its previous larger silhouette. The cat king should be a tiny hidden architectural detail, never a giant statue competing with the tower. Preserve every other pixel/composition and transparency.

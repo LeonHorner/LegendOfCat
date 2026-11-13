@@ -1,0 +1,27 @@
+# Water and statue correction — 2026-11-02
+
+Original generated sources, built-in image-generation tool (model identifier not exposed). The user rejected the repeated water-stone paintings and the first full-panorama statue refinement. Only the detailed statue study below was retained. PhotoCraft 0.19.0 was used for a traced vector mask, bicubic reduction to 33 by 57 pixels, and a layer composite onto the existing parapet. The layered source and high-resolution statue study are preserved under sources/. No surrounding scenery was regenerated for the final statue composite.
+
+Water waves now repeat without stones; each of six distinct rock drawings is anchored once. The mesh retains transparent headroom instead of clipping at the old v=0.25 cutoff. No gameplay collision or persistent format changes.
+
+## Detailed statue study
+
+Use this screenshot as a composition and painted castle STYLE reference only. Produce a close-up original hand-painted design study of ONE stone cat king statue resting on the same kind of warm limestone parapet, with part of the adjacent ruined castle wall. Natural domestic cat proportions, seated upright on its haunches, slender but solid chest, two straight front legs and rounded paws, tail curled around the feet. Head in clear three-quarter SIDE PROFILE facing right: recognizable cat muzzle, small nose, cheeks and almond eye, two normal triangular ears. Tiny modest three-point stone crown BETWEEN the ears. Not human-faced, no beard or mane, no monster, no giant head, no lion. Elegant, simple carved planes and slight weathering, no fragile details. Entire statue and supporting parapet visible, consistent golden upper-left lighting and blue-violet shaded stone. Storybook painterly brushwork matching screenshot, enough clean anatomical detail to judge the cat. No UI, no text, no living orange cat, no copied blurred face. This is an enlarged design study before integration into the distant castle.
+
+## Clear repeated water layer
+
+Edit this transparent river foreground. Remove ALL protruding rocks and pebble groups, replacing them with continuous painted turquoise water and golden/white ripples. Preserve original 1536x1024 canvas, exact waterline height, all left/right edge water pixels and wave silhouettes, transparency above the waves, original hand-painted style and lighting. No land, rocks, objects or scenery anywhere. Only clear river waves in the bottom quarter and transparent upper three quarters. No fog rectangle above water; alpha must be fully transparent above the uneven natural wave edge.
+
+## Six unique rock groups
+
+Original hand-painted game sprite atlas, transparent 3:2 canvas, exactly SIX separate small river rock groups in a strict 3 columns by 2 rows grid. Every group centered within its own square cell, fully inside with 12% transparent padding; no overlaps between cells. Match richly painted Golden River game style: grey-blue/violet limestone shadows, warm golden sunlight, dark teal moss, painterly facets. Six DISTINCT silhouettes: top-left single low broad flat slab; top-center two steep angular split stones; top-right three tiny smooth pebbles; bottom-left one rounded mossy dome; bottom-center a long cracked narrow ridge; bottom-right an asymmetric stepped cluster with a small flat ledge. Low three-quarter side view of stones partly emerging from river water, with just a very thin localized white/cyan foam rim at the base, no large water patch, no horizon or background, no plants, no text. These groups appear once each, so make each unmistakably different in geology and proportions. Original artwork, not photoreal.
+
+The second rock atlas was generated with the built-in image tool. The original prompt was:
+
+> Transparent 3:2 game atlas, precisely 3 columns by 2 rows, 6 separate river rock formations each fully within its square cell with margins. Painterly golden-hour blue-violet limestone, teal moss. Distinct formations: broken ring of small stones, low stair-step strata, tilted blade with tiny pebble, broad double-deck shelf, three uneven flat stepping slabs, crooked fractured boulder with a low spur. Side view, thin localized white foam at feet only. No background, water sheet, text or glow.
+
+The third rock atlas was generated with the built-in image tool from this prompt:
+
+> Game sprite atlas with true transparent background, 3 columns by 2 rows in a 3:2 canvas, each of six hand painted river rock groups wholly inside its own cell. Distinct shapes: scatter of small flat gravel, two nested crescent ledges, split flat slab, low chain of rounded cobbles, broad mossy outcrop with a notch, uneven diagonal cluster of angular chunks. Blue-violet limestone with warm ochre sunset highlights, teal moss, painted Golden River style. Thin foam only at contact with water. No opaque background, no fog or glow, no grid lines or text, clear alpha between every group.
+
+The statue cutout was trimmed in PhotoCraft at the right foreleg and left ear. The flattened panorama was rebuilt from the corrected layer on the same stone parapet.

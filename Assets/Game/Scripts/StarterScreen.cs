@@ -35,6 +35,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     long downloadedBytes, totalBytes;
     Vector2 scroll;
     MovementCourse course;
+    StompArena stompArena;
     VersionedJsonFile displayFile;
     bool fullscreen;
     DisplayState display;
@@ -85,9 +86,38 @@ public sealed partial class StarterScreen : MonoBehaviour
 
     void OpenCourse()
     {
-        if (course != null || popup || applying) return;
+        if (course != null || stompArena != null || popup || applying) return;
         course = Instantiate(Resources.Load<MovementCourse>("MovementCourse"));
         course.BackToMenu = CloseCourse;
+    }
+
+    void OpenLevelOne()
+    {
+        if (course != null || stompArena != null || popup || applying) return;
+        var root = new GameObject("Golden River main route");
+        root.SetActive(false);
+        course = root.AddComponent<MovementCourse>();
+        course.LevelOne = true;
+        course.BackToMenu = CloseCourse;
+        root.SetActive(true);
+    }
+
+    void OpenStompArena()
+    {
+        if (course != null || stompArena != null || popup || applying) return;
+        stompArena = new GameObject("Simple combat lab").AddComponent<StompArena>();
+        stompArena.BackToMenu = CloseStompArena;
+    }
+
+    void CloseStompArena()
+    {
+        if (stompArena == null) return;
+        stompArena.gameObject.SetActive(false);
+        Destroy(stompArena.gameObject);
+        stompArena = null;
+        page = "menu";
+        lastPage = null;
+        previousFocus.Clear();
     }
 
     void CloseCourse()
@@ -258,6 +288,12 @@ public sealed partial class StarterScreen : MonoBehaviour
                 yield return new WaitForSecondsRealtime(0.3f);
                 course.TogglePause();
             }
+        }
+        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale") {
+            OpenLevelOne();
+            if (view == "level-one-finale") course.StartFinalePreview();
+            if (view == "level-one-ascent") course.StartAscentPreview();
+            if (view == "level-one-lift") course.StartVerticalLiftPreview();
         }
         else if (view == "menu" || view == "settings" || view == "play") page = view;
         else if (!string.IsNullOrEmpty(view)) {

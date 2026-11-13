@@ -204,6 +204,81 @@ neighboring atlas speck and retain the accepted apex alignment (-2, -14 source
 pixels). The user accepted the in-game result after playtesting. Original visible
 RGBA and alpha are preserved; the atlas and sprite GUID remain intact.
 
+## Mika natural look study, revision 3 — 2026-10-24
+
+- Files: `art/blender/mika-v3/`, including the original source GLB, native Blender
+  look study, editable material authoring script and actual Blender review renders.
+- Human direction: both prior Blender revisions were rejected. Prioritize a
+  natural-looking cat matching the concept art, especially anatomy, coat, eyes
+  and ears; add bones later after the appearance works.
+- Third-party source: Grab3D, **Tabby Cat**,
+  https://grab3d.com/models/animals/cat/ (downloaded 2026-10-24).
+  Source mesh and all source textures are dedicated to CC0 1.0. The original
+  `source/LICENSE.txt` and `source/manifest.json` are preserved verbatim.
+  The CC0 dedication permits modification and public source redistribution.
+- Generator/model disclosure: Grab3D identifies an AI-assisted Meshy image-to-3D
+  base, followed by cleanup, scaling, texturing and checking in Blender. Exact
+  model revision and prompt are not provided. This source is not represented as
+  original Codex sculpture or as a generation made from the user's concepts.
+- Local work: Codex/Blender 5.2.3 LTS material adaptation to ginger and cream,
+  preserving source facial colors and fur detail; slightly narrower trunk; packed
+  project concept references and studio cameras for full-body and face review.
+  Known concept-image provenance remains as recorded in the earlier entries.
+- Review: the user accepted the visible model on 2026-10-24 and requested a
+  work-in-progress push linked to issue #49. This acceptance covers appearance
+  only. Production topology, skeleton, animation, Unity validation and gameplay
+  integration remain unfinished. Previous Blender models remain rejected.
+
+## Mika Blender rig and motion candidates — 2026-10-31
+
+- Files: `art/blender/mika-rig/`, including the native rig, baked FBX, texture
+  maps, authoring/verification scripts and actual Blender motion review renders.
+- Source and license: the accepted revision 3 Grab3D Tabby Cat adaptation above;
+  its preserved CC0 license and Meshy AI-assisted source disclosure still apply.
+  No new external character or image generator was used.
+- Authoring: Codex and Blender 5.2.3 LTS, 2026-10-31. A working duplicate received
+  voxel cleanup, regular-quad un-subdivision, surface fitting, UV/texture baking,
+  skeleton, constrained heat weights, paw IK and keyed motion candidates. The
+  accepted dense look study remains unchanged. The working mesh has mixed
+  topology; it is not represented as anatomical hand retopology.
+- Human decisions: retain the accepted natural appearance, open eyes, four
+  resting paw contacts, independent ear/tail motion and editable Unity export.
+  Normal/slowed loops are rendered from the actual rig, not generated motion
+  illustrations. The inherited dark underarm marking remains visible.
+- Validation: normalized four-influence weights, native support measurements and
+  FBX reimport passed. Motion appearance, Unity import/materials and game
+  integration remain unaccepted/unverified. See the folder README and validation
+  report. Keep issue #49 incomplete and the existing 2D playable character intact.
+- Revision 2, 2026-11-01: the user rejected the first gait as unnatural. Codex and
+  Blender reauthored the run with pelvis/spine/shoulder coordination, forward
+  head/neck alignment, staggered contacts, gathered/extended recovery and a
+  trailing tail. New side/three-quarter loops are actual Blender renders. The
+  same CC0 source and editable skin are retained; no new generated imagery or
+  copied motion footage is used. Reference reading is linked in the folder
+  README. Visual acceptance and Unity validation remain pending.
+
+- Revision 3, 2026-11-01: human feedback requested stronger body movement for the
+  paired-leg run. Codex and Blender 5.2.3 LTS authored increased spinal flexion,
+  pelvic tuck/extension, body pitch/heave and tail follow-through on the same
+  CC0-derived skin. Local motion reference: user-supplied
+  `tumblr_n0r2iuDJRW1sg7h2jo1_1280-2378486781.gif`; creator and license unverified.
+  This reference is not redistributed, embedded or used as a texture. No motion
+  capture data was extracted; the animation curves are locally authored. Actual
+  Blender renders show the revised candidate. Visual acceptance remains pending.
+
+- Publication decision, 2026-11-02: the user approved pushing the current rig/run
+  and moving PR #51 out of draft. Issue #78 records further motion improvements,
+  varied runs with random selection, walking, idle animations and integration.
+  Existing source, license and generator disclosures remain unchanged. This is
+  approval of the authoring deliverable, not a Unity/gameplay validation result.
+
+- Tail revision 4, 2026-11-02: the user found the running tail too stiff. Codex
+  and Blender 5.2.3 LTS authored progressively delayed joint flexion and subtle
+  sideways follow-through. Only the Run tail curves changed; the same CC0-derived
+  skin and textures are used. No external artwork or new generation was used.
+  The user reviewed the actual Blender previews and approved adding the tail
+  refinement to the original PR on 2026-11-02.
+
 ## Golden River background study — 2026-10-24
 
 `Assets/Game/Resources/BackgroundStudy/painted-atlas.png` is original generated
@@ -492,6 +567,146 @@ Geometry/camera/parallax now use the placed course coordinate frame so translate
 and uniformly scaled courses retain visual/collider contact and stable water UVs.
 No new artwork, animation, traversal mechanic or source-pixel edit was introduced.
 See docs/design/background-study/review-2026-10-31.md for tests and limitations.
+
+## Stomp prototype greybox - 2026-10-31
+
+- Source: original runtime rectangles, labels and impact marker in `StompArena.cs`; authored by Codex (GPT-6), no image generator or external asset source.
+- License: repository project license. No third-party artwork was added. Existing MikaOriginal keeps its existing provenance.
+- Human direction: issue #12 requests a small greybox head-jump encounter with readable anticipation/attack/recovery; exact rules and difficulty require user review.
+- Creative choices proposed for review: stationary anonymous target, striped warning/solid ground attack, white exposed head, restrained impact flash and short damage protection.
+- Evidence: `docs/design/stomp-prototype/{anticipation,attack,recovery}.png`, generated from the actual Unity runtime arena by `StompReview.Record`. These are review screenshots, not production background/character assets.
+
+- Damage feedback revision (2026-10-31): user selected recoil without teleport and a smooth half-opacity protection pulse. No source art changed. `damage-{left,right,closed-head,ground}.gif` and corresponding CSVs were captured from Unity local-scene physics by `StompReview.Record`; FFmpeg encodes the generated frame sequence at its recorded speed. Loop resets are demonstration boundaries.
+
+- Moving-head/feedback revision (2026-10-31): user selected a moving vulnerable head, a brief hit flash and a discreet tone, excluding new heart-loss/health UI. The bounded sinusoidal patrol, original sprite flash shader and 120 ms softly enveloped descending sine tone were authored with Codex (GPT-6), under the repository project license. No external audio, image generator or source-art edits are used. `damage-moving-head.gif`/CSV capture actual Unity local-scene physics; `damage-tone.wav` exports the generated runtime waveform at the configured source volume. Exact tuning and final encounter acceptance remain provisional.
+
+- Damage-hop/contact-star revision (2026-10-31): the user rejected the lateral recoil and first sine tone, selected a vertical hop preserving running, and approved a small cream impact star with sparks and a reduced white flash. The star is original native six-point mesh geometry in StompArena, authored with Codex (GPT-6), under the repository project license; no raster generator or external asset is used. New contact-star/run-left/run-right evidence comes from actual Unity local-scene physics.
+- The three unselected `docs/design/stomp-prototype/sound-options/*.wav` previews are original deterministic filtered-noise synthesis from `tools/generate-stomp-sound-previews.py`, authored with Codex (GPT-6) on 2026-10-31 under the repository project license. No third-party samples or pitched voices are used. Human direction requested discreet alternatives without the rejected tone/pitch glide; selection remains pending and gameplay currently has no damage sound. Earlier `damage-tone.wav` is a rejected historical preview.
+
+- Cat damage vocal candidate (2026-10-31): **Angry Cat Meow** by **bevibeldesign**, source https://freesound.org/people/bevibeldesign/sounds/350411/, source license **CC0 1.0**, https://creativecommons.org/publicdomain/zero/1.0/. Original is a performed pitch-bent human voice; no AI generator/model is involved. The public HQ MP3 preview and source/derived SHA256 hashes are retained in `docs/design/stomp-prototype/sound-options/cat-reaction/`. Codex edited a 420 ms excerpt with short fades and restrained peak level, with no further pitch change; reproduce using `tools/prepare-cat-reaction-preview.py`. Human direction rejected the three abstract noise proposals and satisfied/attention-seeking meow, requesting an abrupt, surprised, slightly rough damage cry. This vocal candidate is unselected and not enabled in gameplay; subjective approval remains pending.
+
+- Real-cat vocal auditions (2026-10-31): **Cat Angry Meow.WAV** by **softcoresoft**, https://freesound.org/people/softcoresoft/sounds/327438/, licensed **CC BY 4.0**, https://creativecommons.org/licenses/by/4.0/. Actual cat hissing/meowing per creator; no AI generator/model. Public HQ source preview retained in `docs/design/stomp-prototype/sound-options/real-cat/` with hashes/attribution. Codex prepared source seconds 0.9-2.1 as a natural-speed 1.2-second excerpt and a pitch-preserving 4/3-tempo 0.9-second edit; mono PCM16/48 kHz, short fades and gain 0.65. Reproduce via `tools/prepare-real-cat-preview.py`. Human direction rejected the previous human-voice clip as too short/not cat-like and requested a real-cat voice with a longer recognizable ending. Both new auditions remain unselected and are not enabled in gameplay; attribution and modification disclosure must accompany redistribution.
+
+- Selected damage voice (2026-10-31): user chose the second real-cat audition, `real-cat/short-reaction.wav` (0.9 seconds), copied unchanged to `Assets/Game/Resources/StompDamageVoice.wav`. **Cat Angry Meow.WAV** by **softcoresoft**, source https://freesound.org/people/softcoresoft/sounds/327438/, **CC BY 4.0**, https://creativecommons.org/licenses/by/4.0/. Edits remain the source 0.9-2.1-second excerpt, pitch-preserving 4/3 tempo, mono PCM16/48 kHz, short fades and gain 0.65; gameplay volume is 0.5. Editor import preloads PCM. Attribution and edit disclosure are bundled in `Assets/StreamingAssets/THIRD-PARTY-NOTICES.txt` for player redistribution. Prior audition-only status is superseded for this selected clip; all rejected variants remain inactive.
+
+- Combat-signal refinement (2026-10-31): user requested both a better contact effect and clearer warning/attack/open-head cues. Codex (GPT-6) authored original native mesh geometry with an irregular feathered cream core, warm rim and tapered brush strokes, plus closed-head crosses, open-head chevrons, pulsing diagonal hatching and active strike marks within the collision band. No raster generator, external art or new audio was used; existing source artwork and selected voice remain unchanged. Prototype code follows the repository code license. `damage-signals.gif`, `signals-small-grayscale.gif`, refreshed contact/movement captures and the grayscale recovery PNG derive from actual Unity camera renders; FFmpeg creates the scaled/grayscale review copies. These are review evidence, not accepted production boss art.
+
+- Distinct enemy-hit feedback (2026-10-31): the user selected separate forms for player and enemy damage. Codex (GPT-6) authored an original native feathered annulus mesh for a flat expanding ring and a separate narrow head-edge overlay. The ring stays at the contact point; the overlay follows the head without changing closed-head marks. Existing warm player burst and selected real-cat voice remain unchanged. No new external asset, image generator or audio is introduced; code follows the repository code license. Color/grayscale camera captures document both hit types and terminal fade for review. User also requested main-menu order Movement lab, then Simple combat lab.
+- Review corrections (2026-11-01): original procedural cap/flash geometry now ends at the existing collision surface; ring placement uses the uncorrected swept contact and the moving head interval. Native Unity Game View captures include the responsive HUD and letterboxed arena at small/narrow window sizes; FFmpeg produces grayscale review copies. Authored with Codex (GPT-6), under the repository code license. No new source artwork, generated bitmap asset, external dependency or audio edit was introduced. Human direction requested exact contact alignment and small-window motion readability while preserving the selected damage behavior.
+- Final-review readability pass (2026-11-01): the existing HUD title includes a compact phase hint in its original UI font, while world-space geometric signals stay unchanged. Pause is omitted on results. The `integration-review/` recordings are actual resized Unity Game View frames after normal main integration; FFmpeg encodes color/grayscale copies. Authored with Codex (GPT-6), under the repository code license. Human direction requested readable small-window labels without obstructing gameplay, preserving the approved artwork, audio and mechanics. No new art source, raster generator, font or audio edit was introduced.
+
+## Golden River introduction variety - 2026-11-01
+
+- Source: five original transparent PNG paintings generated with the built-in OpenAI image generation tool; exact model identifier was not exposed. No third-party reference image, font, brand or character was supplied.
+- Runtime paths: `Assets/Game/Resources/GoldenRiver/{shelf-root,shelf-masonry,landmark-waterwheel,landmark-viaduct,landmark-willow}.png`. Generated source pixels and alpha are preserved; Unity imports clamp edges, disable mipmaps and use uncompressed textures with a 2048 maximum dimension.
+- License: project original-art policy in ASSET-LICENSE.md (CC BY-NC 4.0 only to the extent project rights holders own applicable rights; no copyright claim is created for otherwise unprotected AI output). No additional third-party dependency or license.
+- Human creative direction: the user measured the earlier introduction at 61 seconds but rejected it as very boring, requesting different platform heights/sizes, different floating-platform graphics and significant unique background locations. This authorizes this bounded gameplay/visual iteration, not final art acceptance or completion of #73.
+- Creative implementation: rooted slate island and broken masonry shelf have distinct silhouettes and registered landing contacts, with their natural roughly 3:1 source proportions retained. One abandoned watermill, one broken aqueduct and one ancient willow mark separate sections; each is instantiated once with absolute anchor-based parallax, without tiling or mirrored duplicates. Atmospheric tint/saturation keep background landmarks behind the crisp playable plane. Existing bank, shelf, valley, water and Mika provenance remains applicable.
+- Exact generation prompts: `docs/design/golden-river-main-route/variety-prompts.md`. `GoldenRiverReview.Record` captures actual Unity course views at 960x540 and 640x360, plus grayscale versions of the smaller renders; these static authoring captures are not player-input recordings.
+
+### Golden River composition refinement - 2026-11-01
+
+The user reported 60.7 seconds and rejected pasted/cut-out landmark boundaries,
+mixed styles within floating sequences and the pale willow. The existing five
+generated source PNGs remain unchanged. Original shader/code changes preserve
+painted landmark partial alpha, apply per-landmark brightness/fog and assign one
+art family per connected floating sequence. The willow is darker and retains more
+source color instead of pale atmospheric mixing. No new image generator request,
+source-pixel edit or third-party asset is involved. Existing generation prompts,
+model disclosure and original-art license caveat above remain authoritative.
+
+### Landmark base transitions and lower crossings - 2026-11-01
+
+The user circled remaining lower mill mist/ground patches and requested the same
+correction across the other landmark paintings, together with lower floating
+supports near the water. All three landmark materials now use the same local
+source-UV base/side alpha transition. The five original source PNGs and their
+license/generation disclosures are unchanged. Geometry lowers two existing
+suspended sequences; registered platform art follows their unchanged colliders'
+widths. No new generated or third-party image is involved. Review captures now
+also cover lower boundaries and the two low crossings.
+
+## Supported Golden River landmark hills - 2026-11-01
+
+- Source: built-in OpenAI image generation EDIT tool, two separate edit passes per landmark (six calls total); exact model identifier not exposed. First pass referenced the original project landmark; second pass referenced its intermediate solid-hill composition. Final source PNGs retain generated pixels/alpha without manual raster processing.
+- Active files: `Assets/Game/Resources/GoldenRiver/landmark-{waterwheel,viaduct,willow}-hill-v2.png`. The two shelf PNGs keep their existing paths and provenance. Original isolated landmark PNGs and their GUID-bearing metadata are retained under `Assets/Game/Art/GoldenRiverArchive/`, moved with Unity AssetDatabase and excluded from player packages. The intermediate edit outputs are not runtime assets.
+- License: the same original-art policy in ASSET-LICENSE.md, CC BY-NC 4.0 only to the extent project rights holders own applicable rights; no copyright claim in otherwise unprotected AI output. No third-party artwork or license was introduced.
+- Human creative direction: the user rejected the latest mist/opacity blend as stranger than before and requested a real ground plane under the landmark, descending out of the image like a hill without an abrupt or blurred edge. This supersedes the local base/side feathering approach above.
+- Creative decisions: paint complete rounded supporting hills in the same layer as each landmark, expand the surrounding landscape/headroom, retain recognizable landmark identity, render the source's natural grass/stone silhouette with the existing cutout policy, and position the solid lower canvas below the camera. Remove the experimental opacity feather and partial-alpha halo path; keep existing brightness/fog grading, reversible unique anchors, independent foreground river and gameplay geometry.
+- Full prompts: `docs/design/golden-river-main-route/hill-prompts.md`. Final edited composition remains subject to in-game review. Static Unity center/entry/exit/low-crossing captures document the proposed result, not final acceptance.
+
+## Continuous Golden River scenery and coherent terrain variants - 2026-11-02
+
+- Source: seven original outputs from the built-in OpenAI image generation tool, exact model identifier not exposed. Two new-generation calls created valley/canopy panoramas; five edit calls referenced the existing original `shelf-root.png` or `shelf-masonry.png` to preserve material/lighting while authoring different grounded/compact shapes. No third-party image or character was supplied. Generated source pixels/alpha are preserved.
+- Active additions under `Assets/Game/Resources/GoldenRiver/`: `valley-panorama-v3.png`, `canopy-panorama-v3.png`, `bank-{narrow,medium,wide}-v3.png`, `shelf-root-compact-v3.png`, `shelf-masonry-compact-v3.png`. Existing shelves/hill paintings and their provenance remain applicable. Unity-generated .meta files and importer policy accompany the additions.
+- License: existing original-art policy in ASSET-LICENSE.md, CC BY-NC 4.0 only to the extent project rights holders own applicable rights, without asserting copyright in otherwise unprotected AI output. No third-party license or dependency added.
+- Human direction: remove conspicuous scenery repetition before the clouds, match suspended platforms to grounded ones and stop relying only on scaled copies. Creative choices: two continuous asymmetric natural panoramas without repeating castles, three grounded rock structures matched to span widths, two stout compact suspended forms, common slate/limestone/grass/light palette and preservation of material families across each connected crossing. Existing clouds, foreground water, supported landmark hills and gameplay remain unchanged.
+- Prompts/reference roles: `docs/design/golden-river-main-route/continuity-prompts.md`. Capture utility includes earlier problem locations, opening banks and late/exit panorama coverage. Easter egg ideas are recorded as proposals only; none was embedded into this asset set.
+
+## Unique ruins and decorative easter eggs - 2026-11-02
+
+- Source: built-in OpenAI image generation tool, exact model ID not exposed. Two edits restore different original ruins in the new panoramas, four new-generation calls create the original cat king/fish pair/noticeboard/cat-rock, and two follow-up edits enlarge the keep and replace the physically implausible thin-edge sleeping-cat sign with a broad roof. Intermediate candidates are not runtime assets. Generated final pixels/alpha are preserved.
+- Active additions: `Assets/Game/Resources/GoldenRiver/egg-{cat-king,watching-fish,no-cats-sign,cat-rock}.png`; final panorama paths remain valley-panorama-v3.png/canopy-panorama-v3.png. No borrowed character, brand, text font file or other third-party image was used.
+- Human direction: preserve cool ruins as unique different structures, allow one larger ruin, implement each of the four suggested jokes once, distribute them beyond the intro, make the sleeping cat physically supported and let the fish drift in water instead of remaining static.
+- Creative implementation: unique keep battlement statue, independently bobbing/tilting fish sharing a single pair texture with separate UV regions, broad two-post rain-roof noticeboard with exact "No cats" text, and subtle boulder pareidolia embedded in the final bank. Fish bodies are occluded by the existing river. Decorative movement/placement code is original repository code; no new gameplay, music, sound, collectibles or durable data.
+- License: existing original-art policy in ASSET-LICENSE.md (CC BY-NC 4.0 only to the extent applicable rights are owned; no copyright claim is created for unprotected AI output). Full prompts, edit references and rejected sign correction: `docs/design/golden-river-main-route/ruin-egg-prompts.md`. User visual acceptance remains pending.
+
+2026-11-02: valley-panorama-v3.png revised using the built-in image-generation tool (model identifier not exposed), two edits from the existing original generated panorama. Original generated project artwork; no third-party source. Human direction: replace the rejected sharp floating cat-king cutout with a smaller stone carving supported by the castle parapet, sharing painted lighting and depth. Exact prompts: docs/design/golden-river-main-route/integrated-king-prompt.md. Rejected cutout archived with its Unity metadata.
+
+2026-11-02: egg-watching-fish.png replaced with a built-in image-generation edit of the original rounded fish pair (model identifier not exposed). Human direction: retain round blue-grey and gold characters; horizontal swimming pose, smaller eyes, bodies below the water with turquoise attenuation. Slender trout experiment rejected and unused. Exact prompt: docs/design/golden-river-main-route/round-fish-prompt.md. Original generated artwork; no third-party sources.
+
+2026-11-02 original-style correction: restored bank-wide-v3 from the original painted-bank-v2 without pixel changes; regenerated narrow/medium bank geology and the valley from original painted style references using the built-in image tool. The rejected pale limestone/flat mountain direction is superseded. Added river-stones-slab-v1 as an edit of the original foreground river, with a long flat slab, split angular stones and pebbles. Model identifier not exposed; original generated sources, no third-party inputs. Exact prompts and human decisions: docs/design/golden-river-main-route/original-style-prompts.md.
+
+The same original-style restoration also repaints both long and compact root/masonry shelves from their own silhouettes using painted-bank-v2 as the style reference (four built-in image edits). Their original contact heights and family silhouettes are retained; prompts are in original-style-prompts.md.
+
+2026-11-02 water/statue correction: river-water-v2 and river-rock-groups-v1 are original built-in generated images; repeated water contains no stones and six separate painted groups are each used once. Prior repeating slab artwork archived through Unity with metadata. A generated high-resolution stone cat study was vector-masked and composited onto the existing castle using PhotoCraft 0.19.0; sources/cat-king-composite.pcraft preserves the layers, with source/cutout PNGs alongside. The rejected full-panorama refinement is unused. Model identifier not exposed. Exact prompts and human composition decisions: docs/design/golden-river-main-route/water-and-statue-prompts.md.
+
+2026-11-02: egg-no-cats-sign.png repainted with the built-in image tool using original painted-bank-v2 as the style reference, preserving the supporting roof, sleeping cat and exact text. Original generated assets, model identifier not exposed; prompt and creative decisions in docs/design/golden-river-main-route/sign-style-prompt.md. PhotoCraft layered statue source also removes residual old foreleg pixels behind the new carving; the remainder of the panorama stays intact.
+2026-11-03. river-rock-groups-v2.png adds six unique river formations generated with the built-in image tool. Original project art. The six additional motifs are a broken ring, stepped strata, tilted blade, double shelf, uneven slabs and fractured boulder. Each motif has one fixed placement.
+The standalone cat rock was archived with its Unity metadata. The statue was composited in PhotoCraft from its original cutout at twice the previous resolution, on a 4344 by 1448 valley canvas.
+2026-11-03. river-rock-groups-v3.png adds six more individual river formations, created with the built-in image generator as original project artwork. The new locations, sizes, water depths and atlas cell bounds were selected by hand. PhotoCraft vector masks remove sky pixels from the statue cutout before compositing it onto the parapet.
+2026-11-03. PhotoCraft vector masks remove detached paint specks from the Golden River bank and shelf textures. The masks target isolated alpha regions and preserve the attached terrain and larger flowers.
+
+2026-11-03. far-valley-panorama-v4.png is an original built-in Imagegen edit of canopy-panorama-v3. Human direction sets three skyline shapes and valley fog, with the former canopy archived. The game positions the new painting higher behind the near valley, and cools its atmospheric color. Exact prompt:
+
+> Edit this transparent 3:1 painted game panorama into a distant atmospheric landscape layer with fully transparent sky above the silhouette. Preserve canvas and opaque coverage at bottom. Shift the main skyline upward into the middle third so distant ridges remain visible behind a nearer forest. At 25–37% across, a densely forested tall ridge with irregular treetops and warm golden rim. At 40–54% across, a broad open valley notch framed by a pair of receding blue-violet ridges, the biggest open distant vista. At 55–70% across, overlapping lower rounded hills with alternating woodland and open slopes. Smoothly connect the three views, soft broad color masses and varied silhouettes, cool blue lavender distance, warm subtle sunset light, mist collected low in valleys, distinct crisp ridge contours, original storybook brushwork. No buildings, no repeated mountains, no white or black sky fill, no frames or text.
+
+## Golden River ascent — 2026-11-04
+Two original PNGs, landmark-hillside-fortress-v1 and shelf-ascent-masonry-v1, generated with the built-in OpenAI image generation tool. Exact model identifier was not exposed. No third-party artwork was used. License follows ASSET-LICENSE.md and its original/generated-art rights caveat. Human direction approved the original painted blue-violet rock, golden foliage and teal ivy style, unique supported ruins and varied platform shapes. The fortress has a continuous opaque hillside below its ruins. The shelf uses a cropped left UV margin to exclude the raised buttress from its standable silhouette. Exact prompts are in docs/design/golden-river-main-route/ascent-prompts.md. Original code supplies platform guides and deterministic motion. Existing source provenance remains applicable. Visual acceptance and human timing remain pending.
+
+The fortress received one additional built-in image edit to fit its entire silhouette inside the canvas and remove the clipped left boundary. The final PNG replaces the intermediate at the same path; its Unity GUID is preserved.
+
+## Ascent preview corrections — 2026-11-04
+The user rejected clipped shelf ends, bare guides and stretched cliff banks. The built-in OpenAI image generation tool edited the original generated masonry shelf to create a complete broken end without the raised buttress. A new original tall cliff source was generated for high banks. Exact model identifier is not exposed. Existing ASSET-LICENSE.md original/generated-art policy applies. Human direction preserves golden foliage, blue-violet rock and teal ivy. Full prompts are appended to ascent-prompts.md. Shader grading retains more aqueduct/willow color without brightening the willow. Physics changes and removal of debug-like guides introduce no external asset or dependency.
+
+Final tall-bank source bank-tall-ascent-v1.png is 1060x1484. The renderer retains its native aspect ratio and anchors the authored grass row to the collision surface; the full rocky foot remains below the foreground river. It is used only for high banks after the intro. One late narrow high bank was widened to preserve a submerged base at native proportions. The corrected shelf uses full UVs; the earlier cropped-left treatment is superseded. Bare platform guide lines are removed following user rejection.
+
+## Continuous ascent landscape and matching cliff rim — 2026-11-04
+Five built-in OpenAI image-generation edits (model identifier not exposed): two extended landscape compositions, two localized join repairs and one tall-bank vegetation correction. Only original project images were supplied. PhotoCraft 0.19.0 resized the extension studies, masked their generated left halves, preserved the original intro layers, aligned copied layers, and evaluated localized painted join studies. The final two-layer composite keeps the original intro over the continuous extension study with a narrow 32-source-pixel edge transition beyond the intro framing; the localized patch studies were excluded after render review. Layered sources are near-extended-panorama.pcraft and far-extended-panorama.pcraft under docs/design/golden-river-main-route/sources. Final PNGs are near-extended-panorama-v1 (8688x1448) and far-extended-panorama-v1 (4344x724). Unity imports the wider panorama with an 8192 cap; landscape height and original intro texel density are retained. Original source panoramas remain preserved. The tall rim edit uses bank-wide-v3 as the grass/ivy style reference, with detached upper paint specks masked in PhotoCraft. Exact prompts are in ascent-prompts.md. Existing ASSET-LICENSE.md original/generated-art rights caveat applies; no external licensed asset was introduced. Human decisions require continuous background motion, solid platforms, a matching leafy rim and removal of the easy crossing's catch shelf.
+
+## Shelf collision contours — 2026-11-04
+Codex authored original native polygon geometry against the five existing root/masonry shelf paintings. Contours follow the load-bearing stone body, excluding hanging foliage and roots, and share the exact rendered source registration. No bitmap pixels, character drawings, third-party asset or image-generation request were introduced. Human direction requested silhouette-matched hitboxes, smoother camera motion and correction of an edge-induced airborne hold. Geometry/code follow the repository code license; existing painting provenance remains applicable.
+# Golden River checkpoint landmarks — 2026-11-05
+
+Original generated artwork: `Assets/Game/Resources/GoldenRiver/checkpoint-states-v1.png`, `checkpoint-tree-v1.png`, and `checkpoint-arch-v1.png`. Created with the built-in image generation tool; underlying model identifier not exposed. No external asset/license dependency; generated for this repository and public redistribution. Human decisions: distinct tree/ruin checkpoint settings, clean transparent cutouts, complete grounded feet, blue-violet stone and golden foliage; dark unvisited paw, warm glowing current paw, dark burnt-orange passed paw without emission. The user rejected the initial pale passed state. Final sprite atlas removes the intermediate white halo. Runtime shader adds restrained engraving-only pulsing, no external bloom. Prompt specifications and generation/edit decisions: [checkpoint authoring](docs/design/golden-river-main-route/checkpoints-and-pacing.md).
+
+2026-11-05 checkpoint grounding correction: original code-authored, UV-registered grass overlap meshes reuse the corresponding existing platform painting/material without editing bitmap pixels. Stone, tree roots and arch feet are embedded 0.08 world units. No new generator, third-party asset or license dependency. Human direction: visible contact should activate the checkpoint, with vegetation hiding the pasted-looking bottom seams.
+
+2026-11-05 checkpoint activation presentation: original code-authored shader interpolation and fourteen procedural soft radial spark quads reuse the existing checkpoint atlas. Human direction: gradually brighten only the touched checkpoint and release warm rising sparks; keep the distant passed marker change immediate. The fixed stone silhouette is preserved while engraving colors blend. No new bitmap generation or third-party asset/license dependency.
+# Golden River finale paintings — 2026-11-08
+
+Original generated project artwork made with the built-in OpenAI image generation tool (exact underlying model ID not exposed), with no third-party sources or additional third-party redistribution restriction. Files in `Assets/Game/Resources/GoldenRiver`: `finale-wall-v1.png`, `finale-pier-v1.png`, `finale-garden-v1.png`, `finale-hillside-v1.png`, `finale-gate-v1.png`, `finale-guide-v1.png` and `finale-vertical-guide-v1.png`. Two additional original generated landscape strips extend the existing near/far panoramas through PhotoCraft native compositions in `docs/design/golden-river-main-route/sources/finale-{near,far}-panorama.pcraft`.
+
+Human decisions: retain painted golden grass/daisies, violet stone and deep teal ivy; author distinct wall, compact pier and rooted garden forms; remove raised wall stumps from playable tops; create one supported hillside ruin and a distinct final pointed gate; give moving platforms credible painted counterweight frames; preserve complete feet, clean transparent openings and original intro/ascent registration. No new character artwork or Easter Eggs. Final prompt specifications, extraction edits, contact rows, collision/footing choices, landscape composition and provenance are recorded in [Finale art](docs/design/golden-river-main-route/finale-art.md). Unity-generated metadata is preserved. This records asset origin, not final player acceptance.
+
+Follow-up on 2026-11-08: `finale-rubble-v1.png` is an additional original built-in OpenAI image generation asset (exact model not exposed), with no third-party source or additional third-party redistribution restriction. Human direction rejected a floating grass-topped shelf on top of a terrace and instead selected a low, flat-based stack of blue-violet fallen masonry, small teal moss and warm edges, without a lawn, hanging underside, scenery or halo. It is integrated with a stepped solid contour and registered grass at its base. The full final prompt specification is in the linked Finale art record.
+
+
+## Golden River watchtower detour � 2026-11-08
+
+`Assets/Game/Resources/GoldenRiver/finale-watchtower-v1.png` is an original generated transparent painting made with the built-in OpenAI image generation tool (exact model identifier not exposed). Source output: `exec-c32edae8-5c5e-4fbe-9ab3-f8a6619a7ad6.png`. Existing `ASSET-LICENSE.md` generated-art policy applies; no external asset or licensed reference was supplied. Human creative direction: lengthen the measured 100-second finale through a collapsed tower with a short reversal, varied landings and local recovery, preserving golden vegetation, violet masonry and teal ivy. Full prompt and integration decisions are recorded in `docs/design/golden-river-main-route/finale-art.md`.
+
+The existing near panorama is extended to 14332�1448 using an original generated right-hand continuation (`exec-85ff45e6-365c-4214-ace3-bd4154ece0d6.png`, built-in image generation, exact model not exposed) and PhotoCraft composition. The original project's terminal edge was the only reference; the original intro/ascent mapping is preserved. Editable source: `docs/design/golden-river-main-route/sources/watchtower-near-panorama.pcraft`. The generated-art policy above applies. Prompt, rejected low-ridge study and contour/ground decisions are documented in `finale-art.md`.
 
 ## Mika water-recovery prototype — 2026-10-31
 

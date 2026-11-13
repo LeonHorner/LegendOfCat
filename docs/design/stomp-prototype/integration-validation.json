@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-01",
+  "integratedMain": "afc740af782811ab43216c76bd9b98b86cc4a0d7",
+  "mergeCommit": "d417d21d5d5ef0387c0eabb3f38d615c71d16d2a",
+  "unity": "6000.3.27f2",
+  "scope": "Focused integration tests in a new isolated project with its own Library",
+  "result": "Passed",
+  "total": 111,
+  "passed": 111,
+  "failed": 0,
+  "skipped": 0,
+  "classes": {
+    "CatCollisionTests": 7,
+    "CatMovementTests": 11,
+    "DesktopBehaviorTests": 42,
+    "MenuMovementIntegrationTests": 2,
+    "RunLifecycleTests": 4,
+    "SceneryRendererTests": 11,
+    "StompCombatTests": 34
+  },
+  "testedWorkingCopySha256": {
+    "arena": "c94ce345754e03135037374f3904bf39bcd4b2985ad407fa964968347727bc18",
+    "menuTests": "5dcccb73507b91096209d7b2b5296b6c38b76bac473067b7b64d980bfb05c22f",
+    "combatTests": "cd0f7675f6f274a0b33d5f142afe676142e38b9c1f49df0bea68dbe521b82465"
+  },
+  "windowsPortableNodeTests": {
+    "passed": 36,
+    "failed": 0,
+    "skipped": 1
+  },
+  "fullPrepareMerge": "Not run; pending final user gameplay/audio acceptance",
+  "platformBuilds": "Not run in this development pass",
+  "waterRecovery": "PR #61 inspected separately; not merged or copied",
+  "linuxNodeTests": {
+    "runtime": "Node 24.19.0, portable checksum-verified runtime under WSL Ubuntu",
+    "total": 51,
+    "passed": 51,
+    "failed": 0,
+    "skipped": 0,
+    "exitCode": 0
+  },
+  "windowsPosixFixtureAttempt": {
+    "passed": 40,
+    "failed": 10,
+    "skipped": 1,
+    "limitation": "Native Windows does not select the POSIX gh fixture; mock-token API reads fail with HTTP 401 before mutation. Same unchanged suite passes under WSL Linux."
+  }
+}

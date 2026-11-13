@@ -46,9 +46,9 @@ public static class WaterRecoveryPreview
         var root = Object.Instantiate(Resources.Load<GameObject>("MovementCourse"));
         var course = root.GetComponent<MovementCourse>();
         Invoke(course, "Awake"); Invoke(course.Cat, "Awake");
-        var scenery = root.GetComponentInChildren<BackgroundStudy>();
+        var scenery = root.GetComponentInChildren<SceneryRenderer>();
         var view = scenery.View;
-        view.transform.position = new Vector3(6, BackgroundStudy.CameraFloor, -10);
+        view.transform.position = new Vector3(6, SceneryRenderer.CameraFloor, -10);
         view.aspect = 16f / 9f;
         var water = course.Cat.GetComponent<WaterRecovery>();
         var body = course.Cat.GetComponent<Rigidbody2D>();

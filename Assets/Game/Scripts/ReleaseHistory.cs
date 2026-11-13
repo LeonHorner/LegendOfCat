@@ -16,6 +16,14 @@ public static class ReleaseHistory
     public const int MaxBlocks = 120;
     const int MaxCharacters = 32768;
 
+    // semantic-release adds linked closing issues after the subject and PR/commit references.
+    // Only remove a complete trailing closure clause, never ordinary prose or breaking notes.
+    static readonly System.Text.RegularExpressions.Regex ClosingIssueSuffix =
+        new System.Text.RegularExpressions.Regex(
+            @",\s*(?:closes|fixes|resolves)\s+(?:(?:\[#\d+\]\([^)]*\)|#\d+)[\s,;]*)+$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase |
+            System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
     public static bool IsVersionHeading(string heading, string version)
     {
         if (string.IsNullOrEmpty(version)) return false;
@@ -61,7 +69,7 @@ public static class ReleaseHistory
                 }
             }
             if (line.StartsWith("[x] ", StringComparison.OrdinalIgnoreCase) || line.StartsWith("[ ] ", StringComparison.Ordinal)) line = line.Substring(4);
-            line = Inline(line).Trim();
+            line = Inline(ClosingIssueSuffix.Replace(line, "")).Trim();
             if (line.Length == 0) continue;
             if (blocks.Count == MaxBlocks) { blocks.Add(new Block("More details on GitHub.", false)); break; }
             blocks.Add(new Block((list ? "• " : "") + line, heading));
@@ -134,6 +142,10 @@ public static class ReleaseHistory
             if (c == '_' && (i == 0 || !char.IsLetterOrDigit(text[i - 1]) || i + 1 == text.Length || !char.IsLetterOrDigit(text[i + 1]))) continue;
             output.Append(c);
         }
-        return output.ToString().Replace("()", "").Trim().Replace("&amp;", "&").Replace("&lt;", "<").Replace("&gt;", ">").Replace("&quot;", "\"").Replace("&#39;", "'");
+        // Removing inline PR, issue and SHA links may leave doubled spaces.
+        var compact = System.Text.RegularExpressions.Regex.Replace(
+            output.ToString().Replace("()", ""), @"[ \t]{2,}", " ").Trim();
+        return compact.Replace("&amp;", "&").Replace("&lt;", "<").Replace("&gt;", ">")
+            .Replace("&quot;", "\"").Replace("&#39;", "'");
     }
 }
