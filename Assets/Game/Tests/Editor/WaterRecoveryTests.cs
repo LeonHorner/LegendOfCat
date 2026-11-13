@@ -47,7 +47,7 @@ public class WaterRecoveryTests
         // Let runtime destruction release its generated meshes/materials in normal Play;
         // EditMode tests explicitly release transient objects after cancellation.
         Call(recovery, "Cancel");
-        foreach (string field in new[] { "effects", "submerge", "foamMaterial", "drawings", "sharkFrames", "splashFrames", "spinMesh" }) {
+        foreach (string field in new[] { "effects", "submerge", "foamMaterial", "drawings", "sharkFrames", "splashFrames", "breachMesh" }) {
             var info = recovery.GetType().GetField(field, BindingFlags.NonPublic | BindingFlags.Instance);
             var value = info.GetValue(recovery);
             if (value is Sprite[] sprites) foreach (var sprite in sprites) UnityEngine.Object.DestroyImmediate(sprite);
@@ -115,18 +115,17 @@ public class WaterRecoveryTests
         var effects = root.GetComponentsInChildren<Renderer>();
         var shark = effects.Single(renderer => renderer.name == "Shark");
         var head = effects.Single(renderer => renderer.name == "Mika facial reaction");
-        Call(recovery, "Advance", 1.02f); Call(recovery, "LateUpdate");
-        Assert.That(shark.enabled, Is.True);
-        Assert.That(shark.transform.position.x, Is.EqualTo(head.transform.position.x).Within(0.001f));
-        Assert.That(shark.transform.position.y, Is.LessThan(head.transform.position.y));
-        Assert.That(head.enabled, Is.True);
-        Call(recovery, "Advance", 0.16f); Call(recovery, "LateUpdate");
-        Assert.That(head.enabled, Is.False);
-        var spin = effects.Single(renderer => renderer.name == "Shark aerial spin");
-        Assert.That(spin.enabled, Is.True);
+        var breach = effects.Single(renderer => renderer.name == "Shark side-view breach");
+        Call(recovery, "Advance", 1.38f); Call(recovery, "LateUpdate");
+        Assert.That(breach.enabled, Is.True);
+        Assert.That(breach.transform.position.y, Is.GreaterThan(head.transform.position.y + 2f));
         Assert.That(shark.enabled, Is.False);
-        Call(recovery, "Advance", 1.60f); Call(recovery, "LateUpdate");
-        Assert.That(spin.enabled, Is.False);
+        Assert.That(head.enabled, Is.True);
+        Call(recovery, "Advance", 0.62f); Call(recovery, "LateUpdate");
+        Assert.That(head.enabled, Is.False);
+        Assert.That(breach.enabled, Is.True);
+        Call(recovery, "Advance", 0.78f); Call(recovery, "LateUpdate");
+        Assert.That(breach.enabled, Is.False);
         Assert.That(shark.enabled, Is.False);
         Assert.That(root.GetComponentsInChildren<LineRenderer>()
             .Any(renderer => renderer.name == "Shark bubble" && renderer.enabled), Is.True);

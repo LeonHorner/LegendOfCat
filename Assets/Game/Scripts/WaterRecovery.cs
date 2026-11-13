@@ -12,8 +12,8 @@ public sealed class WaterRecovery : MonoBehaviour
 #else
     const bool ForceSharkForDebug = false;
 #endif
-    const float SharkLaunchTime = 0.86f, SharkBiteTime = 1.14f;
-    const float SharkSubmergeTime = 2.22f, SharkSecondLaunchTime = 3.28f;
+    const float SharkLaunchTime = 0.72f, SharkBiteTime = 1.93f;
+    const float SharkSubmergeTime = 2.30f, SharkSecondLaunchTime = 3.28f;
     const float SharkLungeTime = 3.48f, SharkBlackoutTime = 3.82f;
     bool HasSharkEncounter => sharkEncounter && shark;
     float FadeStart => HasSharkEncounter ? SharkBlackoutTime - 0.06f : 1.65f;
@@ -36,10 +36,12 @@ public sealed class WaterRecovery : MonoBehaviour
     SpriteRenderer splashFront, splashBack;
     SpriteRenderer shark;
     Sprite[] sharkFrames;
-    MeshRenderer spinningShark;
-    Mesh spinMesh;
-    Vector3[] spinVertices;
-    const int SpinColumns = 24;
+    MeshRenderer breachingShark;
+    Mesh breachMesh;
+    Vector3[] breachVertices;
+    Vector2[] breachUVs;
+    float breachHeight;
+    const int BreachColumns = 24;
     LineRenderer[] bubbles;
     bool sharkEncounter;
     Material submerge, foamMaterial;
@@ -156,34 +158,35 @@ public sealed class WaterRecovery : MonoBehaviour
         for (int i = 0; i < sharkFrames.Length; i++)
             sharkFrames[i] = Sprite.Create(texture, new Rect(i * width, 0, width, texture.height),
                 new Vector2(0.5f, 0.42f), width / 1.65f, 0, SpriteMeshType.FullRect);
-        PrepareSharkSpin();
+        PrepareSharkBreach();
     }
 
-    void PrepareSharkSpin()
+    void PrepareSharkBreach()
     {
         var texture = Resources.Load<Texture2D>("WaterRecovery/shark-breach-frames");
         if (!texture) return;
 
-        spinningShark = new GameObject("Shark aerial spin").AddComponent<MeshRenderer>();
-        spinningShark.transform.SetParent(effects.transform, false);
-        spinningShark.sharedMaterial = submerge;
-        spinningShark.sortingOrder = 5;
+        breachingShark = new GameObject("Shark side-view breach").AddComponent<MeshRenderer>();
+        breachingShark.transform.SetParent(effects.transform, false);
+        breachingShark.sharedMaterial = submerge;
+        breachingShark.sortingOrder = 5;
         var properties = new MaterialPropertyBlock();
         properties.SetTexture("_MainTex", texture);
-        spinningShark.SetPropertyBlock(properties);
+        breachingShark.SetPropertyBlock(properties);
 
-        spinMesh = new Mesh { name = "Shark spin surface" };
-        spinMesh.MarkDynamic();
-        spinVertices = new Vector3[2 * (SpinColumns + 1)];
-        var uv = new Vector2[spinVertices.Length];
-        var colors = new Color32[spinVertices.Length];
-        var triangles = new int[SpinColumns * 6];
-        for (int i = 0; i <= SpinColumns; i++) {
-            float u = Mathf.Lerp(0.001f, 0.999f, i / (float)SpinColumns) / 3f;
-            uv[2 * i] = new Vector2(u, 0);
-            uv[2 * i + 1] = new Vector2(u, 1);
+        breachMesh = new Mesh { name = "Shark breach surface" };
+        breachMesh.MarkDynamic();
+        breachVertices = new Vector3[2 * (BreachColumns + 1)];
+        breachUVs = new Vector2[breachVertices.Length];
+        breachHeight = 3.1f * texture.height / (texture.width / 3f);
+        var colors = new Color32[breachVertices.Length];
+        var triangles = new int[BreachColumns * 6];
+        for (int i = 0; i <= BreachColumns; i++) {
+            float u = Mathf.Lerp(0.001f, 0.999f, i / (float)BreachColumns) / 3f;
+            breachUVs[2 * i] = new Vector2(u, 0);
+            breachUVs[2 * i + 1] = new Vector2(u, 1);
             colors[2 * i] = colors[2 * i + 1] = new Color32(255, 255, 255, 255);
-            if (i == SpinColumns) break;
+            if (i == BreachColumns) break;
             int vertex = i * 2;
             int triangle = i * 6;
             triangles[triangle] = vertex;
@@ -193,11 +196,11 @@ public sealed class WaterRecovery : MonoBehaviour
             triangles[triangle + 4] = vertex + 1;
             triangles[triangle + 5] = vertex + 3;
         }
-        spinMesh.vertices = spinVertices;
-        spinMesh.uv = uv;
-        spinMesh.colors32 = colors;
-        spinMesh.triangles = triangles;
-        spinningShark.gameObject.AddComponent<MeshFilter>().sharedMesh = spinMesh;
+        breachMesh.vertices = breachVertices;
+        breachMesh.uv = breachUVs;
+        breachMesh.colors32 = colors;
+        breachMesh.triangles = triangles;
+        breachingShark.gameObject.AddComponent<MeshFilter>().sharedMesh = breachMesh;
     }
 
     LineRenderer Line(string name, int points, bool loop)
@@ -258,13 +261,13 @@ public sealed class WaterRecovery : MonoBehaviour
         }
         submerge.SetFloat("_Surface", visualEntry.y);
         submerge.SetFloat("_SurfaceScale", scale);
-        float spinFraming = HasSharkEncounter
+        float breachFraming = HasSharkEncounter
             ? Mathf.SmoothStep(0, 1, Mathf.InverseLerp(SharkLaunchTime, 1.26f, Elapsed))
                 * (1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(2.02f, 2.48f, Elapsed)))
             : 0;
-        view.orthographicSize = Mathf.Lerp(cameraSize, (1.65f + 0.85f * spinFraming) * scale, zoom);
+        view.orthographicSize = Mathf.Lerp(cameraSize, (1.65f + 0.85f * breachFraming) * scale, zoom);
         Vector3 close = entry + new Vector3(facing * 0.12f * scale,
-            (0.28f + spinFraming * 0.95f - ForegroundInset) * scale, -10);
+            (0.28f + breachFraming * 0.95f - ForegroundInset) * scale, -10);
         float rumble = HasSharkEncounter && Elapsed < SharkSecondLaunchTime
             ? Mathf.InverseLerp(SharkSubmergeTime, SharkSecondLaunchTime, Elapsed) : 0;
         Vector3 shake = new Vector3(Mathf.Sin(Elapsed * 75), Mathf.Sin(Elapsed * 91 + 0.8f), 0);
@@ -288,7 +291,8 @@ public sealed class WaterRecovery : MonoBehaviour
         float splashStart = Elapsed >= SharkSecondLaunchTime ? SharkSecondLaunchTime
             : Elapsed >= SharkSubmergeTime - 0.17f ? SharkSubmergeTime - 0.17f : SharkLaunchTime;
         float splashTime = sharkSplash ? Elapsed - splashStart : Elapsed;
-        float splashX = splashStart == SharkSubmergeTime - 0.17f ? 0.98f : 0.30f;
+        float splashX = splashStart == SharkLaunchTime ? -1.55f
+            : splashStart == SharkSecondLaunchTime ? 0.30f : 0.98f;
         Vector3 splashOrigin = visualEntry + Vector3.right * (sharkSplash ? facing * splashX * scale : 0);
         float crestTime = sharkSplash ? 0.65f : 0.4f;
         float breakAmount = Mathf.Sin(Mathf.Clamp01(splashTime / crestTime) * Mathf.PI);
@@ -386,23 +390,12 @@ public sealed class WaterRecovery : MonoBehaviour
     {
         if (!shark) return;
         bool encounter = HasSharkEncounter;
-        bool firstBreach = encounter && Elapsed >= SharkLaunchTime && Elapsed < SharkBiteTime;
         bool secondBreach = encounter && Elapsed >= SharkSecondLaunchTime && Elapsed < SharkBlackoutTime;
-        shark.enabled = firstBreach || secondBreach;
-        PresentSharkSpin(visualEntry, encounter);
+        shark.enabled = secondBreach;
+        PresentSharkBreach(visualEntry, encounter);
         if (!shark.enabled) return;
 
         Vector3 bite = visualEntry + new Vector3(facing * 0.30f, 0.32f, 0) * scale;
-        if (firstBreach) {
-            float rise = Mathf.InverseLerp(SharkLaunchTime, SharkBiteTime, Elapsed);
-            shark.sharedMaterial = submerge;
-            shark.sortingOrder = 5;
-            shark.transform.position = bite - Vector3.up * (1.23f * (1 - rise * rise)) * scale;
-            shark.transform.localScale = Vector3.one;
-            shark.sprite = sharkFrames[rise < 0.55f ? 0 : 2];
-            return;
-        }
-
         float lift = Mathf.InverseLerp(SharkSecondLaunchTime, SharkLungeTime, Elapsed);
         float lunge = Mathf.InverseLerp(SharkLungeTime, SharkBlackoutTime, Elapsed);
         Vector3 airborne = bite + Vector3.up * (Mathf.Lerp(-1.1f, 0.55f, lift * lift) * scale);
@@ -417,35 +410,48 @@ public sealed class WaterRecovery : MonoBehaviour
         shark.sprite = sharkFrames[lift < 0.48f ? 0 : lunge < 0.16f ? 1 : 2];
     }
 
-    void PresentSharkSpin(Vector3 origin, bool encounter)
+    void PresentSharkBreach(Vector3 origin, bool encounter)
     {
-        if (!spinningShark) return;
-        spinningShark.enabled = encounter && Elapsed >= SharkBiteTime && Elapsed < SharkSubmergeTime;
-        if (!spinningShark.enabled) return;
+        if (!breachingShark) return;
+        breachingShark.enabled = encounter && Elapsed >= SharkLaunchTime && Elapsed < SharkSubmergeTime;
+        if (!breachingShark.enabled) return;
 
-        float t = Mathf.InverseLerp(SharkBiteTime, SharkSubmergeTime, Elapsed);
-        float turn = Mathf.SmoothStep(0, 1, t);
-        float x = Mathf.Lerp(0.05f, 0.98f, t);
-        float y = Mathf.Lerp(-0.88f, -1.65f, t) + 3.1f * Mathf.Sin(t * Mathf.PI);
-        spinningShark.transform.SetPositionAndRotation(origin + new Vector3(facing * x, y, 0) * scale,
-            Quaternion.Euler(0, 0, facing * Mathf.Lerp(78f, 282f, turn)));
+        bool diving = Elapsed >= SharkBiteTime;
+        float travel = diving ? Mathf.InverseLerp(SharkBiteTime, SharkSubmergeTime, Elapsed)
+            : Mathf.InverseLerp(SharkLaunchTime, SharkBiteTime, Elapsed);
+        float x = diving ? Mathf.Lerp(0.30f, 0.98f, travel) : Mathf.Lerp(-1.55f, 0.30f, travel);
+        float y = diving ? Mathf.Lerp(0.29f, -1.4f, travel)
+            : Mathf.Lerp(-0.12f, 0.29f, travel) + 10.8f * travel * (1 - travel);
+        float pitch = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(0.25f, 0.86f, travel));
+        float angle = diving ? -72f : Mathf.Lerp(74f, -72f, pitch);
+        breachingShark.transform.SetPositionAndRotation(origin + new Vector3(facing * x, y, 0) * scale,
+            Quaternion.Euler(0, 0, facing * angle));
 
-        // Bend one continuous body arc as the shark rolls over into the dive.
-        float curvature = -0.27f * Mathf.Sin(Mathf.PI * t);
-        for (int i = 0; i <= SpinColumns; i++) {
-            float u = i / (float)SpinColumns;
-            float localX = (u - 0.5f) * 2.55f;
-            float angle = localX * curvature;
-            float centerX = Mathf.Abs(curvature) > 0.0001f ? Mathf.Sin(angle) / curvature : localX;
-            float centerY = Mathf.Abs(curvature) > 0.0001f ? (1 - Mathf.Cos(angle)) / curvature : 0;
+        // A single arch peaks as the shark turns over and relaxes into the catch.
+        // Bend around the jaw to keep the bite aligned with Mika.
+        float arch = diving ? 0 : Mathf.Sin(Mathf.PI * Mathf.InverseLerp(0.20f, 0.97f, travel));
+        float curvature = -40f * Mathf.Deg2Rad * arch / 3.1f;
+        bool curved = Mathf.Abs(curvature) > 0.0001f;
+        int jaw = diving || travel < 0.54f ? 0 : travel < 0.72f ? 1 : 2;
+        for (int i = 0; i <= BreachColumns; i++) {
+            float u = i / (float)BreachColumns;
+            float localX = (u - 0.91f) * 3.1f;
+            float turn = localX * curvature;
+            float sin = Mathf.Sin(turn);
+            float cos = Mathf.Cos(turn);
+            float centerX = curved ? sin / curvature : localX;
+            float centerY = curved ? (1 - cos) / curvature : 0;
             for (int row = 0; row < 2; row++) {
-                float localY = (row - 0.43f) * 1.16f;
-                spinVertices[2 * i + row] = new Vector3(
-                    facing * (centerX - localY * Mathf.Sin(angle)), centerY + localY * Mathf.Cos(angle), 0);
+                float localY = (row - 0.43f) * breachHeight;
+                int index = 2 * i + row;
+                breachVertices[index] = new Vector3(
+                    facing * (centerX - localY * sin), centerY + localY * cos, 0);
+                breachUVs[index] = new Vector2((jaw + Mathf.Lerp(0.001f, 0.999f, u)) / 3f, row);
             }
         }
-        spinMesh.vertices = spinVertices;
-        spinMesh.RecalculateBounds();
+        breachMesh.vertices = breachVertices;
+        breachMesh.uv = breachUVs;
+        breachMesh.RecalculateBounds();
     }
 
     void OnRespawn() { if (!internalRespawn) Cancel(); }
@@ -486,7 +492,7 @@ public sealed class WaterRecovery : MonoBehaviour
         if (drawings != null) foreach (var drawing in drawings) if (drawing) Destroy(drawing);
         if (splashFrames != null) foreach (var frame in splashFrames) if (frame) Destroy(frame);
         if (sharkFrames != null) foreach (var frame in sharkFrames) if (frame) Destroy(frame);
-        if (spinMesh) Destroy(spinMesh);
+        if (breachMesh) Destroy(breachMesh);
         if (submerge) Destroy(submerge);
         if (foamMaterial) Destroy(foamMaterial);
     }

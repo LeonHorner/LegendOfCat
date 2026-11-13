@@ -129,8 +129,9 @@ Each water entry rolls once for a 1-in-100 chance of the shark sequence.
 `ForceSharkForDebug` forces the encounter in the Unity Editor and development
 builds. Standard builds use the random roll.
 
-The 4.49-second shark sequence starts with a breach beneath Mika. The shark
-closes its jaws, bends through an aerial spin and dives below the surface.
+The 4.49-second shark sequence opens with the earlier side-view breach.
+The shark arches as it pitches over, catches Mika on the descent and dives
+below the surface.
 Bubbles rise and camera shake builds for about one second before the second
 breach. The shark rushes toward the viewer until its open mouth fills the
 frame. Blackout leads to the usual checkpoint recovery.
