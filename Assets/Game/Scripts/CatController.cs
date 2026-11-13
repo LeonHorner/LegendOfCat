@@ -5,6 +5,9 @@ public sealed class CatController : MonoBehaviour
 {
     // Optional placement frame for the course's fall boundary; motor units stay world-space.
     public Transform fallReference;
+    public System.Func<Vector2, Vector2, bool> RecoveryBoundary;
+    Vector2 previousLocalPosition;
+    bool hasPreviousPosition;
     public readonly CatMotion Motion = new CatMotion();
     public bool Grounded { get; private set; }
     public Vector2 PresentationVelocity => body ? body.linearVelocity - supportVelocity : Vector2.zero;
@@ -86,8 +89,10 @@ public sealed class CatController : MonoBehaviour
             }
         }
         if (Motion.Jumped) { Grounded = false; leaveGroundSteps = 2; }
-        float fallY = fallReference ? fallReference.InverseTransformPoint(body.position).y : body.position.y;
-        if (fallY < -7) {
+        Vector2 localPosition = fallReference ? (Vector2)fallReference.InverseTransformPoint(body.position) : body.position;
+        bool recover = RecoveryBoundary != null ? RecoveryBoundary(hasPreviousPosition ? previousLocalPosition : localPosition, localPosition) : localPosition.y < -7;
+        previousLocalPosition = localPosition; hasPreviousPosition = true;
+        if (recover) {
             if (FellOutOfBounds != null) FellOutOfBounds();
             else ReturnToStart();
         }
@@ -105,6 +110,7 @@ public sealed class CatController : MonoBehaviour
     // The course chooses the spawn; the controller always resets motor and physics.
     public void RespawnAt(Vector2 position)
     {
+        hasPreviousPosition = false;
         SetPaused(false);
         Motion.Reset();
         supportVelocity = Vector2.zero;

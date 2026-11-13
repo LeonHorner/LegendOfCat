@@ -1,0 +1,32 @@
+[
+  {
+    "asset": "return-floor-a-v1",
+    "date": "2026-11-13",
+    "generator": "OpenAI image_gen",
+    "model": "Not disclosed",
+    "source": "exec-093455aa-dc93-417e-a192-4b5f3790c65c.png",
+    "prompt": "Native production 2D side-view cave-floor module, true transparency. Image1 is exact geometry stencil: flat gold contact line at y140/1156 on1600x1156 canvas, ALL area above transparent, all purple below solid rock extending to left/right/bottom crop edges. Image2 existing approved painted cave floor sets exact rock/moss style. Paint a substantial connected cliff mass of irregular violet-grey boulders, thin readable golden moss top, dark crevices and sparse subdued green ivy. Typical boulders90-140px wide. Keep EXACT canvas/contact line/framing, no centering or shrink. Top walking edge stays flat, organic moss texture but no plants taller3px, no white flowers, no background, characters, ceiling, water, ruins, glow, haze or isolated flecks. Left and right edges should be continuous dense cropped boulders suitable for joining adjacent pieces; no decorative endcaps or floating-platform silhouette. Cool shaded dry stone, soft upper-right indirect warm light. Native painted large rock volume, not a stretched texture or rectangular poster. Material variation should remain generic; no recognizable unique roots or landmarks. Gold guide becomes natural moss without neon outline.",
+    "license": "Original generated artwork; redistribution under applicable generation service terms.",
+    "decision": "Native violet stone and restrained gold contact edge. Shared deep grain avoids restarting the texture at every tread; geometric stencils define registration."
+  },
+  {
+    "asset": "return-floor-b-v1",
+    "date": "2026-11-13",
+    "generator": "OpenAI image_gen",
+    "model": "Not disclosed",
+    "source": "exec-abb624eb-8e90-4594-9f55-6581e5c2721d.png",
+    "prompt": "Native2D cave-floor module variant, true transparent air above. Input1 exact stencil geometry (flat contact y140/1156 on1600x1156 canvas); input2 approved cave palette/style. Paint solid purple below line edge-to-edge as connected massive violet stone: irregular SMALLER rounded interlocking boulders70-110px with cool crevices, thin natural golden moss walking edge and a few subdued ivy strands, upper-right indirect warm light. Differ from the companion long-diagonal slab material through rounded geological rock forms, but preserve color, scale and lighting. Exact flat contact position/canvas/framing, header remains transparent, rock fills every left/right/bottom cropped edge. No distinct landmark, flowers, background, ceiling, fountain, cat, water, text, glow, haze or floating flecks. No decorative platform endcaps. The asset will be cropped at native scale to form contiguous cave banks and short attached ledges. Do not center or shrink the solid shape. Gold guide becomes thin moss, not a neon border.",
+    "license": "Original generated artwork; redistribution under applicable generation service terms.",
+    "decision": "Native violet stone and restrained gold contact edge. Shared deep grain avoids restarting the texture at every tread; geometric stencils define registration."
+  },
+  {
+    "asset": "return-roof-v1",
+    "date": "2026-11-13",
+    "generator": "OpenAI image_gen",
+    "model": "Not disclosed",
+    "source": "exec-6a352cc7-5356-44d5-8d45-5af727df2d2d.png",
+    "prompt": "Production native 2D cave-roof cutout, true transparent background below. Image1 exact1600x1156 silhouette stencil, lower purple edge is y675/1156 with tiny natural variations; image2 approved roof style. Paint purple as a dense connected mass of cool violet-grey interlocking boulders with crevices, restrained root ends and sparse attached dark green ivy. Fill to every top/left/right cropped edge. Preserve EXACT geometry/framing; do not shrink, center, rotate or turn it into a floating slab. The solid roof occupies upper58% of image, lower42% transparent. Bottom edge naturally uneven individual rock volumes within15px of stencil. Typical boulders90-140px, soft indirect light from upper right, no recognizable unique roots, architectural motifs, warm light opening, characters, ground, platforms, water, sky, haze, glow or disconnected flecks. This joins into a longer cave and will be cropped at native scale; no rectangular scenic border or column. Native painted dry geological mass matching reference.",
+    "license": "Original generated artwork; redistribution under applicable generation service terms.",
+    "decision": "Native violet stone and restrained gold contact edge. Shared deep grain avoids restarting the texture at every tread; geometric stencils define registration."
+  }
+]

@@ -124,10 +124,10 @@ public sealed class MovementCourse : MonoBehaviour
     public static readonly int[] LevelOneFloatingPlatforms = { 3, 4, 8, 9, 10, 14, 15, 16, 19, 20, 22, 23, 24, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
     // Keep each connected suspended sequence in one material family.
     public static readonly int[] LevelOneRootPlatforms = { 3, 4, 8, 9, 10, 28, 29, 30, 31, 35, 36, 37, 40, 41 };
-    // Reserved broad ground for the upper-route owner; no detour is required here.
-    public static readonly Vector2 UpperRouteEntrance = new Vector2(AscentPlatforms[10].x, AscentPlatforms[10].y + 1.27f);
+    // The cave advances to a later bank; the overlook still owns checkpoint 2.
+    public static Vector2 UpperRouteEntrance => CaveRoute.Entrance;
     public static readonly int OverlookIndex = AscentPlatforms.Length - 1;
-    public static readonly Vector2 UpperRouteRejoin = new Vector2(AscentPlatforms[OverlookIndex].x, 13.12f);
+    public static Vector2 UpperRouteRejoin => CaveRoute.Rejoin;
     public static readonly Vector2 LevelOneExit = new Vector2(FinaleRoute.Last.x + 4.5f, FinaleRoute.Last.y + 1.27f);
     Vector3[] ActivePlatforms => LevelOne ? CompletePlatforms : Platforms;
     public CatController Cat { get; private set; }
@@ -288,6 +288,7 @@ public sealed class MovementCourse : MonoBehaviour
             follow.ascent = true;
             for (int i = 0; i < 75; i += 5) {
                 if (i == 30) continue; // The easy horizontal-support crossing needs no catch shelf.
+                if (i == 10) continue; // Native shore ledges replace this catch at the cave entrance.
                 var first = AscentPlatforms[i]; var lastInGroup = AscentPlatforms[i + 4];
                 var landing = AscentPlatforms[i + 1];
                 var catchPoint = new Vector3(landing.x + (i == 50 ? 1.6f : 0), first.y - 1f, i == 50 ? 9 : 10);
@@ -296,8 +297,9 @@ public sealed class MovementCourse : MonoBehaviour
                 var catchCollider = catchFloor.AddComponent<BoxCollider2D>();
                 catchCollider.size = new Vector2(1, 2.2f);
                 catchCollider.offset = new Vector2(0, -0.6f);
-                sceneryRenderer.AddRecoveryTerrain(new Vector3(catchPoint.x, catchPoint.y - 0.5f, catchPoint.z));
+                var catchVisual=sceneryRenderer.AddRecoveryTerrain(new Vector3(catchPoint.x, catchPoint.y - 0.5f, catchPoint.z));
                 SceneryRenderer.MatchFloatingCollider(catchFloor, sceneryRenderer.TerrainVisuals[sceneryRenderer.TerrainVisuals.Count - 1]);
+                CaveEntryStudy.CarveRecovery(catchFloor,catchVisual,transform);
             }
             // A missed first precision landing costs height, with a short jump back to the entry shelf.
             var lateCatch = new Vector3(AscentPlatforms[76].x + 2, 11.15f, 9);
@@ -333,6 +335,12 @@ public sealed class MovementCourse : MonoBehaviour
             // The terminal cliff is visible beyond the gate; scenery continues past its edge.
 
         }
+        if (LevelOne) {
+            var caveRoot=new GameObject("Integrated river cave");caveRoot.SetActive(false);caveRoot.transform.SetParent(transform,false);
+            caveRoot.transform.localPosition=new Vector3(CaveRoute.Origin,CaveRoute.VerticalOffset,0);
+            var cave=caveRoot.AddComponent<CaveEntryStudy>();cave.Embedded=true;caveRoot.SetActive(true);
+            cave.AttachToLevel(Cat,courseCamera,follow,sceneryRenderer,transform);
+        }
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
             if (LevelOne) {
@@ -346,6 +354,17 @@ public sealed class MovementCourse : MonoBehaviour
         }
         // Main-route landmarks and platform silhouettes communicate progression without floating labels.
         if (!LevelOne) Label("FINISH / return or retry", new Vector2(100, 1));
+    }
+    void CreateDescentFloor(Vector3 p, SceneryRenderer scenery, string name)
+    {
+        var floor = Block(name, p, new Vector2(p.z, 1.5f), Color.gray);
+        floor.GetComponent<SpriteRenderer>().enabled = false;
+        var collision = floor.AddComponent<BoxCollider2D>();
+        bool niche = p == UpperRoute.Platforms[UpperRoute.LookoutIndex];
+        float depth = niche ? 3 : .5f;
+        collision.size = new Vector2(1, depth / 1.5f);
+        collision.offset = new Vector2(0, (.75f-depth/2) / 1.5f);
+        scenery.AddDescentTerrain(p);
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
     {
@@ -415,6 +434,7 @@ public sealed class MovementCourse : MonoBehaviour
         Cat.RespawnAt(transform.TransformPoint(LevelOneCheckpointSpawns[1]));
     }
     public void StartAscentPreview() => StartPreviewAt(LevelOneCheckpointSpawns[0]);
+    public void StartDescentPreview() { StartAscentPreview(); Cat.RespawnAt(transform.TransformPoint(CaveRoute.Entrance)); }
     public void StartVerticalLiftPreview()
     {
         var bank = AscentPlatforms[50];

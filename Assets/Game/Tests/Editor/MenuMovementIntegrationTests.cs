@@ -646,12 +646,15 @@ public class MenuMovementIntegrationTests
                 }
                 Assert.That(reached, Is.EqualTo(phaseSteps == 63), "The upper landing must require the lift's high phase.");
             }
-            foreach (int group in new[] { 2, 5, 7, 9, 10, 13 }) {
+            // Entrance group 2 now uses the native cave ledges, covered by connected-cave traversal/reversal.
+            foreach (int group in new[] { 5, 7, 9, 10, 13 }) {
                 mover.GetType().GetMethod("ResetPhase").Invoke(mover,null);
                 for (int tick = 0; tick < 187; tick++) { Call(mover,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
                 var shelf = ascent[group * 5 + 1];
                 var recovery = course.GetComponentsInChildren<PolygonCollider2D>().First(c =>
-                    c.name == "Recovery terrace" && Mathf.Abs(c.transform.localPosition.x - shelf.x - (group == 10 ? 1.6f : 0)) < .01f);
+                    (c.name == "Recovery terrace"||c.name=="Shore opening recovery") && Mathf.Abs(c.transform.localPosition.x - shelf.x - (group == 10 ? 1.6f : 0)) < .01f);
+                // An intentionally carved shore is exercised by the actual entry/rejoin route tests.
+                if(recovery.name=="Shore opening recovery")continue;
                 float center = recovery.transform.localPosition.x;
                 cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[] { new Vector2(center - 3.3f, recovery.bounds.max.y + .46f) });
                 Physics2D.SyncTransforms();
@@ -681,7 +684,9 @@ public class MenuMovementIntegrationTests
         Assert.That(course.GetComponentsInChildren<PlatformEffector2D>(), Is.Empty, "Course platforms must be solid from below.");
         var shaped = course.GetComponentsInChildren<PolygonCollider2D>();
         Assert.That(shaped.Length, Is.GreaterThan(20));
-        foreach (var polygon in shaped.Where(p => !p.isTrigger && p.name!="Solid fallen masonry")) {
+        // This contact-profile assertion applies to suspended/main-route platforms, not solid cave volumes.
+        foreach (var polygon in shaped.Where(p => !p.isTrigger && (p.name=="Standable platform" ||
+            p.name=="Recovery terrace" || p.name=="Late ruin recovery" || p.name.StartsWith("Finale recovery ")))) {
             var bounds = polygon.bounds;
             Assert.That(polygon.OverlapPoint(new Vector2(bounds.center.x, bounds.max.y - 0.03f)), Is.True,
                 "The registered landing surface must remain solid.");

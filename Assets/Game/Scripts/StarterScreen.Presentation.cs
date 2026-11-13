@@ -92,7 +92,7 @@ public sealed partial class StarterScreen
 
     void OnGUI()
     {
-        if (course != null || stompArena != null) return;
+        if (course != null || stompArena != null || entryStudy != null) return;
         PrepareStyles();
         var oldColor = GUI.color;
         var oldMatrix = GUI.matrix;
@@ -258,6 +258,7 @@ public sealed partial class StarterScreen
     void OnDestroy()
     {
         if (course != null) { course.gameObject.SetActive(false); Destroy(course.gameObject); }
+        if (entryStudy != null) { entryStudy.gameObject.SetActive(false); Destroy(entryStudy.gameObject); }
         if (stompArena != null) { stompArena.gameObject.SetActive(false); Destroy(stompArena.gameObject); }
         foreach (var texture in new[] { panelTexture, buttonTexture, hoverTexture, focusTexture })
             if (texture != null) Destroy(texture);
