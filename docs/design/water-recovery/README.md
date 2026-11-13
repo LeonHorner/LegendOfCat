@@ -122,3 +122,9 @@ editing is needed; runtime course construction attaches the behavior.
 - Final regression results are recorded in the PR. User Play Mode visual review,
   Windows/Linux player and launcher builds, and exact-revision merge validation
   remain pending. Keep the PR draft. No merge or release is authorized.
+
+### Shark encounter — 2026-11-13
+
+Each water entry rolls once for a 1-in-100 chance of the shark sequence. The temporary `ForceSharkForDebug` constant in WaterRecovery is enabled for the Unity Editor and development builds. Standard builds use the random roll. PhotoCraft MCP supplied the four jaw poses. Unity plays them during the lunge and hides Mika at jaw closure before the usual checkpoint return.
+
+[Watch the shark preview](shark.mp4)

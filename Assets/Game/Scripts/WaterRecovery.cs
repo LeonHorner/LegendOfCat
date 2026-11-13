@@ -7,6 +7,12 @@ public sealed class WaterRecovery : MonoBehaviour
     public const float SurfaceY = -3.25f;
     public const float ForegroundInset = 0.65f;
     public const float RespawnTime = 2.1f, Duration = 2.5f;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    const bool ForceSharkForDebug = true;
+#else
+    const bool ForceSharkForDebug = false;
+#endif
+    const float SharkBiteTime = 1.08f;
     public bool Active { get; private set; }
     public bool CameraHeld => Active && !respawned;
     public float Elapsed { get; private set; }
@@ -20,7 +26,9 @@ public sealed class WaterRecovery : MonoBehaviour
     System.Action retry;
     MikaSpritePresentation original;
     SpriteRenderer originalRenderer, reaction, impactBody;
-    Sprite[] drawings;
+    Sprite[] drawings, sharkDrawings;
+    SpriteRenderer shark;
+    bool sharkEncounter;
     Material submerge, foamMaterial;
     GameObject effects;
     readonly LineRenderer[] rings = new LineRenderer[2];
@@ -53,6 +61,7 @@ public sealed class WaterRecovery : MonoBehaviour
     void Begin()
     {
         Active = true; respawned = false; Elapsed = 0;
+        sharkEncounter = ForceSharkForDebug || SharkRollHits(Random.Range(0, 100));
         scale = course.lossyScale.y;
         cameraStart = view.transform.position; cameraSize = view.orthographicSize;
         facing = originalRenderer && originalRenderer.flipX ? -1 : 1;
@@ -70,6 +79,8 @@ public sealed class WaterRecovery : MonoBehaviour
         effects.SetActive(true);
         Present();
     }
+
+    static bool SharkRollHits(int roll) => roll == 0;
 
     void PrepareEffects()
     {
@@ -91,6 +102,18 @@ public sealed class WaterRecovery : MonoBehaviour
             impactBody = new GameObject("Original fall through impact").AddComponent<SpriteRenderer>();
             impactBody.transform.SetParent(effects.transform, false);
             impactBody.sharedMaterial = submerge; impactBody.sortingOrder = 4;
+        }
+        var sharkTexture = Resources.Load<Texture2D>("WaterRecovery/shark-frames");
+        if (sharkTexture) {
+            shark = new GameObject("Shark").AddComponent<SpriteRenderer>();
+            shark.transform.SetParent(effects.transform, false);
+            shark.sharedMaterial = submerge;
+            shark.sortingOrder = 5;
+            sharkDrawings = new Sprite[4];
+            float cell = sharkTexture.width / 4f;
+            for (int i = 0; i < sharkDrawings.Length; i++)
+                sharkDrawings[i] = Sprite.Create(sharkTexture, new Rect(i * cell, 0, cell, sharkTexture.height),
+                    new Vector2(0.82f, 0.53f), cell / 2.6f);
         }
         foamMaterial = new Material(Shader.Find("Sprites/Default"));
         for (int i = 0; i < rings.Length; i++) rings[i] = Line("Expanding surface ripple", 49, true);
@@ -146,7 +169,9 @@ public sealed class WaterRecovery : MonoBehaviour
         int frame = Elapsed < 0.25f ? 0 : Elapsed < 0.34f ? 1 : Elapsed < 0.43f ? 2
             : Elapsed < 0.52f ? 3 : Elapsed < 0.61f ? 4 : Elapsed < 0.85f ? 5 : Elapsed < 0.98f ? 6 : 7;
         reaction.sprite = drawings[frame];
-        reaction.enabled = !impactBody || Elapsed >= 0.14f;
+        reaction.enabled = (!impactBody || Elapsed >= 0.14f)
+            && !(sharkEncounter && shark && Elapsed >= SharkBiteTime);
+        PresentShark(visualEntry);
         if (impactBody) {
             impactBody.enabled = Elapsed < 0.14f;
             impactBody.transform.position = impactPosition + foregroundShift - Vector3.up * (Elapsed * 2.3f) * scale;
@@ -204,6 +229,22 @@ public sealed class WaterRecovery : MonoBehaviour
         }
     }
 
+    void PresentShark(Vector3 visualEntry)
+    {
+        if (!shark) return;
+        shark.enabled = sharkEncounter && Elapsed >= 0.68f && Elapsed < 1.60f;
+        if (!shark.enabled) return;
+
+        bool diving = Elapsed >= SharkBiteTime;
+        float travel = diving ? Mathf.InverseLerp(SharkBiteTime, 1.60f, Elapsed)
+            : Mathf.InverseLerp(0.68f, SharkBiteTime, Elapsed);
+        float x = diving ? Mathf.Lerp(0.42f, 1.28f, travel) : Mathf.Lerp(-1.1f, 0.42f, travel);
+        float y = diving ? Mathf.Lerp(0.25f, -0.95f, travel) : Mathf.Lerp(-0.75f, 0.25f, travel);
+        shark.transform.position = visualEntry + new Vector3(facing * x, y, 0) * scale;
+        shark.flipX = facing < 0;
+        shark.sprite = sharkDrawings[diving ? 3 : travel < 0.30f ? 0 : travel < 0.65f ? 1 : 2];
+    }
+
     void OnRespawn() { if (!internalRespawn) Cancel(); }
 
     void RestorePresentation()
@@ -240,6 +281,7 @@ public sealed class WaterRecovery : MonoBehaviour
         if (cat) cat.ReturnedToStart -= OnRespawn;
         if (effects) Destroy(effects);
         if (drawings != null) foreach (var drawing in drawings) if (drawing) Destroy(drawing);
+        if (sharkDrawings != null) foreach (var drawing in sharkDrawings) Destroy(drawing);
         if (submerge) Destroy(submerge);
         if (foamMaterial) Destroy(foamMaterial);
     }

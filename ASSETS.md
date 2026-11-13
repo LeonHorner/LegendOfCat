@@ -756,3 +756,9 @@ The existing near panorama is extended to 14332×1448 using an original generated
   source is confined to water recovery, with existing locomotion artwork retained.
 - Concept approval permits implementation; final in-game visual acceptance
   remains pending.
+
+## Golden River shark â€” 2026-11-13
+
+- Water recovery shark frames at `Assets/Game/Resources/WaterRecovery/shark-frames.png`.
+- Original artwork drawn and exported through PhotoCraft 0.23.1 MCP using manually specified filled curves and ellipses. The four registered poses cover approach, opening jaws, full gape and closing jaws. No external source artwork or generative model was used.
+- The requested creative direction was a rare shark encounter. The artwork uses a stylized blue-gray silhouette and a bloodless bite followed by checkpoint recovery. License is the repository license.

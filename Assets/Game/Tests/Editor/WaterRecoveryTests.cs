@@ -47,7 +47,7 @@ public class WaterRecoveryTests
         // Let runtime destruction release its generated meshes/materials in normal Play;
         // EditMode tests explicitly release transient objects after cancellation.
         Call(recovery, "Cancel");
-        foreach (string field in new[] { "effects", "submerge", "foamMaterial", "drawings" }) {
+        foreach (string field in new[] { "effects", "submerge", "foamMaterial", "drawings", "sharkDrawings" }) {
             var info = recovery.GetType().GetField(field, BindingFlags.NonPublic | BindingFlags.Instance);
             var value = info.GetValue(recovery);
             if (value is Sprite[] sprites) foreach (var sprite in sprites) UnityEngine.Object.DestroyImmediate(sprite);
@@ -106,6 +106,29 @@ public class WaterRecoveryTests
         Assert.That(body.simulated, Is.True);
     }
 
+    [Test] public void DebugSharkSwallowsMikaAndRetriesOnce()
+    {
+        Position(-3.1f);
+        Assert.That((bool)Call(recovery, "TryEnter"), Is.True);
+        var effects = root.GetComponentsInChildren<SpriteRenderer>();
+        var shark = effects.Single(renderer => renderer.name == "Shark");
+        var head = effects.Single(renderer => renderer.name == "Mika facial reaction");
+        Call(recovery, "Advance", 1f); Call(recovery, "LateUpdate");
+        Assert.That(shark.enabled, Is.True);
+        Assert.That(head.enabled, Is.True);
+        Call(recovery, "Advance", 0.10f); Call(recovery, "LateUpdate");
+        Assert.That(head.enabled, Is.False);
+        Call(recovery, "Advance", 2f);
+        Assert.That(retries, Is.EqualTo(1));
+        Assert.That(shark.gameObject.activeInHierarchy, Is.False);
+    }
+
+    [Test] public void NormalSharkChanceHasOneWinningRoll()
+    {
+        var roll = recovery.GetType().GetMethod("SharkRollHits", BindingFlags.Static | BindingFlags.NonPublic);
+        Assert.That(Enumerable.Range(0, 100).Count(i => (bool)roll.Invoke(null, new object[] { i })), Is.EqualTo(1));
+    }
+
     [TestCase(false)]
     [TestCase(true)]
     public void SplashBridgesOriginalFallToDescendingHeadTurnInBothDirections(bool faceLeft)
@@ -117,6 +140,8 @@ public class WaterRecoveryTests
         recovery.GetType().GetField("originalRenderer", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(recovery, renderer);
         Position(-3.1f);
         Assert.That((bool)Call(recovery, "TryEnter"), Is.True);
+        recovery.GetType().GetField("sharkEncounter", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(recovery, false);
         var impact = root.GetComponentsInChildren<SpriteRenderer>().Single(r => r.name == "Original fall through impact");
         var head = root.GetComponentsInChildren<SpriteRenderer>().Single(r => r.name == "Mika facial reaction");
         Assert.That(impact.enabled, Is.True, "Keep the real falling drawing at initial contact.");
