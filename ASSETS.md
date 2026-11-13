@@ -799,3 +799,12 @@ existing baked coat toward copper stripes and ivory markings, soften normal
 detail, and enlarge the head and ears slightly. The editable rig, texture
 and FBX derive from the previously documented CC0 cat mesh and material.
 No new external imagery or generative model was used.
+
+The second design pass samples orange stripe, golden coat, ivory bib, pale paw
+and pink ear colors directly from the original sprite's idle frame. Codex baked
+the sampled colors onto the rig in Blender 5.2.3 LTS, with separate bands for the
+body, legs and tail. The reshaped mesh has a lifted belly, slimmer legs and a
+larger head and taller ears. Existing face texture detail is blended into the
+new coat. The original artwork supplies a side view, so the far side and rear
+markings are interpreted on the existing CC0-derived mesh. The user requested
+closer matching of both shape and color on the existing model branch.

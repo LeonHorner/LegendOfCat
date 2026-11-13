@@ -23,43 +23,43 @@
   "native_motion_metrics": {
     "Idle": {
       "max_ik_target_error_m": 0.0015690742538877602,
-      "support_sole_min_m": -9.294203482568264e-05,
-      "support_sole_max_m": 0.0014636407140642405,
+      "support_sole_min_m": -9.164889343082905e-05,
+      "support_sole_max_m": 0.0014650765806436539,
       "max_stance_displacement_per_frame_m": null
     },
     "LookBack": {
       "max_ik_target_error_m": 0.0005711221845465769,
-      "support_sole_min_m": -1.63795193657279e-05,
-      "support_sole_max_m": 0.00046738400124013424,
+      "support_sole_min_m": -1.6105594113469124e-05,
+      "support_sole_max_m": 0.0004688240587711334,
       "max_stance_displacement_per_frame_m": null
     },
     "Listen": {
       "max_ik_target_error_m": 0.0005711221845465769,
-      "support_sole_min_m": -1.63795193657279e-05,
-      "support_sole_max_m": 0.00046738400124013424,
+      "support_sole_min_m": -1.6105594113469124e-05,
+      "support_sole_max_m": 0.0004688240587711334,
       "max_stance_displacement_per_frame_m": null
     },
     "TailTwitch": {
       "max_ik_target_error_m": 0.0005711221845465769,
-      "support_sole_min_m": -1.63795193657279e-05,
-      "support_sole_max_m": 0.00046738400124013424,
+      "support_sole_min_m": -1.6105594113469124e-05,
+      "support_sole_max_m": 0.0004688240587711334,
       "max_stance_displacement_per_frame_m": null
     },
     "Groom": {
       "max_ik_target_error_m": 0.0005711221845465769,
       "support_sole_min_m": -1.5700621247560775e-08,
-      "support_sole_max_m": 0.00046738400124013424,
+      "support_sole_max_m": 0.0004688240587711334,
       "max_stance_displacement_per_frame_m": null
     },
     "Stretch": {
       "max_ik_target_error_m": 0.0005711221845465769,
-      "support_sole_min_m": -0.00015407265163958073,
-      "support_sole_max_m": 0.00046738400124013424,
+      "support_sole_min_m": -0.0001344133634120226,
+      "support_sole_max_m": 0.0004688240587711334,
       "max_stance_displacement_per_frame_m": null
     },
     "Run": {
       "max_ik_target_error_m": 2.4845545971809866e-05,
-      "support_sole_min_m": -0.0001595979556441307,
+      "support_sole_min_m": -0.0001425251830369234,
       "support_sole_max_m": 0.00030159461311995983,
       "max_stance_displacement_per_frame_m": 6.691460343439821e-07,
       "loop_seam_matrix_error": 0.0
