@@ -1,0 +1,34 @@
+[
+  {
+    "name": "entry-study-left-v1.png",
+    "model": "Not disclosed by built-in image tool",
+    "generator": "Built-in image_gen",
+    "date": "2026-11-13",
+    "license": "Original generated project asset; public source redistribution permitted under tool terms",
+    "decision": "Geometry-specific painted connected terrain; isolated entry slice pending player acceptance."
+  },
+  {
+    "name": "entry-study-right-v1.png",
+    "model": "Not disclosed by built-in image tool",
+    "generator": "Built-in image_gen",
+    "date": "2026-11-13",
+    "license": "Original generated project asset; public source redistribution permitted under tool terms",
+    "decision": "Geometry-specific painted connected terrain; isolated entry slice pending player acceptance."
+  },
+  {
+    "name": "entry-study-floor-v1.png",
+    "model": "Not disclosed by built-in image tool",
+    "generator": "Built-in image_gen",
+    "date": "2026-11-13",
+    "license": "Original generated project asset; public source redistribution permitted under tool terms",
+    "decision": "Geometry-specific painted connected terrain; isolated entry slice pending player acceptance."
+  },
+  {
+    "name": "entry-study-rear-v1.png",
+    "model": "Not disclosed by built-in image tool",
+    "generator": "Built-in image_gen",
+    "date": "2026-11-13",
+    "license": "Original generated project asset; public source redistribution permitted under tool terms",
+    "decision": "Geometry-specific painted connected terrain; isolated entry slice pending player acceptance."
+  }
+]

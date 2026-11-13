@@ -767,3 +767,13 @@ Three original transparent cave-edge-short-v2, cave-edge-medium-v2 and cave-edge
 ## Entry bank replacement - 2026-11-12
 
 Original built-in OpenAI image generation, model not exposed, using only the original descent-entry-reference.png as material/style reference. Source exec-4baf8abb-275c-4d6e-8e39-3a7e7b780965.png is saved as Assets/Game/Resources/GoldenRiver/Descent/entry-bank-v3.png. ASSET-LICENSE.md generated-art terms apply. Human decision: a massive violet-stone bank with attached ivy, a registered grassy top and a naturally shaped cliff edge rather than an exposed rectangular wall. Exact prompt and source: docs/design/golden-river-upper-route/entry-bank-v3.json. Visual integration remains under review.
+
+
+### Entrance-only review paintings (2026-11-13)
+
+- Files: `Assets/Game/Resources/GoldenRiver/Descent/entry-study-{left,right,floor,rear}-v1.png`. Original generated project assets created using the built-in image_gen tool; model name not disclosed. No external artwork was imported. Public source redistribution is permitted under the generation service terms; no separate exclusive copyright claim is made.
+- Inputs: original project-owned `descent-entry-reference.png`, original code-authored geometry stencils, and the generated matching left cliff. The stencils specify contact heights and connected rock silhouettes; the reference controls boulder scale, violet stone, golden moss, ivy and upper-right daylight.
+- Human direction: replace separate floating slabs and textured pillars with continuous painted banks, real attached ledges, a connected overhang and substantial cave floor. Keep the lower rear wall quiet. Keep this isolated entrance/short passage pending player evaluation; the rejected full cave is not visually accepted.
+- Full prompts, source output identifiers and creative decisions: `docs/design/golden-river-upper-route/entry-study-assets.json`. Geometry and review scope are recorded beside that file. Imported through Unity; original generated files retained in the local generation archive.
+
+- Entrance study refinement: active banks are `entry-study-left-v2.png` and `entry-study-right-v2.png`; both first variants are archived through Unity with their metadata. A separate original opaque `entry-study-valley-v1.png` replaces the reused cutout valley whose sky left a visible gap. The v2 left wall is closer to Mika; the v2 right ceiling/end-wall corner is rounded. Source, prompts and decisions are in `entry-study-refinement-assets.json` and `entry-study-left-refinement.json`. Same built-in generator, undisclosed model, generation date and terms as above.

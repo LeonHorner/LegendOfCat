@@ -35,6 +35,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     long downloadedBytes, totalBytes;
     Vector2 scroll;
     MovementCourse course;
+    CaveEntryStudy entryStudy;
     StompArena stompArena;
     VersionedJsonFile displayFile;
     bool fullscreen;
@@ -288,6 +289,10 @@ public sealed partial class StarterScreen : MonoBehaviour
                 yield return new WaitForSecondsRealtime(0.3f);
                 course.TogglePause();
             }
+        }
+        else if(view=="cave-entry-study") {
+            entryStudy=new GameObject("Cave entrance review").AddComponent<CaveEntryStudy>();
+            entryStudy.BackToMenu=()=>{entryStudy.gameObject.SetActive(false);Destroy(entryStudy.gameObject);entryStudy=null;page="menu";lastPage=null;};
         }
         else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale" || view == "level-one-garden" || view == "level-one-descent") {
             OpenLevelOne();

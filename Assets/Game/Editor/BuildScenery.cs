@@ -41,6 +41,7 @@ public static class BuildScenery
     }
 
     public static readonly string[] GoldenRiverArt = {
+        "Descent/entry-study-left-v2", "Descent/entry-study-right-v2", "Descent/entry-study-floor-v1", "Descent/entry-study-rear-v1", "Descent/entry-study-valley-v1",
         "Descent/entry-bank-v3", "Descent/cliff-stone-v2", "Descent/cave-edge-short-v2", "Descent/cave-edge-medium-v2", "Descent/cave-edge-wide-v2",
         "Descent/entry-left-v1", "Descent/entry-overhang-v1", "Descent/inner-corner-v1", "Descent/ceiling-v1",
         "Descent/rock-face-v1", "Descent/rooted-face-v1", "Descent/tread-short-v1", "Descent/tread-medium-v1",
@@ -57,6 +58,19 @@ public static class BuildScenery
     [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]
     public static void ImportGoldenRiverArt()
     {
+        const string entryMaterial="Assets/Game/Resources/GoldenRiver/Descent/entry-study-material.mat";
+        if(!AssetDatabase.LoadAssetAtPath<Material>(entryMaterial))
+            AssetDatabase.CreateAsset(new Material(Shader.Find("LegendOfCat/EntryStudyPaint")),entryMaterial);
+        const string rejectedEntry="Assets/Game/Resources/GoldenRiver/Descent/entry-study-right-v1.png";
+        if(AssetDatabase.LoadAssetAtPath<Texture2D>(rejectedEntry)) {
+            string error=AssetDatabase.MoveAsset(rejectedEntry,"Assets/Game/Art/GoldenRiverArchive/entry-study-right-v1.png");
+            if(!string.IsNullOrEmpty(error)) throw new System.InvalidOperationException(error);
+        }
+        const string rejectedLeft="Assets/Game/Resources/GoldenRiver/Descent/entry-study-left-v1.png";
+        if(AssetDatabase.LoadAssetAtPath<Texture2D>(rejectedLeft)) {
+            string error=AssetDatabase.MoveAsset(rejectedLeft,"Assets/Game/Art/GoldenRiverArchive/entry-study-left-v1.png");
+            if(!string.IsNullOrEmpty(error)) throw new System.InvalidOperationException(error);
+        }
         foreach (string name in new[] { "garden-court-v1", "garden-wall-v1" }) {
             string source = "Assets/Game/Resources/GoldenRiver/" + name + ".png";
             if (!AssetDatabase.LoadAssetAtPath<Texture2D>(source)) continue;
