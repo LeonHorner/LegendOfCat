@@ -14,6 +14,7 @@ public sealed class LevelProgress
     readonly SpriteRenderer[] checkpointVisuals;
     readonly Rect[] checkpointUvs;
     public const float Height = 58;
+    public const float Width = 370;
 
     public bool Visible { get; set; } = true;
     public bool HasArtwork => fill && head;
@@ -117,9 +118,9 @@ public sealed class LevelProgress
     public void Draw(Rect area, int activeCheckpoint)
     {
         if (!Visible || !HasArtwork || Event.current.type != EventType.Repaint) return;
-        float scale = area.width / 290f;
+        float scale = Mathf.Min(1, area.width / 290f);
         float left = area.x + 20 * scale;
-        float width = 250 * scale;
+        float width = area.width - 40 * scale;
         float centerY = area.y + 16 * scale;
         float tip = left + width * Fraction;
         // Keep the full route visible over both bright skies and dark terrain.
@@ -149,7 +150,7 @@ public sealed class LevelProgress
         Color previous = GUI.color;
         GUI.color = Color.white;
         GUI.DrawTexture(rect, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
-            new Color(.12f, .09f, .13f, .85f), 0, 5 * scale);
+            new Color(.12f, .09f, .13f, .55f), 0, 5 * scale);
         GUI.DrawTexture(rect, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
             new Color(.91f, .81f, .67f, .8f), scale, 5 * scale);
         GUI.color = previous;

@@ -803,3 +803,6 @@ The existing near panorama is extended to 14332×1448 using an original generated
 - The revised progress portrait crops Mika's existing original gameplay
   sprite at the neck and downsamples it for HUD use. It retains the source
   artwork's license and uses no new generation model.
+  The portrait now uses the near-frontal frame from Mika's existing painted
+  water-recovery turn atlas. The frame preserves the source colors and is
+  cropped and downsampled for the HUD.

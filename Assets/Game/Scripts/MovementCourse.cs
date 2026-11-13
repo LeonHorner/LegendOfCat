@@ -479,8 +479,8 @@ public sealed class MovementCourse : MonoBehaviour
         float viewportWidth = Screen.width * viewport.width;
         float top = Screen.height * (1 - viewport.yMax) + 10;
         float barWidth = Progress.Visible && Progress.HasArtwork
-            ? Mathf.Max(0, Mathf.Min(290, viewportWidth - 20)) : 0;
-        float barHeight = barWidth * LevelProgress.Height / 290;
+            ? Mathf.Max(0, Mathf.Min(LevelProgress.Width, viewportWidth - 20)) : 0;
+        float barHeight = Mathf.Min(1, barWidth / 290) * LevelProgress.Height;
         if (barWidth > 0) {
             float center = Screen.width * viewport.center.x;
             Progress.Draw(new Rect(center - barWidth / 2, top, barWidth, barHeight), Run.Checkpoint);
