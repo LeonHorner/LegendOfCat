@@ -47,7 +47,7 @@ public class WaterRecoveryTests
         // Let runtime destruction release its generated meshes/materials in normal Play;
         // EditMode tests explicitly release transient objects after cancellation.
         Call(recovery, "Cancel");
-        foreach (string field in new[] { "effects", "submerge", "foamMaterial", "drawings", "sharkMesh", "splashFrames" }) {
+        foreach (string field in new[] { "effects", "submerge", "foamMaterial", "drawings", "sharkFrames", "splashFrames" }) {
             var info = recovery.GetType().GetField(field, BindingFlags.NonPublic | BindingFlags.Instance);
             var value = info.GetValue(recovery);
             if (value is Sprite[] sprites) foreach (var sprite in sprites) UnityEngine.Object.DestroyImmediate(sprite);
@@ -115,13 +115,19 @@ public class WaterRecoveryTests
         var effects = root.GetComponentsInChildren<Renderer>();
         var shark = effects.Single(renderer => renderer.name == "Shark");
         var head = effects.Single(renderer => renderer.name == "Mika facial reaction");
-        Call(recovery, "Advance", 1.33f); Call(recovery, "LateUpdate");
+        Call(recovery, "Advance", 1.02f); Call(recovery, "LateUpdate");
         Assert.That(shark.enabled, Is.True);
-        Assert.That(shark.transform.position.y, Is.GreaterThan(head.transform.position.y + 2f));
+        Assert.That(shark.transform.position.x, Is.EqualTo(head.transform.position.x).Within(0.001f));
+        Assert.That(shark.transform.position.y, Is.LessThan(head.transform.position.y));
         Assert.That(head.enabled, Is.True);
-        Call(recovery, "Advance", 0.62f); Call(recovery, "LateUpdate");
+        Call(recovery, "Advance", 0.16f); Call(recovery, "LateUpdate");
         Assert.That(head.enabled, Is.False);
-        Call(recovery, "Advance", 2f);
+        Call(recovery, "Advance", 0.33f); Call(recovery, "LateUpdate");
+        Assert.That(shark.transform.localScale.x, Is.GreaterThan(3f));
+        Call(recovery, "Advance", 0.10f); Call(recovery, "LateUpdate");
+        Assert.That(Read<float>(recovery, "Fade"), Is.EqualTo(1f));
+        Assert.That(retries, Is.Zero);
+        Call(recovery, "Advance", 1f);
         Assert.That(retries, Is.EqualTo(1));
         Assert.That(shark.gameObject.activeInHierarchy, Is.False);
     }

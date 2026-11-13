@@ -774,3 +774,9 @@ The existing near panorama is extended to 14332×1448 using an original generated
 - Runtime atlas at `Assets/Game/Resources/WaterRecovery/shark-splash-frames.png`.
 - Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP resized and exported the alpha atlas. Repository asset terms apply.
 - Human direction used irregular water sheets, foam and receding surface ripples to match the painted river. See [artwork and prompt](docs/design/water-recovery/shark-breach-art.md).
+
+## Golden River camera-facing shark â€” 2026-11-13
+
+- Runtime atlas at `Assets/Game/Resources/WaterRecovery/shark-lunge-frames.png`.
+- Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP resized and exported the alpha atlas. Repository asset terms apply.
+- Human direction specified a jump scare with an attack from directly below Mika and an open-jaw lunge toward the camera. See [artwork and prompt](docs/design/water-recovery/shark-lunge-art.md).

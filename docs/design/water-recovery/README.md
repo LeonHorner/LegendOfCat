@@ -125,14 +125,14 @@ editing is needed; runtime course construction attaches the behavior.
 
 ### Shark encounter — 2026-11-13
 
-Each water entry rolls once for a 1-in-100 chance of the shark sequence. The temporary `ForceSharkForDebug` constant in WaterRecovery is enabled for the Unity Editor and development builds. Standard builds use the random roll. PhotoCraft MCP supplied the four jaw poses. Unity plays them during the lunge and hides Mika at jaw closure before the usual checkpoint return.
+Each water entry rolls once for a 1-in-100 chance of the shark sequence.
+`ForceSharkForDebug` forces the encounter in the Unity Editor and development
+builds. Standard builds use the random roll.
 
-[Watch the shark preview](shark.mp4)
+At 0.86 seconds, the shark breaches directly beneath Mika through a painted
+splash. The jaws close at 1.14 seconds, then the shark rises and rushes toward
+the camera. The open mouth fills the view before blackout and checkpoint
+recovery. The sequence takes 2.24 seconds. The ordinary recovery takes 2.5
+seconds.
 
-The revised shark sequence takes 3.4 seconds. The camera widens for the high
-breach, the shark pitches down to catch Mika, and larger splashes and ripples
-mark both water contacts. [Artwork and generation prompt](shark-breach-art.md)
-
-The breach uses one launch stroke and one gentle airborne arch. The shark
-straightens into the catch with the jaw registered to Mika. Painted water sheets blend through crest, collapse
-and receding foam at each contact, with separate ballistic droplets.
+[Watch the shark preview](shark.mp4) · [Artwork and prompt](shark-lunge-art.md)

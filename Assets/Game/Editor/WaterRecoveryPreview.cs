@@ -10,7 +10,7 @@ public static class WaterRecoveryPreview
     public static void Prepare()
     {
         PrepareTexture("Assets/Game/Resources/WaterRecovery/turn-reactions.png");
-        PrepareTexture("Assets/Game/Resources/WaterRecovery/shark-breach-frames.png");
+        PrepareTexture("Assets/Game/Resources/WaterRecovery/shark-lunge-frames.png");
         PrepareTexture("Assets/Game/Resources/WaterRecovery/shark-splash-frames.png");
     }
 
