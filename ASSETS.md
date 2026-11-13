@@ -791,3 +791,6 @@ The existing near panorama is extended to 14332×1448 using an original generated
   for the finish. The editable PhotoCraft review files live in
   `docs/design/level-progress/`. Transparent runtime exports live in
   `Assets/Game/Resources/LevelProgress/`. Licensed under the repository license.
+  The top-center revision adds a deterministic pigment and brush-texture pass
+  with Pillow, using the PhotoCraft exports as source. No external texture or
+  generation model was used.

@@ -472,12 +472,19 @@ public sealed class MovementCourse : MonoBehaviour
         if (Run == null || !courseCamera) return;
         if (hudStyle == null) hudStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true };
         var viewport = courseCamera.rect;
-        float width = Mathf.Min(350, Screen.width * viewport.width - 20);
+        float viewportWidth = Screen.width * viewport.width;
+        float top = Screen.height * (1 - viewport.yMax) + 10;
+        float barWidth = Progress.Visible && Progress.HasArtwork
+            ? Mathf.Max(0, Mathf.Min(290, viewportWidth - 20)) : 0;
+        float barHeight = barWidth * 32 / 290;
+        if (barWidth > 0) {
+            float center = Screen.width * viewport.center.x;
+            Progress.Draw(new Rect(center - barWidth / 2, top, barWidth, barHeight), Run.Checkpoint);
+            top += barHeight + 6;
+        }
+        float width = Mathf.Min(350, viewportWidth - 20);
         bool expanded = showHelp || Run.Paused;
-        float barWidth = Progress.Visible && Progress.HasArtwork ? Mathf.Min(290, width - 12) : 0;
-        float barHeight = Mathf.Max(0, barWidth) * 32 / 290;
-        var area = new Rect(Screen.width * viewport.x + 10,
-            Screen.height * (1 - viewport.yMax) + 10, width, (expanded ? 176 : 52) + barHeight);
+        var area = new Rect(Screen.width * viewport.x + 10, top, width, expanded ? 176 : 52);
         var oldColor = GUI.color;
         GUI.color = new Color(1, 1, 1, 0.4f);
         GUI.Box(area, GUIContent.none);
@@ -490,10 +497,6 @@ public sealed class MovementCourse : MonoBehaviour
             showHelp = !showHelp; GUI.FocusControl(null);
         }
         GUILayout.EndHorizontal();
-        if (barHeight > 0) {
-            var bar = GUILayoutUtility.GetRect(barWidth, barHeight, GUILayout.ExpandWidth(false));
-            Progress.Draw(bar, Run.Checkpoint);
-        }
         if (expanded) {
             GUILayout.Label("Arrows/W/Up also work. Backspace: restart entire run. Cross gold markers on safe ground.", hudStyle);
             GUILayout.Label("Controller: South jump, Select retry, LB restart, RB pause, Start menu.", hudStyle);

@@ -14,3 +14,9 @@ The integration test discovers levels from the same registry.
 The review mockups composite the PhotoCraft exports over archived gameplay
 captures at 290 pixels wide, with grayscale and enlarged icon previews.
 Actual HUD layout still needs an in-editor check.
+
+The HUD is now centered at the top of the gameplay viewport. The checked-in
+mockups depict the original concept. The current exports add pigment grain
+and brush highlights to the PhotoCraft shapes. Run `paint-progress.py` from
+the repository root with a folder containing the original transparent PNGs
+to reproduce that pass.
