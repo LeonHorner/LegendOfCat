@@ -1,0 +1,9 @@
+{
+  "name": "discovery-ceiling-v2.png",
+  "prompt": "Edit for production native cave roof asset. Image1 NEW exact1920x880 silhouette stencil is the target geometry. Image2 previous matching rock painting is STYLE only. Keep canvas/framing EXACTLY like image1 and do not compact, center or rescale the solid mass. Paint all purple area right up to top/left/right cropped edges. Purple bottom boundary is at y630 left, y660 around10% width, y570 center, y520 near90% width, with substantial downward end-wall far right. Match these underside coordinates precisely, soften within10px into irregular boulders. This taller mass must extend well above the gameplay camera; do not create a thin floating overhang. Violet-grey irregular boulders70-130px wide, cool crevices, attached dark green ivy and roots, warmer reflected light below the right-central portion. True transparency only below the silhouette. No glow, haze, disconnected flecks, scenery, sky, fountain, characters, water or ceiling line painted on background. Native 2D side-view connected cave mass; preserve exactly the stencil's large filled area and source crop.",
+  "source": "Generated images are saved to C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d as C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-34ea7304-4cc8-4873-9a88-828b4b03889a.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+  "generator": "Built-in image_gen",
+  "model": "Not disclosed",
+  "date": "2026-11-13",
+  "decision": "Taller native roof mass preserves camera coverage without stretching a texture border; lower silhouette registered to actual opaque source."
+}

@@ -777,3 +777,11 @@ Original built-in OpenAI image generation, model not exposed, using only the ori
 - Full prompts, source output identifiers and creative decisions: `docs/design/golden-river-upper-route/entry-study-assets.json`. Geometry and review scope are recorded beside that file. Imported through Unity; original generated files retained in the local generation archive.
 
 - Entrance study refinement: active banks are `entry-study-left-v2.png` and `entry-study-right-v2.png`; both first variants are archived through Unity with their metadata. A separate original opaque `entry-study-valley-v1.png` replaces the reused cutout valley whose sky left a visible gap. The v2 left wall is closer to Mika; the v2 right ceiling/end-wall corner is rounded. Source, prompts and decisions are in `entry-study-refinement-assets.json` and `entry-study-left-refinement.json`. Same built-in generator, undisclosed model, generation date and terms as above.
+
+
+### First cave discovery extension (2026-11-13)
+
+- Active paintings: `Assets/Game/Resources/GoldenRiver/Descent/discovery-floor-v2.png`, `discovery-ceiling-v2.png`, `discovery-rear-v1.png`. Original project assets generated with built-in image_gen; model not disclosed. Public source redistribution follows the generation service terms, without an exclusive copyright claim. Source outputs are retained in the local generated-image archive.
+- References are original project-owned accepted entry paintings and the approved fountain-room concept. Source stencils specify connected floor/roof masses and contact heights. Exact prompts and source identifiers are in `docs/design/golden-river-upper-route/discovery-extension-assets.json` and `discovery-roof-refinement.json`.
+- Human decisions: retain the accepted entrance, extend through a permanent rock opening, descend into an enclosed alcove, reuse the unique `ruin-v1.png` once, bury its base into the painted floor, and place a fixed side-light crack in a quiet rear wall. Use cool stone around warmer reflected light and only twelve restrained paused dust motes. The first floor/roof variants were rejected for header/coverage errors and archived with Unity metadata intact.
+- Dust is an original code-generated 16x16 radial alpha texture, not external art. No new font, package, sound or third-party asset is added. This extension remains pending player visual review.

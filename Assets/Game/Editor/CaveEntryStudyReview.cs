@@ -34,7 +34,7 @@ public static class CaveEntryStudyReview
         var fixedUpdate=typeof(CatController).GetMethod("FixedUpdate",BindingFlags.Instance|BindingFlags.NonPublic);
         var present=cat.GetComponentInChildren<MikaSpritePresentation>();
         VerifyPaintContact(study,scene);
-        var poses=new[]{new Vector2(2.6f,.52f),new Vector2(5,-1.08f),new Vector2(7,-4.28f),new Vector2(12,-9.48f),new Vector2(23,-9.48f)};
+        var poses=new[]{new Vector2(2.6f,.52f),new Vector2(5,-1.08f),new Vector2(7,-4.28f),new Vector2(12,-9.48f),new Vector2(23,-9.48f),new Vector2(29,-9.48f),new Vector2(37.5f,-10.78f),new Vector2(44,-12.08f),new Vector2(52,-12.08f),new Vector2(63,-7.88f)};
         for(int i=0;i<poses.Length;i++) {
             cat.RespawnAt(poses[i]);
             for(int step=0;step<30;step++){fixedUpdate.Invoke(cat,null);scene.GetPhysicsScene2D().Simulate(.02f);}
@@ -46,10 +46,19 @@ public static class CaveEntryStudyReview
                 var image=new Texture2D(target.width,target.height,TextureFormat.RGB24,false);
                 image.ReadPixels(new Rect(0,0,target.width,target.height),0,0);image.Apply();
                 File.WriteAllBytes(output+"/pose-"+i+"-"+width+".png",image.EncodeToPNG());
+                if(width==960) {
+                    var pixels=image.GetPixels32();
+                    for(int pixel=0;pixel<pixels.Length;pixel++) {
+                        var c=pixels[pixel];byte gray=(byte)(c.r*.2126f+c.g*.7152f+c.b*.0722f);
+                        pixels[pixel]=new Color32(gray,gray,gray,255);
+                    }
+                    image.SetPixels32(pixels);image.Apply();
+                    File.WriteAllBytes(output+"/pose-"+i+"-gray.png",image.EncodeToPNG());
+                }
                 study.View.targetTexture=null;RenderTexture.active=null;Object.DestroyImmediate(image);Object.DestroyImmediate(target);
             }
         }
-        Debug.Log("Entry study captured five actual player views at 960x540 and 640x360.");
+        Debug.Log("Entry and discovery study captured ten actual player views at 960x540, 640x360 and grayscale.");
         VerifyMovement(study,scene);
         Object.DestroyImmediate(study.gameObject);
     }
@@ -57,7 +66,15 @@ public static class CaveEntryStudyReview
     public static void VerifyMovement(CaveEntryStudy study,Scene scene)
     {
         var cat=study.Cat;var physics=scene.GetPhysicsScene2D();
-        void Step(){cat.SendMessage("FixedUpdate");physics.Simulate(.02f);study.Follow.Follow(.02f);}
+        bool motion=System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"-discoveryMotion")>=0,recording=false;
+        int ticks=0,frames=0,start=0;
+        if(motion)Directory.CreateDirectory("artifacts/discovery-motion");
+        void Step(){cat.SendMessage("FixedUpdate");physics.Simulate(.02f);study.Follow.Follow(.02f);ticks++;
+            if(motion && recording && (ticks-start)%3==0) {
+                cat.GetComponentInChildren<MikaSpritePresentation>().RenderPose(.06f);
+                SaveContactFrame(study,"artifacts/discovery-motion/frame-"+(frames++).ToString("D4")+".png");
+            }
+        }
         void Settle(Vector2 position){cat.RespawnAt(position);for(int i=0;i<20;i++)Step();}
         void Require(bool condition,string message){if(!condition)throw new System.InvalidOperationException(message);}
         void Reach(Vector2 target,bool jump,float timeout=5)
@@ -79,7 +96,19 @@ public static class CaveEntryStudyReview
         foreach(var p in new[]{new Vector2(5,-1.14f),new Vector2(6.5f,-2.74f),new Vector2(7.8f,-4.34f),new Vector2(9,-5.94f),new Vector2(10.3f,-7.54f),new Vector2(12,-9.54f)})Reach(p,false);
         Reach(new Vector2(17.6f,-9.54f),false);Reach(new Vector2(23,-9.54f),true);
         Require(study.View.transform.position.y+5.5f<0,"The main route is still in the enclosed passage's camera frame.");
+        start=ticks;recording=true;
+        Reach(new Vector2(34,-9.54f),false);
+        Reach(new Vector2(37.5f,-10.84f),false);Reach(new Vector2(45,-12.14f),false);
+        Reach(new Vector2(55.8f,-12.14f),false);
+        foreach(var p in new[]{new Vector2(58.4f,-10.74f),new Vector2(60.9f,-9.34f),new Vector2(63.4f,-7.94f),new Vector2(66,-6.54f)})Reach(p,true);
+        recording=false;
+        if(motion)File.WriteAllText("artifacts/entry-study-review/discovery-timing.txt",((ticks-start)*.02f).ToString("F2")+" seconds, scripted forward extension only; not a human timing or complete optional-route duration.\n");
+        foreach(var p in new[]{new Vector2(63.4f,-7.94f),new Vector2(60.9f,-9.34f),new Vector2(58.4f,-10.74f),new Vector2(55.8f,-12.14f),new Vector2(40,-12.14f)})Reach(p,false);
+        Reach(new Vector2(37.5f,-10.84f),true);Reach(new Vector2(34,-9.54f),true);Reach(new Vector2(23,-9.54f),false);
         var before=cat.transform.position;cat.SetPaused(true);for(int i=0;i<10;i++)Step();
+        var dust=new Vector3[12];for(int i=0;i<dust.Length;i++)dust[i]=study.transform.Find("Fissure dust "+i).localPosition;
+        study.SendMessage("Update");
+        for(int i=0;i<dust.Length;i++)Require(study.transform.Find("Fissure dust "+i).localPosition==dust[i],"Pause moved a dust mote.");
         Require(Vector3.Distance(before,cat.transform.position)<.001f,"Pause moved Mika.");cat.SetPaused(false);
         Settle(new Vector2(12,-9.54f));
         foreach(var p in new[]{new Vector2(10.3f,-7.54f),new Vector2(9,-5.94f),new Vector2(7.8f,-4.34f),new Vector2(6.5f,-2.74f),new Vector2(5,-1.14f),new Vector2(3,.46f)})Reach(p,true);
@@ -87,6 +116,7 @@ public static class CaveEntryStudyReview
         Require(Vector2.Distance(cat.transform.position,new Vector2(2.6f,.52f))<.15f,"Deep fall did not return to the entrance.");
         Require(CaveEntryStudy.CrossesRiver(new Vector2(0,-2),new Vector2(0,-4)),"River crossing is not dangerous.");
         Require(!CaveEntryStudy.CrossesRiver(new Vector2(6,-2),new Vector2(6,-4)),"The dry entrance triggered river recovery.");
+        Require(CaveEntryStudy.CrossesRiver(new Vector2(55,-2),new Vector2(55,-4)),"The lower alcove disabled river recovery above its roof.");
         Directory.CreateDirectory("artifacts/entry-study-review");
         File.WriteAllText("artifacts/entry-study-review/physics.txt","Passed: main jump; all descending ledges; cave gap; reverse climb to entry; deep-fall reset; pause; spatial water crossing; main path outside lower camera frame.\nScripted physics review, not a human playthrough.\n");
     }
@@ -113,6 +143,24 @@ public static class CaveEntryStudyReview
                     }
                 }
             if(lowest>.03f)throw new System.InvalidOperationException("Upper bank visible paw-to-paint gap: "+lowest);
+            painting.LoadImage(File.ReadAllBytes("Assets/Game/Resources/GoldenRiver/Descent/discovery-floor-v2.png"));
+            foreach(var edge in new[]{new Vector3(35.926f,-10.03f,1),new Vector3(38.889f,-11.33f,1),
+                new Vector3(57.056f,-11.29f,-1),new Vector3(59.499f,-9.84f,-1),
+                new Vector3(62.03f,-8.43f,-1),new Vector3(64.647f,-6.96f,-1)}) {
+                cat.RespawnAt(new Vector2(edge.x+edge.z*.42f,edge.y+.46f));Tick();Tick();
+                if(cat.Grounded || body.linearVelocity.y>=-.1f)
+                    throw new System.InvalidOperationException("Invisible support at a discovery step exit: "+edge);
+            }
+            foreach(var stand in new[]{new Vector2(34,-9.5f),new Vector2(37.5f,-10.8f),new Vector2(44,-12.1f),new Vector2(52,-12.1f),new Vector2(58.5f,-10.7f),new Vector2(61,-9.3f),new Vector2(63.3f,-7.9f),new Vector2(66,-6.5f)}) {
+                Place(stand);
+                if(!cat.Grounded)throw new System.InvalidOperationException("Discovery landing is not solid: "+stand);
+                float sole=sprite.transform.position.y;
+                bool painted=false;
+                for(float gap=0;gap<=.04f;gap+=.005f)
+                    if(painting.GetPixelBilinear((body.position.x-CaveEntryStudy.DiscoveryFloorBounds.x)/CaveEntryStudy.DiscoveryFloorBounds.width,
+                        (sole-gap-CaveEntryStudy.DiscoveryFloorBounds.y)/CaveEntryStudy.DiscoveryFloorBounds.height).a>.95f)painted=true;
+                if(!painted)throw new System.InvalidOperationException("Discovery contact floats above painted stone: "+stand);
+            }
             // Sample the painted floor independently of its authored collider/stencil coordinates.
             painting.LoadImage(File.ReadAllBytes("Assets/Game/Resources/GoldenRiver/Descent/entry-study-floor-v1.png"));
             float paintedEdge=-1;

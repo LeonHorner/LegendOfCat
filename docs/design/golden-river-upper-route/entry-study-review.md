@@ -1,12 +1,12 @@
-# Entrance study: review before extension
+# Accepted entrance and first passage
 
-The previous full cave prototype is visually rejected. Passing its movement tests did not establish visual acceptance. The implementation is frozen while a smaller, isolated player study is reviewed.
+The previous full cave prototype is visually rejected. Passing its movement tests did not establish visual acceptance. The owner accepted the smaller entrance study after its contact correction. The rejected complete route remains frozen; see `discovery-extension-review.md` for the subsequent bounded extension.
 
-## Scope
+## Initial approved scope
 
-Only the main-path cleft, attached descending rock ledges and a short enclosed passage are included. There is no fountain, long return route, collectible or campaign checkpoint in this study. It uses the existing Mika presentation, motor, input and camera size. The study does not replace the campaign's route geometry yet.
+The initial review contained only the main-path cleft, attached descending rock ledges and a short enclosed passage, without a fountain, long return route, collectible or campaign checkpoint. It used the existing Mika presentation, motor, input and camera size. The current discovery extension is documented separately and still does not replace the campaign's route geometry.
 
-Launch a development preview with `--preview-view cave-entry-study`. Move with A/D or arrows, jump with Space, reset with R or Backspace, pause with P and return to the menu with Escape. The small review area ends at the rock wall on the right. Player acceptance is pending.
+Launch a development preview with `--preview-view cave-entry-study`. Move with A/D or arrows, jump with Space, reset with R or Backspace, pause with P and return to the menu with Escape. The initial endpoint was the rock wall on the right; that wall now opens into the discovery extension. The owner accepted this initial slice on 2026-11-13; the new continuation and discovery remain pending visual review.
 
 ## Construction
 
@@ -37,4 +37,4 @@ Generated asset provenance and complete prompts are in `entry-study-assets.json`
 
 The first review exposed a small vertical gap on the upper bank and an invisible extension of approximately 0.7 units at the lower floor's painted right edge. The initial geometry stencils were not a sufficient substitute for registering the final painted contours.
 
-The upper left contact is lowered by 0.045 units. Cliff exits and both sides of the lower crack follow the final opaque stone contours, with a small inward exit allowance for contact skin. The player's box collider, motor, gravity, jump and coyote time are unchanged. New checks read the actual painted floor boundary independently from the collision definition, measure visible upper paw contact and assert downward motion within two physics ticks after the visible rear paw passes each reported edge. The extended focused Unity test passed; player evaluation remains pending.
+The upper left contact is lowered by 0.045 units. Cliff exits and both sides of the lower crack follow the final opaque stone contours, with a small inward exit allowance for contact skin. The player's box collider, motor, gravity, jump and coyote time are unchanged. New checks read the actual painted floor boundary independently from the collision definition, measure visible upper paw contact and assert downward motion within two physics ticks after the visible rear paw passes each reported edge. The extended focused Unity test passed. The owner subsequently accepted the corrected entrance and authorized extending that design.

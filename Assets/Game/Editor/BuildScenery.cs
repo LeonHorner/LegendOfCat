@@ -41,6 +41,7 @@ public static class BuildScenery
     }
 
     public static readonly string[] GoldenRiverArt = {
+        "Descent/discovery-floor-v2", "Descent/discovery-ceiling-v2", "Descent/discovery-rear-v1",
         "Descent/entry-study-left-v2", "Descent/entry-study-right-v2", "Descent/entry-study-floor-v1", "Descent/entry-study-rear-v1", "Descent/entry-study-valley-v1",
         "Descent/entry-bank-v3", "Descent/cliff-stone-v2", "Descent/cave-edge-short-v2", "Descent/cave-edge-medium-v2", "Descent/cave-edge-wide-v2",
         "Descent/entry-left-v1", "Descent/entry-overhang-v1", "Descent/inner-corner-v1", "Descent/ceiling-v1",
@@ -58,6 +59,16 @@ public static class BuildScenery
     [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]
     public static void ImportGoldenRiverArt()
     {
+        const string rejectedRoof="Assets/Game/Resources/GoldenRiver/Descent/discovery-ceiling-v1.png";
+        if(AssetDatabase.LoadAssetAtPath<Texture2D>(rejectedRoof)) {
+            string error=AssetDatabase.MoveAsset(rejectedRoof,"Assets/Game/Art/GoldenRiverArchive/discovery-ceiling-v1.png");
+            if(!string.IsNullOrEmpty(error))throw new System.InvalidOperationException(error);
+        }
+        const string rejectedFloor="Assets/Game/Resources/GoldenRiver/Descent/discovery-floor-v1.png";
+        if(AssetDatabase.LoadAssetAtPath<Texture2D>(rejectedFloor)) {
+            string error=AssetDatabase.MoveAsset(rejectedFloor,"Assets/Game/Art/GoldenRiverArchive/discovery-floor-v1.png");
+            if(!string.IsNullOrEmpty(error))throw new System.InvalidOperationException(error);
+        }
         const string entryMaterial="Assets/Game/Resources/GoldenRiver/Descent/entry-study-material.mat";
         if(!AssetDatabase.LoadAssetAtPath<Material>(entryMaterial))
             AssetDatabase.CreateAsset(new Material(Shader.Find("LegendOfCat/EntryStudyPaint")),entryMaterial);

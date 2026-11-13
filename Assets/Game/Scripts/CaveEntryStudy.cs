@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Deliberately isolated visual/playability review: entrance and first enclosed passage only.
-// The campaign route is not extended until this slice has been reviewed in the player.
-public sealed class CaveEntryStudy : MonoBehaviour
+// Bounded visual/playability study: accepted entrance, passage and next discovery candidate.
+// The campaign connection remains separate until the expanded study has been reviewed.
+public sealed partial class CaveEntryStudy : MonoBehaviour
 {
     public CatController Cat { get; private set; }
     public Camera View { get; private set; }
@@ -35,7 +35,7 @@ public sealed class CaveEntryStudy : MonoBehaviour
         var bars=new GameObject("Entry viewport bars").AddComponent<Camera>();bars.transform.SetParent(transform,false);
         bars.depth=.5f;bars.clearFlags=CameraClearFlags.SolidColor;bars.backgroundColor=Color.black;bars.cullingMask=0;
         Follow=cameraObject.AddComponent<CatCamera>();Follow.target=player.transform;
-        Follow.fixedHeight=true;Follow.courseRoot=transform;Follow.leftBoundary=-14;Follow.rightBoundary=34;
+        Follow.fixedHeight=true;Follow.courseRoot=transform;Follow.leftBoundary=-14;Follow.rightBoundary=70;
         Follow.HeightGuide=GuideHeight;Follow.Snap();Follow.Follow(0);
     }
 
@@ -56,13 +56,14 @@ public sealed class CaveEntryStudy : MonoBehaviour
     void Update()
     {
         if(!Cat.Paused) waterTime+=Time.deltaTime;
+        UpdateDiscoveryDust(waterTime);
         foreach(var material in waterMaterials) material.SetFloat("_WaterTime",waterTime);
         View.rect=MenuLayout.Letterbox16By9(Screen.width,Screen.height);View.aspect=16f/9;
     }
     void OnGUI()
     {
         var label=new GUIStyle(GUI.skin.label){fontSize=14,normal={textColor=Color.white}};
-        string text=Cat.Paused?"Paused · P: resume":Cat.transform.localPosition.x>26 && Cat.transform.localPosition.y< -8
+        string text=Cat.Paused?"Paused · P: resume":Cat.transform.localPosition.x>65
             ?"End of review section · R: return to entrance"
             :"Entrance study · A/D: move · Space: jump · R: reset · P: pause · Esc: menu";
         GUI.Box(new Rect(12,12,Mathf.Min(Screen.width-24,610),32),GUIContent.none);
@@ -74,11 +75,12 @@ public sealed class CaveEntryStudy : MonoBehaviour
         Painting("Valley",new Rect(-24,-22,72,40.5f),18,"GoldenRiver/Descent/entry-study-valley-v1",false,true);
         Painting("Recessed cave wall",new Rect(-4,-20,45,30),3,"GoldenRiver/Descent/entry-study-rear-v1",true);
         Painting("Left connected cliff",new Rect(-14,-11,27,18),1,"GoldenRiver/Descent/entry-study-left-v2");
-        Painting("Right overhang and end wall",new Rect(7,-12.15f,30,20),1,"GoldenRiver/Descent/entry-study-right-v2",maximumY:.22f);
+        EntryRoofOpening();
         Painting("Connected cave floor",new Rect(-1,-19.93f,36,12),.8f,"GoldenRiver/Descent/entry-study-floor-v1");
         Collider("Left cliff and descending ledges",Left);
         Collider("Opposing bank, ceiling and end wall",Right);
         Collider("First cave floor",FloorLeft);Collider("Second cave floor",FloorRight);
+        AddDiscovery();
         AddWater();
     }
     void Collider(string name,Vector2[] contour)
@@ -132,7 +134,7 @@ public sealed class CaveEntryStudy : MonoBehaviour
     };
     // Paint registration is authored alongside these contact contours in entry-study-geometry.json.
     public static readonly Vector2[] Left=new[]{new Vector2(-14f,9f),new Vector2(-3.6f,9f),new Vector2(-2.6f,7.2f),new Vector2(-1.8f,5.8f),new Vector2(-1.2f,4.2f),new Vector2(-1.5f,3f),new Vector2(-0.4f,1.8f),new Vector2(0f,-0.045f),new Vector2(3.79f,-0.045f),new Vector2(3.79f,-0.7f),new Vector2(3.6f,-1.6f),new Vector2(5.57f,-1.6f),new Vector2(5.57f,-2.15f),new Vector2(4.8f,-2.6f),new Vector2(4.2f,-3.2f),new Vector2(7.1f,-3.2f),new Vector2(7.1f,-3.8f),new Vector2(5.4f,-4.4f),new Vector2(5f,-4.8f),new Vector2(8.49f,-4.8f),new Vector2(8.49f,-5.4f),new Vector2(6.8f,-6.1f),new Vector2(6.2f,-6.4f),new Vector2(9.82f,-6.4f),new Vector2(9.82f,-7f),new Vector2(7.7f,-7.8f),new Vector2(7.2f,-8f),new Vector2(10.9f,-8f),new Vector2(10.9f,-8.6f),new Vector2(8.8f,-9.2f),new Vector2(7.8f,-10f),new Vector2(13f,-11f),new Vector2(13f,-16f),new Vector2(-14f,-16f)};
-    public static readonly Vector2[] Right=new[]{new Vector2(7f,0f),new Vector2(43f,0f),new Vector2(43f,-18f),new Vector2(27.3f,-18f),new Vector2(27.3f,-10f),new Vector2(27.37f,-9f),new Vector2(26.92f,-8f),new Vector2(27.1f,-7.2f),new Vector2(26.55f,-6.4f),new Vector2(26f,-6.04f),new Vector2(25f,-5.88f),new Vector2(24f,-5.96f),new Vector2(22f,-5.76f),new Vector2(20f,-5.9f),new Vector2(18f,-5.41f),new Vector2(16f,-5.74f),new Vector2(14f,-5.33f),new Vector2(12f,-5.8f),new Vector2(11.53f,-5.5f),new Vector2(10.01f,-4.5f),new Vector2(9.23f,-3f),new Vector2(8.04f,-1.6f),new Vector2(7f,-0.7f)};
+    public static readonly Vector2[] Right=new[]{new Vector2(7f,0f),new Vector2(26f,0f),new Vector2(26f,-6.04f),new Vector2(25f,-5.88f),new Vector2(24f,-5.96f),new Vector2(22f,-5.76f),new Vector2(20f,-5.9f),new Vector2(18f,-5.41f),new Vector2(16f,-5.74f),new Vector2(14f,-5.33f),new Vector2(12f,-5.8f),new Vector2(11.53f,-5.5f),new Vector2(10.01f,-4.5f),new Vector2(9.23f,-3f),new Vector2(8.04f,-1.6f),new Vector2(7f,-0.7f)};
     public static readonly Vector2[] FloorLeft=new[]{new Vector2(-1f,-10f),new Vector2(18.06f,-10f),new Vector2(18.07f,-10.3f),new Vector2(17.95f,-10.8f),new Vector2(17.49f,-11.4f),new Vector2(17.77f,-13f),new Vector2(17.27f,-14.5f),new Vector2(17.44f,-16f),new Vector2(17.55f,-18f),new Vector2(17.68f,-20f),new Vector2(-1f,-20f)};
     public static readonly Vector2[] FloorRight=new[]{new Vector2(20.34f,-10f),new Vector2(35f,-10f),new Vector2(35f,-20f),new Vector2(20.55f,-20f),new Vector2(20.4f,-18f),new Vector2(20.36f,-16f),new Vector2(20.15f,-14.5f),new Vector2(20.64f,-13f),new Vector2(20.06f,-11.4f),new Vector2(20.15f,-10.8f),new Vector2(20.28f,-10.3f)};
 }
