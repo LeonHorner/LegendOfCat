@@ -906,6 +906,7 @@ public class MenuMovementIntegrationTests
         catBody.position = new Vector2(9, -8);
         cat.GetType().GetMethod("FixedUpdate", BindingFlags.Instance | BindingFlags.NonPublic)
             .Invoke(cat, null);
+        WaterRecoveryTests.CompleteCourseRecovery(cat);
         Assert.That(catBody.position.x, Is.EqualTo(9).Within(0.001f));
         Assert.That(catBody.position.y, Is.EqualTo(0.52f).Within(0.001f));
         Assert.That((int)run.GetType().GetProperty("Retries").GetValue(run), Is.EqualTo(2));

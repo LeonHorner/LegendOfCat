@@ -6,6 +6,24 @@ using UnityEngine;
 
 public class WaterRecoveryTests
 {
+    internal static void CompleteCourseRecovery(Component cat)
+    {
+        var recovery = cat.GetComponent("WaterRecovery");
+        Assert.That(recovery, Is.Not.Null);
+        var type = recovery.GetType();
+        var active = type.GetProperty("Active");
+        Assert.That(active.GetValue(recovery), Is.True, "A fall must start the water sequence.");
+        var advance = type.GetMethod("Advance");
+        float duration = (float)type.GetProperty("SequenceDuration").GetValue(recovery);
+        var cameraHeld = type.GetProperty("CameraHeld");
+        const int steps = 100;
+        for (int i = 0; i < steps && (bool)cameraHeld.GetValue(recovery); i++)
+            advance.Invoke(recovery, new object[] { duration / steps });
+        Assert.That(cameraHeld.GetValue(recovery), Is.False, "The sequence must reach the checkpoint swap.");
+        advance.Invoke(recovery, new object[] { duration });
+        Assert.That(active.GetValue(recovery), Is.False);
+    }
+
     GameObject root, player, cameraObject;
     Component cat, recovery;
     Rigidbody2D body;
