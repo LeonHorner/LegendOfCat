@@ -13,12 +13,13 @@ public sealed class WaterRecovery : MonoBehaviour
     const bool ForceSharkForDebug = false;
 #endif
     const float SharkLaunchTime = 0.72f, SharkBiteTime = 1.93f;
-    const float SharkSubmergeTime = 2.30f, SharkSecondLaunchTime = 3.28f;
-    const float SharkLungeTime = 3.48f, SharkBlackoutTime = 3.82f;
+    const float SharkSubmergeTime = 2.30f, SharkSecondLaunchTime = 4.35f;
+    const float SharkLungeTime = SharkSecondLaunchTime + 0.20f;
+    const float SharkBlackoutTime = SharkLungeTime + 0.34f;
     bool HasSharkEncounter => sharkEncounter && shark;
     float FadeStart => HasSharkEncounter ? SharkBlackoutTime - 0.06f : 1.65f;
-    float RetryTime => HasSharkEncounter ? 4.09f : RespawnTime;
-    public float SequenceDuration => HasSharkEncounter ? 4.49f : Duration;
+    float RetryTime => HasSharkEncounter ? SharkBlackoutTime + 0.27f : RespawnTime;
+    public float SequenceDuration => HasSharkEncounter ? RetryTime + 0.40f : Duration;
     public bool Active { get; private set; }
     public bool CameraHeld => Active && !respawned;
     public float Elapsed { get; private set; }
@@ -430,7 +431,7 @@ public sealed class WaterRecovery : MonoBehaviour
         // A single arch peaks as the shark turns over and relaxes into the catch.
         // Bend around the jaw to keep the bite aligned with Mika.
         float arch = diving ? 0 : Mathf.Sin(Mathf.PI * Mathf.InverseLerp(0.20f, 0.97f, travel));
-        float curvature = -40f * Mathf.Deg2Rad * arch / 3.1f;
+        float curvature = -70f * Mathf.Deg2Rad * arch / 3.1f;
         bool curved = Mathf.Abs(curvature) > 0.0001f;
         int jaw = diving || travel < 0.54f ? 0 : travel < 0.72f ? 1 : 2;
         for (int i = 0; i <= BreachColumns; i++) {

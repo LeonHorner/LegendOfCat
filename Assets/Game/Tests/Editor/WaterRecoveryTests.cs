@@ -135,7 +135,11 @@ public class WaterRecoveryTests
         Call(recovery, "Advance", 2f);
         Assert.That(retries, Is.Zero);
         Call(cat, "SetPaused", false);
-        Call(recovery, "Advance", 0.96f); Call(recovery, "LateUpdate");
+        Call(recovery, "Advance", 1.30f); Call(recovery, "LateUpdate");
+        Assert.That(shark.enabled, Is.False);
+        Assert.That(root.GetComponentsInChildren<LineRenderer>()
+            .Any(renderer => renderer.name == "Shark bubble" && renderer.enabled), Is.True);
+        Call(recovery, "Advance", 0.73f); Call(recovery, "LateUpdate");
         Assert.That(shark.enabled, Is.True);
         Assert.That(shark.transform.localScale.x, Is.GreaterThan(3f));
         Call(recovery, "Advance", 0.11f); Call(recovery, "LateUpdate");
