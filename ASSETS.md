@@ -799,3 +799,7 @@ The existing near panorama is extended to 14332×1448 using an original generated
   with a warm tabby coat, striped forehead, and pale muzzle. Licensed under the
   repository license. The HUD checkpoint markers reuse each course's world
   renderer artwork. The stroke retains each course's painted fill.
+
+- The revised progress portrait crops Mika's existing original gameplay
+  sprite at the neck and downsamples it for HUD use. It retains the source
+  artwork's license and uses no new generation model.

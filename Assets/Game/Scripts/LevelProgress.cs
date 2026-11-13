@@ -122,6 +122,8 @@ public sealed class LevelProgress
         float width = 250 * scale;
         float centerY = area.y + 16 * scale;
         float tip = left + width * Fraction;
+        // Keep the full route visible over both bright skies and dark terrain.
+        DrawOutline(new Rect(left, centerY - 6 * scale, width, 12 * scale), scale);
         if (Fraction > 0)
             GUI.DrawTextureWithTexCoords(new Rect(left, centerY - 5 * scale, tip - left, 10 * scale),
                 fill, new Rect(0, 0, Fraction, 1));
@@ -140,6 +142,17 @@ public sealed class LevelProgress
             GUI.color = color;
         }
         GUI.DrawTexture(new Rect(tip - 14 * scale, centerY - 14 * scale, 28 * scale, 28 * scale), head);
+    }
+
+    static void DrawOutline(Rect rect, float scale)
+    {
+        Color previous = GUI.color;
+        GUI.color = Color.white;
+        GUI.DrawTexture(rect, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
+            new Color(.12f, .09f, .13f, .85f), 0, 5 * scale);
+        GUI.DrawTexture(rect, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
+            new Color(.91f, .81f, .67f, .8f), scale, 5 * scale);
+        GUI.color = previous;
     }
 
     internal static LevelProgress ForCourse(bool goldenRiver, Vector2 start)
