@@ -18,6 +18,8 @@ public sealed class CatCamera : MonoBehaviour
 
     public void Follow(float deltaSeconds)
     {
+        var water = target ? target.GetComponent<WaterRecovery>() : null;
+        if (water && water.CameraHeld) return;
         // Read the interpolated render transform, never the fixed-step Rigidbody position.
         if(!view) view=GetComponent<Camera>();
         var camera=view;

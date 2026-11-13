@@ -231,7 +231,8 @@ public sealed class MovementCourse : MonoBehaviour
         visual.SetParent(player.transform, false);
         var original = Resources.Load<GameObject>("MikaOriginal");
         if (original) {
-            Destroy(visual.gameObject);
+            if (Application.isPlaying) Destroy(visual.gameObject);
+            else DestroyImmediate(visual.gameObject);
             visual = Instantiate(original, player.transform).transform;
             visual.GetComponent<MikaSpritePresentation>().controller = Cat;
             originalMika = true;
@@ -277,6 +278,7 @@ public sealed class MovementCourse : MonoBehaviour
             sceneryRenderer.RouteLandmarks = true;
         }
         sceneryRenderer.InitializeForCourse(courseCamera, Cat, ActivePlatforms);
+        Cat.gameObject.AddComponent<WaterRecovery>().Initialize(Cat, courseCamera, transform, RetryCheckpoint);
         if (LevelOne)
             for (int i = 0; i < platformObjects.Count; i++)
                 if (sceneryRenderer.FloatingAt(i)) SceneryRenderer.MatchFloatingCollider(platformObjects[i], sceneryRenderer.TerrainVisuals[i]);

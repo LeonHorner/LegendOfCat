@@ -707,3 +707,76 @@ Follow-up on 2026-11-08: `finale-rubble-v1.png` is an additional original built-
 `Assets/Game/Resources/GoldenRiver/finale-watchtower-v1.png` is an original generated transparent painting made with the built-in OpenAI image generation tool (exact model identifier not exposed). Source output: `exec-c32edae8-5c5e-4fbe-9ab3-f8a6619a7ad6.png`. Existing `ASSET-LICENSE.md` generated-art policy applies; no external asset or licensed reference was supplied. Human creative direction: lengthen the measured 100-second finale through a collapsed tower with a short reversal, varied landings and local recovery, preserving golden vegetation, violet masonry and teal ivy. Full prompt and integration decisions are recorded in `docs/design/golden-river-main-route/finale-art.md`.
 
 The existing near panorama is extended to 14332�1448 using an original generated right-hand continuation (`exec-85ff45e6-365c-4214-ace3-bd4154ece0d6.png`, built-in image generation, exact model not exposed) and PhotoCraft composition. The original project's terminal edge was the only reference; the original intro/ascent mapping is preserved. Editable source: `docs/design/golden-river-main-route/sources/watchtower-near-panorama.pcraft`. The generated-art policy above applies. Prompt, rejected low-ridge study and contour/ground decisions are documented in `finale-art.md`.
+
+## Mika water-recovery prototype — 2026-10-31
+
+- Asset: `Assets/Game/Resources/WaterRecovery/reactions.png`, four complete-character
+  reaction drawings in a horizontal atlas. Original generated artwork from the
+  built-in OpenAI image generation tool; exact model ID was not exposed.
+- Reference: existing original Mika artwork, specifically
+  `Assets/Game/Art/Mika/Original/original-apex-isolated.png`. No third-party input.
+- License: project `ASSET-LICENSE.md` where rights exist; no claim that a license
+  creates copyright in unprotectable generated output.
+- Human direction: user requested a splash, zoom focused on facial animation,
+  head submersion, brief black fade and checkpoint return, and explicitly asked
+  to evaluate an implemented first version. Natural orange/cream quadruped identity
+  retained; surprised eyes, lifted chin, blink and closed eyes selected for review.
+- Generation specification: transparent four-cell horizontal sheet, complete cat
+  facing right, same dimensions/markings/registration, sturdy paws tucked downward,
+  green eyes, ears slightly back, restrained expressions, no water/background/text,
+  no stretched body or detached pieces. The original reference was supplied as
+  identity/style guidance. Source pixels are retained in the atlas.
+- Integration decisions: rigid frame changes and mirrored facing, world-space
+  submersion mask, code-drawn droplets/ripples and camera zoom. No optical flow,
+  cutout rig or whole-body deformation. Editor import preserves native proportions
+  without mipmaps or compression. Visual acceptance remains pending under #60.
+
+## Mika storyboard water-entry revision — 2026-10-31
+
+- Active asset: `Assets/Game/Resources/WaterRecovery/turn-reactions.png`, eight
+  connected head-and-neck drawings in a four-column/two-row atlas. Original
+  generated artwork from the built-in OpenAI image generation tool; exact model
+  ID was not exposed. Uses project `ASSET-LICENSE.md` where rights exist.
+- Reference: original generated six-panel storyboard archived at
+  `docs/design/water-recovery/storyboard/approved-storyboard.png`, accepted by the
+  user in this chat after rejecting the first version's floating-body animation.
+  The storyboard itself used existing Mika and the game screenshot as references.
+  No third-party input or new outside dependency is used.
+- Human decisions: preserve the accepted zoom/fade; submerge chest/shoulders early;
+  turn Mika's eyes and head from profile toward the viewer in three-quarter view;
+  blink while descending; use an early shoulder splash to connect the drawings.
+- Full generation prompt, selection and registration notes are in
+  `docs/design/water-recovery/storyboard/generation.md`. An initial atlas attempt
+  lacked adequate cell separation; the selected second atlas added explicit
+  padding constraints. Native alpha/source pixels are retained.
+- Implementation uses one pixel scale for all drawings and a registered bottom-row
+  pivot. No optical flow, cutout rig, morphing or whole-body deformation is used.
+  The current falling drawing continues through initial impact for 0.14 seconds;
+  the original prototype reaction sheet above is superseded at runtime. New
+  source is confined to water recovery, with existing locomotion artwork retained.
+- Concept approval permits implementation; final in-game visual acceptance
+  remains pending.
+
+## Golden River shark — 2026-11-13
+
+- Water recovery shark frames at `Assets/Game/Resources/WaterRecovery/shark-frames.png`.
+- Original artwork drawn and exported through PhotoCraft 0.23.1 MCP using manually specified filled curves and ellipses. The four registered poses cover approach, opening jaws, full gape and closing jaws. No external source artwork or generative model was used.
+- The requested creative direction was a rare shark encounter. The artwork uses a stylized blue-gray silhouette and a bloodless bite followed by checkpoint recovery. License is the repository license.
+
+## Golden River shark breach — 2026-11-13
+
+- Runtime atlas: `Assets/Game/Resources/WaterRecovery/shark-breach-frames.png`.
+- Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP cropped and exported the registered transparent atlas. The earlier PhotoCraft drawing remains archived in Git history.
+- Human direction: realistic great white anatomy and muted shading, high breach, downward catch and larger water impacts. Repository asset terms apply. See [artwork and prompt](docs/design/water-recovery/shark-breach-art.md).
+
+## Golden River shark splash — 2026-11-13
+
+- Runtime atlas at `Assets/Game/Resources/WaterRecovery/shark-splash-frames.png`.
+- Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP resized and exported the alpha atlas. Repository asset terms apply.
+- Human direction used irregular water sheets, foam and receding surface ripples to match the painted river. See [artwork and prompt](docs/design/water-recovery/shark-breach-art.md).
+
+## Golden River camera-facing shark — 2026-11-13
+
+- Runtime atlas at `Assets/Game/Resources/WaterRecovery/shark-lunge-frames.png`.
+- Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP resized and exported the alpha atlas. Repository asset terms apply.
+- Human direction specified a jump scare with an attack from directly below Mika and an open-jaw lunge toward the camera. See [artwork and prompt](docs/design/water-recovery/shark-lunge-art.md).
