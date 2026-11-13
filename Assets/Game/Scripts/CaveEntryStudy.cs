@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Bounded visual/playability study: accepted entrance, passage and next discovery candidate.
-// The campaign connection remains separate until the expanded study has been reviewed.
+// Native cave paintings shared by the focused study and the connected level passage.
 public sealed partial class CaveEntryStudy : MonoBehaviour
 {
     public CatController Cat { get; private set; }
     public Camera View { get; private set; }
     public System.Action BackToMenu;
+    public bool Embedded;
     public CatCamera Follow { get; private set; }
     readonly List<Object> owned = new List<Object>();
     readonly List<Material> waterMaterials = new List<Material>();
@@ -16,6 +16,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
 
     void Awake()
     {
+        if(Embedded)return;
         AddLand();
         var player=new GameObject("Mika entry study");player.transform.SetParent(transform,false);
         player.transform.localPosition=Spawn;
@@ -55,13 +56,15 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
     }
     void Update()
     {
+        if(!Cat)return;
         if(!Cat.Paused) waterTime+=Time.deltaTime;
         UpdateDiscoveryDust(waterTime);
         foreach(var material in waterMaterials) material.SetFloat("_WaterTime",waterTime);
-        View.rect=MenuLayout.Letterbox16By9(Screen.width,Screen.height);View.aspect=16f/9;
+        if(!Embedded){View.rect=MenuLayout.Letterbox16By9(Screen.width,Screen.height);View.aspect=16f/9;}
     }
     void OnGUI()
     {
+        if(Embedded)return;
         var label=new GUIStyle(GUI.skin.label){fontSize=14,normal={textColor=Color.white}};
         string text=Cat.Paused?"Paused · P: resume":Cat.transform.localPosition.x>65
             ?"End of review section · R: return to entrance"
@@ -72,7 +75,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
 
     void AddLand()
     {
-        Painting("Valley",new Rect(-24,-22,72,40.5f),18,"GoldenRiver/Descent/entry-study-valley-v1",false,true);
+        if(!Embedded)Painting("Valley",new Rect(-24,-22,72,40.5f),18,"GoldenRiver/Descent/entry-study-valley-v1",false,true);
         Painting("Recessed cave wall",new Rect(-4,-20,45,30),3,"GoldenRiver/Descent/entry-study-rear-v1",true);
         Painting("Left connected cliff",new Rect(-14,-11,27,18),1,"GoldenRiver/Descent/entry-study-left-v2");
         EntryRoofOpening();
@@ -81,10 +84,12 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
         Collider("Opposing bank, ceiling and end wall",Right);
         Collider("First cave floor",FloorLeft);Collider("Second cave floor",FloorRight);
         AddDiscovery();
-        AddWater();
+        if(!Embedded)AddWater();
     }
     void Collider(string name,Vector2[] contour)
     {
+        if(Embedded)contour=EmbeddedContour(name,contour);
+        if(contour.Length<3)return;
         var rock=new GameObject(name);rock.transform.SetParent(transform,false);
         rock.AddComponent<PolygonCollider2D>().points=contour;
     }
@@ -92,8 +97,14 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
     {
         var material=new Material(Resources.Load<Material>(valley?"BackgroundStudy/background-material":"GoldenRiver/Descent/entry-study-material"));
         owned.Add(material);material.mainTexture=Resources.Load<Texture2D>(path);
+        RegisterMaterial(material);
+        if(Embedded&&name.ToLowerInvariant().Contains("roof"))material.SetFloat("_ExteriorRoof",1);
+        if(Embedded&&name=="Connected discovery roof")material.SetFloat("_ReturnDoor",1);
         if(valley){material.SetFloat("_Cutout",1);material.SetFloat("_Fog",.36f);material.SetFloat("_Saturation",.76f);}
         else material.SetFloat("_Recessed",recessed?1:0);
+        if(name=="Connected discovery roof")material.SetFloat("_RoofJoin",1);
+        if(name=="Sunlit recessed fissure wall")material.SetFloat("_Recessed",2);
+        if(name=="Quiet return recess")material.SetFloat("_Recessed",3);
         var visible=bounds;visible.yMax=Mathf.Min(visible.yMax,maximumY);
         MeshObject(name,Rectangle(visible),bounds,z,material);
     }
@@ -101,6 +112,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
     void MeshObject(string name,Vector2[] polygon,Rect uvBounds,float z,Material material)
     {
         var item=new GameObject(name);item.transform.SetParent(transform,false);
+        if(Embedded&&(name=="Interior ceiling mass"||name=="Interior recessed wall"))item.layer=31;
         item.transform.localPosition=new Vector3(0,0,z);
         var mesh=new Mesh{name=name};owned.Add(mesh);
         var vertices=new Vector3[polygon.Length];var uv=new Vector2[polygon.Length];
@@ -109,6 +121,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
         for(int i=0;i<vertices.Length-2;i++){triangles[i*3]=0;triangles[i*3+1]=i+1;triangles[i*3+2]=i+2;}
         mesh.vertices=vertices;mesh.uv=uv;mesh.triangles=triangles;mesh.RecalculateBounds();
         item.AddComponent<MeshFilter>().sharedMesh=mesh;item.AddComponent<MeshRenderer>().sharedMaterial=material;
+        AddInteriorLining(name,polygon,uvBounds,z,material);
     }
     void AddWater()
     {
@@ -126,7 +139,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
             }
         }
     }
-    void OnDestroy(){foreach(var item in owned) if(item) Destroy(item);}
+    void OnDestroy(){if(Embedded&&Cat)Cat.ReturnedToStart-=ResetLevelView;foreach(var item in owned) if(item) Destroy(item);}
 
     public static readonly Vector2[][] WaterContours={
         new[]{new Vector2(-40,-4.5f),new Vector2(3.8f,-4.5f),new Vector2(4.2f,-3.3f),new Vector2(3.8f,-2.85f),new Vector2(-40,-2.85f)},

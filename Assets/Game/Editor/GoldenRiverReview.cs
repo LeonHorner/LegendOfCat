@@ -108,11 +108,9 @@ public static class GoldenRiverReview
         }
         bool upperReview = System.Array.IndexOf(args, "-upperReview") >= 0;
         if (upperReview) {
-            var steps = UpperRoute.Platforms;
-            points = new[] { UpperRoute.Entrance, new Vector2(steps[2].x, steps[2].y + 1.22f),
-                new Vector2(steps[UpperRoute.RiskIndex-1].x, steps[UpperRoute.RiskIndex-1].y + 1.22f),
-                new Vector2(UpperRoute.Recoveries[0].x, UpperRoute.Recoveries[0].y + 1.22f),
-                new Vector2(steps[UpperRoute.LookoutIndex].x, steps[UpperRoute.LookoutIndex].y + 1.22f), UpperRoute.Rejoin };
+            points = new[] { CaveRoute.Entrance,CaveRoute.ToCourse(new Vector2(6.5f,-2.69f)),
+                CaveRoute.ToCourse(new Vector2(98.7f,-10.65f)),CaveRoute.ToCourse(new Vector2(100,-16.99f)),
+                CaveRoute.ToCourse(new Vector2(44,-12.16f)),CaveRoute.Rejoin };
             names = new[] { "descent-entrance", "descent-entry-bank", "descent-risk", "descent-catch", "descent-niche", "descent-rejoin" };
         }
         try {
@@ -268,10 +266,9 @@ public static class GoldenRiverReview
         var pilot=full ? System.Activator.CreateInstance(type,new object[]{course,!mainOnly})
             : System.Activator.CreateInstance(type,new object[]{course});
         course.RestartRun();
-        if(!full) course.Cat.RespawnAt(UpperRoute.Entrance);
+        if(!full) course.Cat.RespawnAt(CaveRoute.Entrance);
         if (catchOnly) {
-            var takeoff = UpperRoute.Platforms[UpperRoute.RiskIndex - 1];
-            course.Cat.RespawnAt(new Vector2(takeoff.x, takeoff.y + 1.22f));
+            course.Cat.RespawnAt(CaveRoute.ToCourse(new Vector2(98.7f,-10.65f)));
         }
         var movers=course.GetComponentsInChildren<MovingSupport>();
         foreach(var mover in movers){mover.SendMessage("Start");mover.ResetPhase();}
@@ -283,9 +280,8 @@ public static class GoldenRiverReview
             for(int tick=0;tick<(full?25000:5000);tick++) {
                 foreach(var mover in movers)mover.SendMessage("FixedUpdate");
                 if (catchOnly) {
-                    var takeoff = UpperRoute.Platforms[UpperRoute.RiskIndex - 1];
-                    float direction=Mathf.Sign(UpperRoute.Platforms[UpperRoute.RiskIndex].x-takeoff.x);
-                    float edge=takeoff.x+direction*(takeoff.z/2+.6f);
+                    float direction=1;
+                    float edge=CaveRoute.Origin+101.5f;
                     course.Cat.Motion.SetMove(direction*(edge-course.Cat.transform.position.x)>.02f?direction:0);
                 } else type.GetMethod("Command").Invoke(pilot,null);
                 course.Cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);
@@ -300,7 +296,7 @@ public static class GoldenRiverReview
                     File.WriteAllBytes($"{frames}/frame-{tick/4:00000}.png",pixels.EncodeToPNG());
                 }
                 bool complete = catchOnly ? tick > 150 && course.Cat.Grounded &&
-                    Mathf.Abs(course.Cat.transform.position.y-(UpperRoute.Recoveries[0].y+1.22f)) < .15f
+                    Mathf.Abs(course.Cat.transform.position.y-(-17.5f+CaveRoute.VerticalOffset+.51f)) < .15f
                     : (bool)type.GetProperty("Complete").GetValue(pilot);
                 if(complete) {
                     Debug.Log("Scripted optional loop recording completed in "+(tick*Time.fixedDeltaTime).ToString("F2")+"s; not human-input evidence.");return;

@@ -646,12 +646,15 @@ public class MenuMovementIntegrationTests
                 }
                 Assert.That(reached, Is.EqualTo(phaseSteps == 63), "The upper landing must require the lift's high phase.");
             }
-            foreach (int group in new[] { 2, 5, 7, 9, 10, 13 }) {
+            // Entrance group 2 now uses the native cave ledges, covered by connected-cave traversal/reversal.
+            foreach (int group in new[] { 5, 7, 9, 10, 13 }) {
                 mover.GetType().GetMethod("ResetPhase").Invoke(mover,null);
                 for (int tick = 0; tick < 187; tick++) { Call(mover,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
                 var shelf = ascent[group * 5 + 1];
                 var recovery = course.GetComponentsInChildren<PolygonCollider2D>().First(c =>
-                    c.name == "Recovery terrace" && Mathf.Abs(c.transform.localPosition.x - shelf.x - (group == 10 ? 1.6f : 0)) < .01f);
+                    (c.name == "Recovery terrace"||c.name=="Shore opening recovery") && Mathf.Abs(c.transform.localPosition.x - shelf.x - (group == 10 ? 1.6f : 0)) < .01f);
+                // An intentionally carved shore is exercised by the actual entry/rejoin route tests.
+                if(recovery.name=="Shore opening recovery")continue;
                 float center = recovery.transform.localPosition.x;
                 cat.GetType().GetMethod("RespawnAt").Invoke(cat,new object[] { new Vector2(center - 3.3f, recovery.bounds.max.y + .46f) });
                 Physics2D.SyncTransforms();

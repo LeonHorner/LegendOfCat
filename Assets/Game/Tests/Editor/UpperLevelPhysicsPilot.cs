@@ -24,7 +24,7 @@ public sealed class UpperLevelPhysicsPilot
         body = cat.GetComponent<Rigidbody2D>();
         platforms = (Vector3[])((Vector3[])course.GetType().GetField("CompletePlatforms").GetValue(null)).Clone();
         movers = course.GetComponentsInChildren(course.GetType().Assembly.GetType("MovingSupport"));
-        entrance = ((Vector2)course.GetType().Assembly.GetType("UpperRoute").GetProperty("Entrance").GetValue(null)).x;
+        entrance = ((Vector2)course.GetType().Assembly.GetType("CaveRoute").GetProperty("Entrance").GetValue(null)).x;
     }
     void Move(float value) => motion.GetType().GetMethod("SetMove").Invoke(motion, new object[] { value });
     public UpperLevelPhysicsPilot(Component course, bool includeDescent) : this(course) { entered = !includeDescent; }

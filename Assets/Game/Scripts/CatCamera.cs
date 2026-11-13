@@ -13,10 +13,10 @@ public sealed class CatCamera : MonoBehaviour
     public float rightBoundary = 48;
     public Transform courseRoot;
     public System.Func<Vector2,float> HeightGuide;
+    public System.Func<Vector2,float?> PassageHeightGuide;
+    public System.Func<float> PassageDepthGuide;
     bool snap = true;
-    bool descentFollowing;
-    float descentHeight;
-    public void Snap() { snap = true; descentFollowing = false; }
+    public void Snap() { snap = true; }
     void LateUpdate() => Follow(Time.deltaTime);
 
     public void Follow(float deltaSeconds)
@@ -36,26 +36,10 @@ public sealed class CatCamera : MonoBehaviour
             float localX = courseRoot.InverseTransformPoint(target.position).x;
             // Follow near the upper edge, leaving ordinary jumps inside a broad resting zone.
             const float upperEdge = 2.6f, lowerEdge = -2.2f;
-            bool wasDescending = descentFollowing;
-            var descentBounds = UpperRoute.MaskBounds;
-            if (localY >= -.5f || localX < UpperRoute.Origin + descentBounds.xMin || localX > UpperRoute.Origin + descentBounds.xMax) descentFollowing = false;
-            else if (localY < -3.2f && UpperRoute.IsDry(new Vector2(localX,localY))) descentFollowing = true;
-            if (!descentFollowing) {
-                if (localX < 425) trackedHeight = 1;
-                else if (snap) trackedHeight = Mathf.Max(1, localY - upperEdge);
-                else if (localY > trackedHeight + upperEdge) trackedHeight = localY - upperEdge;
-                else if (localY < trackedHeight + lowerEdge) trackedHeight = Mathf.Max(1, localY - lowerEdge);
-            }
-            if (descentFollowing) {
-                if (!rider) rider = target.GetComponent<CatController>();
-                float blend = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(-.5f, -3, localY));
-                float destination = UpperRoute.CameraHeight(new Vector2(localX,localY));
-                if (localX < UpperRoute.Origin + 30) destination = Mathf.Min(-7, destination);
-                if (!wasDescending || snap || rider && rider.Grounded) descentHeight = destination;
-                else if (localY > descentHeight + upperEdge) descentHeight = localY - upperEdge;
-                else if (localY < descentHeight + lowerEdge) descentHeight = destination;
-                trackedHeight = Mathf.Lerp(trackedHeight, descentHeight, blend);
-            }
+            if (localX < 425) trackedHeight = 1;
+            else if (snap) trackedHeight = Mathf.Max(1, localY - upperEdge);
+            else if (localY > trackedHeight + upperEdge) trackedHeight = localY - upperEdge;
+            else if (localY < trackedHeight + lowerEdge) trackedHeight = Mathf.Max(1, localY - lowerEdge);
             if(localX>=FinaleRoute.StartX && localY>10) trackedHeight=Mathf.Max(trackedHeight,FinaleRoute.CameraMinimum(localX));
             if(localX>FinaleRoute.Last.x-35 && localY>FinaleRoute.Last.y-1) {
                 float reveal=Mathf.SmoothStep(0,1,Mathf.InverseLerp(FinaleRoute.Last.x-35,FinaleRoute.Last.x-8,localX));
@@ -63,7 +47,9 @@ public sealed class CatCamera : MonoBehaviour
             }
             floor = courseRoot.TransformPoint(new Vector3(0, trackedHeight)).y;
         }
-        if (HeightGuide!=null || ascent && (courseRoot.InverseTransformPoint(target.position).x >= FinaleRoute.StartX || descentFollowing)) {
+        float? passage=PassageHeightGuide?.Invoke(courseRoot.InverseTransformPoint(target.position));
+        if(passage.HasValue)floor=courseRoot.TransformPoint(new Vector3(0,passage.Value)).y;
+        if (HeightGuide!=null || passage.HasValue || ascent && (courseRoot.InverseTransformPoint(target.position).x >= FinaleRoute.StartX)) {
             if(!rider) rider=target.GetComponent<CatController>();
             float movement=rider?rider.PresentationVelocity.x:0;
             // Carrier drift must not reverse the look-ahead while Mika stands still.
@@ -71,9 +57,9 @@ public sealed class CatCamera : MonoBehaviour
             lookAhead = snap ? facing * 2 : Mathf.SmoothDamp(lookAhead, facing * 2, ref lookVelocity, .3f, Mathf.Infinity, deltaSeconds);
         } else { lookAhead = 2; facing = 1; lookVelocity = 0; }
         var desired = new Vector3(Mathf.Clamp(target.position.x + lookAhead * scale, halfWidth + left, right - halfWidth),
-            fixedHeight ? floor : Mathf.Clamp(target.position.y + 1.2f, 2.5f, 5), -10);
+            fixedHeight ? floor : Mathf.Clamp(target.position.y + 1.2f, 2.5f, 5), PassageDepthGuide?.Invoke()??-10);
         var next = Vector3.Lerp(transform.position, desired, 1 - Mathf.Exp(-8 * deltaSeconds));
-        if (ascent || HeightGuide!=null) {
+        if (ascent || HeightGuide!=null || passage.HasValue) {
             float smoothTime = desired.y > transform.position.y ? 0.22f : 0.12f;
             next.y = Mathf.SmoothDamp(transform.position.y, desired.y, ref verticalVelocity,
                 smoothTime, 24 * scale, deltaSeconds);

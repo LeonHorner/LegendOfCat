@@ -12,6 +12,7 @@ Shader "LegendOfCat/StudyTerrain"
         _CaveBoundary ("Permanent cave distances", 2D) = "black" {}
         _UseCaveBoundary ("Use cave edge shading", Float) = 0
         _CaveLayer ("Solid cave layer", Float) = 0
+        _CutCaveAir ("Carve level cave opening", Float) = 0
     }
     SubShader {
         Tags { "Queue"="AlphaTest" "RenderType"="TransparentCutout" }
@@ -28,6 +29,7 @@ Shader "LegendOfCat/StudyTerrain"
             float _WorldMapped;
             sampler2D _CaveBoundary;float4 _CaveBoundary_TexelSize;
             float _UseCaveBoundary,_CaveLayer;
+            float _CutCaveAir;
             struct Input { float4 vertex : POSITION; float2 uv : TEXCOORD0; };
             struct Output { float4 vertex : SV_POSITION; float2 uv : TEXCOORD0; float height : TEXCOORD1; float2 world : TEXCOORD2; };
             Output vert(Input v) {
@@ -51,7 +53,10 @@ Shader "LegendOfCat/StudyTerrain"
                 color.rgb *= float3(0.95, 0.98, 1.02);
                 float foot = 1 - smoothstep(-3.4, -1.3, i.height);
                 float2 dryUV=(i.world-_DryRect.xy)/_DryRect.zw;
+                if(_CutCaveAir>.5)clip(.5-tex2D(_DryMask,saturate(dryUV)).b*step(0,dryUV.x)*step(dryUV.x,1)*step(0,dryUV.y)*step(dryUV.y,1));
                 float dry=tex2D(_DryMask,saturate(dryUV)).g*step(0,dryUV.x)*step(dryUV.x,1)*step(0,dryUV.y)*step(dryUV.y,1)*_UseDryMask;
+                // Main-route foundations do not protrude into the permanently dry cave volume.
+                if(_CaveLayer<.5&&i.height< -3.35)clip(.5-dry);
                 foot *= 1-dry;
                 color.rgb = lerp(color.rgb, float3(0.57, 0.64, 0.57), 0.06 + foot * 0.11);
                 // A restrained cool damp zone connects the submerged rocks to the teal river.
