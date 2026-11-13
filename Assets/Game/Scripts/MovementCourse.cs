@@ -181,6 +181,9 @@ public sealed class MovementCourse : MonoBehaviour
         int finaleStart=LevelOnePlatforms.Length+AscentPlatforms.Length;
         for(int platformIndex=0;platformIndex<platforms.Length;platformIndex++) {
             var p=platforms[platformIndex];
+            if(LevelOne&&platformIndex>=LevelOnePlatforms.Length&&CaveRoute.ReplacesAscent(platformIndex-LevelOnePlatforms.Length)) {
+                var registration=new GameObject("Native shore contact registration");registration.transform.SetParent(transform,false);registration.transform.localPosition=p;platformObjects.Add(registration);continue;
+            }
             var platform = Block("Standable platform", new Vector2(p.x, p.y), new Vector2(p.z, 1.5f), new Color(0.22f, 0.28f, 0.28f));
             platformObjects.Add(platform);
             var collider = platform.AddComponent<BoxCollider2D>();
@@ -279,7 +282,7 @@ public sealed class MovementCourse : MonoBehaviour
         sceneryRenderer.InitializeForCourse(courseCamera, Cat, ActivePlatforms);
         if (LevelOne)
             for (int i = 0; i < platformObjects.Count; i++)
-                if (sceneryRenderer.FloatingAt(i)) SceneryRenderer.MatchFloatingCollider(platformObjects[i], sceneryRenderer.TerrainVisuals[i]);
+                if (sceneryRenderer.FloatingAt(i)&&!CaveRoute.ReplacesAscent(i-LevelOnePlatforms.Length)) SceneryRenderer.MatchFloatingCollider(platformObjects[i], sceneryRenderer.TerrainVisuals[i]);
         foreach (var support in supports) {
             support.Cat = Cat;
             support.Visual = sceneryRenderer.TerrainVisuals[supportIndices[support]];
@@ -434,7 +437,7 @@ public sealed class MovementCourse : MonoBehaviour
         Cat.RespawnAt(transform.TransformPoint(LevelOneCheckpointSpawns[1]));
     }
     public void StartAscentPreview() => StartPreviewAt(LevelOneCheckpointSpawns[0]);
-    public void StartDescentPreview() { StartAscentPreview(); Cat.RespawnAt(transform.TransformPoint(CaveRoute.Entrance)); }
+    public void StartDescentPreview() { StartAscentPreview(); Cat.RespawnAt(transform.TransformPoint(CaveRoute.Approach)); }
     public void StartVerticalLiftPreview()
     {
         var bank = AscentPlatforms[50];

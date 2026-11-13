@@ -59,6 +59,11 @@ Shader "LegendOfCat/StudyWater"
                 color = lerp(color, float3(0.88, 0.94, 0.85), water * crest * broken * 0.14);
                 color = lerp(color, float3(0.80, 0.79, 0.73), _Fog);
                 color = lerp(dot(color, float3(0.2126, 0.7152, 0.0722)).xxx, color, _Saturation);
+                // Foam follows the permanent rock boundary; no player-driven water switching.
+                float2 bankOffset=float2(.22/_DryRect.z,0);
+                float shore=max(tex2D(_DryMask,saturate(dryUV-bankOffset)).r,tex2D(_DryMask,saturate(dryUV+bankOffset)).r);
+                float contact=saturate(shore-dry)*inBounds*_UseDryMask;
+                color=lerp(color,float3(.79,.88,.80),contact*(.25+.15*sin(phase)));
                 // Keep the authored wave silhouette fixed at cliff feet; only the water interior flows.
                 return fixed4(color, smoothstep(0.5, 0.95, painted.a) * (1-dry));
             }

@@ -57,10 +57,14 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
     void Update()
     {
         if(!Cat)return;
-        if(!Cat.Paused) waterTime+=Time.deltaTime;
+        AdvanceVisuals(Time.deltaTime);
+        if(!Embedded){View.rect=MenuLayout.Letterbox16By9(Screen.width,Screen.height);View.aspect=16f/9;}
+    }
+    public void AdvanceVisuals(float seconds)
+    {
+        if(!Cat.Paused)waterTime+=seconds;
         UpdateDiscoveryDust(waterTime);
         foreach(var material in waterMaterials) material.SetFloat("_WaterTime",waterTime);
-        if(!Embedded){View.rect=MenuLayout.Letterbox16By9(Screen.width,Screen.height);View.aspect=16f/9;}
     }
     void OnGUI()
     {
@@ -75,6 +79,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
 
     void AddLand()
     {
+        if(Embedded){AddEmbeddedLand();return;}
         if(!Embedded)Painting("Valley",new Rect(-24,-22,72,40.5f),18,"GoldenRiver/Descent/entry-study-valley-v1",false,true);
         Painting("Recessed cave wall",new Rect(-4,-20,45,30),3,"GoldenRiver/Descent/entry-study-rear-v1",true);
         Painting("Left connected cliff",new Rect(-14,-11,27,18),1,"GoldenRiver/Descent/entry-study-left-v2");
@@ -98,13 +103,15 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
         var material=new Material(Resources.Load<Material>(valley?"BackgroundStudy/background-material":"GoldenRiver/Descent/entry-study-material"));
         owned.Add(material);material.mainTexture=Resources.Load<Texture2D>(path);
         RegisterMaterial(material);
-        if(Embedded&&name.ToLowerInvariant().Contains("roof"))material.SetFloat("_ExteriorRoof",1);
         if(Embedded&&name=="Connected discovery roof")material.SetFloat("_ReturnDoor",1);
         if(valley){material.SetFloat("_Cutout",1);material.SetFloat("_Fog",.36f);material.SetFloat("_Saturation",.76f);}
         else material.SetFloat("_Recessed",recessed?1:0);
         if(name=="Connected discovery roof")material.SetFloat("_RoofJoin",1);
         if(name=="Sunlit recessed fissure wall")material.SetFloat("_Recessed",2);
         if(name=="Quiet return recess")material.SetFloat("_Recessed",3);
+        if(Embedded&&name.ToLowerInvariant().Contains("roof")){maximumY=Mathf.Min(maximumY,-4.45f);z=-3;}
+        if(Embedded&&name=="Sunlit recessed fissure wall")z=1.8f;
+        if(Embedded&&name=="Discovery floor and return steps")z=-3;
         var visible=bounds;visible.yMax=Mathf.Min(visible.yMax,maximumY);
         MeshObject(name,Rectangle(visible),bounds,z,material);
     }
@@ -112,16 +119,15 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
     void MeshObject(string name,Vector2[] polygon,Rect uvBounds,float z,Material material)
     {
         var item=new GameObject(name);item.transform.SetParent(transform,false);
-        if(Embedded&&(name=="Interior ceiling mass"||name=="Interior recessed wall"))item.layer=31;
+
         item.transform.localPosition=new Vector3(0,0,z);
         var mesh=new Mesh{name=name};owned.Add(mesh);
         var vertices=new Vector3[polygon.Length];var uv=new Vector2[polygon.Length];
         for(int i=0;i<vertices.Length;i++) {vertices[i]=polygon[i];uv[i]=new Vector2((polygon[i].x-uvBounds.x)/uvBounds.width,(polygon[i].y-uvBounds.y)/uvBounds.height);}
-        var triangles=new int[(vertices.Length-2)*3];
-        for(int i=0;i<vertices.Length-2;i++){triangles[i*3]=0;triangles[i*3+1]=i+1;triangles[i*3+2]=i+2;}
+        var triangles=CaveGeometry.Triangulate(polygon);
         mesh.vertices=vertices;mesh.uv=uv;mesh.triangles=triangles;mesh.RecalculateBounds();
         item.AddComponent<MeshFilter>().sharedMesh=mesh;item.AddComponent<MeshRenderer>().sharedMaterial=material;
-        AddInteriorLining(name,polygon,uvBounds,z,material);
+
     }
     void AddWater()
     {

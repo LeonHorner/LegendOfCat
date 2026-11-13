@@ -4,6 +4,29 @@ using UnityEngine;
 // Convex pieces use one authored outline for paint and collision, including carved openings.
 public static class CaveGeometry
 {
+    public static int[] Triangulate(Vector2[] points)
+    {
+        var remaining=new List<int>();float signed=0;
+        for(int i=0;i<points.Length;i++){remaining.Add(i);var a=points[i];var b=points[(i+1)%points.Length];signed+=a.x*b.y-b.x*a.y;}
+        float winding=Mathf.Sign(signed);var triangles=new List<int>();
+        while(remaining.Count>3) {
+            bool found=false;
+            for(int i=0;i<remaining.Count;i++) {
+                int a=remaining[(i+remaining.Count-1)%remaining.Count],b=remaining[i],c=remaining[(i+1)%remaining.Count];
+                if(Side(points[c],points[a],points[b])*winding<=.000001f)continue;
+                bool occupied=false;
+                foreach(int index in remaining) {
+                    if(index==a||index==b||index==c)continue;
+                    var p=points[index];
+                    if(Side(p,points[a],points[b])*winding>=0&&Side(p,points[b],points[c])*winding>=0&&Side(p,points[c],points[a])*winding>=0){occupied=true;break;}
+                }
+                if(occupied)continue;
+                triangles.Add(a);triangles.Add(b);triangles.Add(c);remaining.RemoveAt(i);found=true;break;
+            }
+            if(!found)throw new System.InvalidOperationException("Terrain contour must be a simple polygon without duplicate edges.");
+        }
+        triangles.AddRange(remaining);return triangles.ToArray();
+    }
     public static Vector2[] Bevel(Rect rect, float amount=.22f)
     {
         float b=Mathf.Min(amount,Mathf.Min(rect.width,rect.height)*.2f);

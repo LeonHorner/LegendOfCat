@@ -41,6 +41,7 @@ public static class BuildScenery
     }
 
     public static readonly string[] GoldenRiverArt = {
+        "Descent/anchored-ledge-v1", "Descent/shore-left-v1", "Descent/shore-right-v1", "Descent/shore-exit-roof-v1", "Descent/shore-exit-floor-v1",
         "Descent/return-floor-a-v1", "Descent/return-floor-b-v1", "Descent/return-roof-v1",
         "Descent/discovery-floor-v2", "Descent/discovery-ceiling-v2", "Descent/discovery-rear-v1",
         "Descent/entry-study-left-v2", "Descent/entry-study-right-v2", "Descent/entry-study-floor-v1", "Descent/entry-study-rear-v1", "Descent/entry-study-valley-v1",

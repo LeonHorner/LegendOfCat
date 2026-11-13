@@ -36,4 +36,19 @@ public sealed class CaveGeometryTests
             Assert.That(texture.GetPixel(0,50).b,Is.GreaterThan(.95f));
         } finally {UnityEngine.Object.DestroyImmediate(texture);}
     }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void ConcaveTerrainLeavesThePassageEmptyInEitherWinding(bool reverse)
+    {
+        var points=new[]{new Vector2(0,0),new Vector2(4,0),new Vector2(4,4),new Vector2(3,4),
+            new Vector2(3,1),new Vector2(1,1),new Vector2(1,4),new Vector2(0,4)};
+        if(reverse)Array.Reverse(points);
+        var type=AppDomain.CurrentDomain.GetAssemblies().Select(a=>a.GetType("CaveGeometry")).First(t=>t!=null);
+        var indices=(int[])type.GetMethod("Triangulate").Invoke(null,new object[]{points});float area=0;
+        for(int i=0;i<indices.Length;i+=3){var a=points[indices[i]];var b=points[indices[i+1]];var c=points[indices[i+2]];
+            area+=Mathf.Abs((b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x))/2;
+            var center=(a+b+c)/3;Assert.That(center.x>1&&center.x<3&&center.y>1,Is.False,"A terrain triangle covers the open cavity.");}
+        Assert.That(area,Is.EqualTo(10).Within(.0001f));
+    }
 }

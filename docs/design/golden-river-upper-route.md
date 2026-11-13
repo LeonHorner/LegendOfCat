@@ -1,8 +1,8 @@
 # Golden River upper route
 
-## Current playable test candidate — 2026-11-12
+## Current shoreline revision — 2026-11-13
 
-The forward enclosed cave candidate is built and open for player review. It now rejoins ascent bank 49, roughly 322 world units beyond entry, with a 60.48-second scripted traversal. See [test-run instructions, current evidence and validation](golden-river-upper-route/cave-test-run-evidence/README.md). The older progress notes and images below describe superseded prototypes. PR #79 stays draft during player review.
+The accepted isolated cleft is being integrated using permanent native shores, a fixed camera plane and a forward exit at ascent bank 39. See [current construction, test instructions and evidence](golden-river-upper-route/permanent-shores.md). The first campaign integration was rejected for water cuts, overlapping terrain and scenery transitions. The bank-49 layout and its 60.48-second measurement below belong to an older rejected prototype. PR #79 stays draft during player review.
 
 ## Current replacement: dry descent — 2026-11-10
 

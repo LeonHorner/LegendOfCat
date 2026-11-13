@@ -1,6 +1,6 @@
 # Accepted entrance and first passage
 
-Current integration: the owner subsequently requested the actual level connection and forward return. See [Connected cave review](connected-cave-review.md); the isolated-scope statements below describe the earlier review stage.
+Current integration: see [Permanent cave shores](permanent-shores.md). The isolated-scope statements below describe the earlier accepted study; the subsequent first campaign integration was rejected.
 
 The previous full cave prototype is visually rejected. Passing its movement tests did not establish visual acceptance. The owner accepted the smaller entrance study after its contact correction. The rejected complete route remains frozen; see `discovery-extension-review.md` for the subsequent bounded extension.
 

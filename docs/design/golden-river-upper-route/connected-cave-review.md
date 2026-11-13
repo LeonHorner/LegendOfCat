@@ -1,5 +1,7 @@
 # Connected cave review
 
+**Historical, rejected integration.** The owner rejected the shoreline joins and scenery transitions shown by this version. Its depth/layer accommodations and visual-readiness claims below no longer describe the implementation. See [Permanent cave shores](permanent-shores.md) for the replacement and current evidence. Retained below only as a record of the failed iteration.
+
 The owner accepted the corrected entrance and requested integration into the actual level with a separate return. This supersedes the isolated endpoint described in the earlier study documents; the original complete cave composition remains rejected.
 
 The accepted native entry and fountain chamber now share the campaign player, input, checkpoint state and camera. The return travels forward below the river and ascends to main ascent platform 39, approximately 241 world units beyond the entrance. Main-route platform contacts, two checkpoints, finale and movement constants are retained. The old broad catch below entrance platform 10 is replaced by the registered native shore ledges; other recovery geometry is permanently carved at the two shore openings.

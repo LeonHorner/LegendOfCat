@@ -50,6 +50,15 @@ public sealed class UpperRouteTests
         Runtime("IntegratedCaveReview").GetMethod("Verify").Invoke(null,null);
         yield return new ExitPlayMode();
     }
+    [UnityTest]
+    public IEnumerator ShoreReplacementsAreUniqueAndWaterMaskEndsInsideSolidRock()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);yield return new EnterPlayMode();
+        root=new GameObject("Permanent shore registration");root.SetActive(false);
+        var course=root.AddComponent(Runtime("MovementCourse"));course.GetType().GetField("LevelOne").SetValue(course,true);root.SetActive(true);
+        Runtime("IntegratedCaveReview").GetMethod("VerifyShoreRegistration").Invoke(null,new object[]{course});
+        yield return new ExitPlayMode();
+    }
     [UnityTearDown]
     public IEnumerator Cleanup()
     {

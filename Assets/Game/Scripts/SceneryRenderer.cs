@@ -8,7 +8,6 @@ public sealed partial class SceneryRenderer : MonoBehaviour
     public const float FinaleRuinTravel = .22f;
     public Camera View { get; private set; }
     public const float CameraFloor = 1f;
-    public bool PreserveCameraDepth;
     public static bool IsFloating(int index) => index == 3 || index == 4 || index == 8 || index == 12;
     public CatController Cat { get; private set; }
     // Optional course-owned styling; null retains the original Movement Lab selection.
@@ -166,7 +165,9 @@ public sealed partial class SceneryRenderer : MonoBehaviour
         var platforms = coursePlatforms;
         for (int index = 0; index < platforms.Length; index++) {
             var p = platforms[index];
-            Terrain(p, FloatingAt(index), index);
+            if(RouteLandmarks&&index>=MovementCourse.LevelOnePlatforms.Length&&CaveRoute.ReplacesAscent(index-MovementCourse.LevelOnePlatforms.Length)){
+                var registration=new GameObject("Native shore visual registration");registration.transform.SetParent(transform,false);TerrainVisuals.Add(registration.transform);
+            }else Terrain(p, FloatingAt(index), index);
         }
         if (RouteLandmarks) {
             CreateLandmarks();
@@ -573,7 +574,7 @@ public sealed partial class SceneryRenderer : MonoBehaviour
         // Keep the damp-foot tint registered with the placed shore/water grid too.
         terrainMaterial.SetFloat("_CourseOriginY", transform.position.y);
         terrainMaterial.SetFloat("_CourseScale", transform.lossyScale.y);
-        View.transform.position = new Vector3(x, y, PreserveCameraDepth?View.transform.position.z:-10);
+        View.transform.position = new Vector3(x, y, -10);
         var localView = transform.InverseTransformPoint(new Vector3(x, y, 0));
         // Distant scenery has no physical join to the world-space terrain or foreground water.
         for (int i = 0; i < 3; i++) {

@@ -1,6 +1,6 @@
-#
-Current integration: the owner subsequently requested the actual level connection and forward return. See [Connected cave review](connected-cave-review.md); the isolated-scope statements below describe the earlier review stage.
- First discovery after the approved entrance
+# First discovery after the approved entrance
+
+Current integration: see [Permanent cave shores](permanent-shores.md). The isolated-scope statements below describe the earlier study stage; the subsequent first campaign integration was rejected.
 
 On 2026-11-13 the owner accepted the entrance and short passage after the painted-contact correction, then authorized extending that design. The accepted entrance paintings, Mika collider, motor, camera scale and corrected ledge contacts are retained.
 

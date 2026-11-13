@@ -11,7 +11,6 @@ public sealed partial class CaveEntryStudy
         var visible=bounds;visible.yMax=.22f;
         var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/entry-study-material"));owned.Add(material);
         RegisterMaterial(material);
-        if(Embedded){material.SetFloat("_ExteriorRoof",1);material.SetFloat("_EntryBank",1);}
         material.mainTexture=Resources.Load<Texture2D>("GoldenRiver/Descent/entry-study-right-v2");
         var opening=Rectangle(new Rect(26,-13.5f,12,7.7f));
         foreach(var piece in CaveGeometry.Subtract(new List<Vector2[]>{Rectangle(visible)},opening))

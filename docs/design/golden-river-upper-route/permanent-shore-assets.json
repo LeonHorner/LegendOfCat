@@ -1,0 +1,56 @@
+[
+  {
+    "asset": "shore-left-v1",
+    "date": "2026-11-13",
+    "generator": "OpenAI image_gen",
+    "model": "Not disclosed",
+    "source": "exec-2ae9c3fc-b7ab-4edc-911f-ecb450b0789e.png",
+    "prompt": "Production hand-painted 2D platformer native terrain cutout. Image1 is an EXACT geometry stencil; fill only its purple connected solid, preserve canvas, placement, ALL horizontal tread positions and dimensions. Outside fully transparent. Image2 is STYLE reference only, violet interlocking boulders, warm golden thin moss, restrained teal ivy. New low riverbank with six descending attached ledges on its right, NO towering wall above the highest flat walking surface. Left outer bank slopes naturally into water at approximately world height -3.1 (image y29% from top), paint a narrow dark damp stone zone along that left slope with tiny restrained pale foam contact flecks attached to the stone, no water sheet. Fill to left/bottom crop only where stencil does. Maintain massive bearing foundations, sharp flat walking contacts, organic undercut boulder edges within 3 pixels of stencil. No sky, background, cat, ruins, detached flecks, glow or haze. Do not center/shrink silhouette. Keep the exact silhouette as collision registration; this is a reusable game component, not a scenery picture.",
+    "license": "Original generated artwork under the applicable generation service terms",
+    "decision": "Native shore solids replace conflicting main-route contacts and graphics. Permanent shore envelopes and riverbed hide water mask edges. No camera depth or visibility switches."
+  },
+  {
+    "asset": "shore-right-v1",
+    "date": "2026-11-13",
+    "generator": "OpenAI image_gen",
+    "model": "Not disclosed",
+    "source": "exec-d7427d60-c162-4d9f-8153-c866745e2831.png",
+    "prompt": "Production 2D hand-painted native riverbank and cave roof cutout, true transparency. Image1 EXACT geometry stencil, preserve its canvas/framing and purple silhouette. Image2 STYLE only, violet boulder masses, golden moss, muted teal ivy and roots. The short FLAT upper-left platform is a main-route landing: thin crisp moss only there. Its right outer cliff slopes down to a long low submerged riverbed on the RIGHT; paint dark wet stone and a narrow subtle foam contact where the slope approaches the horizontal riverbed. The long RIGHT slab has NO grass on its top because it is a riverbed; its UNDERSIDE forms a cool dry cave ceiling with irregular natural boulder faces and a few root ends. Fill purple only, no rock outside stencil beyond 2px and no isolated flecks. All air truly transparent. No sky, water sheet, background, characters, scenery frame, glow, haze or text. Do not shrink/center shape, do not fill the large transparent space above the low roof, and do not add the old tall right end-wall. Native coherent solid architecture, matched warm light upper right and cooler recess below.",
+    "license": "Original generated artwork under the applicable generation service terms",
+    "decision": "Native shore solids replace conflicting main-route contacts and graphics. Permanent shore envelopes and riverbed hide water mask edges. No camera depth or visibility switches."
+  },
+  {
+    "asset": "shore-exit-roof-v1",
+    "date": "2026-11-13",
+    "generator": "OpenAI image_gen",
+    "model": "Not disclosed",
+    "source": "exec-7e2125c5-8415-4de6-bdb6-62bff0d0d993.png",
+    "prompt": "Native hand-painted 2D platformer cave-mouth upper cliff, transparent cutout. Image1 EXACT solid purple geometry, preserve canvas, silhouette and flat top contacts. Image2 style reference only. Paint irregular massive violet boulders, warm golden moss along the TWO upper walking terraces, muted teal ivy and natural roots. The LEFT outside face is a riverbank, with dark damp rock and very restrained small pale foam attached near lower-left waterline (about82% image height). The RIGHT organically jagged outer cliff face frames a cave mouth BELOW it; give this boundary naturally rounded boulder silhouettes, not a sawn poster edge. Lower underside is a cool shadowed cave ceiling, no moss floor there. No fill outside stencil beyond 2 pixels. Top terraces remain exact. All surrounding air transparent, no sky/background, water sheet, characters, buildings, detached flecks, glows or haze. Rock scale: roughly90-140px irregular boulders on1800px-wide image. Solid continuous geology, cropped only at short lower-left roof connection.",
+    "refinements": [
+      "Edit this native 2D cliff cutout. Preserve exact canvas, alpha outside silhouette, flat TWO topmost walking contacts and outer rock silhouette. REMOVE the long horizontal moss-covered ledge running through the MIDDLE of the cliff and its flowers; replace it with ordinary irregular solid violet boulder faces with occasional attached ivy. REMOVE the dark front-facing arch/hole painted at bottom-right; replace with solid violet geology. This is a SIDE-VIEW solid upper cliff block with NO interior holes or internal walking ledges. Golden moss stays ONLY along the outer TOP outline. Preserve wet left foot, upper-right light, palette and boulder scale. No new elements, background, framing, characters, glow or haze. True transparency outside original solid silhouette.",
+      "Edit ONLY the lower silhouette of this production native 2D violet rock cliff. Keep canvas, exact top two walking contacts, left wet shoreline, right outline, color palette, scale and solid stone interior unchanged. The current bottom boundary is a straight cropped line: replace it with an ORGANIC UNDERSIDE of individual rounded boulders hanging 20-40 pixels lower into the existing transparent bottom margin. The leftmost 80px lower join stays unchanged to join another rock ceiling. The bottom edge must form a visibly irregular natural overhang with restrained root ends, true alpha below. No arch or front-facing cave hole, no internal moss platform, no sky/background/water sheet, no characters or isolated flecks. This is the SIDE-VIEW roof/lip above a cave passage; don't add a second silhouette or frame."
+    ],
+    "license": "Original generated artwork under the applicable generation service terms",
+    "decision": "Native shore solids replace conflicting main-route contacts and graphics. Permanent shore envelopes and riverbed hide water mask edges. No camera depth or visibility switches."
+  },
+  {
+    "asset": "shore-exit-floor-v1",
+    "date": "2026-11-13",
+    "generator": "OpenAI image_gen",
+    "model": "Not disclosed",
+    "source": "exec-68ca9e24-dd2b-4b85-a578-03e1fe125114.png",
+    "prompt": "Native production hand-painted 2D terrain cutout. Image1 is EXACT geometry, fill only purple and preserve full canvas, placement, and every flat step. Image2 STYLE reference only. Paint one connected massive violet rock formation with a low flat approach on left, attached ascending natural boulder ledges to right, and broad final top terrace. Thin crisp golden moss ONLY on the walking step silhouettes, muted teal ivy in crevices. No internal horizontal moss lines that look like extra ledges. All front faces solid bearing geology; no holes, arches, pillars, floating platforms or rectangular poster borders. Keep flat tread heights, add rounded undercut boulder details only within2px of silhouette. Right outer cliff slopes down into river at image approximately35% height; dark damp stone and tiny pale attached foam there. Top/right air is true transparency, bottom rock fills crop. Request high detail 2048px wide, small irregular boulders45-75px wide across this large module so scale matches a cat game. No sky, water sheet, characters, text, glow or haze. Do not center or shrink.",
+    "license": "Original generated artwork under the applicable generation service terms",
+    "decision": "Native shore solids replace conflicting main-route contacts and graphics. Permanent shore envelopes and riverbed hide water mask edges. No camera depth or visibility switches."
+  },
+  {
+    "asset": "anchored-ledge-v1",
+    "date": "2026-11-13",
+    "generator": "OpenAI image_gen",
+    "model": "Not disclosed",
+    "source": "exec-ed4c641c-4af6-4b06-a90a-d59ab3561799.png",
+    "prompt": "Production 2D painted rock ledge with bearing buttress, true transparent cutout. Input1 EXACT purple silhouette: flat horizontal contact across top, a natural shallow projecting rock lip, then a rooted substantial rear-wall bearing mass tapering downward. Preserve all silhouette/canvas registration. Input2 style reference only. Violet grey interlocking boulders, thin crisp golden moss ONLY across the outer flat top, a few muted teal ivy strands that stay attached. Match source rock scale and warm top-right indirect light. Undercut top lip clearly distinguishable from the rear bearing mass, cooler shadowed support below. No repeated internal grass ledges, sky, water, background, characters, text, floating specks, haze, glow. Fill stencil only, no centering/shrink. This is attached to a cave wall, not a free-floating flat rectangle or stretched pillar.",
+    "license": "Original generated artwork under the applicable generation service terms",
+    "decision": "A shallow projecting contact lip is registered in the playable plane, with its substantial bearing mass fixed in the rear wall plane. The full source silhouette is retained without stretching its short treads."
+  }
+]
