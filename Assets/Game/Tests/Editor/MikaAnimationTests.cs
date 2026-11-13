@@ -18,6 +18,25 @@ public class MikaAnimationTests
         animation = Activator.CreateInstance(type);
     }
 
+    [TestCase("Idle", 0, 0f, "IdleRelaxed")]
+    [TestCase("Run", 4, 1f, "Walk")]
+    [TestCase("Run", 4, 7f, "Run")]
+    [TestCase("Turn", 8, 7f, "Stop")]
+    [TestCase("Jump", 10, 7f, "Takeoff")]
+    [TestCase("Jump", 17, 7f, "Airborne")]
+    [TestCase("Fall", 16, 7f, "Airborne")]
+    [TestCase("Fall", 19, 7f, "Fall")]
+    [TestCase("Landing", 12, 7f, "Land")]
+    public void ModelMapsSpriteStatesToImportedClips(string pose, int frame, float speed, string expected)
+    {
+        var model = type.Assembly.GetType("MikaModelPreview");
+        var selected = (string)model.GetMethod("SelectClip").Invoke(null,
+            new object[] { Enum.Parse(type.GetNestedType("Pose"), pose), frame, speed });
+        Assert.That(selected, Is.EqualTo(expected));
+        Assert.That(Resources.LoadAll<AnimationClip>("mika-rig")
+            .Any(clip => clip.name.Split('|').Last() == selected && clip.length > 0), Is.True);
+    }
+
     [Test]
     public void OriginalRunUsesOnlyFourSourcePosesAndStopsAtRest()
     {

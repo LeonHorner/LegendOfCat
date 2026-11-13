@@ -7,6 +7,7 @@ public sealed class MikaAnimation
     public Pose Current { get; private set; }
     public int Facing { get; private set; } = 1;
     public int Frame { get; private set; }
+    public float PoseElapsed => elapsed;
     public const int FrameCount = 21;
     public const float StrideLength = 2.4f;
     public const float LandingDuration = 0.20f;
