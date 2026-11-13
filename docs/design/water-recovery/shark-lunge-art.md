@@ -4,9 +4,10 @@ OpenAI ImageGen generated the three jaw poses on 2026-11-13. The exact model ID
 was unavailable. PhotoCraft 0.23.1 MCP resized and exported the transparent
 atlas to `Assets/Game/Resources/WaterRecovery/shark-lunge-frames.png`.
 
-The requested jump scare starts with a vertical strike below Mika, then the
-shark rises toward the camera. The game centers the open mouth as it expands
-into blackout. The artwork is original generated material under the repository
+The jump scare starts with a vertical strike below Mika. The existing side-view
+shark artwork supplies the aerial spin and dive, followed by bubbles and camera
+shake. The front-facing poses return for the second breach and camera lunge.
+The game centers the open mouth as it expands into blackout. The artwork is original generated material under the repository
 asset terms.
 
 ## Generation prompt
