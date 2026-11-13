@@ -292,6 +292,7 @@ public sealed class MovementCourse : MonoBehaviour
             for (int i = 0; i < 75; i += 5) {
                 if (i == 30) continue; // The easy horizontal-support crossing needs no catch shelf.
                 if (i == 10) continue; // Native shore ledges replace this catch at the cave entrance.
+                if (i == 35) continue; // The permanent exit cliff and outer stairs supply this landing.
                 var first = AscentPlatforms[i]; var lastInGroup = AscentPlatforms[i + 4];
                 var landing = AscentPlatforms[i + 1];
                 var catchPoint = new Vector3(landing.x + (i == 50 ? 1.6f : 0), first.y - 1f, i == 50 ? 9 : 10);

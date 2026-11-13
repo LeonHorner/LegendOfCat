@@ -69,11 +69,13 @@ public static class IntegratedCaveReview
         var follow=root.GetComponentInChildren<CatCamera>();var view=follow.GetComponent<Camera>();
         var movers=root.GetComponentsInChildren<MovingSupport>();foreach(var mover in movers)mover.SendMessage("Start");
         var scenery=root.GetComponentInChildren<SceneryRenderer>();var cave=root.GetComponentInChildren<CaveEntryStudy>();
+        var upper=MovementCourse.AscentPlatforms[15];var outer=MovementCourse.AscentPlatforms[35];
         var samples=new[]{CaveRoute.Entrance,CaveRoute.ToCourse(new Vector2(6.5f,-2.74f)),CaveRoute.ToCourse(new Vector2(44,-12.21f)),
             CaveRoute.ToCourse(new Vector2(98.7f,-10.7f)),CaveRoute.ToCourse(new Vector2(100,-17.04f)),
             CaveRoute.ToCourse(new Vector2(190,-7.39f)),CaveRoute.ToCourse(new Vector2(233.5f,4.165f)),CaveRoute.Rejoin,
             CaveRoute.Approach,CaveRoute.ToCourse(new Vector2(78.5f,-12.79f)),CaveRoute.ToCourse(new Vector2(207,-6.14f)),
-            CaveRoute.ToCourse(new Vector2(215,-3.335f))};
+            CaveRoute.ToCourse(new Vector2(215,-3.335f)),new Vector2(upper.x,upper.y+1.27f),
+            CaveRoute.ToCourse(new Vector2(32,-9.49f)),CaveRoute.ToCourse(new Vector2(109,-9.25f)),new Vector2(outer.x,outer.y+1.27f)};
         bool recording=false;int motionTick=0;string motionDirectory="motion";
         if(capture)Directory.CreateDirectory("artifacts/integrated-cave-review/motion");
         void Tick(){foreach(var mover in movers)mover.SendMessage("FixedUpdate");cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(.02f);course.SendMessage("Update");follow.Follow(.02f);scenery.SendMessage("LateUpdate");cave.AdvanceVisuals(.02f);
@@ -85,6 +87,7 @@ public static class IntegratedCaveReview
         var renderers=root.GetComponentsInChildren<Renderer>();var active=new bool[renderers.Length];
         for(int i=0;i<active.Length;i++)active[i]=renderers[i].enabled;
         if(capture)for(int i=0;i<samples.Length;i++) {
+            if(i==12||i==15)course.StartAscentPreview();
             cat.RespawnAt(samples[i]);if(i==11)cat.Motion.SetMove(-.1f);for(int t=0;t<120;t++)Tick();
             cat.GetComponentInChildren<MikaSpritePresentation>().RenderPose(.25f);follow.Snap();follow.Follow(.02f);
             Debug.Log("Cave view "+i+" cat="+cat.transform.localPosition+" grounded="+cat.Grounded+" camera="+view.transform.position+" guide="+follow.PassageHeightGuide(cat.transform.localPosition)+" mask="+view.cullingMask);

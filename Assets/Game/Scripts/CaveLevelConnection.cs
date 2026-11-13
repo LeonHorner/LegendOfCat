@@ -28,6 +28,7 @@ public sealed partial class CaveEntryStudy
     void RegisterMaterial(Material material)
     {
         if(material.HasProperty("_CaveOrigin")){material.SetVector("_CaveOrigin",transform.position);material.SetFloat("_CaveScale",transform.lossyScale.x);}
+        if(material.HasProperty("_TerrainStone"))material.SetTexture("_TerrainStone",Resources.Load<Texture2D>("GoldenRiver/Descent/terrain-stone-v1"));
     }
     static Vector2[] Below(Vector2[] source,float top)
     {
@@ -53,10 +54,12 @@ public sealed partial class CaveEntryStudy
         for(int i=0;i<points.Length;i++)points[i].y+=shift;
         var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/entry-study-material"));owned.Add(material);RegisterMaterial(material);
         material.mainTexture=Resources.Load<Texture2D>("GoldenRiver/Descent/"+texture);
+        if(texture=="shore-exit-floor-v1"||texture=="shore-exit-roof-v1")RegisterSharpShore(material,points,bounds);
         if(texture=="shore-right-v1")material.SetFloat("_RoofEndJoin",1);
         if(texture=="shore-exit-floor-v1"){material.SetFloat("_NativeFoundationJoin",1);material.SetTexture("_SecondTex",Resources.Load<Texture2D>("GoldenRiver/Descent/return-floor-a-v1"));}
         var paint=(Vector2[])points.Clone();
-        for(int i=0;i<points.Length;i++){int next=(i+1)%points.Length;if(points[next].x>points[i].x&&Mathf.Abs(points[next].y-points[i].y)<.001f){paint[i].y+=.12f;paint[next].y+=.12f;}}
+        float crown=material.GetFloat("_SharpTerrain")>.5f?.6f:.12f;
+        for(int i=0;i<points.Length;i++){int next=(i+1)%points.Length;if(points[next].x>points[i].x&&Mathf.Abs(points[next].y-points[i].y)<.001f){paint[i].y+=crown;paint[next].y+=crown;}}
         if(texture=="shore-exit-roof-v1")for(int i=14;i<paint.Length;i++)paint[i].y-=.7f;
         MeshObject(name,paint,bounds,-1.8f,material);Collider(name+" solid",points);
         var lip=Below(paint,-2.8f);
@@ -65,6 +68,23 @@ public sealed partial class CaveEntryStudy
         wet.SetFloat("_ShoreEdge",texture=="shore-left-v1"?-5.3f:texture=="shore-right-v1"?12:texture=="shore-exit-roof-v1"?185:246.8f);
         wet.SetFloat("_ShoreDirection",texture=="shore-left-v1"||texture=="shore-exit-roof-v1"?1:-1);
         if(lip.Length>=3)MeshObject(name+" permanent wet footing",lip,bounds,-3,wet);
+    }
+    void RegisterSharpShore(Material material,Vector2[] contour,Rect bounds)
+    {
+        var profile=new Texture2D(4096,1,TextureFormat.RGBAFloat,false,true){name="Native shore contact heights",filterMode=FilterMode.Point,wrapMode=TextureWrapMode.Clamp};owned.Add(profile);
+        for(int x=0;x<profile.width;x++) {
+            float position=bounds.x+(x+.5f)/profile.width*bounds.width,nearest=float.PositiveInfinity,height=0;
+            for(int i=0;i<contour.Length;i++) {
+                var a=contour[i];var b=contour[(i+1)%contour.Length];
+                if(b.x<=a.x||Mathf.Abs(a.y-b.y)>.001f)continue;
+                float distance=Mathf.Abs(position-Mathf.Clamp(position,a.x,b.x));
+                if(distance<nearest){nearest=distance;height=a.y;}
+            }
+            profile.SetPixel(x,0,new Color(height,0,0,1));
+        }
+        profile.Apply(false,true);material.SetFloat("_SharpTerrain",1);material.SetTexture("_ContactProfile",profile);
+        material.SetVector("_ContactRect",new Vector4(bounds.x,bounds.width,0,0));
+        material.SetTexture("_SharpCrown",Resources.Load<Texture2D>("GoldenRiver/bank-narrow-v3"));
     }
     void AddEmbeddedLand()
     {
@@ -104,10 +124,16 @@ public sealed partial class CaveEntryStudy
                     ReturnBank(new Vector3(end,Mathf.Min(p.y,next.y),gap),"Attached return footing "+i,true);
             }
         }
-        foreach(var p in CaveRoute.CatchFloors){if(p.z>3.1f)ReturnBank(p,"Recovery landing foundation",false);else AnchoredCatch(p);}
-        foreach(var span in new[]{new Vector2(84,100),new Vector2(103,105)}) {
-            var edge=BandMaterial(true,span.x,span.y,-13,-13);
-            MeshObject("Rescue tunnel bearing rock",Rectangle(new Rect(span.x,-13.2f,span.y-span.x,1.85f)),new Rect(span.x,-24.71f,36,26),-3,edge);
+        foreach(var p in CaveRoute.CatchFloors){if(p.z>3.1f)ReturnBank(p,"Recovery landing foundation",false);else if(p.x==76.5f)AnchoredCatch(p);}
+        AttachedStone("Connected recovery staircase",new[]{new Vector2(72,-11.9f),new Vector2(76,-11.9f),new Vector2(76,-13.3f),
+            new Vector2(80,-13.3f),new Vector2(80,-14.7f),new Vector2(84,-14.7f),new Vector2(84,-16.1f),
+            new Vector2(88,-16.1f),new Vector2(88,-31),new Vector2(72,-31)});
+        foreach(var span in new[]{new Vector2(84,100),new Vector2(103,106)}) {
+            var edge=new Material(Resources.Load<Material>("GoldenRiver/Descent/entry-study-material"));owned.Add(edge);RegisterMaterial(edge);edge.SetFloat("_StoneBody",1);
+            var rim=new List<Vector2>{new Vector2(span.x,-11.8f),new Vector2(span.x,-13.05f)};
+            for(float x=span.x+1;x<span.y;x+=1)rim.Add(new Vector2(x,-13.07f-.1f*Mathf.Sin(x*2.7f)));
+            rim.Add(new Vector2(span.y,-13.05f));rim.Add(new Vector2(span.y,-11.8f));
+            MeshObject("Rescue tunnel rock joint",rim.ToArray(),new Rect(span.x,-14,span.y-span.x,3),-3,edge);
         }
         for(float x=60;x<187;x+=18) {
             float right=Mathf.Min(x+18,187),leftHeight=CaveRoute.Ceiling(x),rightHeight=CaveRoute.Ceiling(right);
@@ -124,25 +150,29 @@ public sealed partial class CaveEntryStudy
     static readonly Vector2[] RearContour={new Vector2(11,-20),new Vector2(205.5f,-28),new Vector2(205.5f,-8),new Vector2(205.4f,-7.2f),new Vector2(204.8f,-6),new Vector2(205.1f,-5.2f),new Vector2(205.79f,-4.6f),new Vector2(183,-4.6f),new Vector2(166.7f,-6.2f),new Vector2(84,-6.2f),new Vector2(65,-4.5f),new Vector2(36,-5.1f),new Vector2(24,-5.5f),new Vector2(16,-5.4f),new Vector2(11,-4.8f)};
     void AnchoredCatch(Vector3 p)
     {
-        var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/entry-study-material"));owned.Add(material);RegisterMaterial(material);
-        material.mainTexture=Resources.Load<Texture2D>("GoldenRiver/Descent/anchored-ledge-v1");
-        var bounds=new Rect(p.x-.2f,p.y-3.2f,p.z+.4f,3.8f);
-        // The buttress is fixed in the rear rock plane; only its projecting lip occupies the playable plane.
-        var rear=bounds;rear.yMax=p.y-.5f;
-        var bearing=new Material(material);owned.Add(bearing);bearing.SetFloat("_Bearing",1);bearing.SetFloat("_BearingTop",p.y-.5f);
-        MeshObject("Attached recovery bearing",Rectangle(rear),bounds,1.7f,bearing);
-        var front=bounds;front.yMin=p.y-.5f;
-        MeshObject("Native recovery lip",Rectangle(front),bounds,-3,material);
-        var outline=new[]{new Vector2(p.x,p.y),new Vector2(p.x+p.z,p.y),new Vector2(p.x+p.z-.1f,p.y-.3f),
-            new Vector2(p.x+p.z-.35f,p.y-.5f),new Vector2(p.x+.35f,p.y-.5f),new Vector2(p.x+.1f,p.y-.3f)};
-        Collider("Attached recovery ledge",outline);
+        Vector2[] outline;
+        if(p.x==72)outline=new[]{new Vector2(71.8f,p.y),new Vector2(76,p.y),new Vector2(75.8f,p.y-.35f),new Vector2(74.9f,p.y-.5f),new Vector2(71.8f,p.y-.5f)};
+        else if(p.x==79)outline=new[]{new Vector2(79,p.y),new Vector2(82,p.y),new Vector2(82,-11.4f),new Vector2(84.2f,-11.4f),
+            new Vector2(84.2f,-12.1f),new Vector2(81,-12.1f),new Vector2(79,-10.1f)};
+        else outline=new[]{new Vector2(p.x,p.y),new Vector2(79.5f,p.y),new Vector2(79.5f,p.y-.5f),new Vector2(p.x+.2f,p.y-.35f)};
+        AttachedStone("Attached recovery ledge",outline);
+    }
+    void AttachedStone(string name,Vector2[] outline)
+    {
+        float left=float.PositiveInfinity,right=float.NegativeInfinity,bottom=float.PositiveInfinity,top=float.NegativeInfinity;
+        foreach(var p in outline){left=Mathf.Min(left,p.x);right=Mathf.Max(right,p.x);bottom=Mathf.Min(bottom,p.y);top=Mathf.Max(top,p.y);}
+        var bounds=Rect.MinMaxRect(left,bottom,right,top+.6f);
+        var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/entry-study-material"));owned.Add(material);RegisterMaterial(material);RegisterSharpShore(material,outline,bounds);
+        var paint=(Vector2[])outline.Clone();
+        for(int i=0;i<outline.Length;i++){int next=(i+1)%outline.Length;if(outline[next].x>outline[i].x&&Mathf.Abs(outline[next].y-outline[i].y)<.001f){paint[i].y+=.6f;paint[next].y+=.6f;}}
+        MeshObject(name,paint,bounds,-3,material);Collider(name+" solid",outline);
     }
     Material BandMaterial(bool roof,float left,float right,float first,float last)
     {
         var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/entry-study-material"));owned.Add(material);RegisterMaterial(material);
         material.mainTexture=Resources.Load<Texture2D>("GoldenRiver/Descent/"+(roof?"return-roof-v1":"return-floor-a-v1"));
         material.SetFloat("_Band",1);material.SetVector("_BandProfile",new Vector4(left,first,right,last));
-        material.SetVector("_BandRect",new Vector4(0,roof?-11.71f:-22.868f,36,26));
+        material.SetVector("_BandRect",new Vector4(0,(roof?-11.71f:-22.868f)/3,12,26f/3));
         if(!roof){material.SetTexture("_SecondTex",Resources.Load<Texture2D>("GoldenRiver/Descent/return-floor-b-v1"));material.SetFloat("_BandFloorBlend",1);}
         return material;
     }

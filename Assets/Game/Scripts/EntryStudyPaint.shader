@@ -17,6 +17,13 @@ Shader "LegendOfCat/EntryStudyPaint"
         _NativeFoundationJoin ("Shared bearing stone", Float) = 0
         _Bearing ("Rear wall bearing", Float) = 0
         _BearingTop ("Bearing shoulder", Float) = 0
+        _FloorJoin ("Fixed entrance floor overlap", Float) = 0
+        _DiscoveryJoin ("Shared exit foundation", Float) = 0
+        _TerrainStone ("Continuous fine stone", 2D) = "white" {}
+        _SharpTerrain ("Shared main-route terrain detail", Float) = 0
+        _SharpCrown ("Main-route grass", 2D) = "white" {}
+        _ContactProfile ("Native tread heights", 2D) = "black" {}
+        _ContactRect ("Native tread range", Vector) = (0,1,0,0)
         _WetFooting ("Irregular submerged contact", Float) = 0
         _WetShore ("Native lateral shore contact", Float) = 0
         _ShoreEdge ("Registered water boundary", Float) = 0
@@ -37,6 +44,13 @@ Shader "LegendOfCat/EntryStudyPaint"
             sampler2D _SecondTex;float _Band,_BandFloorBlend;float4 _BandProfile,_BandRect;
             float _StoneBody,_NativeFoundationJoin;
             float _Bearing,_BearingTop;
+            float _FloorJoin,_DiscoveryJoin;
+            float _SharpTerrain;sampler2D _TerrainStone,_SharpCrown,_ContactProfile;float4 _ContactRect;
+            fixed4 TerrainStone(float2 world) {
+                float2 uv=frac(world/float2(12,8));float2 w=sin(uv*3.14159265);w*=w;
+                return lerp(lerp(tex2D(_TerrainStone,frac(uv+.5)),tex2D(_TerrainStone,frac(uv+float2(0,.5))),w.x),
+                    lerp(tex2D(_TerrainStone,frac(uv+float2(.5,0))),tex2D(_TerrainStone,uv),w.x),w.y);
+            }
             float _WetFooting;
             float _WetShore,_ShoreEdge,_ShoreDirection;
             fixed4 WorldStone(sampler2D source,float2 world) {
@@ -54,8 +68,18 @@ Shader "LegendOfCat/EntryStudyPaint"
             }
             fixed4 frag(Output i) : SV_Target {
                 fixed4 c=tex2D(_MainTex,i.uv);
-                if(_StoneBody>.5){c=WorldStone(_MainTex,i.world);c.a=1;c.rgb*=float3(.79,.85,.91);}
-                if(_NativeFoundationJoin>.5)c.rgb=lerp(c.rgb,WorldStone(_SecondTex,i.world).rgb,
+                if(_SharpTerrain>.5) {
+                    float contact=tex2D(_ContactProfile,float2(saturate((i.world.x-_ContactRect.x)/_ContactRect.y),.5)).r;
+                    float u=frac(i.world.x/8.5),v=.66+(i.world.y-contact)*(.34/.6);
+                    float blend=sin(u*3.14159265);blend*=blend;
+                    fixed4 crown=lerp(tex2D(_SharpCrown,float2(frac(u+.5),v)),tex2D(_SharpCrown,float2(u,v)),blend);
+                    if(i.world.y>contact)c.a=crown.a;
+                    c.rgb=lerp(TerrainStone(i.world).rgb,crown.rgb,smoothstep(contact-.5,contact-.15,i.world.y));
+                    c.rgb=lerp(dot(c.rgb,float3(.2126,.7152,.0722)).xxx,c.rgb,.8)*float3(.95,.98,1.02);
+                }
+                if(_StoneBody>.5){c=TerrainStone(i.world);c.a=1;}
+                if(_DiscoveryJoin>.5)c.rgb=lerp(c.rgb,TerrainStone(i.world).rgb,smoothstep(65,72,i.world.x)*(1-smoothstep(-8,-7.1,i.world.y)));
+                if(_NativeFoundationJoin>.5)c.rgb=lerp(c.rgb,TerrainStone(i.world).rgb,
                     (1-smoothstep(187,193,i.world.x))*(1-smoothstep(-11.3,-9.6,i.world.y)));
                 if(_Band>.5) {
                     float contact=lerp(_BandProfile.y,_BandProfile.w,saturate((i.world.x-_BandProfile.x)/max(.001,_BandProfile.z-_BandProfile.x)));
@@ -67,12 +91,8 @@ Shader "LegendOfCat/EntryStudyPaint"
                         fixed4 second=lerp(tex2D(_SecondTex,float2(frac(u+.5),b)),tex2D(_SecondTex,float2(u,b)),weight);
                         c=lerp(c,second,.5+.5*sin(i.world.x*.043));
                         // Adjacent steps share the deep stone grain rather than restarting it at each tread.
-                        float cycle=frac(i.world.y/12),other=frac(cycle+.5);
-                        float verticalWeight=sin(cycle*3.14159265);verticalWeight*=verticalWeight;
-                        fixed4 firstBody=lerp(tex2D(_MainTex,float2(frac(u+.5),.12+.48*cycle)),tex2D(_MainTex,float2(u,.12+.48*cycle)),weight);
-                        fixed4 secondBody=lerp(tex2D(_MainTex,float2(frac(u+.5),.12+.48*other)),tex2D(_MainTex,float2(u,.12+.48*other)),weight);
-                        fixed4 body=lerp(secondBody,firstBody,verticalWeight);
-                        c=lerp(c,body,smoothstep(.5,1.7,contact-i.world.y));
+                        fixed4 body=TerrainStone(i.world);
+                        c=lerp(c,body,smoothstep(.2,.65,contact-i.world.y));
                     }
                 }
                 if(_ReturnDoor>.5&&i.world.x>66&&i.world.y< -4.2&&i.world.y> -13)clip(-1);
@@ -97,7 +117,9 @@ Shader "LegendOfCat/EntryStudyPaint"
 
                     float shade=1-smoothstep(-10,-1,i.world.y);
                     c.rgb*=lerp(float3(1,1,1),float3(.77,.81,.93),shade);
-                    if(_Bearing>.5){c.rgb*=float3(.72,.76,.84);c.a*=smoothstep(_BearingTop-2.5,_BearingTop-.3,i.world.y);}
+                    if(_Bearing>.5)c.rgb=lerp(TerrainStone(i.world).rgb*float3(.77,.81,.93),c.rgb,
+                        smoothstep(_BearingTop-2.5,_BearingTop-.3,i.world.y));
+                    if(_FloorJoin>.5)c.a*=1-smoothstep(30.5,35,i.world.x);
                 }
                 if(_WetFooting>.5) {
                     float bed=-4.45;

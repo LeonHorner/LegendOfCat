@@ -646,8 +646,8 @@ public class MenuMovementIntegrationTests
                 }
                 Assert.That(reached, Is.EqualTo(phaseSteps == 63), "The upper landing must require the lift's high phase.");
             }
-            // Entrance group 2 now uses the native cave ledges, covered by connected-cave traversal/reversal.
-            foreach (int group in new[] { 5, 7, 9, 10, 13 }) {
+            // Entrance group 2 and exit group 7 use native cave terrain, covered by connected traversal/reversal.
+            foreach (int group in new[] { 5, 9, 10, 13 }) {
                 mover.GetType().GetMethod("ResetPhase").Invoke(mover,null);
                 for (int tick = 0; tick < 187; tick++) { Call(mover,"FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); }
                 var shelf = ascent[group * 5 + 1];

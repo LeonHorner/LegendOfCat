@@ -1,5 +1,7 @@
 # Permanent shore review evidence — 2026-11-13
 
+**Superseded candidate.** Owner screenshots subsequently exposed an intrusive backdrop, clipped joins, floating support ends and enlarged terrain detail. See [terrain consistency corrections](../terrain-corrections.md) and its evidence for the replacement. The earlier visual-readiness statements below are historical and do not establish approval.
+
 This is the replacement for the rejected campaign integration in `../connected-evidence`. It is a review candidate, not owner approval. See [construction and remaining acceptance](../permanent-shores.md).
 
 ## Recordings

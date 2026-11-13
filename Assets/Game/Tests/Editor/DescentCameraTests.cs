@@ -24,6 +24,8 @@ public sealed class DescentCameraTests
         var follow=root.GetComponentInChildren(Runtime("CatCamera"));var camera=follow.GetComponent<Camera>();
         var scenery=root.GetComponentInChildren(Runtime("SceneryRenderer"));
         var route=Runtime("CaveRoute");float origin=(float)route.GetProperty("Origin").GetValue(null);
+        var fissure=root.GetComponentsInChildren<MeshRenderer>().Single(r=>r.name=="Sunlit recessed fissure wall");
+        Assert.That(fissure.bounds.max.y,Is.LessThan(-4.3f),"The cave backdrop must not cover the main route above the riverbed.");
         var renderers=root.GetComponentsInChildren<Renderer>();var enabled=renderers.Select(r=>r.enabled).ToArray();
         int mask=camera.cullingMask;var layers=renderers.Select(r=>r.gameObject.layer).ToArray();
         var mode=Physics2D.simulationMode;Physics2D.simulationMode=SimulationMode2D.Script;

@@ -1,5 +1,7 @@
 # Permanent cave shores
 
+Current follow-up: [terrain consistency corrections](terrain-corrections.md). The owner found defects in the first shore candidate; its original screenshots are historical, not accepted artwork. The correction bounds the backdrop, repairs joins/supports and restores terrain detail density.
+
 This replaces the rejected campaign integration recorded in `connected-cave-review.md`. The accepted isolated entrance remains the art reference; the former camera-depth/layer transition and rectangular overlaid banks are removed. PR #79 remains a draft for owner review.
 
 ## Landscape and collision

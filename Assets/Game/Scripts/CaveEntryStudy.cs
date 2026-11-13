@@ -110,8 +110,9 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
         if(name=="Sunlit recessed fissure wall")material.SetFloat("_Recessed",2);
         if(name=="Quiet return recess")material.SetFloat("_Recessed",3);
         if(Embedded&&name.ToLowerInvariant().Contains("roof")){maximumY=Mathf.Min(maximumY,-4.45f);z=-3;}
-        if(Embedded&&name=="Sunlit recessed fissure wall")z=1.8f;
-        if(Embedded&&name=="Discovery floor and return steps")z=-3;
+        if(Embedded&&name=="Sunlit recessed fissure wall"){z=1.8f;maximumY=Mathf.Min(maximumY,-4.45f);}
+        if(Embedded&&name=="Connected cave floor"){material.SetFloat("_FloorJoin",1);z=-3.05f;}
+        if(Embedded&&name=="Discovery floor and return steps"){z=-3;material.SetFloat("_DiscoveryJoin",1);}
         var visible=bounds;visible.yMax=Mathf.Min(visible.yMax,maximumY);
         MeshObject(name,Rectangle(visible),bounds,z,material);
     }
