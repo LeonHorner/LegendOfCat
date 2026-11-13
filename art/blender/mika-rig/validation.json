@@ -8,6 +8,7 @@
     "Mika_Rig|Mika_Rig|Fall",
     "Mika_Rig|Mika_Rig|Groom",
     "Mika_Rig|Mika_Rig|Idle",
+    "Mika_Rig|Mika_Rig|IdleRelaxed",
     "Mika_Rig|Mika_Rig|JumpReview",
     "Mika_Rig|Mika_Rig|Land",
     "Mika_Rig|Mika_Rig|Listen",
@@ -16,7 +17,8 @@
     "Mika_Rig|Mika_Rig|Stop",
     "Mika_Rig|Mika_Rig|Stretch",
     "Mika_Rig|Mika_Rig|TailTwitch",
-    "Mika_Rig|Mika_Rig|Takeoff"
+    "Mika_Rig|Mika_Rig|Takeoff",
+    "Mika_Rig|Mika_Rig|Walk"
   ],
   "native_motion_metrics": {
     "Idle": {
@@ -94,6 +96,18 @@
     },
     "JumpReview": {
       "max_ik_target_error_m": 0.0005711221845465769,
+      "support_sole_min_m": null,
+      "support_sole_max_m": null,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "Walk": {
+      "max_ik_target_error_m": 1.603224374368364e-05,
+      "support_sole_min_m": null,
+      "support_sole_max_m": null,
+      "max_stance_displacement_per_frame_m": null
+    },
+    "IdleRelaxed": {
+      "max_ik_target_error_m": 8.125586598116309e-06,
       "support_sole_min_m": null,
       "support_sole_max_m": null,
       "max_stance_displacement_per_frame_m": null

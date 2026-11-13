@@ -789,3 +789,13 @@ the walk and relaxed idle in Blender 5.2.3 LTS, with a tail sweep led by the bas
 and followed by the middle and tip. The user directed the whole-tail motion,
 requested the in-game model, and identified reversed facing in the first preview.
 The Unity presentation mirrors the imported rig to follow movement direction.
+
+## Mika original sprite palette — 2026-11-13
+
+The animated Mika model uses the original `mika-movement-candidate.png` from
+`Assets/Game/Art/Mika/` as its design reference. The user requested restoring
+the original cat's design and colors. Codex used Blender 5.2.3 LTS to remap the
+existing baked coat toward copper stripes and ivory markings, soften normal
+detail, and enlarge the head and ears slightly. The editable rig, texture
+and FBX derive from the previously documented CC0 cat mesh and material.
+No new external imagery or generative model was used.
