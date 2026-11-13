@@ -806,3 +806,9 @@ The existing near panorama is extended to 14332×1448 using an original generated
   The portrait now uses the near-frontal frame from Mika's existing painted
   water-recovery turn atlas. The frame preserves the source colors and is
   cropped and downsampled for the HUD.
+
+- **Front-facing Mika progress portrait**, 2026-11-13. Original layered
+  PhotoCraft illustration based on Mika's painted orange coat, tabby markings,
+  pale muzzle, and green eyes. The symmetric eye and nose placement establishes
+  a head-on view. Licensed under the repository license. No generation model
+  or external artwork was used.

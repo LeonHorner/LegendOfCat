@@ -43,6 +43,7 @@ public sealed class LevelProgressTests
             string path = id == "golden-river" ? $"Checkpoint waystone {i}/Engraved paw" : $"Safe checkpoint {i}";
             var world = root.Find(path)?.GetComponent<SpriteRenderer>();
             Assert.That(world, Is.Not.Null, $"{id} checkpoint {i} has no world artwork.");
+            Assert.That(Call(hud, "GetCheckpointState", i, 0).ToString(), Is.EqualTo("Unreached"), id);
             Assert.That(Call(hud, "CheckpointVisual", i), Is.SameAs(world),
                 $"{id} checkpoint {i} must use its world artwork in the HUD.");
         }
@@ -57,7 +58,9 @@ public sealed class LevelProgressTests
         var run = Read(course, "Run");
         if (checkpoints.Count > 0) {
             var spawn = checkpoints[0];
+            Call(hud, "MarkCheckpointReached", 1);
             Call(run, "TryActivateCheckpoint", 1, spawn, true);
+            Assert.That(Call(hud, "GetCheckpointState", 1, 1).ToString(), Is.EqualTo("Active"), id);
             Call(course, "RetryCheckpoint");
             float atCheckpoint = (float)Read(hud, "Fraction");
             Assert.That(atCheckpoint, Is.GreaterThan(0).And.LessThan(1), id);
@@ -65,11 +68,20 @@ public sealed class LevelProgressTests
             Call(hud, "UpdatePosition", spawn + Vector2.up * 2, false);
             Call(course, "RetryCheckpoint");
             Assert.That(Read(hud, "Fraction"), Is.EqualTo(atCheckpoint), id);
+            if (checkpoints.Count > 1) {
+                Assert.That(Call(hud, "GetCheckpointState", 2, 1).ToString(), Is.EqualTo("Unreached"), id);
+                Call(hud, "MarkCheckpointReached", 2);
+                Call(run, "TryActivateCheckpoint", 2, checkpoints[1], true);
+                Assert.That(Call(hud, "GetCheckpointState", 1, 2).ToString(), Is.EqualTo("Reached"), id);
+                Assert.That(Call(hud, "GetCheckpointState", 2, 2).ToString(), Is.EqualTo("Active"), id);
+            }
         }
         Call(course, "RestartRun");
         Assert.That(Read(hud, "Fraction"), Is.EqualTo(0f), id);
         Assert.That(Read(run, "Checkpoint"), Is.EqualTo(0), id);
         Assert.That(Call(hud, "CheckpointFraction", 0), Is.Null, id);
+        for (int i = 1; i <= checkpoints.Count; i++)
+            Assert.That(Call(hud, "GetCheckpointState", i, 0).ToString(), Is.EqualTo("Unreached"), id);
 
         Call(screen, "CloseCourse");
         UnityEngine.Object.DestroyImmediate(host);

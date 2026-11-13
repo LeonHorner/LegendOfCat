@@ -407,6 +407,7 @@ public sealed class MovementCourse : MonoBehaviour
             // Touching the stone activates it; the saved spawn remains fixed on safe ground.
             bool inside = LevelOne ? checkpointMarkers[i].Touches(catShape)
                 : Mathf.Abs(position.x - point.x) <= .7f && Mathf.Abs(position.y - point.y) <= .2f;
+            if (inside) Progress.MarkCheckpointReached(i + 1);
             if (inside &&
                 Run.TryActivateCheckpoint(i + 1, point, true) && LevelOne && i == 0)
             {
@@ -425,6 +426,7 @@ public sealed class MovementCourse : MonoBehaviour
     public void StartFinalePreview() {
         StartAscentPreview();
         Run.TryActivateCheckpoint(2, LevelOneCheckpointSpawns[1], true);
+        Progress.MarkCheckpointReached(2);
         ascentFinished=0; finaleStarted=Run.ElapsedSeconds; finaleFinished=-1;
         RespawnWithProgress(LevelOneCheckpointSpawns[1]);
     }
@@ -437,6 +439,7 @@ public sealed class MovementCourse : MonoBehaviour
     void StartPreviewAt(Vector2 spawn)
     {
         Run.TryActivateCheckpoint(1, spawn, true);
+        Progress.MarkCheckpointReached(1);
         IntroductionSeconds = 0;
         ascentStarted = Run.ElapsedSeconds;
         RespawnWithProgress(spawn, true);
