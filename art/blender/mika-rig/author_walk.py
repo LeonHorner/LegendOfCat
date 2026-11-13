@@ -58,12 +58,14 @@ def author_actions(rig, scene, sole_offsets):
             # the middle. Distal joints follow rather than supplying all motion.
             root_flex = .22 if walking else .28
             root_sweep = .16 if walking else .24
-            rotate('Tail.1', -1.12-pitch+root_flex*math.sin(phase-.7))
+            rotate('Tail.1', (-1.12 if walking else -1.42)-pitch+root_flex*math.sin(phase-.7))
             rotate('Tail.1', root_sweep*math.sin(phase-1.1), (0, 0, 1), add=True)
             for i, (bias, flex) in enumerate([
                 (-.12, .20), (-.08, .18), (-.18, .14), (-.20, .10)
             ], start=2):
                 lag = .7 + .65*(i-1)
+                if not walking:
+                    bias = (.18, .43, .41, .20)[i-2]
                 rotate(f'Tail.{i}', bias+flex*math.sin(phase-lag))
                 rotate(f'Tail.{i}', .055*math.sin(phase-lag-.4), (0, 0, 1), add=True)
             if not walking:

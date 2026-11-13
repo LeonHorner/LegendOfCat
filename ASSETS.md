@@ -808,3 +808,16 @@ larger head and taller ears. Existing face texture detail is blended into the
 new coat. The original artwork supplies a side view, so the far side and rear
 markings are interpreted on the existing CC0-derived mesh. The user requested
 closer matching of both shape and color on the existing model branch.
+
+The region-by-region study uses the original idle sprite for face and flank
+registration, separate front-shin and hind-thigh stripe directions, cream
+gradients and toe divisions, and pale tail rings with an orange tip. These are
+Blender 5.2.3 LTS edits of the same CC0-derived rig. The side-view source guides
+the visible markings, while the opposite side is interpreted. The eye and tail
+silhouette still require comparison in motion.
+
+The face refinement preserves the UV-painted iris and eyelid detail using
+the original mesh's eye socket coordinates. The forehead mask fades into the
+ear colors, and the cream whisker pads and shorter muzzle are shaped separately.
+Relaxed idle now bends the tail down from the rump and curls it back upward,
+following the idle sprite's silhouette.
