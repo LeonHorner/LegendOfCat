@@ -812,3 +812,11 @@ The existing near panorama is extended to 14332×1448 using an original generated
   pale muzzle, and green eyes. The symmetric eye and nose placement establishes
   a head-on view. Licensed under the repository license. No generation model
   or external artwork was used.
+
+- **Playable Mika reference portrait**, 2026-11-13. Generated with OpenAI
+  ImageGen (built-in image model, exact revision undisclosed), using the
+  playable apex sprite and revision 3 movement identity artwork as references.
+  The brief specified the playable cat's narrow face, tall pink ears,
+  olive eyes, irregular orange tabby markings and cream muzzle, with a
+  straight-on gaze. The selected output was cropped and downsampled for HUD
+  use. Distributed under the repository license.

@@ -11,7 +11,7 @@ Use a distinct painted fill and bind each checkpoint to its world renderer.
 The integration test discovers levels from the same registry.
 
 The mockups use archived gameplay captures to show the HUD at start, past a
-checkpoint, and after backtracking. The layered PhotoCraft source for Mika's front-facing portrait is included.
+checkpoint, and after backtracking. The earlier PhotoCraft portrait study is included. The runtime portrait uses the playable sprite references documented in ASSETS.md.
 The existing fill textures come from the original PhotoCraft concepts and
 their pigment pass. Run paint-progress.py from the repository root with the
 folder containing the original fill PNG exports to reproduce that pass.
