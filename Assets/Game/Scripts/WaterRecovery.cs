@@ -342,11 +342,12 @@ public sealed class WaterRecovery : MonoBehaviour
         shark.transform.SetPositionAndRotation(visualEntry + new Vector3(facing * x, y, 0) * scale,
             Quaternion.Euler(0, 0, facing * angle));
         int jaw = diving || travel < 0.54f ? 0 : travel < 0.72f ? 1 : 2;
-        // One launch stroke and a smaller tuck near the apex. The trunk holds
-        // its shape in flight and the tail returns to neutral before the bite.
+        // A single airborne arch follows the pitch-over. Bend around the jaw
+        // so the centerline retains its length and the catch stays registered.
         float kick = Mathf.Sin(Mathf.PI * Mathf.InverseLerp(0, 0.27f, travel));
-        float tuck = Mathf.Sin(Mathf.PI * Mathf.InverseLerp(0.36f, 0.75f, travel));
-        float tailAngle = diving ? 0 : (17f * kick - 8f * tuck) * Mathf.Deg2Rad;
+        float arch = diving ? 0 : Mathf.Sin(Mathf.PI * Mathf.InverseLerp(0.27f, 0.96f, travel));
+        float curvature = -28f * Mathf.Deg2Rad * arch / 3.1f;
+        float tailAngle = diving ? 0 : 17f * kick * Mathf.Deg2Rad;
         const float tailRoot = 0.38f;
         float hingeX = (tailRoot - 0.91f) * 3.1f;
         float cos = Mathf.Cos(tailAngle);
@@ -362,6 +363,13 @@ public sealed class WaterRecovery : MonoBehaviour
                 float offsetX = localX - hingeX;
                 float posedX = Mathf.Lerp(localX, hingeX + offsetX * cos - localY * sin, weight);
                 float posedY = Mathf.Lerp(localY, offsetX * sin + localY * cos, weight);
+                if (Mathf.Abs(curvature) > 0.0001f) {
+                    float turn = posedX * curvature;
+                    float sectionCos = Mathf.Cos(turn);
+                    float sectionSin = Mathf.Sin(turn);
+                    posedX = sectionSin / curvature - posedY * sectionSin;
+                    posedY = (1 - sectionCos) / curvature + posedY * sectionCos;
+                }
                 int i = row * (SharkColumns + 1) + col;
                 sharkVertices[i] = new Vector3(facing * posedX, posedY, 0);
                 sharkUVs[i] = new Vector2((jaw + Mathf.Lerp(0.001f, 0.999f, u)) / 3, v);

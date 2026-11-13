@@ -27,7 +27,7 @@ Transparent alpha sprite atlas of THREE sequential realistic water impact effect
 
 The [Smithsonian frame-by-frame breach](https://ocean.si.edu/ocean-life/sharks-rays/breaching-sequence)
 and [published breach observations](https://pmc.ncbi.nlm.nih.gov/articles/PMC6170759/)
-informed the steep exit and airborne momentum. The game uses one launch stroke
-and a smaller tail tuck near the apex. The front of the body holds its shape
-while the tail rotates at its base. The overhead catch remains a game-specific
-choreography choice.
+informed the steep exit and airborne momentum. A single tail stroke drives the
+launch. As the shark pitches over, its centerline eases into a shallow arch,
+then straightens before the bite. The bend follows a circular arc anchored at
+the jaws. The overhead catch remains a game-specific choreography choice.
