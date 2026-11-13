@@ -336,23 +336,34 @@ public sealed class WaterRecovery : MonoBehaviour
         float x = diving ? Mathf.Lerp(0.30f, 0.94f, travel) : Mathf.Lerp(-1.55f, 0.30f, travel);
         float y = diving ? Mathf.Lerp(0.29f, -1.4f, travel)
             : Mathf.Lerp(-0.12f, 0.29f, travel) + 10.8f * travel * (1 - travel);
-        float angle = diving ? -72f : Mathf.Lerp(68f, -72f, Mathf.SmoothStep(0, 1, travel));
+        // Carry the steep launch into the air before pitching over into the catch.
+        float pitch = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(0.25f, 0.86f, travel));
+        float angle = diving ? -72f : Mathf.Lerp(74f, -72f, pitch);
         shark.transform.SetPositionAndRotation(visualEntry + new Vector3(facing * x, y, 0) * scale,
             Quaternion.Euler(0, 0, facing * angle));
         int jaw = diving || travel < 0.54f ? 0 : travel < 0.72f ? 1 : 2;
-        float stroke = Elapsed - SharkLaunchTime;
-        float strength = diving ? 0.50f : 0.30f + 0.32f * Mathf.Sin(travel * Mathf.PI);
+        // One launch stroke and a smaller tuck near the apex. The trunk holds
+        // its shape in flight and the tail returns to neutral before the bite.
+        float kick = Mathf.Sin(Mathf.PI * Mathf.InverseLerp(0, 0.27f, travel));
+        float tuck = Mathf.Sin(Mathf.PI * Mathf.InverseLerp(0.36f, 0.75f, travel));
+        float tailAngle = diving ? 0 : (17f * kick - 8f * tuck) * Mathf.Deg2Rad;
+        const float tailRoot = 0.38f;
+        float hingeX = (tailRoot - 0.91f) * 3.1f;
+        float cos = Mathf.Cos(tailAngle);
+        float sin = Mathf.Sin(tailAngle);
+
         for (int row = 0; row <= SharkRows; row++) {
             float v = row / (float)SharkRows;
             for (int col = 0; col <= SharkColumns; col++) {
                 float u = col / (float)SharkColumns;
-                float tail = 1 - u;
-                // Pin the jaws and carry each beat down the spine into a wider tail sweep.
-                float bend = tail * tail * strength * Mathf.Sin(stroke * 17f - tail * 4.1f);
-                float sweep = tail * tail * 0.16f * Mathf.Sin(stroke * 17f - tail * 4.1f - 1.57f);
+                float localX = (u - 0.91f) * 3.1f;
+                float localY = (v - 0.43f) * sharkHeight;
+                float weight = 1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(0.19f, tailRoot, u));
+                float offsetX = localX - hingeX;
+                float posedX = Mathf.Lerp(localX, hingeX + offsetX * cos - localY * sin, weight);
+                float posedY = Mathf.Lerp(localY, offsetX * sin + localY * cos, weight);
                 int i = row * (SharkColumns + 1) + col;
-                sharkVertices[i] = new Vector3(facing * ((u - 0.91f) * 3.1f + sweep),
-                    (v - 0.43f) * sharkHeight + bend, 0);
+                sharkVertices[i] = new Vector3(facing * posedX, posedY, 0);
                 sharkUVs[i] = new Vector2((jaw + Mathf.Lerp(0.001f, 0.999f, u)) / 3, v);
             }
         }

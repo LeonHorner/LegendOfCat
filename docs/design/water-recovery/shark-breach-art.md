@@ -22,3 +22,12 @@ to `Assets/Game/Resources/WaterRecovery/shark-splash-frames.png`.
 Unity blends the three stages and adds velocity-aligned ballistic spray.
 
 Transparent alpha sprite atlas of THREE sequential realistic water impact effects, exactly THREE equally sized columns across a wide 3:1 canvas. Each effect independently centered on the SAME ground baseline, full silhouette contained in its cell with ample transparent padding, no overlap. Hand-painted naturalistic white foam and blue-green translucent water suitable for a richly painted 2D river game. First cell: a tight rising explosive crown splash with thin curved water sheets, irregular torn edges and many small droplets, broad low horizontal splash base. Second cell: a wider collapsing crown, broken bright white foam, curling translucent sheets breaking into droplets, a little airy spray. Third cell: low wide broken foam streaks and thin receding concentric ripples, horizontally foreshortened and seen from slightly above, soft transparent edges. Color ivory white, pale cool cyan, desaturated blue green, no saturated blue. NO pool, no ocean backdrop or horizon, no solid ribbon shapes, no borders or lettering. Actual transparent background, isolated water FX only. Make fine structures and highlights readable at game size.
+
+### Breach motion reference
+
+The [Smithsonian frame-by-frame breach](https://ocean.si.edu/ocean-life/sharks-rays/breaching-sequence)
+and [published breach observations](https://pmc.ncbi.nlm.nih.gov/articles/PMC6170759/)
+informed the steep exit and airborne momentum. The game uses one launch stroke
+and a smaller tail tuck near the apex. The front of the body holds its shape
+while the tail rotates at its base. The overhead catch remains a game-specific
+choreography choice.
