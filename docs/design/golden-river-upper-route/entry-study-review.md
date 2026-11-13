@@ -32,3 +32,9 @@ This study deliberately suspends the full-route duration and exit-position accep
 - No Linux player/launcher, package or merge-ready validation is claimed for this draft iteration. No merge or publication is authorized.
 
 Generated asset provenance and complete prompts are in `entry-study-assets.json`, `entry-study-refinement-assets.json` and `entry-study-left-refinement.json`; original reference ownership is unchanged. Active terrain uses left-v2, right-v2, floor-v1, rear-v1 and valley-v1. Rejected first bank variants were moved out of Resources with Unity's AssetDatabase, preserving metadata.
+
+## Contact correction after player review
+
+The first review exposed a small vertical gap on the upper bank and an invisible extension of approximately 0.7 units at the lower floor's painted right edge. The initial geometry stencils were not a sufficient substitute for registering the final painted contours.
+
+The upper left contact is lowered by 0.045 units. Cliff exits and both sides of the lower crack follow the final opaque stone contours, with a small inward exit allowance for contact skin. The player's box collider, motor, gravity, jump and coyote time are unchanged. New checks read the actual painted floor boundary independently from the collision definition, measure visible upper paw contact and assert downward motion within two physics ticks after the visible rear paw passes each reported edge. The extended focused Unity test passed; player evaluation remains pending.

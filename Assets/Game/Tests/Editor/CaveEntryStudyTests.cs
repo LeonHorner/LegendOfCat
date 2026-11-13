@@ -27,6 +27,7 @@ public sealed class CaveEntryStudyTests
             var renderers=root.GetComponentsInChildren<Renderer>();
             var visible=renderers.Select(r=>r.enabled).ToArray();
             Runtime("CaveEntryStudyReview").GetMethod("VerifyMovement").Invoke(null,new object[]{study,scene});
+            Runtime("CaveEntryStudyReview").GetMethod("VerifyPaintContact").Invoke(null,new object[]{study,scene});
             Assert.That(root.GetComponentsInChildren<Renderer>().Select(r=>r.GetInstanceID()),Is.EqualTo(renderers.Select(r=>r.GetInstanceID())));
             Assert.That(renderers.Select(r=>r.enabled),Is.EqualTo(visible),"Traversal must not toggle scenery visibility.");
         } finally {UnityEngine.Object.Destroy(root);}

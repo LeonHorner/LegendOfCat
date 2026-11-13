@@ -33,6 +33,7 @@ public static class CaveEntryStudyReview
         var body=cat.GetComponent<Rigidbody2D>();body.interpolation=RigidbodyInterpolation2D.None;
         var fixedUpdate=typeof(CatController).GetMethod("FixedUpdate",BindingFlags.Instance|BindingFlags.NonPublic);
         var present=cat.GetComponentInChildren<MikaSpritePresentation>();
+        VerifyPaintContact(study,scene);
         var poses=new[]{new Vector2(2.6f,.52f),new Vector2(5,-1.08f),new Vector2(7,-4.28f),new Vector2(12,-9.48f),new Vector2(23,-9.48f)};
         for(int i=0;i<poses.Length;i++) {
             cat.RespawnAt(poses[i]);
@@ -88,5 +89,73 @@ public static class CaveEntryStudyReview
         Require(!CaveEntryStudy.CrossesRiver(new Vector2(6,-2),new Vector2(6,-4)),"The dry entrance triggered river recovery.");
         Directory.CreateDirectory("artifacts/entry-study-review");
         File.WriteAllText("artifacts/entry-study-review/physics.txt","Passed: main jump; all descending ledges; cave gap; reverse climb to entry; deep-fall reset; pause; spatial water crossing; main path outside lower camera frame.\nScripted physics review, not a human playthrough.\n");
+    }
+
+    public static void VerifyPaintContact(CaveEntryStudy study,Scene scene)
+    {
+        var cat=study.Cat;var body=cat.GetComponent<Rigidbody2D>();
+        var presentation=cat.GetComponentInChildren<MikaSpritePresentation>();
+        var sprite=cat.GetComponentInChildren<SpriteRenderer>();
+        void Tick(){cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(.02f);}
+        void Place(Vector2 p){cat.RespawnAt(p);for(int i=0;i<25;i++)Tick();presentation.RenderPose(.25f);presentation.RenderPose(.25f);}
+        var painting=new Texture2D(2,2,TextureFormat.RGBA32,false);
+        try {
+            painting.LoadImage(File.ReadAllBytes("Assets/Game/Resources/GoldenRiver/Descent/entry-study-left-v2.png"));
+            Place(new Vector2(2.6f,.52f));
+            if(!cat.Grounded)throw new System.InvalidOperationException("Mika is not standing on the upper bank.");
+            var frame=sprite.sprite;float lowest=float.PositiveInfinity;
+            for(int y=0;y<frame.rect.height && float.IsPositiveInfinity(lowest);y++)
+                for(int x=0;x<frame.rect.width;x++) if(frame.texture.GetPixel((int)frame.rect.x+x,(int)frame.rect.y+y).a>.95f) {
+                    var paw=sprite.transform.TransformPoint(new Vector3((x+.5f-frame.pivot.x)/frame.pixelsPerUnit,(y+.5f-frame.pivot.y)/frame.pixelsPerUnit));
+                    for(float gap=0;gap<.16f;gap+=.005f) {
+                        float u=(paw.x+14)/27,v=(paw.y-gap+11)/18;
+                        if(painting.GetPixelBilinear(u,v).a>.95f){lowest=Mathf.Min(lowest,gap);break;}
+                    }
+                }
+            if(lowest>.03f)throw new System.InvalidOperationException("Upper bank visible paw-to-paint gap: "+lowest);
+            // Sample the painted floor independently of its authored collider/stencil coordinates.
+            painting.LoadImage(File.ReadAllBytes("Assets/Game/Resources/GoldenRiver/Descent/entry-study-floor-v1.png"));
+            float paintedEdge=-1;
+            for(int x=0;x<painting.width/2+100;x++) {
+                float world=-1+(x+.5f)/painting.width*36;
+                if(world>19)break;
+                if(painting.GetPixel(x,Mathf.RoundToInt((-10.1f+19.93f)/12*painting.height)).a>.95f)paintedEdge=world;
+            }
+            foreach(float edge in new[]{3.84f,paintedEdge}) {
+                float top=edge<10?-.045f:-10;
+                // The idle rear paw lies 0.373 units behind the body centre. Once all drawn
+                // feet have left the painted stone, a wider invisible shelf must not hold Mika.
+                Place(new Vector2(edge-.7f,top+.52f));
+                cat.RespawnAt(new Vector2(edge+.42f,top+.46f));
+                Tick();Tick();
+                if(cat.Grounded || body.linearVelocity.y>=-.1f)
+                    throw new System.InvalidOperationException("Invisible support beyond painted edge "+edge+" at "+body.position);
+                if(System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"-entryContactFrames")>=0) {
+                    Place(new Vector2(edge-.9f,top+.52f));cat.Motion.SetMove(1);
+                    string prefix=edge<10?"upper":"lower";
+                    for(int tick=0;tick<24;tick++) {
+                        Tick();presentation.RenderPose(.02f);study.Follow.Follow(.02f);
+                        if(tick%3==0)SaveContactFrame(study,"artifacts/entry-study-review/"+prefix+"-walkoff-"+tick+".png");
+                    }
+                }
+            }
+            Directory.CreateDirectory("artifacts/entry-study-review");
+            File.WriteAllText("artifacts/entry-study-review/contact.txt","Upper standing paw gap <= 0.03 world units; upper and lower painted exits release Mika within two physics ticks after the last visible idle paw passes the rock. Player collider and motor unchanged.\n");
+        } finally {Object.DestroyImmediate(painting);}
+    }
+
+    static void SaveContactFrame(CaveEntryStudy study,string path)
+    {
+        var target=new RenderTexture(960,540,24);target.Create();
+        var previous=RenderTexture.active;var previousTarget=study.View.targetTexture;
+        var image=new Texture2D(960,540,TextureFormat.RGB24,false);
+        try {
+            study.View.targetTexture=target;study.View.Render();RenderTexture.active=target;
+            image.ReadPixels(new Rect(0,0,960,540),0,0);image.Apply();
+            File.WriteAllBytes(path,image.EncodeToPNG());
+        } finally {
+            RenderTexture.active=previous;study.View.targetTexture=previousTarget;
+            Object.DestroyImmediate(image);target.Release();Object.DestroyImmediate(target);
+        }
     }
 }
