@@ -15,7 +15,9 @@
     "Fall": 12,
     "Land": 12,
     "Stop": 16,
-    "JumpReview": 48
+    "JumpReview": 48,
+    "Walk": 28,
+    "IdleRelaxed": 96
   },
   "pole_angles": {
     "Front.L": 3.1415927410125732,
@@ -42,6 +44,17 @@
       "Front.R": 0.52
     },
     "revision": 4,
+    "visual_acceptance": false
+  },
+  "walk": {
+    "stride_m": 0.2,
+    "stance_fraction": 0.65,
+    "contacts": {
+      "Hind.L": 0,
+      "Front.L": 0.25,
+      "Hind.R": 0.5,
+      "Front.R": 0.75
+    },
     "visual_acceptance": false
   }
 }
