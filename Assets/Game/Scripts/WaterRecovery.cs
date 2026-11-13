@@ -30,8 +30,14 @@ public sealed class WaterRecovery : MonoBehaviour
     System.Action retry;
     MikaSpritePresentation original;
     SpriteRenderer originalRenderer, reaction, impactBody;
-    Sprite[] drawings, sharkDrawings;
-    SpriteRenderer shark;
+    Sprite[] drawings, splashFrames;
+    SpriteRenderer splashFront, splashBack;
+    MeshRenderer shark;
+    Mesh sharkMesh;
+    Vector3[] sharkVertices;
+    Vector2[] sharkUVs;
+    float sharkHeight;
+    const int SharkColumns = 28, SharkRows = 6;
     bool sharkEncounter;
     Material submerge, foamMaterial;
     GameObject effects;
@@ -107,23 +113,67 @@ public sealed class WaterRecovery : MonoBehaviour
             impactBody.transform.SetParent(effects.transform, false);
             impactBody.sharedMaterial = submerge; impactBody.sortingOrder = 4;
         }
-        var sharkTexture = Resources.Load<Texture2D>("WaterRecovery/shark-breach-frames");
-        if (sharkTexture) {
-            shark = new GameObject("Shark").AddComponent<SpriteRenderer>();
-            shark.transform.SetParent(effects.transform, false);
-            shark.sharedMaterial = submerge;
-            shark.sortingOrder = 5;
-            sharkDrawings = new Sprite[3];
-            float cell = sharkTexture.width / 3f;
-            for (int i = 0; i < sharkDrawings.Length; i++)
-                sharkDrawings[i] = Sprite.Create(sharkTexture, new Rect(i * cell, 0, cell, sharkTexture.height),
-                    new Vector2(0.91f, 0.43f), cell / 3.1f);
+        PrepareShark();
+        var splashTexture = Resources.Load<Texture2D>("WaterRecovery/shark-splash-frames");
+        if (splashTexture) {
+            splashFrames = new Sprite[3];
+            float widthPerFrame = splashTexture.width / 3f;
+            for (int i = 0; i < splashFrames.Length; i++)
+                splashFrames[i] = Sprite.Create(splashTexture,
+                    new Rect(i * widthPerFrame, 0, widthPerFrame, splashTexture.height),
+                    new Vector2(0.5f, 0.15f), widthPerFrame / 3f, 0, SpriteMeshType.FullRect);
+            splashBack = new GameObject("Shark splash underlay").AddComponent<SpriteRenderer>();
+            splashBack.transform.SetParent(effects.transform, false);
+            splashBack.sortingOrder = 6;
+            splashFront = new GameObject("Shark splash overlay").AddComponent<SpriteRenderer>();
+            splashFront.transform.SetParent(effects.transform, false);
+            splashFront.sortingOrder = 7;
         }
         foamMaterial = new Material(Shader.Find("Sprites/Default"));
         for (int i = 0; i < rings.Length; i++) rings[i] = Line("Expanding surface ripple", 49, true);
         for (int i = 0; i < droplets.Length; i++) droplets[i] = Line("Splash droplet", 2, false);
         splash = Line("Breaking shoulder splash", 33, false);
         neckFoam = Line("Water washing over neck", 25, false);
+    }
+
+    void PrepareShark()
+    {
+        var texture = Resources.Load<Texture2D>("WaterRecovery/shark-breach-frames");
+        if (!texture) return;
+
+        shark = new GameObject("Shark").AddComponent<MeshRenderer>();
+        shark.transform.SetParent(effects.transform, false);
+        shark.sharedMaterial = submerge;
+        shark.sortingOrder = 5;
+        var properties = new MaterialPropertyBlock();
+        properties.SetTexture("_MainTex", texture);
+        shark.SetPropertyBlock(properties);
+
+        sharkHeight = 3.1f * texture.height / (texture.width / 3f);
+        sharkMesh = new Mesh { name = "Shark body grid" };
+        sharkMesh.MarkDynamic();
+        int stride = SharkColumns + 1;
+        sharkVertices = new Vector3[stride * (SharkRows + 1)];
+        sharkUVs = new Vector2[sharkVertices.Length];
+        var colors = new Color32[sharkVertices.Length];
+        for (int i = 0; i < colors.Length; i++) colors[i] = new Color32(255, 255, 255, 255);
+        var triangles = new int[SharkColumns * SharkRows * 6];
+        int index = 0;
+        for (int row = 0; row < SharkRows; row++) {
+            for (int col = 0; col < SharkColumns; col++) {
+                int corner = row * stride + col;
+                triangles[index++] = corner;
+                triangles[index++] = corner + stride;
+                triangles[index++] = corner + 1;
+                triangles[index++] = corner + 1;
+                triangles[index++] = corner + stride;
+                triangles[index++] = corner + stride + 1;
+            }
+        }
+        sharkMesh.vertices = sharkVertices;
+        sharkMesh.colors32 = colors;
+        sharkMesh.triangles = triangles;
+        shark.gameObject.AddComponent<MeshFilter>().sharedMesh = sharkMesh;
     }
 
     LineRenderer Line(string name, int points, bool loop)
@@ -208,24 +258,24 @@ public sealed class WaterRecovery : MonoBehaviour
         bool impact = Elapsed >= SharkBiteTime;
         float splashTime = sharkSplash ? Elapsed - (impact ? SharkBiteTime : SharkLaunchTime) : Elapsed;
         Vector3 splashOrigin = visualEntry + Vector3.right * (sharkSplash ? facing * (impact ? 0.30f : -1.55f) * scale : 0);
-        float splashSize = sharkSplash ? (impact ? 3.3f : 2.7f) : 1f;
         float crestTime = sharkSplash ? 0.65f : 0.4f;
         float breakAmount = Mathf.Sin(Mathf.Clamp01(splashTime / crestTime) * Mathf.PI);
-        splash.enabled = splashTime < crestTime;
-        splash.startWidth = splash.endWidth = (0.035f + breakAmount * 0.11f * splashSize) * scale;
+        PresentSharkSplash(sharkSplash, impact, splashTime, splashOrigin);
+        splash.enabled = !sharkSplash && splashTime < crestTime;
+        splash.startWidth = splash.endWidth = (0.035f + breakAmount * 0.11f) * scale;
         splash.startColor = splash.endColor = new Color(0.8f, 0.94f, 0.91f, 1 - Mathf.Clamp01(splashTime / crestTime));
         for (int p = 0; p < 33; p++) {
-            float x = (p / 32f - 0.5f) * (0.9f + splashTime * 1.2f) * splashSize;
+            float x = (p / 32f - 0.5f) * (0.9f + splashTime * 1.2f);
             float envelope = Mathf.Sin(p / 32f * Mathf.PI);
-            float wave = sharkSplash ? 0.5f + 0.5f * Mathf.Sin(p * 0.53f + splashTime * 7)
-                : Mathf.Abs(Mathf.Sin(p * 1.7f));
+            float wave = Mathf.Abs(Mathf.Sin(p * 1.7f));
             float crest = envelope * (0.10f + wave * 0.22f) * breakAmount;
-            splash.SetPosition(p, splashOrigin + new Vector3(x, crest * splashSize, -0.12f) * scale);
+            splash.SetPosition(p, splashOrigin + new Vector3(x, crest, -0.12f) * scale);
         }
         float rippleTime = sharkSplash ? splashTime : Elapsed;
         float alpha = 1 - Mathf.Clamp01(rippleTime / (sharkSplash ? 0.85f : 1.75f));
         for (int r = 0; r < rings.Length; r++) {
             float radius = (0.25f + rippleTime * (0.7f + r * 0.25f)) * scale * (sharkSplash ? 2.2f : 1f);
+            rings[r].enabled = !sharkSplash;
             rings[r].startWidth = rings[r].endWidth = 0.022f * scale;
             rings[r].startColor = rings[r].endColor = new Color(0.82f, 0.93f, 0.88f, alpha * 0.8f);
             for (int p = 0; p < 49; p++) {
@@ -242,11 +292,36 @@ public sealed class WaterRecovery : MonoBehaviour
             var position = splashOrigin + new Vector3(vx * t, vy * t - 6 * t * t, -0.1f) * scale;
             droplets[i].enabled = i < count && splashTime < (sharkSplash ? 0.85f : 0.65f)
                 && position.y >= visualEntry.y;
-            droplets[i].startWidth = 0.035f * scale; droplets[i].endWidth = 0.012f * scale;
+            float dropWidth = sharkSplash ? 0.014f + (i % 5) * 0.005f : 0.035f;
+            droplets[i].startWidth = dropWidth * scale;
+            droplets[i].endWidth = dropWidth * 0.25f * scale;
             droplets[i].startColor = droplets[i].endColor = new Color(0.8f, 0.93f, 0.9f, 1 - t);
             droplets[i].SetPosition(0, position);
-            droplets[i].SetPosition(1, position + Vector3.up * 0.065f * scale);
+            var streak = sharkSplash ? new Vector3(vx, vy - 12 * t, 0) * 0.018f : Vector3.up * 0.065f;
+            droplets[i].SetPosition(1, position + streak * scale);
         }
+    }
+
+    void PresentSharkSplash(bool active, bool impact, float age, Vector3 origin)
+    {
+        if (!splashFront) return;
+        splashFront.enabled = splashBack.enabled = active && age < 0.88f;
+        if (!splashFront.enabled) return;
+
+        float frame = Mathf.Lerp(0, 2, Mathf.InverseLerp(0.06f, 0.62f, age));
+        int first = Mathf.FloorToInt(frame);
+        float blend = frame - first;
+        float opacity = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(0, 0.07f, age))
+            * (1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(0.53f, 0.88f, age)));
+        float width = Mathf.Lerp(0.48f, impact ? 1.46f : 1.20f, Mathf.InverseLerp(0, 0.68f, age));
+        float height = Mathf.Lerp(0.48f, impact ? 1.12f : 0.98f, Mathf.InverseLerp(0, 0.12f, age));
+        height *= Mathf.Lerp(1f, 0.52f, Mathf.InverseLerp(0.2f, 0.7f, age));
+        splashBack.sprite = splashFrames[first];
+        splashFront.sprite = splashFrames[Mathf.Min(first + 1, 2)];
+        splashBack.color = new Color(1, 1, 1, opacity * (1 - blend));
+        splashFront.color = new Color(1, 1, 1, opacity * blend);
+        splashBack.transform.position = splashFront.transform.position = origin;
+        splashBack.transform.localScale = splashFront.transform.localScale = new Vector3(width, height, 1);
     }
 
     void PresentShark(Vector3 visualEntry)
@@ -264,8 +339,26 @@ public sealed class WaterRecovery : MonoBehaviour
         float angle = diving ? -72f : Mathf.Lerp(68f, -72f, Mathf.SmoothStep(0, 1, travel));
         shark.transform.SetPositionAndRotation(visualEntry + new Vector3(facing * x, y, 0) * scale,
             Quaternion.Euler(0, 0, facing * angle));
-        shark.flipX = facing < 0;
-        shark.sprite = sharkDrawings[diving || travel < 0.54f ? 0 : travel < 0.72f ? 1 : 2];
+        int jaw = diving || travel < 0.54f ? 0 : travel < 0.72f ? 1 : 2;
+        float stroke = Elapsed - SharkLaunchTime;
+        float strength = diving ? 0.50f : 0.30f + 0.32f * Mathf.Sin(travel * Mathf.PI);
+        for (int row = 0; row <= SharkRows; row++) {
+            float v = row / (float)SharkRows;
+            for (int col = 0; col <= SharkColumns; col++) {
+                float u = col / (float)SharkColumns;
+                float tail = 1 - u;
+                // Pin the jaws and carry each beat down the spine into a wider tail sweep.
+                float bend = tail * tail * strength * Mathf.Sin(stroke * 17f - tail * 4.1f);
+                float sweep = tail * tail * 0.16f * Mathf.Sin(stroke * 17f - tail * 4.1f - 1.57f);
+                int i = row * (SharkColumns + 1) + col;
+                sharkVertices[i] = new Vector3(facing * ((u - 0.91f) * 3.1f + sweep),
+                    (v - 0.43f) * sharkHeight + bend, 0);
+                sharkUVs[i] = new Vector2((jaw + Mathf.Lerp(0.001f, 0.999f, u)) / 3, v);
+            }
+        }
+        sharkMesh.vertices = sharkVertices;
+        sharkMesh.uv = sharkUVs;
+        sharkMesh.RecalculateBounds();
     }
 
     void OnRespawn() { if (!internalRespawn) Cancel(); }
@@ -304,7 +397,8 @@ public sealed class WaterRecovery : MonoBehaviour
         if (cat) cat.ReturnedToStart -= OnRespawn;
         if (effects) Destroy(effects);
         if (drawings != null) foreach (var drawing in drawings) if (drawing) Destroy(drawing);
-        if (sharkDrawings != null) foreach (var drawing in sharkDrawings) Destroy(drawing);
+        if (splashFrames != null) foreach (var frame in splashFrames) if (frame) Destroy(frame);
+        if (sharkMesh) Destroy(sharkMesh);
         if (submerge) Destroy(submerge);
         if (foamMaterial) Destroy(foamMaterial);
     }

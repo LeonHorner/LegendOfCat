@@ -47,7 +47,7 @@ public class WaterRecoveryTests
         // Let runtime destruction release its generated meshes/materials in normal Play;
         // EditMode tests explicitly release transient objects after cancellation.
         Call(recovery, "Cancel");
-        foreach (string field in new[] { "effects", "submerge", "foamMaterial", "drawings", "sharkDrawings" }) {
+        foreach (string field in new[] { "effects", "submerge", "foamMaterial", "drawings", "sharkMesh", "splashFrames" }) {
             var info = recovery.GetType().GetField(field, BindingFlags.NonPublic | BindingFlags.Instance);
             var value = info.GetValue(recovery);
             if (value is Sprite[] sprites) foreach (var sprite in sprites) UnityEngine.Object.DestroyImmediate(sprite);
@@ -112,7 +112,7 @@ public class WaterRecoveryTests
     {
         Position(-3.1f);
         Assert.That((bool)Call(recovery, "TryEnter"), Is.True);
-        var effects = root.GetComponentsInChildren<SpriteRenderer>();
+        var effects = root.GetComponentsInChildren<Renderer>();
         var shark = effects.Single(renderer => renderer.name == "Shark");
         var head = effects.Single(renderer => renderer.name == "Mika facial reaction");
         Call(recovery, "Advance", 1.33f); Call(recovery, "LateUpdate");

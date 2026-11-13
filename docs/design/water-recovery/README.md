@@ -132,3 +132,7 @@ Each water entry rolls once for a 1-in-100 chance of the shark sequence. The tem
 The revised shark sequence takes 3.4 seconds. The camera widens for the high
 breach, the shark pitches down to catch Mika, and larger splashes and ripples
 mark both water contacts. [Artwork and generation prompt](shark-breach-art.md)
+
+The breach uses a continuous body bend and a wider tail sweep, with the jaw
+registered to the catch. Painted water sheets blend through crest, collapse
+and receding foam at each contact, with separate ballistic droplets.

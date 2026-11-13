@@ -11,6 +11,7 @@ public static class WaterRecoveryPreview
     {
         PrepareTexture("Assets/Game/Resources/WaterRecovery/turn-reactions.png");
         PrepareTexture("Assets/Game/Resources/WaterRecovery/shark-breach-frames.png");
+        PrepareTexture("Assets/Game/Resources/WaterRecovery/shark-splash-frames.png");
     }
 
     static void PrepareTexture(string path)

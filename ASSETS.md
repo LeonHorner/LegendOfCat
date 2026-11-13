@@ -768,3 +768,9 @@ The existing near panorama is extended to 14332×1448 using an original generated
 - Runtime atlas: `Assets/Game/Resources/WaterRecovery/shark-breach-frames.png`.
 - Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP cropped and exported the registered transparent atlas. The earlier PhotoCraft drawing remains archived in Git history.
 - Human direction: realistic great white anatomy and muted shading, high breach, downward catch and larger water impacts. Repository asset terms apply. See [artwork and prompt](docs/design/water-recovery/shark-breach-art.md).
+
+## Golden River shark splash â€” 2026-11-13
+
+- Runtime atlas at `Assets/Game/Resources/WaterRecovery/shark-splash-frames.png`.
+- Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP resized and exported the alpha atlas. Repository asset terms apply.
+- Human direction used irregular water sheets, foam and receding surface ripples to match the painted river. See [artwork and prompt](docs/design/water-recovery/shark-breach-art.md).
