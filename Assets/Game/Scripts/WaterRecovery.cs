@@ -7,10 +7,9 @@ public sealed class WaterRecovery : MonoBehaviour
     public const float SurfaceY = -3.25f;
     public const float ForegroundInset = 0.65f;
     public const float RespawnTime = 2.1f, Duration = 2.5f;
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-    const bool ForceSharkForDebug = true;
-#else
-    const bool ForceSharkForDebug = false;
+#if UNITY_EDITOR
+    public void PreviewSharkOnNextEntry() => previewShark = true;
+    bool previewShark;
 #endif
     const float SharkLaunchTime = 0.72f, SharkBiteTime = 1.93f;
     const float SharkSubmergeTime = 2.30f, SharkSecondLaunchTime = 4.35f;
@@ -77,7 +76,11 @@ public sealed class WaterRecovery : MonoBehaviour
     void Begin()
     {
         Active = true; respawned = false; Elapsed = 0;
-        sharkEncounter = ForceSharkForDebug || SharkRollHits(Random.Range(0, 100));
+        sharkEncounter = SharkRollHits(Random.Range(0, 100));
+#if UNITY_EDITOR
+        sharkEncounter |= previewShark;
+        previewShark = false;
+#endif
         scale = course.lossyScale.y;
         cameraStart = view.transform.position; cameraSize = view.orthographicSize;
         facing = originalRenderer && originalRenderer.flipX ? -1 : 1;

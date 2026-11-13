@@ -30,7 +30,10 @@ public static class WaterRecoveryPreview
     {
         if (EditorApplication.isPlaying) {
             var course = Object.FindFirstObjectByType<MovementCourse>();
-            if (course) course.Cat.RespawnAt(course.transform.TransformPoint(new Vector3(6, -1.8f)));
+            if (course) {
+                course.Cat.RespawnAt(course.transform.TransformPoint(new Vector3(6, -1.8f)));
+                course.Cat.GetComponent<WaterRecovery>().PreviewSharkOnNextEntry();
+            }
             return;
         }
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -61,6 +64,7 @@ public static class WaterRecoveryPreview
         presentation.GetComponent<SpriteRenderer>().sprite = presentation.frames[11];
         presentation.transform.position = new Vector3(6, -3.27f);
         Physics2D.SyncTransforms();
+        water.PreviewSharkOnNextEntry();
         water.TryEnter();
         var render = new RenderTexture(960, 540, 24);
         var pixels = new Texture2D(960, 540, TextureFormat.RGB24, false);

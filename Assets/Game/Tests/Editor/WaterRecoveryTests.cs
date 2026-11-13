@@ -108,8 +108,9 @@ public class WaterRecoveryTests
         Assert.That(body.simulated, Is.True);
     }
 
-    [Test] public void DebugSharkDivesBeforeSecondBreachAndRetriesOnce()
+    [Test] public void PreviewSharkDivesBeforeSecondBreachAndRetriesOnce()
     {
+        Call(recovery, "PreviewSharkOnNextEntry");
         Position(-3.1f);
         Assert.That((bool)Call(recovery, "TryEnter"), Is.True);
         var effects = root.GetComponentsInChildren<Renderer>();

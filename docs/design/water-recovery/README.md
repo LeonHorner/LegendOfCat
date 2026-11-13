@@ -126,8 +126,8 @@ editing is needed; runtime course construction attaches the behavior.
 ### Shark encounter — 2026-11-13
 
 Each water entry rolls once for a 1-in-100 chance of the shark sequence.
-`ForceSharkForDebug` forces the encounter in the Unity Editor and development
-builds. Standard builds use the random roll.
+All builds use these odds. The Unity Editor command **Preview first gap** forces
+a single encounter for review.
 
 The 5.56-second shark sequence opens with the earlier side-view breach.
 The shark bends into a deeper arch as it pitches over, catches Mika on the descent and dives
