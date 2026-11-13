@@ -344,11 +344,15 @@ public sealed class MovementCourse : MonoBehaviour
             var point = ActiveCheckpoints[i];
             if (LevelOne) {
                 int bankIndex = i == 0 ? LevelOnePlatforms.Length - 1 : LevelOnePlatforms.Length + OverlookIndex;
-                checkpointMarkers.Add(CheckpointMarker.Create(transform, point, i + 1, Run, sceneryRenderer.TerrainVisuals[bankIndex]));
+                var marker = CheckpointMarker.Create(transform, point, i + 1, Run, sceneryRenderer.TerrainVisuals[bankIndex]);
+                checkpointMarkers.Add(marker);
+                Progress.SetCheckpointVisual(i + 1, marker.WorldVisual, CheckpointMarker.ActiveArtworkUv);
                 continue;
             }
-            Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
+            var post = Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
                 new Vector2(0.14f, 0.9f), new Color(0.95f, 0.75f, 0.36f));
+            // Match the world post's aspect ratio in the centered HUD icon.
+            Progress.SetCheckpointVisual(i + 1, post.GetComponent<SpriteRenderer>(), new Rect(0, 0, 1, 1));
             Label("CHECKPOINT " + (i + 1), new Vector2(point.x, point.y + 1.2f));
         }
         // Main-route landmarks and platform silhouettes communicate progression without floating labels.
@@ -476,7 +480,7 @@ public sealed class MovementCourse : MonoBehaviour
         float top = Screen.height * (1 - viewport.yMax) + 10;
         float barWidth = Progress.Visible && Progress.HasArtwork
             ? Mathf.Max(0, Mathf.Min(290, viewportWidth - 20)) : 0;
-        float barHeight = barWidth * 32 / 290;
+        float barHeight = barWidth * LevelProgress.Height / 290;
         if (barWidth > 0) {
             float center = Screen.width * viewport.center.x;
             Progress.Draw(new Rect(center - barWidth / 2, top, barWidth, barHeight), Run.Checkpoint);

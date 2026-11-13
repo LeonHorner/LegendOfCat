@@ -1,22 +1,16 @@
 # Level progress HUD
 
-The fill measures Mika's current distance along the route. The diamond marks
-the most recently activated checkpoint. The pennant marks the finish. The
-default-on setting is available from the main menu.
+The top-center stroke measures Mika's current distance along the route. Mika's
+portrait moves with the stroke tip, and the world checkpoint icon marks the
+active retry position. The default-on setting is available from the main menu.
 
-When adding a level, register its launch factory in LevelRegistry and supply
-an ordered local-space route through its traversable waypoints, including
-the start, each checkpoint spawn, and finish. Use distinct PhotoCraft track,
-fill, checkpoint and finish artwork. Review the artwork in gameplay before
-integration, especially the checkpoint against filled and unfilled track.
+When adding a level, register its launch factory in LevelRegistry. Supply an
+ordered local-space route through the start, checkpoint spawns, and finish.
+Use a distinct painted fill and bind each checkpoint to its world renderer.
 The integration test discovers levels from the same registry.
 
-The review mockups composite the PhotoCraft exports over archived gameplay
-captures at 290 pixels wide, with grayscale and enlarged icon previews.
-Actual HUD layout still needs an in-editor check.
-
-The HUD is now centered at the top of the gameplay viewport. The checked-in
-mockups depict the original concept. The current exports add pigment grain
-and brush highlights to the PhotoCraft shapes. Run `paint-progress.py` from
-the repository root with a folder containing the original transparent PNGs
-to reproduce that pass.
+The mockups use archived gameplay captures to show the HUD at start, past a
+checkpoint, and after backtracking. The layered PhotoCraft portrait is included.
+The existing fill textures come from the original PhotoCraft concepts and
+their pigment pass. Run paint-progress.py from the repository root with the
+folder containing the original fill PNG exports to reproduce that pass.

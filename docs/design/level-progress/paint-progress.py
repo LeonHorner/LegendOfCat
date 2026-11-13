@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser(description="Texture the transparent PhotoCraft
 parser.add_argument("exports", type=Path, help="Folder containing the original transparent PNGs")
 args = parser.parse_args()
 root=Path('Assets/Game/Resources/LevelProgress')
-for path in sorted(root.glob('*.png')):
+for path in sorted(root.glob('*-fill.png')):
     original=Image.open(args.exports / path.name).convert('RGBA')
     w,h=original.size
     rng=random.Random(path.name)

@@ -38,6 +38,14 @@ public sealed class LevelProgressTests
         Assert.That(Read(hud, "Artwork"), Is.EqualTo(id));
         var checkpoints = (IReadOnlyList<Vector2>)Read(course, "ProgressCheckpoints");
         Assert.That(Read(hud, "CheckpointCount"), Is.EqualTo(checkpoints.Count), id);
+        var root = ((Component)course).transform;
+        for (int i = 1; i <= checkpoints.Count; i++) {
+            string path = id == "golden-river" ? $"Checkpoint waystone {i}/Engraved paw" : $"Safe checkpoint {i}";
+            var world = root.Find(path)?.GetComponent<SpriteRenderer>();
+            Assert.That(world, Is.Not.Null, $"{id} checkpoint {i} has no world artwork.");
+            Assert.That(Call(hud, "CheckpointVisual", i), Is.SameAs(world),
+                $"{id} checkpoint {i} must use its world artwork in the HUD.");
+        }
         Assert.That(Read(hud, "Fraction"), Is.EqualTo(0f), id);
         var settings = RuntimeType("MenuSettings").GetMethod("Open").Invoke(null,
             new object[] { Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".json") });

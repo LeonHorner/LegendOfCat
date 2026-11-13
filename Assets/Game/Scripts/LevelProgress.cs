@@ -10,10 +10,13 @@ public sealed class LevelProgress
     int segment;
     float distance;
     Vector2 previousPosition;
-    readonly Texture2D track, fill, checkpoint, finish;
+    readonly Texture2D fill, head;
+    readonly SpriteRenderer[] checkpointVisuals;
+    readonly Rect[] checkpointUvs;
+    public const float Height = 58;
 
     public bool Visible { get; set; } = true;
-    public bool HasArtwork => track && fill && checkpoint && finish;
+    public bool HasArtwork => fill && head;
     public string Artwork { get; }
     public int CheckpointCount => checkpoints.Length;
     public float? CheckpointFraction(int activeCheckpoint) =>
@@ -42,12 +45,12 @@ public sealed class LevelProgress
             checkpoints[i] = distances[waypoint];
             previous = waypoint;
         }
+        checkpointVisuals = new SpriteRenderer[checkpoints.Length];
+        checkpointUvs = new Rect[checkpoints.Length];
         Artwork = artwork;
         string prefix = "LevelProgress/" + artwork + "-";
-        track = Resources.Load<Texture2D>(prefix + "track");
         fill = Resources.Load<Texture2D>(prefix + "fill");
-        checkpoint = Resources.Load<Texture2D>(prefix + "checkpoint");
-        finish = Resources.Load<Texture2D>(prefix + "finish");
+        head = Resources.Load<Texture2D>("LevelProgress/mika-progress-head");
         previousPosition = route[0];
     }
 
@@ -103,23 +106,40 @@ public sealed class LevelProgress
         segment = bestSegment;
     }
 
+    internal void SetCheckpointVisual(int sequence, SpriteRenderer worldRenderer, Rect uv)
+    {
+        checkpointVisuals[sequence - 1] = worldRenderer;
+        checkpointUvs[sequence - 1] = uv;
+    }
+
+    public SpriteRenderer CheckpointVisual(int sequence) => checkpointVisuals[sequence - 1];
+
     public void Draw(Rect area, int activeCheckpoint)
     {
         if (!Visible || !HasArtwork || Event.current.type != EventType.Repaint) return;
         float scale = area.width / 290f;
         float left = area.x + 20 * scale;
         float width = 250 * scale;
-        float top = area.y + 8 * scale;
-        GUI.DrawTexture(area, track);
+        float centerY = area.y + 16 * scale;
+        float tip = left + width * Fraction;
         if (Fraction > 0)
-            GUI.DrawTextureWithTexCoords(new Rect(left, top, width * Fraction, 10 * scale),
+            GUI.DrawTextureWithTexCoords(new Rect(left, centerY - 5 * scale, tip - left, 10 * scale),
                 fill, new Rect(0, 0, Fraction, 1));
-        GUI.DrawTexture(new Rect(area.x + 265 * scale, area.y + scale, 24 * scale, 24 * scale), finish);
         float? marker = CheckpointFraction(activeCheckpoint);
-        if (marker.HasValue) {
+        if (marker.HasValue && CheckpointVisual(activeCheckpoint) is SpriteRenderer world && world && world.sprite) {
             float x = left + width * marker.Value;
-            GUI.DrawTexture(new Rect(x - 12 * scale, area.y + scale, 24 * scale, 24 * scale), checkpoint);
+            float y = centerY - 12 * scale;
+            if (Mathf.Abs(tip - x) < 26 * scale) y = centerY + 14 * scale;
+            Color color = GUI.color;
+            GUI.color *= world.color;
+            Rect uv = checkpointUvs[activeCheckpoint - 1];
+            float iconWidth = 24 * scale * (uv.width < 1 ? .65f :
+                Mathf.Clamp01(world.transform.localScale.x / world.transform.localScale.y));
+            GUI.DrawTextureWithTexCoords(new Rect(x - iconWidth / 2, y, iconWidth, 24 * scale),
+                world.sprite.texture, uv);
+            GUI.color = color;
         }
+        GUI.DrawTexture(new Rect(tip - 14 * scale, centerY - 14 * scale, 28 * scale, 28 * scale), head);
     }
 
     internal static LevelProgress ForCourse(bool goldenRiver, Vector2 start)

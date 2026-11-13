@@ -794,3 +794,8 @@ The existing near panorama is extended to 14332×1448 using an original generated
   The top-center revision adds a deterministic pigment and brush-texture pass
   with Pillow, using the PhotoCraft exports as source. No external texture or
   generation model was used.
+
+- **Mika progress portrait**, 2026-11-13. Original layered PhotoCraft illustration
+  with a warm tabby coat, striped forehead, and pale muzzle. Licensed under the
+  repository license. The HUD checkpoint markers reuse each course's world
+  renderer artwork. The stroke retains each course's painted fill.
