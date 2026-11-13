@@ -69,6 +69,8 @@ public class WaterRecoveryTests
         Assert.That(body.simulated, Is.False);
         Call(cat, "FixedUpdate"); Call(cat, "PressJump");
         Assert.That((bool)Call(recovery, "TryEnter"), Is.False);
+        recovery.GetType().GetField("sharkEncounter", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(recovery, false);
         Call(recovery, "Advance", 2f);
         Assert.That(retries, Is.Zero);
         Assert.That(Read<float>(recovery, "Fade"), Is.EqualTo(1));
@@ -113,10 +115,11 @@ public class WaterRecoveryTests
         var effects = root.GetComponentsInChildren<SpriteRenderer>();
         var shark = effects.Single(renderer => renderer.name == "Shark");
         var head = effects.Single(renderer => renderer.name == "Mika facial reaction");
-        Call(recovery, "Advance", 1f); Call(recovery, "LateUpdate");
+        Call(recovery, "Advance", 1.33f); Call(recovery, "LateUpdate");
         Assert.That(shark.enabled, Is.True);
+        Assert.That(shark.transform.position.y, Is.GreaterThan(head.transform.position.y + 2f));
         Assert.That(head.enabled, Is.True);
-        Call(recovery, "Advance", 0.10f); Call(recovery, "LateUpdate");
+        Call(recovery, "Advance", 0.62f); Call(recovery, "LateUpdate");
         Assert.That(head.enabled, Is.False);
         Call(recovery, "Advance", 2f);
         Assert.That(retries, Is.EqualTo(1));

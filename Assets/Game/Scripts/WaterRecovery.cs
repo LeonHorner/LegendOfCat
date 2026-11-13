@@ -12,13 +12,17 @@ public sealed class WaterRecovery : MonoBehaviour
 #else
     const bool ForceSharkForDebug = false;
 #endif
-    const float SharkBiteTime = 1.08f;
+    const float SharkLaunchTime = 0.72f, SharkBiteTime = 1.93f, SharkDiveEnd = 2.30f;
+    bool HasSharkEncounter => sharkEncounter && shark;
+    float FadeStart => HasSharkEncounter ? 2.55f : 1.65f;
+    float RetryTime => HasSharkEncounter ? 3.0f : RespawnTime;
+    public float SequenceDuration => HasSharkEncounter ? 3.4f : Duration;
     public bool Active { get; private set; }
     public bool CameraHeld => Active && !respawned;
     public float Elapsed { get; private set; }
-    public float Fade => !Active ? 0 : Elapsed < 1.65f ? 0 : Elapsed < 1.95f
-        ? Mathf.InverseLerp(1.65f, 1.95f, Elapsed) : Elapsed < RespawnTime ? 1
-        : 1 - Mathf.InverseLerp(RespawnTime, Duration, Elapsed);
+    public float Fade => !Active ? 0 : Elapsed < RetryTime
+        ? Mathf.InverseLerp(FadeStart, FadeStart + 0.30f, Elapsed)
+        : 1 - Mathf.InverseLerp(RetryTime, SequenceDuration, Elapsed);
     CatController cat;
     Camera view;
     Transform course;
@@ -32,7 +36,7 @@ public sealed class WaterRecovery : MonoBehaviour
     Material submerge, foamMaterial;
     GameObject effects;
     readonly LineRenderer[] rings = new LineRenderer[2];
-    readonly LineRenderer[] droplets = new LineRenderer[12];
+    readonly LineRenderer[] droplets = new LineRenderer[44];
     LineRenderer splash, neckFoam;
     Vector3 impactPosition;
     Vector3 cameraStart, entry;
@@ -103,17 +107,17 @@ public sealed class WaterRecovery : MonoBehaviour
             impactBody.transform.SetParent(effects.transform, false);
             impactBody.sharedMaterial = submerge; impactBody.sortingOrder = 4;
         }
-        var sharkTexture = Resources.Load<Texture2D>("WaterRecovery/shark-frames");
+        var sharkTexture = Resources.Load<Texture2D>("WaterRecovery/shark-breach-frames");
         if (sharkTexture) {
             shark = new GameObject("Shark").AddComponent<SpriteRenderer>();
             shark.transform.SetParent(effects.transform, false);
             shark.sharedMaterial = submerge;
             shark.sortingOrder = 5;
-            sharkDrawings = new Sprite[4];
-            float cell = sharkTexture.width / 4f;
+            sharkDrawings = new Sprite[3];
+            float cell = sharkTexture.width / 3f;
             for (int i = 0; i < sharkDrawings.Length; i++)
                 sharkDrawings[i] = Sprite.Create(sharkTexture, new Rect(i * cell, 0, cell, sharkTexture.height),
-                    new Vector2(0.82f, 0.53f), cell / 2.6f);
+                    new Vector2(0.91f, 0.43f), cell / 3.1f);
         }
         foamMaterial = new Material(Shader.Find("Sprites/Default"));
         for (int i = 0; i < rings.Length; i++) rings[i] = Line("Expanding surface ripple", 49, true);
@@ -138,14 +142,14 @@ public sealed class WaterRecovery : MonoBehaviour
     {
         if (!Active || cat.Paused) return;
         Elapsed += Mathf.Max(0, seconds);
-        if (!respawned && Elapsed >= RespawnTime) {
+        if (!respawned && Elapsed >= RetryTime) {
             internalRespawn = true;
             try { retry(); } finally { internalRespawn = false; }
             respawned = true;
             RestorePresentation();
             cat.SetRecovering(true);
         }
-        if (Elapsed >= Duration) Cancel();
+        if (Elapsed >= SequenceDuration) Cancel();
     }
 
     void LateUpdate()
@@ -162,15 +166,18 @@ public sealed class WaterRecovery : MonoBehaviour
         Vector3 visualEntry = entry + foregroundShift;
         // Continue the existing fall through impact, then reveal a submerged neck.
         // The head keeps descending during its authored turn; there is no floating hold.
-        float sink = Elapsed * 0.1f + 0.65f * Mathf.Pow(Mathf.InverseLerp(0.9f, 1.6f, Elapsed), 1.5f);
+        float sinkTime = HasSharkEncounter ? Mathf.Min(Elapsed, 0.80f) : Elapsed;
+        float sink = sinkTime * 0.1f + 0.65f * Mathf.Pow(Mathf.InverseLerp(0.9f, 1.6f, sinkTime), 1.5f);
         reaction.transform.position = visualEntry + new Vector3(facing * 0.30f, 0.40f - sink, 0) * scale;
         reaction.transform.localScale = Vector3.one;
         reaction.flipX = facing < 0;
-        int frame = Elapsed < 0.25f ? 0 : Elapsed < 0.34f ? 1 : Elapsed < 0.43f ? 2
-            : Elapsed < 0.52f ? 3 : Elapsed < 0.61f ? 4 : Elapsed < 0.85f ? 5 : Elapsed < 0.98f ? 6 : 7;
+        float expressionTime = HasSharkEncounter && Elapsed < SharkBiteTime - 0.12f
+            ? Mathf.Min(Elapsed, 0.80f) : Elapsed;
+        int frame = expressionTime < 0.25f ? 0 : expressionTime < 0.34f ? 1 : expressionTime < 0.43f ? 2
+            : expressionTime < 0.52f ? 3 : expressionTime < 0.61f ? 4 : expressionTime < 0.85f ? 5 : expressionTime < 0.98f ? 6 : 7;
         reaction.sprite = drawings[frame];
         reaction.enabled = (!impactBody || Elapsed >= 0.14f)
-            && !(sharkEncounter && shark && Elapsed >= SharkBiteTime);
+            && !(HasSharkEncounter && Elapsed >= SharkBiteTime);
         PresentShark(visualEntry);
         if (impactBody) {
             impactBody.enabled = Elapsed < 0.14f;
@@ -178,9 +185,11 @@ public sealed class WaterRecovery : MonoBehaviour
         }
         submerge.SetFloat("_Surface", visualEntry.y);
         submerge.SetFloat("_SurfaceScale", scale);
-        view.orthographicSize = Mathf.Lerp(cameraSize, 1.65f * scale, zoom);
+        float breachFraming = HasSharkEncounter
+            ? Mathf.SmoothStep(0, 1, Mathf.InverseLerp(0.48f, 1.00f, Elapsed)) : 0;
+        view.orthographicSize = Mathf.Lerp(cameraSize, Mathf.Lerp(1.65f, 2.60f, breachFraming) * scale, zoom);
         // Follow the face only slightly as it sinks; keep the surface in the close view.
-        Vector3 close = entry + new Vector3(facing * 0.12f * scale, (0.28f - ForegroundInset) * scale, -10);
+        Vector3 close = entry + new Vector3(facing * 0.12f * scale, (0.28f + breachFraming * 1.05f - ForegroundInset) * scale, -10);
         view.transform.position = Vector3.Lerp(cameraStart, close, zoom);
         // A small foreground wash overlaps the softened neck edge; the wider
         // expanding rings alone leave the drawing looking detached from the water.
@@ -195,33 +204,44 @@ public sealed class WaterRecovery : MonoBehaviour
             float y = -Mathf.Sin(angle) * 0.035f + Mathf.Sin(x * 19 + Elapsed * 5) * 0.01f;
             neckFoam.SetPosition(p, visualEntry + new Vector3(x, y, -0.13f) * scale);
         }
-        float breakAmount = Mathf.Sin(Mathf.Clamp01(Elapsed / 0.4f) * Mathf.PI);
-        splash.enabled = Elapsed < 0.4f;
-        splash.startWidth = splash.endWidth = (0.035f + breakAmount * 0.11f) * scale;
-        splash.startColor = splash.endColor = new Color(0.8f, 0.94f, 0.91f, 1 - Mathf.Clamp01(Elapsed / 0.4f));
+        bool sharkSplash = HasSharkEncounter && Elapsed >= SharkLaunchTime;
+        bool impact = Elapsed >= SharkBiteTime;
+        float splashTime = sharkSplash ? Elapsed - (impact ? SharkBiteTime : SharkLaunchTime) : Elapsed;
+        Vector3 splashOrigin = visualEntry + Vector3.right * (sharkSplash ? facing * (impact ? 0.30f : -1.55f) * scale : 0);
+        float splashSize = sharkSplash ? (impact ? 3.3f : 2.7f) : 1f;
+        float crestTime = sharkSplash ? 0.65f : 0.4f;
+        float breakAmount = Mathf.Sin(Mathf.Clamp01(splashTime / crestTime) * Mathf.PI);
+        splash.enabled = splashTime < crestTime;
+        splash.startWidth = splash.endWidth = (0.035f + breakAmount * 0.11f * splashSize) * scale;
+        splash.startColor = splash.endColor = new Color(0.8f, 0.94f, 0.91f, 1 - Mathf.Clamp01(splashTime / crestTime));
         for (int p = 0; p < 33; p++) {
-            float x = (p / 32f - 0.5f) * (0.9f + Elapsed * 1.2f);
+            float x = (p / 32f - 0.5f) * (0.9f + splashTime * 1.2f) * splashSize;
             float envelope = Mathf.Sin(p / 32f * Mathf.PI);
-            float crest = envelope * (0.10f + Mathf.Abs(Mathf.Sin(p * 1.7f)) * 0.22f) * breakAmount;
-            splash.SetPosition(p, visualEntry + new Vector3(x, crest, -0.12f) * scale);
+            float wave = sharkSplash ? 0.5f + 0.5f * Mathf.Sin(p * 0.53f + splashTime * 7)
+                : Mathf.Abs(Mathf.Sin(p * 1.7f));
+            float crest = envelope * (0.10f + wave * 0.22f) * breakAmount;
+            splash.SetPosition(p, splashOrigin + new Vector3(x, crest * splashSize, -0.12f) * scale);
         }
-        float alpha = 1 - Mathf.Clamp01(Elapsed / 1.75f);
+        float rippleTime = sharkSplash ? splashTime : Elapsed;
+        float alpha = 1 - Mathf.Clamp01(rippleTime / (sharkSplash ? 0.85f : 1.75f));
         for (int r = 0; r < rings.Length; r++) {
-            float radius = (0.25f + Elapsed * (0.7f + r * 0.25f)) * scale;
+            float radius = (0.25f + rippleTime * (0.7f + r * 0.25f)) * scale * (sharkSplash ? 2.2f : 1f);
             rings[r].startWidth = rings[r].endWidth = 0.022f * scale;
             rings[r].startColor = rings[r].endColor = new Color(0.82f, 0.93f, 0.88f, alpha * 0.8f);
             for (int p = 0; p < 49; p++) {
                 float angle = p * Mathf.PI * 2 / 48;
-                rings[r].SetPosition(p, visualEntry + new Vector3(Mathf.Cos(angle) * radius,
+                rings[r].SetPosition(p, splashOrigin + new Vector3(Mathf.Cos(angle) * radius,
                     Mathf.Sin(angle) * radius * 0.12f, -0.1f));
             }
         }
         for (int i = 0; i < droplets.Length; i++) {
-            float t = Mathf.Min(Elapsed, 0.65f);
-            float vx = (i - 5.5f) * 0.38f;
-            float vy = 2.4f + (i % 3) * 0.45f;
-            var position = visualEntry + new Vector3(vx * t, vy * t - 6 * t * t, -0.1f) * scale;
-            droplets[i].enabled = Elapsed < 0.65f && position.y >= visualEntry.y;
+            int count = sharkSplash ? droplets.Length : 12;
+            float t = Mathf.Min(splashTime, 0.85f);
+            float vx = (2f * i / (count - 1) - 1) * (sharkSplash ? 4.2f : 2.09f);
+            float vy = sharkSplash ? 3.0f + (i * 7 % 13) * 0.24f : 2.4f + (i % 3) * 0.45f;
+            var position = splashOrigin + new Vector3(vx * t, vy * t - 6 * t * t, -0.1f) * scale;
+            droplets[i].enabled = i < count && splashTime < (sharkSplash ? 0.85f : 0.65f)
+                && position.y >= visualEntry.y;
             droplets[i].startWidth = 0.035f * scale; droplets[i].endWidth = 0.012f * scale;
             droplets[i].startColor = droplets[i].endColor = new Color(0.8f, 0.93f, 0.9f, 1 - t);
             droplets[i].SetPosition(0, position);
@@ -232,17 +252,20 @@ public sealed class WaterRecovery : MonoBehaviour
     void PresentShark(Vector3 visualEntry)
     {
         if (!shark) return;
-        shark.enabled = sharkEncounter && Elapsed >= 0.68f && Elapsed < 1.60f;
+        shark.enabled = HasSharkEncounter && Elapsed >= SharkLaunchTime && Elapsed < SharkDiveEnd;
         if (!shark.enabled) return;
 
         bool diving = Elapsed >= SharkBiteTime;
-        float travel = diving ? Mathf.InverseLerp(SharkBiteTime, 1.60f, Elapsed)
-            : Mathf.InverseLerp(0.68f, SharkBiteTime, Elapsed);
-        float x = diving ? Mathf.Lerp(0.42f, 1.28f, travel) : Mathf.Lerp(-1.1f, 0.42f, travel);
-        float y = diving ? Mathf.Lerp(0.25f, -0.95f, travel) : Mathf.Lerp(-0.75f, 0.25f, travel);
-        shark.transform.position = visualEntry + new Vector3(facing * x, y, 0) * scale;
+        float travel = diving ? Mathf.InverseLerp(SharkBiteTime, SharkDiveEnd, Elapsed)
+            : Mathf.InverseLerp(SharkLaunchTime, SharkBiteTime, Elapsed);
+        float x = diving ? Mathf.Lerp(0.30f, 0.94f, travel) : Mathf.Lerp(-1.55f, 0.30f, travel);
+        float y = diving ? Mathf.Lerp(0.29f, -1.4f, travel)
+            : Mathf.Lerp(-0.12f, 0.29f, travel) + 10.8f * travel * (1 - travel);
+        float angle = diving ? -72f : Mathf.Lerp(68f, -72f, Mathf.SmoothStep(0, 1, travel));
+        shark.transform.SetPositionAndRotation(visualEntry + new Vector3(facing * x, y, 0) * scale,
+            Quaternion.Euler(0, 0, facing * angle));
         shark.flipX = facing < 0;
-        shark.sprite = sharkDrawings[diving ? 3 : travel < 0.30f ? 0 : travel < 0.65f ? 1 : 2];
+        shark.sprite = sharkDrawings[diving || travel < 0.54f ? 0 : travel < 0.72f ? 1 : 2];
     }
 
     void OnRespawn() { if (!internalRespawn) Cancel(); }

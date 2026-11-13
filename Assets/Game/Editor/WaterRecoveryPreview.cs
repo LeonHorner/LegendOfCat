@@ -10,7 +10,7 @@ public static class WaterRecoveryPreview
     public static void Prepare()
     {
         PrepareTexture("Assets/Game/Resources/WaterRecovery/turn-reactions.png");
-        PrepareTexture("Assets/Game/Resources/WaterRecovery/shark-frames.png");
+        PrepareTexture("Assets/Game/Resources/WaterRecovery/shark-breach-frames.png");
     }
 
     static void PrepareTexture(string path)
@@ -65,8 +65,9 @@ public static class WaterRecoveryPreview
         var pixels = new Texture2D(960, 540, TextureFormat.RGB24, false);
         view.targetTexture = render;
         string folder = Path.GetFullPath("Logs/water-review"); Directory.CreateDirectory(folder);
+        int frameCount = Mathf.CeilToInt(water.SequenceDuration * 30);
         float prior = 0;
-        for (int frame = 0; frame <= 75; frame++) {
+        for (int frame = 0; frame <= frameCount; frame++) {
             float time = frame / 30f;
             water.Advance(time - prior); prior = time;
             if (water.CameraHeld) Invoke(water, "LateUpdate");

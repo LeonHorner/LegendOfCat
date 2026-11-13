@@ -762,3 +762,9 @@ The existing near panorama is extended to 14332×1448 using an original generated
 - Water recovery shark frames at `Assets/Game/Resources/WaterRecovery/shark-frames.png`.
 - Original artwork drawn and exported through PhotoCraft 0.23.1 MCP using manually specified filled curves and ellipses. The four registered poses cover approach, opening jaws, full gape and closing jaws. No external source artwork or generative model was used.
 - The requested creative direction was a rare shark encounter. The artwork uses a stylized blue-gray silhouette and a bloodless bite followed by checkpoint recovery. License is the repository license.
+
+## Golden River shark breach â€” 2026-11-13
+
+- Runtime atlas: `Assets/Game/Resources/WaterRecovery/shark-breach-frames.png`.
+- Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP cropped and exported the registered transparent atlas. The earlier PhotoCraft drawing remains archived in Git history.
+- Human direction: realistic great white anatomy and muted shading, high breach, downward catch and larger water impacts. Repository asset terms apply. See [artwork and prompt](docs/design/water-recovery/shark-breach-art.md).
