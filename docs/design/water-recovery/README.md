@@ -133,7 +133,7 @@ The 5.56-second shark sequence opens with the earlier side-view breach.
 The shark bends into a deeper arch as it pitches over, catches Mika on the descent and dives
 below the surface.
 Bubbles rise and camera shake builds for about two seconds before the second
-breach. The shark rushes toward the viewer until its open mouth fills the
-frame. Blackout leads to the usual checkpoint recovery.
+breach. The shark closes the distance faster and its open jaws pass beyond
+the edges of the frame. Blackout leads to the usual checkpoint recovery.
 
 [Watch the shark preview](shark.mp4) · [Artwork and prompt](shark-lunge-art.md)

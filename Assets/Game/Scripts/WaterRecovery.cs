@@ -406,9 +406,11 @@ public sealed class WaterRecovery : MonoBehaviour
         shark.sharedMaterial = lunge > 0 ? foamMaterial : submerge;
         shark.sortingOrder = lunge > 0 ? 20 : 5;
         float screenHeight = 2 * view.orthographicSize / scale;
-        float fullFrameScale = 3.5f * screenHeight * Mathf.Max(1, view.aspect) / sharkFrames[2].bounds.size.x;
-        shark.transform.localScale = Vector3.one * Mathf.Lerp(1, fullFrameScale, lunge * lunge);
-        shark.sprite = sharkFrames[lift < 0.48f ? 0 : lunge < 0.16f ? 1 : 2];
+        float fullFrameScale = 5.2f * screenHeight * Mathf.Max(1, view.aspect) / sharkFrames[2].bounds.size.x;
+        // Close distance immediately after the breach, then accelerate into the jaws.
+        float approach = lunge * (0.32f + 0.68f * lunge);
+        shark.transform.localScale = Vector3.one * Mathf.Lerp(1, fullFrameScale, approach);
+        shark.sprite = sharkFrames[lift < 0.48f ? 0 : lunge < 0.10f ? 1 : 2];
     }
 
     void PresentSharkBreach(Vector3 origin, bool encounter)
