@@ -17,6 +17,7 @@ public sealed class LevelProgress
     readonly bool[] reachedCheckpoints;
     readonly Material grayscale;
     public enum CheckpointState { Unreached, Reached, Active }
+    const float GuideHandoffDistance = 5;
     public const float Height = 58;
     public const float Width = 520;
 
@@ -131,9 +132,10 @@ public sealed class LevelProgress
         sequence == activeCheckpoint ? CheckpointState.Active :
         reachedCheckpoints[sequence - 1] ? CheckpointState.Reached : CheckpointState.Unreached;
 
-    internal int UpdateGuideCheckpoint(int activeCheckpoint, bool activeCheckpointCovered)
+    internal int UpdateGuideCheckpoint(int activeCheckpoint, float distanceFromCheckpoint)
     {
-        if (activeCheckpoint > clearedGuideCheckpoint && activeCheckpointCovered) return activeCheckpoint;
+        if (activeCheckpoint > clearedGuideCheckpoint && Mathf.Abs(distanceFromCheckpoint) < GuideHandoffDistance)
+            return activeCheckpoint;
         clearedGuideCheckpoint = Mathf.Max(clearedGuideCheckpoint, activeCheckpoint);
         return clearedGuideCheckpoint < checkpoints.Length ? clearedGuideCheckpoint + 1 : 0;
     }
@@ -152,7 +154,6 @@ public sealed class LevelProgress
         if (Fraction > 0)
             GUI.DrawTextureWithTexCoords(new Rect(left, centerY - 5 * scale, tip - left, 10 * scale),
                 fill, new Rect(0, 0, Fraction, 1));
-        bool activeCheckpointCovered = false;
         for (int sequence = 1; sequence <= checkpoints.Length; sequence++) {
             var world = CheckpointVisual(sequence);
             if (!world || !world.sprite) continue;
@@ -163,8 +164,7 @@ public sealed class LevelProgress
                 Mathf.Clamp01(world.transform.localScale.x / world.transform.localScale.y));
             var icon = new Rect(x - iconWidth / 2, centerY - 12 * scale, iconWidth, 24 * scale);
             if (state == CheckpointState.Active) {
-                activeCheckpointCovered = portrait.Overlaps(icon);
-                if (!activeCheckpointCovered)
+                if (!portrait.Overlaps(icon))
                     GUI.DrawTexture(new Rect(x - 2 * scale, icon.yMax, 4 * scale, 2 * scale),
                         Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
                         new Color(1, .89f, .64f), 0, scale);
@@ -180,7 +180,8 @@ public sealed class LevelProgress
             }
         }
         GUI.DrawTexture(portrait, head);
-        int guide = UpdateGuideCheckpoint(activeCheckpoint, activeCheckpointCovered);
+        float distanceFromCheckpoint = (Fraction - CheckpointFraction(activeCheckpoint).GetValueOrDefault()) * width / scale;
+        int guide = UpdateGuideCheckpoint(activeCheckpoint, distanceFromCheckpoint);
         if (guide > 0) {
             float x = left + width * checkpoints[guide - 1] / distances[distances.Length - 1];
             DrawCheckpointPointer(x, portrait.yMax + 2 * scale, scale, guide == activeCheckpoint);
