@@ -148,10 +148,12 @@ public sealed class LevelProgress
             Rect uv = checkpointUvs[sequence - 1];
             float iconWidth = 24 * scale * (uv.width < 1 ? .65f :
                 Mathf.Clamp01(world.transform.localScale.x / world.transform.localScale.y));
-            // Move each marker clear of the portrait when their bounds overlap.
-            float y = Mathf.Abs(tip - x) < 15 * scale + iconWidth / 2
-                ? centerY + 14 * scale : centerY - 12 * scale;
-            var icon = new Rect(x - iconWidth / 2, y, iconWidth, 24 * scale);
+            // Leave room for the portrait to pass above the fixed checkpoint row.
+            var icon = new Rect(x - iconWidth / 2, centerY + 16 * scale, iconWidth, 24 * scale);
+            var tick = new Rect(x - scale / 2, centerY + 6 * scale, scale, 8 * scale);
+            Color tickColor = state == CheckpointState.Unreached
+                ? new Color(.68f, .68f, .68f, .8f) : new Color(1, .89f, .64f, .85f);
+            GUI.DrawTexture(tick, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, tickColor, 0, 0);
             if (state == CheckpointState.Active)
                 GUI.DrawTexture(new Rect(x - 2 * scale, icon.yMax, 4 * scale, 2 * scale),
                     Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
