@@ -16,7 +16,7 @@ See game-direction.md and art-direction.md before implementation. The following 
 
 7. **Implement checkpoint, retry and run lifecycle** — Implement checkpoint activation, falls, retry and full-run restart as distinct operations, with a small reusable playable scene.
 
-8. **Define and implement rewards and optional abilities** — Decide whether coins, alternative collectibles, power-ups or another small reward system support the new adventure. Ask the user to choose before implementation.
+8. **Define and implement rewards and optional abilities** — The user selected optional exploration keepsakes without gameplay bonuses; see [reward scope](rewards.md). Implement one small demonstration after native dependencies are resolved, then validate pickup readability and retry/restart behavior.
 
 9. **Build a complete first-level art and gameplay slice** — Produce one short complete level using painted environment layers, approved character animation and clear playable silhouettes. This is the quality reference for later level issues.
 
