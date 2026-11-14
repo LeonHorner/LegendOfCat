@@ -780,3 +780,43 @@ The existing near panorama is extended to 14332×1448 using an original generated
 - Runtime atlas at `Assets/Game/Resources/WaterRecovery/shark-lunge-frames.png`.
 - Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP resized and exported the alpha atlas. Repository asset terms apply.
 - Human direction specified a jump scare with an attack from directly below Mika and an open-jaw lunge toward the camera. See [artwork and prompt](docs/design/water-recovery/shark-lunge-art.md).
+
+## Level progress HUD
+
+- **Golden River and Movement Lab progress artwork**, 2026-11-13. Original layered
+  PhotoCraft shape artwork authored for this project, with no external assets or image
+  generation model. The first concept was selected for implementation. Golden River
+  uses violet masonry, ivy, and gold pigment. Movement Lab uses rounded river stones
+  and a blue-green fill. Both use a diamond for the active checkpoint and a pennant
+  for the finish. The editable PhotoCraft review files live in
+  `docs/design/level-progress/`. Transparent runtime exports live in
+  `Assets/Game/Resources/LevelProgress/`. Licensed under the repository license.
+  The top-center revision adds a deterministic pigment and brush-texture pass
+  with Pillow, using the PhotoCraft exports as source. No external texture or
+  generation model was used.
+
+- **Mika progress portrait**, 2026-11-13. Original layered PhotoCraft illustration
+  with a warm tabby coat, striped forehead, and pale muzzle. Licensed under the
+  repository license. The HUD checkpoint markers reuse each course's world
+  renderer artwork. The stroke retains each course's painted fill.
+
+- The revised progress portrait crops Mika's existing original gameplay
+  sprite at the neck and downsamples it for HUD use. It retains the source
+  artwork's license and uses no new generation model.
+  The portrait now uses the near-frontal frame from Mika's existing painted
+  water-recovery turn atlas. The frame preserves the source colors and is
+  cropped and downsampled for the HUD.
+
+- **Front-facing Mika progress portrait**, 2026-11-13. Original layered
+  PhotoCraft illustration based on Mika's painted orange coat, tabby markings,
+  pale muzzle, and green eyes. The symmetric eye and nose placement establishes
+  a head-on view. Licensed under the repository license. No generation model
+  or external artwork was used.
+
+- **Playable Mika reference portrait**, 2026-11-13. Generated with OpenAI
+  ImageGen (built-in image model, exact revision undisclosed), using the
+  playable apex sprite and revision 3 movement identity artwork as references.
+  The brief specified the playable cat's narrow face, tall pink ears,
+  olive eyes, irregular orange tabby markings and cream muzzle, with a
+  straight-on gaze. The selected output was cropped and downsampled for HUD
+  use. Distributed under the repository license.

@@ -84,22 +84,29 @@ public sealed partial class StarterScreen : MonoBehaviour
             value ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed);
     }
 
-    void OpenCourse()
+    public bool ShowLevelProgress { get; private set; } = true;
+
+    void OpenCourse() => OpenLevel("movement-lab");
+    void OpenLevelOne() => OpenLevel("golden-river");
+
+    public void OpenLevel(string id)
     {
         if (course != null || stompArena != null || popup || applying) return;
-        course = Instantiate(Resources.Load<MovementCourse>("MovementCourse"));
+        course = LevelRegistry.Create(id);
+        course.Progress.Visible = ShowLevelProgress;
         course.BackToMenu = CloseCourse;
     }
 
-    void OpenLevelOne()
+    void SetShowLevelProgress(bool visible)
     {
-        if (course != null || stompArena != null || popup || applying) return;
-        var root = new GameObject("Golden River main route");
-        root.SetActive(false);
-        course = root.AddComponent<MovementCourse>();
-        course.LevelOne = true;
-        course.BackToMenu = CloseCourse;
-        root.SetActive(true);
+        ShowLevelProgress = visible;
+        if (course != null) course.Progress.Visible = visible;
+        try {
+            settingsFile.Data["showLevelProgress"] = visible;
+            settingsFile.Save();
+        } catch (Exception) {
+            warning = "The level progress preference could not be saved.";
+        }
     }
 
     void OpenStompArena()
@@ -154,6 +161,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     {
         settingsFile = MenuSettings.Open(preferencesPath);
         preferences.lastOfferedVersion = (string)settingsFile.Data["lastOfferedVersion"];
+        ShowLevelProgress = (bool)settingsFile.Data["showLevelProgress"];
         warning = settingsFile.Warning;
     }
     void Send(string command)
