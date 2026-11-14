@@ -38,9 +38,6 @@ public sealed class StompArena : MonoBehaviour
     readonly MeshRenderer[] sparks = new MeshRenderer[3];
     float burstTime;
     public const float DamageBurstDuration = .15f;
-    bool showHelp;
-    Vector2 helpScroll;
-    GUIStyle hudStyle;
     static readonly Rect BossBounds = new Rect(-0.85f, 0, 1.7f, 1.35f);
     static readonly Rect Hazard = new Rect(-2.8f, 0, 5.6f, 0.35f);
     static readonly Vector2 Half = new Vector2(0.45f, 0.45f);
@@ -248,39 +245,6 @@ public sealed class StompArena : MonoBehaviour
     {
         ArenaCamera.rect = MenuLayout.Letterbox16By9(Screen.width, Screen.height);
         ArenaCamera.aspect = 16f / 9f;
-    }
-    void OnGUI()
-    {
-        if (!ArenaCamera || Run == null) return;
-        if (hudStyle == null) hudStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true };
-        var viewport = ArenaCamera.pixelRect;
-        float width = Mathf.Max(1, Mathf.Min(440, viewport.width - 16));
-        bool expanded = showHelp || Run.Paused || Combat.Finished;
-        float height = Mathf.Min(expanded ? 210 : 88, Screen.height - 16);
-        // Anchor in the top letterbox bar when available; otherwise use the viewport.
-        float top = Mathf.Max(8, Screen.height - viewport.yMax - height);
-        GUILayout.BeginArea(new Rect(viewport.x + 8, top, width, height), GUI.skin.box);
-        helpScroll = GUILayout.BeginScrollView(helpScroll);
-        string phaseHint = Combat.Finished ? (Combat.BossHealth == 0 ? "TARGET DEFEATED" : "TRY AGAIN")
-            : Combat.Phase == StompCombat.AttackPhase.Recovery ? "OPEN HEAD"
-            : Combat.Phase == StompCombat.AttackPhase.Attack ? "GROUND ATTACK" : "WARNING";
-        GUILayout.Label("SIMPLE COMBAT LAB / " + phaseHint, hudStyle);
-        GUILayout.Label("Mika " + Combat.PlayerHealth + "/3 | Target " + Combat.BossHealth + "/3" +
-            (Combat.Invulnerability > 0 ? " | PROTECTED" : "") + (Run.Paused ? " | PAUSED" : ""), hudStyle);
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button(showHelp ? "Less" : "Controls")) showHelp = !showHelp;
-        if (!Combat.Finished && GUILayout.Button(Run.Paused ? "Resume" : "Pause")) TogglePause();
-        if (GUILayout.Button("Menu")) BackToMenu?.Invoke();
-        GUILayout.EndHorizontal();
-        if (expanded) {
-            GUILayout.Label("Shared move/jump controls. Descend onto the white head. Dark head/sides hurt; striped ground becomes an active attack.", hudStyle);
-            GUILayout.Label("R: retry | Backspace: restart | P: pause | Esc: menu. Controller: South jump, Select retry, LB restart, RB pause, Start menu.", hudStyle);
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Retry")) Retry();
-            if (GUILayout.Button("Restart")) Restart();
-            GUILayout.EndHorizontal();
-        }
-        GUILayout.EndScrollView(); GUILayout.EndArea();
     }
     void CreateDamageBurst()
     {

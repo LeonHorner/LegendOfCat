@@ -171,10 +171,6 @@ public sealed class MovementCourse : MonoBehaviour
     string previousPose;
     float landing;
     bool originalMika;
-    bool showHelp;
-    GUIStyle hudStyle;
-    string hudStatus;
-    float hudRefresh, frameSeconds;
     readonly System.Collections.Generic.List<CheckpointMarker> checkpointMarkers = new System.Collections.Generic.List<CheckpointMarker>();
 
     void Awake()
@@ -388,14 +384,6 @@ public sealed class MovementCourse : MonoBehaviour
     void Update()
     {
         if (Run == null) return;
-        frameSeconds = Mathf.Lerp(frameSeconds, Time.unscaledDeltaTime, 0.08f);
-        hudRefresh -= Time.unscaledDeltaTime;
-        if (hudRefresh <= 0) {
-            hudStatus = (Run.Paused ? "Paused | " : "") + "Checkpoint " + Run.Checkpoint + "/" + ActiveCheckpoints.Length
-                + (LevelOne ? " | Intro " + (IntroductionSeconds < 0 ? Run.ElapsedSeconds : IntroductionSeconds).ToString("F1")
-                    + "s" + (IntroductionSeconds >= 0 ? " | Ascent " + AscentSeconds.ToString("F1") + "s" : "") + (FinaleSeconds >= 0 ? " | Finale " + FinaleSeconds.ToString("F1") + "s" : "") : " | R: retry | P: pause");
-            hudRefresh = 0.25f;
-        }
         Run.Advance(Time.deltaTime);
         foreach (var marker in checkpointMarkers) marker.Refresh(Time.deltaTime);
         if (Run.Paused) return;
@@ -479,47 +467,13 @@ public sealed class MovementCourse : MonoBehaviour
     }
     void OnGUI()
     {
-        if (Run == null || !courseCamera) return;
-        if (hudStyle == null) hudStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true };
-        var viewport = courseCamera.rect;
-        float viewportWidth = Screen.width * viewport.width;
-        float top = Screen.height * (1 - viewport.yMax) + 10;
-        float barWidth = Progress.Visible && Progress.HasArtwork
-            ? Mathf.Max(0, Mathf.Min(LevelProgress.Width, viewportWidth - 20)) : 0;
-        float barHeight = Mathf.Min(1, barWidth / 290) * LevelProgress.Height;
-        if (barWidth > 0) {
-            float center = Screen.width * viewport.center.x;
-            Progress.Draw(new Rect(center - barWidth / 2, top, barWidth, barHeight), Run.Checkpoint);
-            top += barHeight + 6;
-        }
-        float width = Mathf.Min(350, viewportWidth - 20);
-        bool expanded = showHelp || Run.Paused;
-        var area = new Rect(Screen.width * viewport.x + 10, top, width, expanded ? 176 : 52);
-        var oldColor = GUI.color;
-        GUI.color = new Color(1, 1, 1, 0.4f);
-        GUI.Box(area, GUIContent.none);
-        GUI.color = oldColor;
-        GUILayout.BeginArea(new Rect(area.x + 6, area.y + 3, area.width - 12, area.height - 6));
-        GUILayout.Label(hudStatus ?? ("Checkpoint 0/" + ActiveCheckpoints.Length + " | R: retry | P: pause"), hudStyle);
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("A/D: move | Space: jump | Esc: menu", hudStyle);
-        if (GUILayout.Button(showHelp ? "Less" : "Controls", GUILayout.Width(62), GUILayout.Height(19))) {
-            showHelp = !showHelp; GUI.FocusControl(null);
-        }
-        GUILayout.EndHorizontal();
-        if (expanded) {
-            GUILayout.Label("Arrows/W/Up also work. Backspace: restart entire run. Cross gold markers on safe ground.", hudStyle);
-            GUILayout.Label("Controller: South jump, Select retry, LB restart, RB pause, Start menu.", hudStyle);
-            GUILayout.Label("Retries " + Run.Retries + " | " + Run.ElapsedSeconds.ToString("F1")
-                + "s | " + (1 / Mathf.Max(frameSeconds, 0.001f)).ToString("F0") + " fps", hudStyle);
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Retry")) { RetryCheckpoint(); GUI.FocusControl(null); }
-            if (GUILayout.Button("Restart")) { RestartRun(); GUI.FocusControl(null); }
-            if (GUILayout.Button(Run.Paused ? "Resume" : "Pause")) { TogglePause(); GUI.FocusControl(null); }
-            if (GUILayout.Button("Menu")) { BackToMenu?.Invoke(); GUI.FocusControl(null); }
-            GUILayout.EndHorizontal();
-        }
-        GUILayout.EndArea();
+        if (Run == null || !courseCamera || !Progress.Visible || !Progress.HasArtwork) return;
+        var viewport = courseCamera.pixelRect;
+        float width = Mathf.Min(LevelProgress.Width, viewport.width - 20);
+        if (width <= 0) return;
+        float height = Mathf.Min(1, width / 290) * LevelProgress.Height;
+        float top = Screen.height - viewport.yMax + 10;
+        Progress.Draw(new Rect(viewport.center.x - width / 2, top, width, height), Run.Checkpoint);
     }
     void OnDestroy() { Destroy(square); Destroy(texture); }
 }
