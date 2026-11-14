@@ -1,0 +1,2 @@
+Dry descent imported texture bytes: 115340992
+Packed scenery verified: 60 active paintings and five shader-reference materials; historical art excluded.

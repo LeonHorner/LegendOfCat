@@ -95,12 +95,14 @@ public sealed partial class StarterScreen : MonoBehaviour
     void OpenLevelOne()
     {
         if (course != null || stompArena != null || popup || applying) return;
+        var started=Time.realtimeSinceStartupAsDouble;
         var root = new GameObject("Golden River main route");
         root.SetActive(false);
         course = root.AddComponent<MovementCourse>();
         course.LevelOne = true;
         course.BackToMenu = CloseCourse;
         root.SetActive(true);
+        if(Debug.isDebugBuild)Debug.Log("Golden River startup: "+((Time.realtimeSinceStartupAsDouble-started)*1000).ToString("F1")+" ms");
     }
 
     void OpenStompArena()

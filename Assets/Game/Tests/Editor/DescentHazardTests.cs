@@ -36,7 +36,7 @@ public sealed class DescentHazardTests
             Assert.That(Recover(new Vector2(Origin+x,-2.9f),new Vector2(Origin+x,-3.3f)),Is.False);
         Assert.That(Recover(new Vector2(Origin+28,-2.9f),new Vector2(Origin+28,-3.3f)),Is.True);
         Assert.That(Recover(new Vector2(Origin,-11),new Vector2(Origin,-12)),Is.False);
-        Assert.That(Recover(new Vector2(Origin,-26),new Vector2(Origin,-27)),Is.True);
+        Assert.That(Recover(new Vector2(Origin,-33),new Vector2(Origin,-35)),Is.True);
         Assert.That(Recover(new Vector2(Origin-100,-6),new Vector2(Origin-100,-8)),Is.True);
     }
     [Test]

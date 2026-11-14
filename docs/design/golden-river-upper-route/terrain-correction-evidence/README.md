@@ -1,4 +1,6 @@
-# Terrain correction review evidence
+# Terrain correction review evidence (owner rejected)
+
+This candidate was rejected on 2026-11-14. It is retained only as historical evidence. See [the current rebuild](../cave-rebuild.md); these captures and test results do not validate the new geometry.
 
 This replaces the owner-rejected `permanent-shore-evidence` candidate. See [scope, implementation and remaining review](../terrain-corrections.md) and [new stone provenance/prompt](../terrain-stone-assets.json).
 

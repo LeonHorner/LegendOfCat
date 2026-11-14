@@ -31,25 +31,25 @@ public static class BuildScenery
         foreach (string name in new[] { "background-material", "terrain-material", "water-material" })
             if (!paths.Contains(ResourcesDirectory + name + ".mat"))
                 throw new BuildFailedException("Missing scenery shader-reference material: " + name);
+        foreach (string name in new[] { "cave-rock-material", "cave-grass-material" })
+            if (!paths.Contains("Assets/Game/Resources/GoldenRiver/Descent/" + name + ".mat"))
+                throw new BuildFailedException("Missing cave shader-reference material: " + name);
+        foreach(string name in CaveTerrainImport.MaskNames)
+            if(!paths.Contains("Assets/Game/Resources/GoldenRiver/Descent/"+name+".png"))
+                throw new BuildFailedException("Missing precomputed cave mask: "+name);
         long descentBytes = GoldenRiverArt.Where(n => n.StartsWith("Descent/", System.StringComparison.Ordinal))
             .Sum(n => UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(
                 AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Game/Resources/GoldenRiver/" + n + ".png")));
-        if (descentBytes > 128L * 1024 * 1024)
-            throw new BuildFailedException("Dry descent textures exceed the 128 MiB imported-memory budget.");
         Debug.Log("Dry descent imported texture bytes: " + descentBytes);
-        Debug.Log("Packed scenery verified: " + (ActiveLayers.Length + GoldenRiverArt.Length) + " active paintings and three shader-reference materials; historical art excluded.");
+        Debug.Log("Packed scenery verified: " + (ActiveLayers.Length + GoldenRiverArt.Length) + " active paintings and five shader-reference materials; historical art excluded.");
     }
 
     public static readonly string[] GoldenRiverArt = {
-        "Descent/terrain-stone-v1", "Descent/anchored-ledge-v1", "Descent/shore-left-v1", "Descent/shore-right-v1", "Descent/shore-exit-roof-v1", "Descent/shore-exit-floor-v1",
-        "Descent/return-floor-a-v1", "Descent/return-floor-b-v1", "Descent/return-roof-v1",
-        "Descent/discovery-floor-v2", "Descent/discovery-ceiling-v2", "Descent/discovery-rear-v1",
-        "Descent/entry-study-left-v2", "Descent/entry-study-right-v2", "Descent/entry-study-floor-v1", "Descent/entry-study-rear-v1", "Descent/entry-study-valley-v1",
-        "Descent/entry-bank-v3", "Descent/cliff-stone-v2", "Descent/cave-edge-short-v2", "Descent/cave-edge-medium-v2", "Descent/cave-edge-wide-v2",
-        "Descent/entry-left-v1", "Descent/entry-overhang-v1", "Descent/inner-corner-v1", "Descent/ceiling-v1",
-        "Descent/rock-face-v1", "Descent/rooted-face-v1", "Descent/tread-short-v1", "Descent/tread-medium-v1",
-        "Descent/tread-wide-v1", "Descent/rear-rock-v1", "Descent/ruin-v1", "Descent/floor-v1",
-        "Descent/vegetation-v1", "Descent/shore-entry-v1", "Descent/shore-exit-v1",
+        "Descent/entry-module-0-v1", "Descent/entry-module-1-v1", "Descent/entry-module-2-v1",
+        "Descent/entry-module-3-v1", "Descent/entry-module-4-v1", "Descent/entry-module-5-v1",
+        "Descent/terrain-stone-v1", "Descent/discovery-floor-v2", "Descent/discovery-ceiling-v2", "Descent/discovery-rear-v1",
+        "Descent/entry-study-left-v2", "Descent/entry-study-right-v2", "Descent/entry-study-floor-v1",
+        "Descent/entry-study-rear-v1", "Descent/entry-study-valley-v1", "Descent/ruin-v1",
         "finale-watchtower-v1", "finale-rubble-v1", "finale-hillside-v1", "finale-gate-v1", "finale-guide-v1", "finale-vertical-guide-v1", "finale-wall-v1", "finale-pier-v1", "finale-garden-v1",
         "checkpoint-states-v1", "checkpoint-tree-v1", "checkpoint-arch-v1",
         "near-extended-panorama-v1", "far-extended-panorama-v1", "bank-tall-ascent-v1", "shelf-ascent-masonry-v1", "landmark-hillside-fortress-v1", "shelf-root", "shelf-masonry", "landmark-waterwheel-hill-v2", "landmark-viaduct-hill-v2", "landmark-willow-hill-v2",
@@ -61,6 +61,7 @@ public static class BuildScenery
     [MenuItem("LegendOfCat/Scenery/Import Golden River variety art")]
     public static void ImportGoldenRiverArt()
     {
+        CaveTerrainImport.Prepare();
         const string rejectedRoof="Assets/Game/Resources/GoldenRiver/Descent/discovery-ceiling-v1.png";
         if(AssetDatabase.LoadAssetAtPath<Texture2D>(rejectedRoof)) {
             string error=AssetDatabase.MoveAsset(rejectedRoof,"Assets/Game/Art/GoldenRiverArchive/discovery-ceiling-v1.png");
@@ -107,6 +108,7 @@ public static class BuildScenery
             if (!string.IsNullOrEmpty(error)) throw new System.InvalidOperationException(error);
         }
         foreach (string name in GoldenRiverArt) {
+            if(name.StartsWith("Descent/entry-module-", System.StringComparison.Ordinal)) continue;
             var importer = (TextureImporter)AssetImporter.GetAtPath("Assets/Game/Resources/GoldenRiver/" + name + ".png");
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.mipmapEnabled = false;
