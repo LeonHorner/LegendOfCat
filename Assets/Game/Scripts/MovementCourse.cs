@@ -154,6 +154,9 @@ public sealed class MovementCourse : MonoBehaviour
     public float AscentSeconds => IntroductionSeconds < 0 ? -1 :
         ascentFinished >= 0 ? ascentFinished : Mathf.Max(0, Run.ElapsedSeconds - ascentStarted);
     public IReadOnlyList<Vector2> ProgressCheckpoints => ActiveCheckpoints;
+    static readonly float[] LabCheckpointHalfWidths = System.Array.ConvertAll(CheckpointSpawns, spawn =>
+        System.Array.Find(Platforms, platform => platform.x == spawn.x).z / 2);
+
     Vector2[] ActiveCheckpoints => LevelOne ? LevelOneCheckpointSpawns : CheckpointSpawns;
     public System.Action BackToMenu;
     readonly System.Collections.Generic.List<MovingSupport> supports = new System.Collections.Generic.List<MovingSupport>();
@@ -406,7 +409,7 @@ public sealed class MovementCourse : MonoBehaviour
             // Marker/spawn follow the course transform when reused in another scene.
             // Touching the stone activates it; the saved spawn remains fixed on safe ground.
             bool inside = LevelOne ? checkpointMarkers[i].Touches(catShape)
-                : Mathf.Abs(position.x - point.x) <= .7f && Mathf.Abs(position.y - point.y) <= .2f;
+                : Mathf.Abs(position.x - point.x) <= LabCheckpointHalfWidths[i] && Mathf.Abs(position.y - point.y) <= .2f;
             if (inside) Progress.MarkCheckpointReached(i + 1);
             if (inside &&
                 Run.TryActivateCheckpoint(i + 1, point, true) && LevelOne && i == 0)

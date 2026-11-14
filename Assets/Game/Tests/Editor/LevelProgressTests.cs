@@ -88,6 +88,43 @@ public sealed class LevelProgressTests
         yield return new ExitPlayMode();
     }
 
+    [UnityTest]
+    public IEnumerator MovementLabGuideWaitsForGroundedCheckpointActivation()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        var host = new GameObject("Checkpoint activation test");
+        var screen = host.AddComponent(RuntimeType("StarterScreen"));
+        Call(screen, "OpenLevel", "movement-lab");
+        var course = screen.GetType().GetField("course", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(screen);
+        var hud = Read(course, "Progress");
+        var run = Read(course, "Run");
+        var cat = (Component)Read(course, "Cat");
+        var grounded = cat.GetType().GetProperty("Grounded");
+        var first = ((IReadOnlyList<Vector2>)Read(course, "ProgressCheckpoints"))[0];
+
+        void Place(Vector2 position, bool onGround)
+        {
+            cat.GetComponent<Rigidbody2D>().position = position;
+            grounded.SetValue(cat, onGround);
+            Call(course, "Update");
+        }
+
+        var landing = first + Vector2.right * 1.5f;
+        Place(landing + Vector2.up, false);
+        Assert.That(Read(run, "Checkpoint"), Is.EqualTo(0));
+        Assert.That(Call(hud, "UpdateGuideCheckpoint", 0, 20f), Is.EqualTo(1));
+
+        Place(landing, true);
+        int active = (int)Read(run, "Checkpoint");
+        Assert.That(active, Is.EqualTo(1), "Landing beyond the post on its platform should activate the checkpoint.");
+        Assert.That(Call(hud, "UpdateGuideCheckpoint", active, 20f), Is.EqualTo(2));
+
+        Call(screen, "CloseCourse");
+        UnityEngine.Object.DestroyImmediate(host);
+        yield return new ExitPlayMode();
+    }
+
     [Test]
     public void GuideAdvancesWithinTwoHudPixelsOfEachReachedCheckpoint()
     {
