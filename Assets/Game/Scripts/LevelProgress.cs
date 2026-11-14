@@ -17,7 +17,7 @@ public sealed class LevelProgress
     readonly bool[] reachedCheckpoints;
     readonly Material grayscale;
     public enum CheckpointState { Unreached, Reached, Active }
-    const float GuideHandoffDistance = 5;
+    const float GuideHandoffDistance = 2;
     public const float Height = 58;
     public const float Width = 520;
 

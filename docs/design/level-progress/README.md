@@ -4,7 +4,7 @@ The top-center outline shows the full route. The painted stroke measures Mika's 
 front-facing portrait moves with the stroke tip. The HUD shows every world
 checkpoint at its fixed position on the bar. Mika passes in front of it, and
 a small upward pointer guides the player to the next checkpoint. The pointer
-glows when Mika reaches it and advances once the portrait moves five HUD
+glows when Mika reaches it and advances once the portrait moves two HUD
 pixels from the checkpoint center at full HUD scale. It disappears after the final checkpoint and resets on restart.
 Unreached checkpoints are gray, reached checkpoints use their
 original colors, and the active retry point has a small gold underline. The default-on setting is available from the main menu.
