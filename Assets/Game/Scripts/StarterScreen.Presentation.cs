@@ -5,6 +5,7 @@ public sealed partial class StarterScreen
 {
     GUIStyle titleStyle, headingStyle, textStyle, smallStyle, buttonStyle, panelStyle;
     GUIStyle runTimerStyle;
+    Texture2D runClockIcon, runClockHand;
     Texture2D backdrop, panelTexture, buttonTexture, hoverTexture, focusTexture;
     readonly List<string> focusable = new List<string>();
     readonly List<string> previousFocus = new List<string>();
@@ -240,13 +241,13 @@ public sealed partial class StarterScreen
     void DrawRunTimer(float elapsedSeconds)
     {
         if (Event.current.type != EventType.Repaint) return;
-        PrepareStyles();
         if (runTimerStyle == null) {
-            runTimerStyle = new GUIStyle(panelStyle) {
-                alignment = TextAnchor.MiddleCenter, fontSize = 16, fontStyle = FontStyle.Bold,
-                padding = new RectOffset(10, 10, 4, 4)
+            runClockIcon = Resources.Load<Texture2D>("Menu/run-stopwatch");
+            runClockHand = CreateRunClockHand();
+            runTimerStyle = new GUIStyle(GUI.skin.label) {
+                alignment = TextAnchor.MiddleRight, fontSize = 25, fontStyle = FontStyle.Bold,
+                padding = new RectOffset()
             };
-            runTimerStyle.normal.textColor = Ink;
         }
 
         var region = MenuLayout.ContentRegion(Screen.width, Screen.height, Screen.safeArea);
@@ -255,8 +256,67 @@ public sealed partial class StarterScreen
         float top = Mathf.Max(region.y, (1 - viewport.yMax) * Screen.height);
         int seconds = Mathf.FloorToInt(elapsedSeconds);
         var label = new GUIContent($"{seconds / 60:00}:{seconds % 60:00}");
-        float width = Mathf.Max(64, runTimerStyle.CalcSize(label).x);
-        GUI.Label(new Rect(right - width - 10, top + 10, width, 28), label, runTimerStyle);
+        float width = Mathf.Ceil(runTimerStyle.CalcSize(label).x);
+        var digits = new Rect(right - width - 12, Mathf.Ceil(top) + 10, width, 36);
+        const float clockSize = 36;
+        if (runClockIcon != null) {
+            var clock = new Rect(digits.x - clockSize - 4, digits.center.y - clockSize / 2, clockSize, clockSize);
+            GUI.DrawTexture(clock, runClockIcon);
+
+            // The painted dial sits below the winding crown within the texture.
+            var pin = new Vector2(
+                Mathf.Floor(clock.x + clock.width * 0.510f) + 0.5f,
+                Mathf.Floor(clock.y + clock.height * 0.567f) + 0.5f);
+            var previousColor = GUI.color;
+            GUI.color = new Color(0.39f, 0.22f, 0.10f);
+            for (int mark = 1; mark < 12; mark++) {
+                if (mark % 3 == 0) continue;
+                float angle = mark * Mathf.PI / 6f;
+                var dot = pin + new Vector2(Mathf.Sin(angle), -Mathf.Cos(angle)) * 9f;
+                GUI.DrawTexture(new Rect(Mathf.Floor(dot.x), Mathf.Floor(dot.y), 1f, 1f), Texture2D.whiteTexture);
+            }
+            GUI.color = previousColor;
+
+            var matrix = GUI.matrix;
+            // The decorative hand makes one full turn every twelve elapsed seconds.
+            GUIUtility.RotateAroundPivot((seconds % 12) * 30f, pin);
+            GUI.DrawTexture(new Rect(pin.x - 2.5f, pin.y - 9, 5, 9), runClockHand);
+            GUI.matrix = matrix;
+        }
+        runTimerStyle.normal.textColor = new Color(0.13f, 0.09f, 0.17f);
+        for (int y = -1; y <= 1; y++)
+            for (int x = -1; x <= 1; x++)
+                if (x != 0 || y != 0)
+                    GUI.Label(new Rect(digits.x + x, digits.y + y, width, digits.height), label, runTimerStyle);
+        runTimerStyle.normal.textColor = Ink;
+        GUI.Label(digits, label, runTimerStyle);
+    }
+
+    static Texture2D CreateRunClockHand()
+    {
+        const int pixelsPerPoint = 8;
+        const int width = 5 * pixelsPerPoint + 1;
+        const int height = 9 * pixelsPerPoint;
+        var hand = new Texture2D(width, height, TextureFormat.RGBA32, false) {
+            hideFlags = HideFlags.HideAndDontSave,
+            wrapMode = TextureWrapMode.Clamp,
+            filterMode = FilterMode.Bilinear
+        };
+        var pixels = new Color32[width * height];
+        for (int y = 0; y < height; y++) {
+            float distanceFromPin = (y + 0.5f) / pixelsPerPoint;
+            // Use a narrow stem at the hub, then flare into the blade.
+            float shoulder = Mathf.Lerp(0.4f, 1.1f, Mathf.InverseLerp(2f, 4f, distanceFromPin));
+            float halfWidth = Mathf.Min(shoulder, (8.2f - distanceFromPin) * 0.3f);
+            for (int x = 0; x < width; x++) {
+                float distanceFromCenter = Mathf.Abs(x - width / 2) * (5f / width);
+                float coverage = Mathf.Clamp01(0.5f + halfWidth - distanceFromCenter);
+                pixels[y * width + x] = new Color32(75, 42, 23, (byte)Mathf.RoundToInt(255 * coverage));
+            }
+        }
+        hand.SetPixels32(pixels);
+        hand.Apply(false, true);
+        return hand;
     }
 
     void DrawGameplayMenu()
@@ -354,7 +414,7 @@ public sealed partial class StarterScreen
     {
         if (course != null) { course.gameObject.SetActive(false); Destroy(course.gameObject); }
         if (stompArena != null) { stompArena.gameObject.SetActive(false); Destroy(stompArena.gameObject); }
-        foreach (var texture in new[] { panelTexture, buttonTexture, hoverTexture, focusTexture })
+        foreach (var texture in new[] { panelTexture, buttonTexture, hoverTexture, focusTexture, runClockHand })
             if (texture != null) Destroy(texture);
     }
 }
