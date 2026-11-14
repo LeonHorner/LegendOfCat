@@ -48,6 +48,7 @@ public static class CaveRebuildReview
             if(!reached)throw new System.InvalidOperationException("Unreachable shared cave target "+point);
         }
         for(int i=0;i<15;i++)Tick();Reach(new Vector3(-6.6f,-1.2f,0));
+        if(capture){cat.GetComponentInChildren<MikaSpritePresentation>().RenderPose(.25f);Save(follow.GetComponent<Camera>(),-1);}
         System.IO.Directory.CreateDirectory("artifacts/cave-rebuild-review");
         var path=CaveTerrainLayout.Path();path[0]=new Vector3(2.6f,-.045f,1);int index=0;foreach(var p in path){Reach(p);if(capture&&index<13){cat.GetComponentInChildren<MikaSpritePresentation>().RenderPose(.25f);Save(root.GetComponentInChildren<Camera>(),index);}if(capture&&index==9){recording=false;System.IO.File.WriteAllText("artifacts/cave-rebuild-review/"+motion+"/frames.txt",((motionTick+4)/5).ToString());}index++;}
         Debug.Log("Shared cave full forward geometry passed.");
@@ -62,6 +63,8 @@ public static class CaveRebuildReview
         if(capture){motion="entrance-reverse";motionTick=0;recording=true;System.IO.Directory.CreateDirectory("artifacts/cave-rebuild-review/"+motion);}
         foreach(var p in new[]{new Vector3(14.7f,-10.7f,1),new Vector3(12,-9.3f,1),new Vector3(10.3f,-8,1),new Vector3(9,-6.405f,1),new Vector3(7.8f,-4.774f,1),new Vector3(6.5f,-3.234f,1),new Vector3(5,-1.585f,1),new Vector3(2.6f,-.045f,1)})Reach(p);
         Debug.Log("Shared cave entrance is reversible with actual jump input.");
+        Reach(new Vector3(-10,-1.245f,0));Reach(new Vector3(2.6f,-.045f,1));
+        Debug.Log("Connected approach shore passed in both directions.");
         if(capture){recording=false;System.IO.File.WriteAllText("artifacts/cave-rebuild-review/"+motion+"/frames.txt",((motionTick+4)/5).ToString());}
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(44,-12.16f)));for(int i=0;i<15;i++)Tick();
         course.TogglePause();var paused=cat.transform.position;for(int i=0;i<20;i++)Tick();

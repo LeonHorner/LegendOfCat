@@ -37,7 +37,7 @@ public static class CaveTerrainImport
         string hash;
         using(var input=new System.IO.MemoryStream())using(var digest=System.Security.Cryptography.SHA256.Create()){
             foreach(var path in new[]{"Assets/Game/Scripts/CaveTerrainLayout.cs","Assets/Game/Scripts/CaveRoute.cs",
-                "Assets/Game/Scripts/CaveLevelConnection.cs","Assets/Game/Editor/CaveTerrainImport.cs"}){
+                "Assets/Game/Scripts/CaveLevelConnection.cs","Assets/Game/Scripts/MovementCourse.cs","Assets/Game/Editor/CaveTerrainImport.cs"}){
                 var bytes=System.IO.File.ReadAllBytes(path);input.Write(bytes,0,bytes.Length);
             }
             hash="cave-mask-v1:"+System.Convert.ToBase64String(digest.ComputeHash(input.ToArray()));

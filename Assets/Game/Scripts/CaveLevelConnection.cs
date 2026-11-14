@@ -57,7 +57,9 @@ public sealed partial class CaveEntryStudy
         TerrainCollider.generationType=CompositeCollider2D.GenerationType.Manual;TerrainCollider.vertexDistance=.001f;
         var stone=RockMaterial();
         foreach(var section in terrain){
-            MeshObject(section.Name,section.Outline,new Rect(0,0,8,8),-3,stone);
+            // The upstream bank stays behind the river; the dry throat remains in front.
+            float depth=section.Name=="Connected approach shore"?-1.8f:-3;
+            MeshObject(section.Name,section.Outline,new Rect(0,0,8,8),depth,stone);
             var item=new GameObject(section.Name+" collision source");item.transform.SetParent(transform,false);
             var collider=item.AddComponent<PolygonCollider2D>();collider.points=section.Outline;collider.compositeOperation=Collider2D.CompositeOperation.Merge;
         }
