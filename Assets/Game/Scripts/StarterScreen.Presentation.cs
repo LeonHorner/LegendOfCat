@@ -4,6 +4,7 @@ using UnityEngine;
 public sealed partial class StarterScreen
 {
     GUIStyle titleStyle, headingStyle, textStyle, smallStyle, buttonStyle, panelStyle;
+    GUIStyle runTimerStyle;
     Texture2D backdrop, panelTexture, buttonTexture, hoverTexture, focusTexture;
     readonly List<string> focusable = new List<string>();
     readonly List<string> previousFocus = new List<string>();
@@ -94,6 +95,7 @@ public sealed partial class StarterScreen
     void OnGUI()
     {
         if (course != null || stompArena != null) {
+            DrawRunTimer((course != null ? course.Run : stompArena.Run).ElapsedSeconds);
             DrawGameplayMenu();
             return;
         }
@@ -233,6 +235,28 @@ public sealed partial class StarterScreen
         if (Event.current.type == EventType.Repaint) { previousFocus.Clear(); previousFocus.AddRange(focusable); }
         GUI.color = oldColor;
         GUI.matrix = oldMatrix;
+    }
+
+    void DrawRunTimer(float elapsedSeconds)
+    {
+        if (Event.current.type != EventType.Repaint) return;
+        PrepareStyles();
+        if (runTimerStyle == null) {
+            runTimerStyle = new GUIStyle(panelStyle) {
+                alignment = TextAnchor.MiddleCenter, fontSize = 16, fontStyle = FontStyle.Bold,
+                padding = new RectOffset(10, 10, 4, 4)
+            };
+            runTimerStyle.normal.textColor = Ink;
+        }
+
+        var region = MenuLayout.ContentRegion(Screen.width, Screen.height, Screen.safeArea);
+        var viewport = MenuLayout.Letterbox16By9(Screen.width, Screen.height);
+        float right = Mathf.Min(region.xMax, viewport.xMax * Screen.width);
+        float top = Mathf.Max(region.y, (1 - viewport.yMax) * Screen.height);
+        int seconds = Mathf.FloorToInt(elapsedSeconds);
+        var label = new GUIContent($"{seconds / 60:00}:{seconds % 60:00}");
+        float width = Mathf.Max(64, runTimerStyle.CalcSize(label).x);
+        GUI.Label(new Rect(right - width - 10, top + 10, width, 28), label, runTimerStyle);
     }
 
     void DrawGameplayMenu()

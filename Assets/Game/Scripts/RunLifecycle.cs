@@ -10,6 +10,7 @@ public sealed class RunLifecycle
     public int Checkpoint { get; private set; }
     public int Retries { get; private set; }
     public float ElapsedSeconds { get; private set; }
+    bool completed;
     public bool Paused { get; private set; }
 
     // Encounter owners subscribe to remove projectiles and restore their initial state
@@ -35,8 +36,10 @@ public sealed class RunLifecycle
     {
         if (float.IsNaN(deltaSeconds) || float.IsInfinity(deltaSeconds) || deltaSeconds < 0)
             throw new ArgumentOutOfRangeException(nameof(deltaSeconds));
-        if (!Paused) ElapsedSeconds += deltaSeconds;
+        if (!Paused && !completed) ElapsedSeconds += deltaSeconds;
     }
+
+    public void Complete() => completed = true;
 
     public bool TogglePause() => Paused = !Paused;
 
@@ -44,6 +47,7 @@ public sealed class RunLifecycle
     {
         ResetTransientState?.Invoke();
         Retries++;
+        completed = false;
         Paused = false;
         return Spawn;
     }
@@ -55,6 +59,7 @@ public sealed class RunLifecycle
         Checkpoint = 0;
         Retries = 0;
         ElapsedSeconds = 0;
+        completed = false;
         Paused = false;
         return Start;
     }

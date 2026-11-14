@@ -195,6 +195,7 @@ public sealed class StompArena : MonoBehaviour
         previousTargetX = Combat.TargetX;
         Combat.Advance(Time.fixedDeltaTime);
         Run.Advance(Time.fixedDeltaTime);
+        if (Combat.Finished) Run.Complete();
         Present();
     }
     public void Retry() { Cat.RespawnAt(transform.TransformPoint(Run.Retry())); previous = transform.InverseTransformPoint(body.position); Present(); }
