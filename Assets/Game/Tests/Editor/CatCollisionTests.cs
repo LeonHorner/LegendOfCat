@@ -60,6 +60,24 @@ public class CatCollisionTests
         } finally { UnityEngine.Object.DestroyImmediate(wall); }
     }
 
+    [TestCase(-1)]
+    [TestCase(1)]
+    public void GentleStaticInclineSupportsStandingWalkingAndJumping(int direction)
+    {
+        UnityEngine.Object.DestroyImmediate(floor.GetComponent<BoxCollider2D>());
+        floor.transform.position=Vector3.zero;
+        floor.AddComponent<PolygonCollider2D>().points=new[]{new Vector2(-5,-2),new Vector2(5,-2),new Vector2(5,2),new Vector2(-5,0)};
+        controller.GetType().GetMethod("RespawnAt").Invoke(controller,new object[]{new Vector2(0,1.7f)});
+        Physics2D.SyncTransforms();for(int i=0;i<40;i++)Tick();var start=body.position;
+        for(int i=0;i<100;i++)Tick();
+        Assert.That(Vector2.Distance(body.position,start),Is.LessThan(.05f),"Idle must not slide down the shore.");
+        Input("SetMove",(float)direction);for(int i=0;i<18;i++)Tick();
+        Assert.That((body.position.x-start.x)*direction,Is.GreaterThan(.8f));
+        Assert.That(controller.GetType().GetProperty("Grounded").GetValue(controller),Is.True);
+        controller.GetType().GetMethod("PressJump").Invoke(controller,null);Tick();
+        Assert.That(body.linearVelocity.y,Is.GreaterThan(5),"A running slope contact must permit a fresh jump.");
+    }
+
     [Test]
     public void SteepBevelCannotHoldMikaInMidair()
     {

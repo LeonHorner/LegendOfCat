@@ -1,0 +1,6 @@
+Shared cave full forward geometry passed.
+Shared cave local recovery geometry passed.
+Shared cave formerly mismatched seam passed in both directions without jumping.
+Connected approach shore passed in both directions.
+Natural bank incline supports idle and jumping.
+Shared cave water, pause, retry and restart passed.

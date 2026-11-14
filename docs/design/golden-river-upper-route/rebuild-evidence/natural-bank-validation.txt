@@ -1,0 +1,4 @@
+Unity 6000.3.27f2: 239/239 tests passed, zero failures. Includes uphill/downhill static incline idle/walk/jump tests and moving-support regressions.
+Windows preview and packed-art validation passed.
+The natural approach supports walking in both directions, idle stability and fresh jumping with the actual controller.
+Visible Windows player launch passed without shader/runtime errors. First Golden River construction measured 639.5 ms in this run; not an FPS benchmark.

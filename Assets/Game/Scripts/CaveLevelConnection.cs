@@ -63,7 +63,7 @@ public sealed partial class CaveEntryStudy
             var item=new GameObject(section.Name+" collision source");item.transform.SetParent(transform,false);
             var collider=item.AddComponent<PolygonCollider2D>();collider.points=section.Outline;collider.compositeOperation=Collider2D.CompositeOperation.Merge;
         }
-        TerrainCollider.GenerateGeometry();Physics2D.SyncTransforms();AddEntranceDetails();AddExposedGrass();
+        TerrainCollider.GenerateGeometry();Physics2D.SyncTransforms();AddEntranceDetails();AddExposedGrass();AddApproachGrass();
         var background=RockMaterial(.52f);
         var rear=new[]{new Vector2(8,-42),new Vector2(205,-42),new Vector2(205,-4.5f),new Vector2(183,-4.5f),
             new Vector2(179,-5.8f),new Vector2(104,-5.8f),new Vector2(72,-7.3f),new Vector2(44,-5.5f),new Vector2(34,-8),
@@ -132,6 +132,22 @@ public sealed partial class CaveEntryStudy
             material.mainTexture=Resources.Load<Texture2D>("GoldenRiver/bank-narrow-v3");material.SetFloat("_Contact",span.y);
             var bounds=new Rect(span.x,span.y-.12f,span.z,.72f);MeshObject("Vegetation over solid contact",Rectangle(bounds),bounds,-3.1f,material);
         }
+    }
+    void AddApproachGrass()
+    {
+        var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/cave-grass-material"));owned.Add(material);RegisterMaterial(material);
+        material.mainTexture=Resources.Load<Texture2D>("GoldenRiver/bank-narrow-v3");material.SetFloat("_FollowContact",1);
+        var vertices=new Vector3[50];var contacts=new Vector2[50];var triangles=new int[144];
+        for(int i=0;i<=24;i++){
+            float x=Mathf.Lerp(CaveTerrainLayout.ApproachRiseStart,CaveTerrainLayout.ApproachRiseEnd,i/24f),height=CaveTerrainLayout.ApproachHeight(x);
+            vertices[i*2]=new Vector3(x,height-.12f,-3.1f);vertices[i*2+1]=new Vector3(x,height+.6f,-3.1f);
+            contacts[i*2]=contacts[i*2+1]=new Vector2(height,0);
+            if(i==24)continue;int offset=i*6,a=i*2;triangles[offset]=a;triangles[offset+1]=a+1;triangles[offset+2]=a+2;
+            triangles[offset+3]=a+2;triangles[offset+4]=a+1;triangles[offset+5]=a+3;
+        }
+        var mesh=new Mesh{name="Continuous approach vegetation"};owned.Add(mesh);mesh.vertices=vertices;mesh.uv2=contacts;mesh.triangles=triangles;mesh.RecalculateBounds();
+        var item=new GameObject("Vegetation following the natural bank",typeof(MeshFilter),typeof(MeshRenderer));item.transform.SetParent(transform,false);
+        item.GetComponent<MeshFilter>().sharedMesh=mesh;item.GetComponent<MeshRenderer>().sharedMaterial=material;
     }
     public static void CarveRecovery(GameObject floor,Transform visual,Transform frame)
     {

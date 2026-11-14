@@ -1,5 +1,7 @@
 # Entrance rebuild review candidate
 
+The latest correction is `natural-approach-960.png` with 640-pixel/grayscale variants, `natural-bank-physics.txt` and `natural-bank-validation.txt` (239 tests). The owner rejected the preceding three-terrace connected-approach candidate. Its images and older motion clips predate the continuous incline and rounded water contact and are historical evidence.
+
 This is the first visual review slice, not acceptance of the complete route. The owner must evaluate the integrated entrance through its first closed passage before the remaining artwork is produced. The far return is currently a tested geometry prototype.
 
 ## Evidence

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 public sealed class CatController : MonoBehaviour
@@ -56,6 +57,7 @@ public sealed class CatController : MonoBehaviour
         var filter = new ContactFilter2D { useTriggers = false };
         var count = shape.Cast(Vector2.down, filter, hits, 0.04f);
         Vector2 nextSupportVelocity = Vector2.zero;
+        Vector2 groundNormal=Vector2.up;bool staticSlope=false,staticGround=false;
         if (leaveGroundSteps == 0)
             for (int i = 0; i < count; i++) {
                 var hit = hits[i];
@@ -63,18 +65,31 @@ public sealed class CatController : MonoBehaviour
                 var moving = hit.collider.GetComponent<MovingSupport>();
                 Vector2 candidateVelocity = moving ? moving.Velocity : Vector2.zero;
                 // A newly landed rider can rise in world space while resting on an ascending lift.
-                if (body.linearVelocity.y - candidateVelocity.y > 0.1f) continue;
+                var contactVelocity=body.linearVelocity-candidateVelocity;
+                bool slope=moving==null&&hit.normal.y<.999999f;
+                if (contactVelocity.y>0.1f&&(!slope||Mathf.Abs(Vector2.Dot(contactVelocity,hit.normal))>.15f)) continue;
                 // Casts do not apply one-way collision rules. An overlapping underside is not ground.
                 if (hit.collider.usedByEffector && shape.bounds.min.y < hit.collider.bounds.max.y - 0.07f) continue;
                 Grounded = true;
                 nextSupportVelocity = candidateVelocity;
+                groundNormal=hit.normal;staticSlope=slope;staticGround=moving==null;
                 break;
             }
         if (leaveGroundSteps > 0) leaveGroundSteps--;
+        if(Grounded&&staticGround&&Mathf.Abs(body.linearVelocity.x)>.05f){
+            var bounds=shape.bounds;
+            var origin=new Vector2(bounds.center.x+Mathf.Sign(body.linearVelocity.x)*(bounds.extents.x+.05f),bounds.min.y+.18f);
+            var ahead=gameObject.scene.GetPhysicsScene2D().Raycast(origin,Vector2.down,.3f);
+            if(ahead.collider&&!ahead.collider.isTrigger&&ahead.distance>.001f&&ahead.normal.y>.7f&&ahead.normal.y<.999999f&&
+                ahead.collider.GetComponent<MovingSupport>()==null){groundNormal=ahead.normal;staticSlope=true;}
+        }
         var relativeVelocity = body.linearVelocity - (Grounded ? nextSupportVelocity : supportVelocity);
         body.linearVelocity = Motion.Step(Time.fixedDeltaTime, Grounded, relativeVelocity);
         supportVelocity = Grounded && !Motion.Jumped ? nextSupportVelocity : Vector2.zero;
         body.linearVelocity += supportVelocity;
+        // Follow a static incline tangentially; do not inject gravity drift while standing.
+        if(Grounded&&staticSlope&&!Motion.Jumped)
+            body.linearVelocity=new Vector2(body.linearVelocity.x,-groundNormal.x/groundNormal.y*body.linearVelocity.x);
         if (!Grounded && relativeVelocity.y <= 0.1f) {
             int contacts = shape.GetContacts(filter, sideContacts);
             for (int i = 0; i < contacts; i++) {

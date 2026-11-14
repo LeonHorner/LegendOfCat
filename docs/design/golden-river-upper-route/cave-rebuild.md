@@ -34,9 +34,11 @@ The rebuilt Windows preview measured 486.8 ms for the first `OpenLevelOne` const
 
 ### Connected approach correction
 
-The owner requested a continuous connection instead of the hard cut between the preceding bank and entrance. Ascent platform 9 now joins the shared terrain registration. Its original contact height is retained, and three short rounded rock rises connect to the upper entrance bank. The legacy platform painting/collider is replaced, not overlaid. Both banks use the same opaque stone and vegetation treatment. The upstream bank renders behind the river so the foreground water remains present; the dry throat remains in front. Actual controller traversal verifies the connection in both directions.
+The owner requested a continuous connection instead of the hard cut between the preceding bank and entrance, then rejected the small three-terrace candidate. Ascent platform 9 now joins the shared terrain registration through a continuous gently curved rock rise. The grass follows the same sampled curve as collision. Static-incline grounding follows the surface tangent so walking, standing without drift and jumping work; moving-support behavior remains independently tested. The legacy platform painting/collider is replaced, not overlaid.
 
-See `rebuild-evidence/connected-approach-960.png`, the 640-pixel/grayscale variants, and `shore-connection-physics.txt`.
+The wet-shore outline is rounded and extends in front of the hidden water-mask edge. The upstream river foundation has an irregular top instead of a straight lower water cut. The preceding bank stays behind the river; the dry throat stays in front. Actual controller traversal verifies the connection in both directions.
+
+See `rebuild-evidence/natural-approach-960.png`, the 640-pixel/grayscale variants, and `natural-bank-physics.txt`. The older connected-approach images and three-terrace validation are retained as owner-rejected history.
 
 The actual approach, descent into the first closed passage and reverse entrance are recorded in [rebuild evidence](rebuild-evidence/README.md), alongside color and grayscale camera poses. Evaluate the wet shoreline contacts, permanent throat, contact correspondence and material consistency in motion before extending this art treatment. The first slice is a review candidate, not owner-accepted final art.
 

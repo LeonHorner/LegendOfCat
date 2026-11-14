@@ -63,8 +63,13 @@ public static class CaveRebuildReview
         if(capture){motion="entrance-reverse";motionTick=0;recording=true;System.IO.Directory.CreateDirectory("artifacts/cave-rebuild-review/"+motion);}
         foreach(var p in new[]{new Vector3(14.7f,-10.7f,1),new Vector3(12,-9.3f,1),new Vector3(10.3f,-8,1),new Vector3(9,-6.405f,1),new Vector3(7.8f,-4.774f,1),new Vector3(6.5f,-3.234f,1),new Vector3(5,-1.585f,1),new Vector3(2.6f,-.045f,1)})Reach(p);
         Debug.Log("Shared cave entrance is reversible with actual jump input.");
-        Reach(new Vector3(-10,-1.245f,0));Reach(new Vector3(2.6f,-.045f,1));
+        Reach(new Vector3(-10,-1.245f,0));Reach(new Vector3(2.6f,-.045f,0));
         Debug.Log("Connected approach shore passed in both directions.");
+        cat.RespawnAt(CaveRoute.ToCourse(new Vector2(-4.3f,.5f)));for(int i=0;i<80;i++)Tick();
+        var standing=cat.transform.localPosition;for(int i=0;i<100;i++)Tick();
+        if(!cat.Grounded||Vector2.Distance(standing,cat.transform.localPosition)>.06f)throw new System.InvalidOperationException("Natural bank incline drifts while idle.");
+        cat.PressJump();Tick();if(cat.GetComponent<Rigidbody2D>().linearVelocity.y<5)throw new System.InvalidOperationException("Jump from the natural bank incline failed.");
+        Debug.Log("Natural bank incline supports idle and jumping.");
         if(capture){recording=false;System.IO.File.WriteAllText("artifacts/cave-rebuild-review/"+motion+"/frames.txt",((motionTick+4)/5).ToString());}
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(44,-12.16f)));for(int i=0;i<15;i++)Tick();
         course.TogglePause();var paused=cat.transform.position;for(int i=0;i<20;i++)Tick();
