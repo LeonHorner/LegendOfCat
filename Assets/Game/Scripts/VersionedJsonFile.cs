@@ -142,3 +142,50 @@ public static class DisplaySettings
                 throw new InvalidDataException("Display dimensions are outside safe bounds.");
         });
 }
+
+public sealed class LevelProgressRecords
+{
+    const int CurrentVersion = 0;
+    readonly VersionedJsonFile file;
+    bool dirty;
+
+    public LevelProgressRecords(string path)
+    {
+        file = new VersionedJsonFile(path, CurrentVersion,
+            () => new JObject { ["levels"] = new JObject() },
+            data => {
+                if (!(data["levels"] is JObject levels))
+                    throw new InvalidDataException("Level progress records must contain a levels object.");
+                foreach (var record in levels.Properties()) {
+                    var value = record.Value;
+                    if ((value.Type != JTokenType.Float && value.Type != JTokenType.Integer) ||
+                        !IsValidFraction(value.Value<float>()))
+                        throw new InvalidDataException("Level progress must be a finite fraction between zero and one.");
+                }
+            });
+    }
+
+    public float Best(string levelId) => file.Data["levels"][levelId]?.Value<float>() ?? 0;
+
+    public void Record(string levelId, float fraction)
+    {
+        if (!IsValidFraction(fraction) || fraction <= Best(levelId)) return;
+        file.Data["levels"][levelId] = fraction;
+        dirty = true;
+    }
+
+    public void Save()
+    {
+        if (!dirty || !file.CanWrite) return;
+        try {
+            file.Save();
+            dirty = false;
+        } catch (IOException error) {
+            UnityEngine.Debug.LogWarning("Level progress records could not be saved. " + error.Message);
+        } catch (UnauthorizedAccessException error) {
+            UnityEngine.Debug.LogWarning("Level progress records could not be saved. " + error.Message);
+        }
+    }
+
+    static bool IsValidFraction(float fraction) => fraction >= 0 && fraction <= 1;
+}

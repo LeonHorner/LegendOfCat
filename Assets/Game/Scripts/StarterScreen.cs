@@ -35,6 +35,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     long downloadedBytes, totalBytes;
     Vector2 scroll;
     MovementCourse course;
+    LevelProgressRecords levelProgressRecords;
     StompArena stompArena;
     VersionedJsonFile displayFile;
     bool fullscreen;
@@ -94,6 +95,12 @@ public sealed partial class StarterScreen : MonoBehaviour
         if (course != null || stompArena != null || popup || applying) return;
         course = LevelRegistry.Create(id);
         course.Progress.Visible = ShowLevelProgress;
+        if (!Preview) {
+            if (levelProgressRecords == null)
+                levelProgressRecords = new LevelProgressRecords(
+                    Path.Combine(Application.persistentDataPath, "level-progress-records.json"));
+            course.Progress.AttachRecords(levelProgressRecords, id);
+        }
         course.BackToMenu = CloseCourse;
     }
 
@@ -130,6 +137,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     void CloseCourse()
     {
         if (course == null) return;
+        course.Progress.SaveRecord();
         // Stop input and rendering immediately, before deferred destruction at the end of the frame.
         course.gameObject.SetActive(false);
         Destroy(course.gameObject);
@@ -333,7 +341,7 @@ public sealed partial class StarterScreen : MonoBehaviour
         messages.Enqueue("{\"state\":\"ready\"}");
     }
 #endif
-    void OnApplicationQuit() { ObserveDisplay(true); platform?.Dispose(); }
+    void OnApplicationQuit() { levelProgressRecords?.Save(); ObserveDisplay(true); platform?.Dispose(); }
     public static bool IsReleaseUrl(string url) => UpdatePolicy.IsReleaseUrl(url);
     string StatusText()
     {

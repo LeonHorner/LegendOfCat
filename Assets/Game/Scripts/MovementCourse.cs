@@ -399,7 +399,11 @@ public sealed class MovementCourse : MonoBehaviour
         Vector2 position = transform.InverseTransformPoint(catBody.position);
         bool atExit = LevelOne && Cat.Grounded && position.x >= LevelOneExit.x - 1 &&
             position.x <= LevelOneExit.x + 3 && Mathf.Abs(position.y - LevelOneExit.y) <= 0.2f;
-        Progress.UpdatePosition(position, atExit);
+        bool completing = atExit || (!LevelOne && Cat.Grounded && position.x >= LabFinish.x);
+        float previousRecord = Progress.PersonalRecord;
+        Progress.UpdatePosition(position, completing);
+        if (completing && previousRecord < 1 && Progress.PersonalRecord >= 1)
+            Progress.SaveRecord();
         if (!LevelOne && !Cat.Grounded) return;
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             Vector2 point = ActiveCheckpoints[i];
@@ -408,11 +412,12 @@ public sealed class MovementCourse : MonoBehaviour
             bool inside = LevelOne ? checkpointMarkers[i].Touches(catShape)
                 : Mathf.Abs(position.x - point.x) <= .7f && Mathf.Abs(position.y - point.y) <= .2f;
             if (inside) Progress.MarkCheckpointReached(i + 1);
-            if (inside &&
-                Run.TryActivateCheckpoint(i + 1, point, true) && LevelOne && i == 0)
-            {
-                IntroductionSeconds = Run.ElapsedSeconds;
-                ascentStarted = Run.ElapsedSeconds;
+            if (inside && Run.TryActivateCheckpoint(i + 1, point, true)) {
+                Progress.SaveRecord();
+                if (LevelOne && i == 0) {
+                    IntroductionSeconds = Run.ElapsedSeconds;
+                    ascentStarted = Run.ElapsedSeconds;
+                }
             }
         }
         if (LevelOne && Run.Checkpoint == 2 && ascentFinished < 0) { ascentFinished = Mathf.Max(0,AscentSeconds); finaleStarted = Run.ElapsedSeconds; }
@@ -438,6 +443,7 @@ public sealed class MovementCourse : MonoBehaviour
     }
     void StartPreviewAt(Vector2 spawn)
     {
+        Progress.BeginPreviewRun();
         Run.TryActivateCheckpoint(1, spawn, true);
         Progress.MarkCheckpointReached(1);
         IntroductionSeconds = 0;

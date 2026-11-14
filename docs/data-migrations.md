@@ -9,6 +9,9 @@ level files yet; do not invent their data models before those features exist.
 
 - Each file format has its own integer `schemaVersion`, independent of the application version.
   Menu and display settings each use independent version **0** schemas, with no display predecessor and no display migration steps. Menu schema 0 shipped in v0.2.0.
+  Level progress records use independent schema 0 in
+  `level-progress-records.json`. The `levels` object maps stable level IDs
+  to their best route fraction between 0 and 1.
   Future saves and editable levels also start at **0** and maintain their own
   version histories. Shipped Unity scenes/assets are build inputs, not migrated user files.
 - `schemaVersion` is mandatory and must be a non-negative integer. Missing/invalid versions

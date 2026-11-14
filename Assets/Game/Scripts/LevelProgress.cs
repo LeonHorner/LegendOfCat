@@ -16,6 +16,10 @@ public sealed class LevelProgress
     readonly Rect[] checkpointUvs;
     readonly bool[] reachedCheckpoints;
     readonly Material grayscale;
+    LevelProgressRecords records;
+    string levelId;
+    bool previewRun;
+    GUIStyle recordLabel;
     public enum CheckpointState { Unreached, Reached, Active }
     const float GuideHandoffDistance = 5;
     public const float Height = 58;
@@ -62,6 +66,23 @@ public sealed class LevelProgress
         previousPosition = route[0];
     }
 
+    public float PersonalRecord => records?.Best(levelId) ?? 0;
+
+    internal void AttachRecords(LevelProgressRecords store, string id)
+    {
+        records = store;
+        levelId = id;
+    }
+
+    internal void BeginPreviewRun() => previewRun = true;
+
+    internal void SaveRecord() => records?.Save();
+
+    void RecordPosition()
+    {
+        if (!previewRun) records?.Record(levelId, Fraction);
+    }
+
     public void Reset(Vector2 position, int activeCheckpoint, bool preview = false)
     {
         if (activeCheckpoint == 0) {
@@ -82,6 +103,7 @@ public sealed class LevelProgress
             segment = route.Length - 2;
             distance = distances[distances.Length - 1];
             previousPosition = position;
+            RecordPosition();
             return;
         }
 
@@ -90,6 +112,7 @@ public sealed class LevelProgress
         float reach = Mathf.Max(4, Vector2.Distance(position, previousPosition) + 2);
         previousPosition = position;
         Project(position, reach);
+        RecordPosition();
     }
 
     void Project(Vector2 position, float reach)
@@ -146,7 +169,7 @@ public sealed class LevelProgress
         float scale = Mathf.Min(1, area.width / 290f);
         float left = area.x + 20 * scale;
         float width = area.width - 40 * scale;
-        float centerY = area.y + 16 * scale;
+        float centerY = area.y + 32 * scale;
         float tip = left + width * Fraction;
         var portrait = new Rect(tip - 14 * scale, centerY - 14 * scale, 28 * scale, 28 * scale);
         // Keep the full route visible over both bright skies and dark terrain.
@@ -180,12 +203,31 @@ public sealed class LevelProgress
             }
         }
         GUI.DrawTexture(portrait, head);
+        if (PersonalRecord > 0)
+            DrawRecord(left + width * PersonalRecord, portrait.yMin - 2 * scale, scale);
         float distanceFromCheckpoint = (Fraction - CheckpointFraction(activeCheckpoint).GetValueOrDefault()) * width / scale;
         int guide = UpdateGuideCheckpoint(activeCheckpoint, distanceFromCheckpoint);
         if (guide > 0) {
             float x = left + width * checkpoints[guide - 1] / distances[distances.Length - 1];
             DrawCheckpointPointer(x, portrait.yMax + 2 * scale, scale, guide == activeCheckpoint);
         }
+    }
+
+    void DrawRecord(float x, float bottom, float scale)
+    {
+        var badge = new Rect(x - 10 * scale, bottom - 13 * scale, 20 * scale, 11 * scale);
+        GUI.DrawTexture(badge, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
+            new Color(.12f, .09f, .13f, .85f), 0, 2 * scale);
+        GUI.DrawTexture(new Rect(x - scale, badge.yMax, 2 * scale, 2 * scale),
+            Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, new Color(1, .89f, .64f), 0, 0);
+        if (recordLabel == null) recordLabel = new GUIStyle(GUI.skin.label) {
+            alignment = TextAnchor.MiddleCenter,
+            padding = new RectOffset(),
+            fontStyle = FontStyle.Bold,
+            normal = { textColor = new Color(1, .89f, .64f) }
+        };
+        recordLabel.fontSize = Mathf.Max(1, Mathf.RoundToInt(9 * scale));
+        GUI.Label(badge, "PR", recordLabel);
     }
 
     static void DrawCheckpointPointer(float x, float y, float scale, bool glowing)
