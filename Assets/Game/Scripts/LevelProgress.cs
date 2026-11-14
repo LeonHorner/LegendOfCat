@@ -8,6 +8,7 @@ public sealed class LevelProgress
     readonly float[] distances;
     readonly float[] checkpoints;
     int segment;
+    int clearedGuideCheckpoint;
     float distance;
     Vector2 previousPosition;
     readonly Texture2D fill, head;
@@ -62,7 +63,10 @@ public sealed class LevelProgress
 
     public void Reset(Vector2 position, int activeCheckpoint, bool preview = false)
     {
-        if (activeCheckpoint == 0) Array.Clear(reachedCheckpoints, 0, reachedCheckpoints.Length);
+        if (activeCheckpoint == 0) {
+            Array.Clear(reachedCheckpoints, 0, reachedCheckpoints.Length);
+            clearedGuideCheckpoint = 0;
+        }
         float anchor = activeCheckpoint > 0 ? checkpoints[activeCheckpoint - 1] : 0;
         segment = 0;
         while (segment + 1 < route.Length - 1 && distances[segment + 1] <= anchor) segment++;
@@ -127,6 +131,13 @@ public sealed class LevelProgress
         sequence == activeCheckpoint ? CheckpointState.Active :
         reachedCheckpoints[sequence - 1] ? CheckpointState.Reached : CheckpointState.Unreached;
 
+    internal int UpdateGuideCheckpoint(int activeCheckpoint, bool activeCheckpointCovered)
+    {
+        if (activeCheckpoint > clearedGuideCheckpoint && activeCheckpointCovered) return activeCheckpoint;
+        clearedGuideCheckpoint = Mathf.Max(clearedGuideCheckpoint, activeCheckpoint);
+        return clearedGuideCheckpoint < checkpoints.Length ? clearedGuideCheckpoint + 1 : 0;
+    }
+
     public void Draw(Rect area, int activeCheckpoint)
     {
         if (!Visible || !HasArtwork || Event.current.type != EventType.Repaint) return;
@@ -141,6 +152,7 @@ public sealed class LevelProgress
         if (Fraction > 0)
             GUI.DrawTextureWithTexCoords(new Rect(left, centerY - 5 * scale, tip - left, 10 * scale),
                 fill, new Rect(0, 0, Fraction, 1));
+        bool activeCheckpointCovered = false;
         for (int sequence = 1; sequence <= checkpoints.Length; sequence++) {
             var world = CheckpointVisual(sequence);
             if (!world || !world.sprite) continue;
@@ -150,13 +162,12 @@ public sealed class LevelProgress
             float iconWidth = 24 * scale * (uv.width < 1 ? .65f :
                 Mathf.Clamp01(world.transform.localScale.x / world.transform.localScale.y));
             var icon = new Rect(x - iconWidth / 2, centerY - 12 * scale, iconWidth, 24 * scale);
-            bool covered = portrait.Overlaps(icon);
-            if (covered) {
-                DrawCheckpointPointer(x, portrait.yMax + 2 * scale, scale, state);
-            } else if (state == CheckpointState.Active) {
-                GUI.DrawTexture(new Rect(x - 2 * scale, icon.yMax, 4 * scale, 2 * scale),
-                    Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
-                    new Color(1, .89f, .64f), 0, scale);
+            if (state == CheckpointState.Active) {
+                activeCheckpointCovered = portrait.Overlaps(icon);
+                if (!activeCheckpointCovered)
+                    GUI.DrawTexture(new Rect(x - 2 * scale, icon.yMax, 4 * scale, 2 * scale),
+                        Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
+                        new Color(1, .89f, .64f), 0, scale);
             }
             if (state == CheckpointState.Unreached) {
                 grayscale.SetColor("_Tint", world.color);
@@ -169,16 +180,27 @@ public sealed class LevelProgress
             }
         }
         GUI.DrawTexture(portrait, head);
+        int guide = UpdateGuideCheckpoint(activeCheckpoint, activeCheckpointCovered);
+        if (guide > 0) {
+            float x = left + width * checkpoints[guide - 1] / distances[distances.Length - 1];
+            DrawCheckpointPointer(x, portrait.yMax + 2 * scale, scale, guide == activeCheckpoint);
+        }
     }
 
-    static void DrawCheckpointPointer(float x, float y, float scale, CheckpointState state)
+    static void DrawCheckpointPointer(float x, float y, float scale, bool glowing)
     {
-        Color color = state == CheckpointState.Unreached ? new Color(.8f, .8f, .8f) :
-            state == CheckpointState.Active ? new Color(1, .89f, .64f) : new Color(.96f, .92f, .84f);
+        Color color = new Color(.86f, .86f, .86f);
+        if (glowing) {
+            color = new Color(1, .89f, .64f);
+            float pulse = .65f + .35f * Mathf.Sin(Time.unscaledTime * 5);
+            GUI.DrawTexture(new Rect(x - 7 * scale, y - 2 * scale, 14 * scale, 10 * scale),
+                Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
+                new Color(1, .72f, .24f, pulse * .45f), 0, 5 * scale);
+        }
         // An upward pointer with a dark edge stays visible against light scenery.
         for (int row = 0; row < 5; row++) {
             float halfWidth = (row + .5f) * scale;
-            GUI.DrawTexture(new Rect(x - halfWidth - scale, y + row * scale, 2 * (halfWidth + scale), 2 * scale),
+            GUI.DrawTexture(new Rect(x - halfWidth - .75f * scale, y + row * scale, 2 * (halfWidth + .75f * scale), 2 * scale),
                 Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, new Color(.12f, .09f, .13f, .85f), 0, 0);
             GUI.DrawTexture(new Rect(x - halfWidth, y + row * scale, 2 * halfWidth, scale),
                 Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, color, 0, 0);

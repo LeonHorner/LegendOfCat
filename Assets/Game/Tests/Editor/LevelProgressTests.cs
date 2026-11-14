@@ -89,6 +89,23 @@ public sealed class LevelProgressTests
     }
 
     [Test]
+    public void GuideAdvancesWhenMikaClearsEachReachedCheckpoint()
+    {
+        var route = new[] { Vector2.zero, Vector2.right, Vector2.right * 2, Vector2.right * 3 };
+        var hud = Activator.CreateInstance(RuntimeType("LevelProgress"), route, new[] { 1, 2 }, "golden-river");
+        int Guide(int active, bool covered) => (int)Call(hud, "UpdateGuideCheckpoint", active, covered);
+
+        Assert.That(Guide(0, false), Is.EqualTo(1));
+        Assert.That(Guide(1, true), Is.EqualTo(1));
+        Assert.That(Guide(1, false), Is.EqualTo(2));
+        Assert.That(Guide(1, true), Is.EqualTo(2), "Backtracking must keep the next checkpoint targeted.");
+        Assert.That(Guide(2, true), Is.EqualTo(2));
+        Assert.That(Guide(2, false), Is.Zero);
+        Call(hud, "Reset", Vector2.zero, 0, false);
+        Assert.That(Guide(0, false), Is.EqualTo(1));
+    }
+
+    [Test]
     public void ProjectionFollowsSwitchbackAndVerticalCrossing()
     {
         var points = new[] { Vector2.zero, new Vector2(20, 0), new Vector2(20, 3),
