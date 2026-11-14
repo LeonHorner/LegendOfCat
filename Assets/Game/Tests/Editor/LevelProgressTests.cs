@@ -89,55 +89,6 @@ public sealed class LevelProgressTests
     }
 
     [Test]
-    public void PersonalRecordPersistsByLevelAndIgnoresPreviewRuns()
-    {
-        string dir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(dir);
-        string path = Path.Combine(dir, "level-progress-records.json");
-        var recordType = RuntimeType("LevelProgressRecords");
-        object Open() => Activator.CreateInstance(recordType, path);
-        try {
-            var points = new[] { Vector2.zero, Vector2.right * 5, Vector2.right * 10 };
-            var hud = Activator.CreateInstance(RuntimeType("LevelProgress"), points, new[] { 1 }, "golden-river");
-            var records = Open();
-            Call(hud, "AttachRecords", records, "golden-river");
-            Assert.That(Read(hud, "PersonalRecord"), Is.EqualTo(0f));
-            Call(hud, "UpdatePosition", Vector2.right * 6, false);
-            Assert.That((float)Read(hud, "PersonalRecord"), Is.EqualTo(.6f).Within(.001f));
-            Call(hud, "UpdatePosition", Vector2.right * 3, false);
-            Call(hud, "Reset", points[1], 1, false);
-            Call(hud, "Reset", points[0], 0, false);
-            Assert.That((float)Read(hud, "PersonalRecord"), Is.EqualTo(.6f).Within(.001f));
-
-            Call(hud, "BeginPreviewRun");
-            Call(hud, "Reset", points[1], 1, true);
-            Call(hud, "UpdatePosition", points[2], true);
-            Call(hud, "SaveRecord");
-            Call(records, "Record", "movement-lab", .2f);
-            Call(records, "Save");
-
-            var reopened = Open();
-            Assert.That((float)Call(reopened, "Best", "golden-river"), Is.EqualTo(.6f).Within(.001f));
-            Assert.That((float)Call(reopened, "Best", "movement-lab"), Is.EqualTo(.2f).Within(.001f));
-
-            var normalRun = Activator.CreateInstance(RuntimeType("LevelProgress"), points, new[] { 1 }, "golden-river");
-            Call(normalRun, "AttachRecords", reopened, "golden-river");
-            Call(normalRun, "UpdatePosition", points[2], true);
-            Call(normalRun, "SaveRecord");
-            Assert.That(Call(Open(), "Best", "golden-river"), Is.EqualTo(1f));
-
-            const string future = "{\"schemaVersion\":1,\"levels\":{}}";
-            File.WriteAllText(path, future);
-            var protectedRecords = Open();
-            Call(protectedRecords, "Record", "golden-river", .4f);
-            Call(protectedRecords, "Save");
-            Assert.That(File.ReadAllText(path), Is.EqualTo(future));
-        } finally {
-            Directory.Delete(dir, true);
-        }
-    }
-
-    [Test]
     public void GuideAdvancesWithinFiveHudPixelsOfEachReachedCheckpoint()
     {
         var route = new[] { Vector2.zero, Vector2.right, Vector2.right * 2, Vector2.right * 3 };

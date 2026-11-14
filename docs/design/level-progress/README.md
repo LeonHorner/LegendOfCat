@@ -9,11 +9,6 @@ pixels from the checkpoint center at full HUD scale. It disappears after the fin
 Unreached checkpoints are gray, reached checkpoints use their
 original colors, and the active retry point has a small gold underline. The default-on setting is available from the main menu.
 
-A PR notch above the bar tracks the furthest progress reached in each level.
-It stays at the record when Mika backtracks, retries, or restarts. Records
-are saved on checkpoint activation, completion, menu return, and game quit.
-Developer preview runs do not update records.
-
 When adding a level, register its launch factory in LevelRegistry. Supply an
 ordered local-space route through the start, checkpoint spawns, and finish.
 Use a distinct painted fill and bind each checkpoint to its world renderer.
