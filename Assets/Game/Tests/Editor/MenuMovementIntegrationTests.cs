@@ -841,12 +841,20 @@ public class MenuMovementIntegrationTests
             SettleCourse(cat, course);
             SettleCourse(cat, course);
             Assert.That(exitSignals, Is.EqualTo(1));
+            var elapsed = run.GetType().GetProperty("ElapsedSeconds");
+            float finalTime = (float)elapsed.GetValue(run);
+            run.GetType().GetMethod("Advance").Invoke(run, new object[] { 3f });
+            Assert.That(elapsed.GetValue(run), Is.EqualTo(finalTime));
             course.GetType().GetMethod("RetryCheckpoint").Invoke(course, null);
             Assert.That(body.position.x, Is.EqualTo(((Vector2[])course.GetType().GetField("LevelOneCheckpointSpawns").GetValue(null))[1].x).Within(0.001f));
+            Assert.That(elapsed.GetValue(run), Is.EqualTo(finalTime));
+            run.GetType().GetMethod("Advance").Invoke(run, new object[] { 3f });
+            Assert.That(elapsed.GetValue(run), Is.EqualTo(finalTime + 3f));
             cat.GetType().GetMethod("RespawnAt").Invoke(cat, new object[] { (Vector2)course.GetType().GetField("LevelOneExit").GetValue(null) });
             SettleCourse(cat, course);
             Assert.That(exitSignals, Is.EqualTo(2), "Retry rearms the transient exit hook.");
             course.GetType().GetMethod("RestartRun").Invoke(course, null);
+            Assert.That(elapsed.GetValue(run), Is.EqualTo(0f));
             Assert.That((int)run.GetType().GetProperty("Checkpoint").GetValue(run), Is.Zero);
         } finally {
             Physics2D.simulationMode = oldMode;

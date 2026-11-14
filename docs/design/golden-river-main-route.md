@@ -165,8 +165,10 @@ later sections remain short placeholders for subsequent pacing iterations.
 The introduction pacing review used elapsed session time through the first
 checkpoint, including retries and excluding pauses. The gameplay debug panel
 that displayed this timing was removed in #84. Press P or the controller's
-right bumper to open the pause menu. Retry returns Mika to the active
-checkpoint, and Restart returns Mika to the level start.
+right bumper to open the pause menu. The standalone timer in the upper-right
+shows total run time in minutes and seconds. It freezes while paused and at the
+exit. Retry returns Mika to the active checkpoint and continues the same clock.
+Restart returns Mika to the level start and resets the timer to zero.
 
 This is a collision/pacing iteration using existing scenery. The longer route
 exposes repeated/mirrored banks and scenery; unique landmarks and final scenery

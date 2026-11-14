@@ -388,8 +388,9 @@ public sealed class MovementCourse : MonoBehaviour
         foreach (var marker in checkpointMarkers) marker.Refresh(Time.deltaTime);
         if (Run.Paused) return;
         Vector2 position = transform.InverseTransformPoint(catBody.position);
-        bool atExit = LevelOne && Cat.Grounded && position.x >= LevelOneExit.x - 1 &&
-            position.x <= LevelOneExit.x + 3 && Mathf.Abs(position.y - LevelOneExit.y) <= 0.2f;
+        Vector2 finish = LevelOne ? LevelOneExit : LabFinish;
+        bool atExit = Cat.Grounded && position.x >= finish.x - 1 &&
+            position.x <= finish.x + 3 && Mathf.Abs(position.y - finish.y) <= 0.2f;
         Progress.UpdatePosition(position, atExit);
         if (!LevelOne && !Cat.Grounded) return;
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
@@ -410,6 +411,7 @@ public sealed class MovementCourse : MonoBehaviour
         if (atExit && !HasReachedExit) {
             HasReachedExit = true;
             finaleFinished = FinaleSeconds;
+            Run.Complete();
             ExitReached?.Invoke();
         }
     }

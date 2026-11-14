@@ -820,3 +820,28 @@ The existing near panorama is extended to 14332×1448 using an original generated
   olive eyes, irregular orange tabby markings and cream muzzle, with a
   straight-on gaze. The selected output was cropped and downsampled for HUD
   use. Distributed under the repository license.
+
+- **Run stopwatch**, 2026-11-14. Runtime asset
+  `Assets/Game/Resources/Menu/run-stopwatch.png`. Original artwork generated
+  with the built-in OpenAI ImageGen tool (exact model revision undisclosed).
+  The user supplied a painted river and waterwheel scene as a style reference
+  and asked for a fresh, detailed clock with no HUD backdrop. The generation
+  brief specified a weathered brass stopwatch, an ivory face with bold hands,
+  and gold-green ivy. The selected image was cropped and downsampled to fit a
+  128-pixel RGBA texture with transparent padding. See ASSET-LICENSE.md for
+  the project's CC BY-NC 4.0 terms.
+
+  The animated revision uses a built-in ImageGen edit of the same icon. The
+  edit brief removed the fixed hands and retained the brass case, ivory
+  dial, gold pin, hour marks, ivy, and transparent edges. The game draws
+  a decorative hand that snaps forward 30 degrees each elapsed second.
+
+  The simplified HUD trial uses a built-in ImageGen edit of the handless
+  revision. At the user's request the brief reduced detail to a clean brass
+  rim, ivory dial, four hour marks, simple crown, and one ivy leaf. The icon
+  was cropped and downsampled with alpha, and the moving hand was aligned
+  to the new dial pin.
+
+  The pointer is an original code-drawn tapered hand with filtered alpha
+  edges. The user requested a classic profile and more consistent visual
+  weight across tick positions. No new image model or external asset was used.
