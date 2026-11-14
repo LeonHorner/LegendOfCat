@@ -14,6 +14,7 @@ public sealed partial class StarterScreen
     bool simulateCutout;
     float guiScale = 1;
     bool revealFocus;
+    bool gameplayMenuVisible;
     bool UpdatesSupported {
         get {
 #if LEGEND_OF_CAT_PREVIEW
@@ -67,7 +68,7 @@ public sealed partial class StarterScreen
         bool keyboard = GUI.enabled && !Event.current.alt && GUI.GetNameOfFocusedControl() == control && Event.current.type == EventType.KeyDown &&
             (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter);
         if (keyboard) Event.current.Use();
-        bool clicked = GUILayout.Button(label, buttonStyle, GUILayout.MinHeight(Mathf.Max(48, 48 / guiScale)));
+        bool clicked = GUILayout.Button(label, buttonStyle, GUILayout.MinHeight(gameplayMenuVisible ? 48 : Mathf.Max(48, 48 / guiScale)));
         if (revealFocus && Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == control) {
             var rect = GUILayoutUtility.GetLastRect();
             if (popup) popupScroll.y = Mathf.Max(0, rect.y - 80);
@@ -92,7 +93,11 @@ public sealed partial class StarterScreen
 
     void OnGUI()
     {
-        if (course != null || stompArena != null) return;
+        if (course != null || stompArena != null) {
+            DrawGameplayMenu();
+            return;
+        }
+        gameplayMenuVisible = false;
         PrepareStyles();
         var oldColor = GUI.color;
         var oldMatrix = GUI.matrix;
@@ -228,6 +233,70 @@ public sealed partial class StarterScreen
         if (Event.current.type == EventType.Repaint) { previousFocus.Clear(); previousFocus.AddRange(focusable); }
         GUI.color = oldColor;
         GUI.matrix = oldMatrix;
+    }
+
+    void DrawGameplayMenu()
+    {
+        bool finished = stompArena != null && stompArena.Combat.Finished;
+        bool paused = (course != null ? course.Run : stompArena.Run)?.Paused ?? false;
+        if (!paused && !finished) {
+            if (gameplayMenuVisible) {
+                previousFocus.Clear();
+                GUI.FocusControl(null);
+                revealFocus = false;
+                gameplayMenuVisible = false;
+            }
+            return;
+        }
+
+        PrepareStyles();
+        var region = MenuLayout.ContentRegion(Screen.width, Screen.height, Screen.safeArea);
+        var oldMatrix = GUI.matrix;
+        var oldColor = GUI.color;
+        int oldDepth = GUI.depth;
+        GUI.depth = -10;
+        guiScale = Mathf.Min(MenuLayout.Scale(region), Mathf.Max(1, region.height - 16) / 320);
+        GUI.matrix = Matrix4x4.TRS(new Vector3(region.x, region.y), Quaternion.identity, Vector3.one * guiScale);
+        GUI.color = Color.white;
+        float width = region.width / guiScale;
+        float height = region.height / guiScale;
+        float panelWidth = Mathf.Max(1, Mathf.Min(320, width - 16));
+        float panelHeight = Mathf.Max(1, Mathf.Min(320, height - 16));
+
+        if (!gameplayMenuVisible) {
+            previousFocus.Clear();
+            GUI.FocusControl(null);
+            revealFocus = false;
+            gameplayMenuVisible = true;
+        }
+        NavigateFocus();
+        focusable.Clear();
+        GUILayout.BeginArea(new Rect((width - panelWidth) / 2, (height - panelHeight) / 2, panelWidth, panelHeight), panelStyle);
+        Label(finished ? (stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
+        bool resume = !finished && Button("Resume", fixedNavigation: true);
+        bool retry = Button("Retry", fixedNavigation: true);
+        bool restart = Button("Restart", fixedNavigation: true);
+        bool menu = Button("Main menu", fixedNavigation: true);
+        GUILayout.EndArea();
+        if (Event.current.type == EventType.Repaint) {
+            previousFocus.Clear();
+            previousFocus.AddRange(focusable);
+        }
+        GUI.matrix = oldMatrix;
+        GUI.color = oldColor;
+        GUI.depth = oldDepth;
+
+        if (course != null) {
+            if (resume) course.TogglePause();
+            else if (retry) course.RetryCheckpoint();
+            else if (restart) course.RestartRun();
+            else if (menu) CloseCourse();
+        } else {
+            if (resume) stompArena.TogglePause();
+            else if (retry) stompArena.Retry();
+            else if (restart) stompArena.Restart();
+            else if (menu) CloseStompArena();
+        }
     }
 
 #if LEGEND_OF_CAT_PREVIEW

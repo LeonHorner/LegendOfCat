@@ -162,12 +162,11 @@ is (431, 0.52), rejoin is (470, 0.52), and exit reference is (503, 0.52). There 
 still exactly two checkpoints beyond start and 31 main-route platforms. These
 later sections remain short placeholders for subsequent pacing iterations.
 
-The compact HUD shows **Intro** session seconds and freezes that reading on first
-activation of checkpoint 1. It includes time spent before retries, excludes pause,
-and resets on full restart. It is session feedback, not a saved record or a clean
-attempt timer. For this review, play from full restart to **INTRODUCTION COMPLETE**,
-report the displayed time, falls, and whether any stretch feels repetitive, empty
-or awkward. The rest of the route remains traversable after that marker.
+The introduction pacing review used elapsed session time through the first
+checkpoint, including retries and excluding pauses. The gameplay debug panel
+that displayed this timing was removed in #84. Press P or the controller's
+right bumper to open the pause menu. Retry returns Mika to the active
+checkpoint, and Restart returns Mika to the level start.
 
 This is a collision/pacing iteration using existing scenery. The longer route
 exposes repeated/mirrored banks and scenery; unique landmarks and final scenery
