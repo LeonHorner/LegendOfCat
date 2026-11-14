@@ -11,6 +11,15 @@ public static class CaveTerrainImport
     public static void Prepare()
     {
         ArchiveRejectedTerrain();
+        foreach(var name in new[]{"concept-entry-left-v1","concept-entry-roof-v1","concept-entry-recess-v1","concept-entry-rock-v1"}){
+            string path="Assets/Game/Resources/GoldenRiver/Descent/"+name+".png";
+            var importer=AssetImporter.GetAtPath(path) as TextureImporter;if(!importer)continue;
+            importer.textureType=TextureImporterType.Default;importer.alphaIsTransparency=false;importer.wrapMode=TextureWrapMode.Clamp;
+            importer.npotScale=TextureImporterNPOTScale.None;importer.mipmapEnabled=false;importer.isReadable=false;
+            importer.maxTextureSize=4096;importer.textureCompression=TextureImporterCompression.Uncompressed;
+            var platform=importer.GetPlatformTextureSettings("Standalone");platform.overridden=true;platform.maxTextureSize=4096;
+            platform.format=TextureImporterFormat.RGBA32;importer.SetPlatformTextureSettings(platform);importer.SaveAndReimport();
+        }
         for(int i=0;i<6;i++){
             string path="Assets/Game/Resources/GoldenRiver/Descent/entry-module-"+i+"-v1.png";
             var importer=AssetImporter.GetAtPath(path) as TextureImporter;if(!importer)continue;

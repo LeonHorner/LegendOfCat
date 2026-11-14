@@ -12,7 +12,7 @@ public static class IntegratedCaveReview
     {
         Physics2D.SyncTransforms();var shapes=course.GetComponentsInChildren<Collider2D>();
         bool Effective(Collider2D c)=>c.enabled&&!c.isTrigger&&c.compositeOperation==Collider2D.CompositeOperation.None;
-        foreach(int i in new[]{9,10,11,33,34,39}){
+        foreach(int i in new[]{9,10,11,12,33,34,39}){
             var p=MovementCourse.AscentPlatforms[i];var point=new Vector2(p.x,p.y+.74f);int contacts=0;
             foreach(var c in shapes){if(Effective(c)&&c.OverlapPoint(point))contacts++;
                 Require(c.name!="Standable platform"||Mathf.Abs(c.transform.position.x-p.x)>=.01f,"Old main collision remains at shore "+i);}

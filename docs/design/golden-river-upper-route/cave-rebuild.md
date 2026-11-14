@@ -32,6 +32,16 @@ The rebuilt Windows preview measured 486.8 ms for the first `OpenLevelOne` const
 
 ## Entrance review candidate
 
+### Approved concept implementation
+
+The owner approved [this new entrance concept](approved-entrance-concept.png) and requested its in-game implementation. It supersedes the earlier thin curved-overhang treatment as the entrance target. Concept approval is not acceptance of the game captures or the rest of the route.
+
+The entrance now uses separate native left cliff and massive right cliff paintings, a quieter recessed alcove and a slate-only foundation material. The two right-hand main landings (ascent 11 and 12) belong to the same solid cliff, with their original contact heights and widths preserved. The old ascent-12 painting and collider are replaced together. A shallow top cleft separates their contacts; the normal route can continue by jumping as before. Below them, the wide overhang is visibly anchored in the larger cliff rather than forming a thin arm.
+
+The alcove's upper seam is buried inside the roof contour, including where that roof rises above the riverbed; it cannot cross the main-route sky. Its irregular outer flank narrows the remaining valley opening through actual world-space descent. The camera does not toggle or move any of these renderers. The native paintings are clipped to the same outlines as collision and do not determine contact through their grass alpha. Slate grain continues into the underlying foundations; the grass darkens gradually with indirect cave light.
+
+See [source images, exact production prompts and decisions](concept-entry-assets.json). The retained stencils show the authored registration. The first thin roof trial and a visible fixed-height rear-wall edge were rejected during local in-game comparison. The concept is stored outside Resources and is never overlaid as a screenshot.
+
 ### Connected approach correction
 
 The owner requested a continuous connection instead of the hard cut between the preceding bank and entrance, then rejected the small three-terrace candidate. Ascent platform 9 now joins the shared terrain registration through a continuous gently curved rock rise. The grass follows the same sampled curve as collision. Static-incline grounding follows the surface tangent so walking, standing without drift and jumping work; moving-support behavior remains independently tested. The legacy platform painting/collider is replaced, not overlaid.

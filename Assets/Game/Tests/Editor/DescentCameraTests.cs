@@ -26,6 +26,13 @@ public sealed class DescentCameraTests
         var route=Runtime("CaveRoute");float origin=(float)route.GetProperty("Origin").GetValue(null);
         var fissure=root.GetComponentsInChildren<MeshRenderer>().Single(r=>r.name=="Permanent recessed cave rock");
         Assert.That(fissure.bounds.max.y,Is.LessThan(-4.3f),"The cave backdrop must not cover the main route above the riverbed.");
+        var mouth=root.GetComponentsInChildren<MeshRenderer>().Single(r=>r.name=="Layered recessed entrance alcove");
+        var mouthVertices=mouth.GetComponent<MeshFilter>().sharedMesh.vertices;
+        var roof=(Vector2[])Runtime("CaveTerrainLayout").GetField("EntryRoof").GetValue(null);
+        foreach(var vertex in mouthVertices.Take(13).Where(v=>v.y>-4.3f)){
+            bool underSolid=(bool)route.GetMethod("Contains").Invoke(null,new object[]{roof,(Vector2)vertex});
+            Assert.That(underSolid,Is.True,"The upper alcove seam must be buried in solid roof, never across main-route sky.");
+        }
         var renderers=root.GetComponentsInChildren<Renderer>();var enabled=renderers.Select(r=>r.enabled).ToArray();
         int mask=camera.cullingMask;var layers=renderers.Select(r=>r.gameObject.layer).ToArray();
         var mode=Physics2D.simulationMode;Physics2D.simulationMode=SimulationMode2D.Script;

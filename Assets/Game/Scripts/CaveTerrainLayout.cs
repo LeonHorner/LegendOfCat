@@ -72,12 +72,15 @@ public static class CaveTerrainLayout
     public static readonly Vector2[] EntryRoof=BuildEntranceRoof();
     static Vector2[] BuildEntranceRoof()
     {
-        var points=new List<Vector2>{new Vector2(5.99f,.755f),new Vector2(9.99f,.755f),new Vector2(10.4f,.35f),
-            new Vector2(11.5f,-1.3f),new Vector2(12.5f,-3.1f)};
-        for(float x=14;x<=34;x+=.5f)points.Add(new Vector2(x,RiverbedSurface(x)));
+        // Both existing main landings belong to one massive cliff. Their original
+        // contact heights and widths remain; the shallow cleft still invites a jump.
+        var points=new List<Vector2>{new Vector2(5.99f,.755f),new Vector2(9.99f,.755f),new Vector2(10.2f,-.35f),
+            new Vector2(11.35f,-.35f),new Vector2(11.79f,.955f),new Vector2(17.79f,.955f),new Vector2(18.25f,.55f),
+            new Vector2(18.7f,-.6f),new Vector2(19.2f,-1.7f),new Vector2(20.3f,-3.1f)};
+        for(float x=22;x<=34;x+=.5f)points.Add(new Vector2(x,RiverbedSurface(x)));
         points.AddRange(new[]{new Vector2(34,-8.2f),new Vector2(29,-8.6f),new Vector2(24,-8.6f),new Vector2(18,-8.6f),
-            new Vector2(16,-7.8f),new Vector2(14,-7),new Vector2(12,-5.8f),new Vector2(11.53f,-5.5f),new Vector2(10.01f,-4.5f),
-            new Vector2(9.23f,-3),new Vector2(8.04f,-1.6f),new Vector2(7,-.7f),new Vector2(6.2f,-.2f)});
+            new Vector2(16,-7.8f),new Vector2(14,-7),new Vector2(12,-5.8f),new Vector2(11.53f,-5.5f),new Vector2(10.7f,-5.15f),new Vector2(10.01f,-4.5f),
+            new Vector2(9.23f,-3),new Vector2(8.7f,-2.7f),new Vector2(8.04f,-1.6f),new Vector2(7.5f,-1.35f),new Vector2(7,-.7f),new Vector2(6.2f,-.2f)});
         return points.ToArray();
     }    public static Vector2[] Box(float x,float y,float w,float h)=>new[]{new Vector2(x,y),new Vector2(x+w,y),new Vector2(x+w,y+h),new Vector2(x,y+h)};
     static Section Bank(string name,Vector3 p,bool carve=false)
@@ -91,7 +94,7 @@ public static class CaveTerrainLayout
             new Vector3(-2.65f,-.045f,6.44f),new Vector3(3.6f,-1.585f,1.97f),new Vector3(4.2f,-3.234f,2.9f),
             new Vector3(5,-4.774f,3.49f),new Vector3(6.2f,-6.405f,3.62f),new Vector3(7.2f,-8,3.7f),
             new Vector3(10.4f,-9.3f,3.2f),new Vector3(13.6f,-10.7f,2.7f)),
-            new Section("Massive entrance overhang",EntryRoof,new Vector3(5.99f,.755f,4))};
+            new Section("Massive entrance overhang",EntryRoof,new Vector3(5.99f,.755f,4),new Vector3(11.79f,.955f,6))};
         var first=(Vector2[])CaveEntryStudy.FloorLeft.Clone();var second=(Vector2[])CaveEntryStudy.FloorRight.Clone();
         for(int i=0;i<first.Length;i++)first[i].y=first[i].y< -18?Bottom:first[i].y-2;
         for(int i=0;i<second.Length;i++)second[i].y=second[i].y< -18?Bottom:second[i].y-2;

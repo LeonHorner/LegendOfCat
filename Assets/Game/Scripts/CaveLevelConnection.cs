@@ -44,9 +44,9 @@ public sealed partial class CaveEntryStudy
     Material RockMaterial(float shade=1)
     {
         var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/cave-rock-material"));owned.Add(material);RegisterMaterial(material);
-        var grain=Resources.Load<Texture2D>("GoldenRiver/Descent/entry-module-0-v1");
+        var grain=Resources.Load<Texture2D>("GoldenRiver/Descent/concept-entry-rock-v1");
         material.mainTexture=grain?grain:Resources.Load<Texture2D>("GoldenRiver/Descent/terrain-stone-v1");
-        material.SetTexture("_BaseTex",material.mainTexture);material.SetVector("_Frame",new Vector4(-2.21f,-6.045f,6,6));
+        material.SetTexture("_BaseTex",material.mainTexture);material.SetVector("_Frame",new Vector4(0,0,8,5.333333f));
         material.SetFloat("_Shade",shade);return material;
     }
     void AddEmbeddedLand()
@@ -63,7 +63,7 @@ public sealed partial class CaveEntryStudy
             var item=new GameObject(section.Name+" collision source");item.transform.SetParent(transform,false);
             var collider=item.AddComponent<PolygonCollider2D>();collider.points=section.Outline;collider.compositeOperation=Collider2D.CompositeOperation.Merge;
         }
-        TerrainCollider.GenerateGeometry();Physics2D.SyncTransforms();AddEntranceDetails();AddExposedGrass();AddApproachGrass();
+        TerrainCollider.GenerateGeometry();Physics2D.SyncTransforms();AddEntranceDetails();AddAuthoredEntrance();AddExposedGrass();AddApproachGrass();
         var background=RockMaterial(.52f);
         var rear=new[]{new Vector2(8,-42),new Vector2(205,-42),new Vector2(205,-4.5f),new Vector2(183,-4.5f),
             new Vector2(179,-5.8f),new Vector2(104,-5.8f),new Vector2(72,-7.3f),new Vector2(44,-5.5f),new Vector2(34,-8),
@@ -72,6 +72,7 @@ public sealed partial class CaveEntryStudy
             new Vector2(10.4f,-7.6f),new Vector2(10,-7.9f),new Vector2(9.7f,-8.2f),new Vector2(9.8f,-8.7f),
             new Vector2(9.4f,-8.9f),new Vector2(9,-9.1f),new Vector2(9.1f,-9.5f),new Vector2(8.8f,-9.7f),new Vector2(8.7f,-10.1f),new Vector2(8,-10.5f)};
         MeshObject("Permanent recessed cave rock",rear,new Rect(0,0,24,24),2,background);
+        AddRecessedMouth();
         Painting("Rooted fountain landmark",new Rect(43,-12.976f,10.2f,6.8f),1.4f,"GoldenRiver/Descent/ruin-v1");
         var future=new GameObject("FutureCollectibleAnchor");future.transform.SetParent(transform,false);future.transform.localPosition=new Vector3(54.8f,-12.5f,0);
         AddDiscoveryDust();
@@ -79,6 +80,32 @@ public sealed partial class CaveEntryStudy
     bool SolidAt(Vector2 point)
     {
         foreach(var section in terrain)if(CaveRoute.Contains(section.Outline,point))return true;return false;
+    }
+    void AddAuthoredEntrance()
+    {
+        // These paintings are registered to the solid outlines, never to the camera.
+        // They supply whole cliff faces instead of repeating a small material patch.
+        var names=new[]{"concept-entry-left-v1","concept-entry-roof-v1"};
+        var frames=new[]{new Rect(-1,-10,13,11),new Rect(5.5f,-9,18,11)};
+        for(int i=0;i<names.Length;i++){
+            var texture=Resources.Load<Texture2D>("GoldenRiver/Descent/"+names[i]);if(!texture)continue;
+            var material=RockMaterial();material.mainTexture=texture;material.SetFloat("_WorldMapped",0);
+            material.SetFloat("_Cutout",1);material.SetFloat("_AuthoredFace",1);
+            MeshObject("Authored entrance cliff face "+i,i==0?CaveTerrainLayout.LeftShore:CaveTerrainLayout.EntryRoof,frames[i],-3.04f-i*.001f,material);
+        }
+    }
+    void AddRecessedMouth()
+    {
+        var texture=Resources.Load<Texture2D>("GoldenRiver/Descent/concept-entry-recess-v1");if(!texture)return;
+        var material=RockMaterial(.68f);material.mainTexture=texture;material.SetFloat("_WorldMapped",0);
+        // The upper seam runs inside the opaque roof, rather than cutting across the
+        // opening at a fixed height. The outer flank is permanent and behind Mika.
+        var outline=new[]{new Vector2(5.9f,-24),new Vector2(36,-24),new Vector2(36,-7.8f),new Vector2(18,-8.3f),
+            new Vector2(16,-7.5f),new Vector2(14,-6.7f),new Vector2(12,-5.5f),new Vector2(11.5f,-5.2f),
+            new Vector2(10,-4.2f),new Vector2(9.1f,-2.7f),new Vector2(7.9f,-1.3f),new Vector2(7,-.4f),
+            new Vector2(6.2f,-.05f),new Vector2(6.5f,-1.5f),new Vector2(6.8f,-3),new Vector2(6.8f,-4.5f),
+            new Vector2(6.4f,-6),new Vector2(6.1f,-8),new Vector2(5.5f,-9),new Vector2(5.9f,-11.6f)};
+        MeshObject("Layered recessed entrance alcove",outline,new Rect(5.9f,-20,30.1f,20.06667f),1.8f,material);
     }
     void AddEntranceDetails()
     {

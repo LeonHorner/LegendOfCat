@@ -7,6 +7,7 @@ Shader "LegendOfCat/CaveRock"
         _Frame("World frame",Vector)=(0,0,8,5.33333)
         _WorldMapped("Shared world grain",Float)=1
         _Cutout("Native cutout detail",Float)=0
+        _AuthoredFace("Continuous authored cliff face",Float)=0
         _Shade("Recess tint",Float)=1
         _Origin("Cave origin and scale",Vector)=(0,0,1,1)
         _DryMask("Permanent river coverage",2D)="white"{}
@@ -21,7 +22,7 @@ Shader "LegendOfCat/CaveRock"
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            sampler2D _MainTex,_BaseTex,_EdgeMask,_DryMask;float4 _Frame,_Origin,_DryRect;float _WorldMapped,_Cutout,_Shade,_UseDryMask;
+            sampler2D _MainTex,_BaseTex,_EdgeMask,_DryMask;float4 _Frame,_Origin,_DryRect;float _WorldMapped,_Cutout,_Shade,_UseDryMask,_AuthoredFace;
             struct Input{float4 vertex:POSITION;float2 uv:TEXCOORD0;};
             struct Output{float4 vertex:SV_POSITION;float2 uv:TEXCOORD0;float2 world:TEXCOORD1;};
             Output vert(Input v){Output o;o.vertex=UnityObjectToClipPos(v.vertex);o.uv=v.uv;o.world=(mul(unity_ObjectToWorld,v.vertex).xy-_Origin.xy)/_Origin.z;return o;}
@@ -39,7 +40,9 @@ Shader "LegendOfCat/CaveRock"
                     if(_Cutout>.5){
                         float edge=min(min(i.uv.x,1-i.uv.x),min(i.uv.y,1-i.uv.y));
                         float grain=sin(i.world.x*17+i.world.y*11)*sin(i.world.y*23-i.world.x*7)*.018;
-                        c.rgb=lerp(baseRock.rgb,c.rgb,smoothstep(.01,.10,edge+grain)*tex2D(_EdgeMask,i.uv).r);
+                        float detail=_AuthoredFace>.5?1:tex2D(_EdgeMask,i.uv).r;
+                        float feather=_AuthoredFace>.5?smoothstep(0,.035,edge):smoothstep(.01,.10,edge+grain);
+                        c.rgb=lerp(baseRock.rgb,c.rgb,feather*detail);
                     }
                 }
                 if(_Cutout>.5)clip(c.a-.95);

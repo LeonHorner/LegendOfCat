@@ -17,7 +17,7 @@ Shader "LegendOfCat/CaveGrass"
                 float u=frac(i.world.x/7.5),v=.66+(i.world.y-i.contact)*(.34/.6),w=sin(u*3.14159265);w*=w;
                 fixed4 c=lerp(tex2D(_MainTex,float2(frac(u+.5),v)),tex2D(_MainTex,float2(u,v)),w);
                 c.a*=smoothstep(i.contact-.12,i.contact-.02,i.world.y);
-                float shade=1-smoothstep(-10,-1,i.world.y);c.rgb*=lerp(float3(1,1,1),float3(.77,.81,.93),shade);
+                float shade=1-smoothstep(-10,-1,i.world.y);c.rgb*=lerp(float3(1,1,1),float3(.66,.69,.79),shade);
                 return c;
             }
             ENDCG

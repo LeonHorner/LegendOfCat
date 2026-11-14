@@ -15,7 +15,7 @@ public static class CaveRoute
     public static float RejoinLocal=>Rejoin.x-Origin;
     public const float ExitStart=166.7f;
     public static Rect MaskBounds=>new Rect(Origin-44,-44,334,60);
-    public static bool ReplacesAscent(int index)=>index==9||index==10||index==11||index==33||index==34||index==39;
+    public static bool ReplacesAscent(int index)=>index==9||index==10||index==11||index==12||index==33||index==34||index==39;
     static Vector2[] Box(float x,float y,float width,float height)=>new[]{new Vector2(x,y),new Vector2(x+width,y),new Vector2(x+width,y+height),new Vector2(x,y+height)};
     // These are shore envelopes, not the shape of the stairs through the air.
     public static readonly Vector2[][] ShoreOpenings={
