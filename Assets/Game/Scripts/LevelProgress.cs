@@ -135,6 +135,7 @@ public sealed class LevelProgress
         float width = area.width - 40 * scale;
         float centerY = area.y + 16 * scale;
         float tip = left + width * Fraction;
+        var portrait = new Rect(tip - 14 * scale, centerY - 14 * scale, 28 * scale, 28 * scale);
         // Keep the full route visible over both bright skies and dark terrain.
         DrawOutline(new Rect(left, centerY - 6 * scale, width, 12 * scale), scale);
         if (Fraction > 0)
@@ -148,16 +149,15 @@ public sealed class LevelProgress
             Rect uv = checkpointUvs[sequence - 1];
             float iconWidth = 24 * scale * (uv.width < 1 ? .65f :
                 Mathf.Clamp01(world.transform.localScale.x / world.transform.localScale.y));
-            // Leave room for the portrait to pass above the fixed checkpoint row.
-            var icon = new Rect(x - iconWidth / 2, centerY + 16 * scale, iconWidth, 24 * scale);
-            var tick = new Rect(x - scale / 2, centerY + 6 * scale, scale, 8 * scale);
-            Color tickColor = state == CheckpointState.Unreached
-                ? new Color(.68f, .68f, .68f, .8f) : new Color(1, .89f, .64f, .85f);
-            GUI.DrawTexture(tick, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, tickColor, 0, 0);
-            if (state == CheckpointState.Active)
+            var icon = new Rect(x - iconWidth / 2, centerY - 12 * scale, iconWidth, 24 * scale);
+            bool covered = portrait.Overlaps(icon);
+            if (covered) {
+                DrawCheckpointPointer(x, portrait.yMax + 2 * scale, scale, state);
+            } else if (state == CheckpointState.Active) {
                 GUI.DrawTexture(new Rect(x - 2 * scale, icon.yMax, 4 * scale, 2 * scale),
                     Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0,
                     new Color(1, .89f, .64f), 0, scale);
+            }
             if (state == CheckpointState.Unreached) {
                 grayscale.SetColor("_Tint", world.color);
                 Graphics.DrawTexture(icon, world.sprite.texture, uv, 0, 0, 0, 0, grayscale);
@@ -168,7 +168,21 @@ public sealed class LevelProgress
                 GUI.color = color;
             }
         }
-        GUI.DrawTexture(new Rect(tip - 14 * scale, centerY - 14 * scale, 28 * scale, 28 * scale), head);
+        GUI.DrawTexture(portrait, head);
+    }
+
+    static void DrawCheckpointPointer(float x, float y, float scale, CheckpointState state)
+    {
+        Color color = state == CheckpointState.Unreached ? new Color(.8f, .8f, .8f) :
+            state == CheckpointState.Active ? new Color(1, .89f, .64f) : new Color(.96f, .92f, .84f);
+        // An upward pointer with a dark edge stays visible against light scenery.
+        for (int row = 0; row < 5; row++) {
+            float halfWidth = (row + .5f) * scale;
+            GUI.DrawTexture(new Rect(x - halfWidth - scale, y + row * scale, 2 * (halfWidth + scale), 2 * scale),
+                Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, new Color(.12f, .09f, .13f, .85f), 0, 0);
+            GUI.DrawTexture(new Rect(x - halfWidth, y + row * scale, 2 * halfWidth, scale),
+                Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, color, 0, 0);
+        }
     }
 
     static void DrawOutline(Rect rect, float scale)
