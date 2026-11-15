@@ -127,13 +127,13 @@ public sealed class RangedArena : MonoBehaviour
     void OnGUI()
     {
         if (!ArenaCamera) return;
-        if (labelStyle == null) labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 13, wordWrap = true };
+        if (labelStyle == null) labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true, margin = new RectOffset(2, 2, 0, 0) };
         var viewport = ArenaCamera.pixelRect;
-        GUILayout.BeginArea(new Rect(viewport.x + 8, Screen.height - viewport.yMax + 8, Mathf.Max(1, viewport.width - 16), 110), GUI.skin.box);
-        GUILayout.Label("RANGED COMBAT LAB | Target " + Combat.Health + "/6", labelStyle);
+        GUILayout.BeginArea(new Rect(viewport.x + 8, Screen.height - viewport.yMax + 8, Mathf.Max(1, viewport.width - 16), 64), GUI.skin.box);
+        GUILayout.Label("RANGED COMBAT LAB | Target " + Combat.Health + "/6" +
+            (Combat.Charging ? " | Charge: " + Mathf.RoundToInt(Combat.Charge * 100) + "%" : " | R retry / Backspace restart"), labelStyle);
         GUILayout.Label("A/D or arrows: move | Space: jump | J: pulse | Hold K, release: lob (0.8s max)", labelStyle);
         GUILayout.Label("Gamepad: South jump, West pulse, RT lob | P/RB pause | Esc/Start menu", labelStyle);
-        GUILayout.Label(Combat.Charging ? "Lob charge: " + Mathf.RoundToInt(Combat.Charge * 100) + "%" : "R: retry | Backspace: restart | Hit the round OPEN target. Square shield blocks shots.", labelStyle);
         GUILayout.EndArea();
     }
     void OnDisable() => Combat.CancelTransient();

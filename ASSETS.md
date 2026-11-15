@@ -847,7 +847,7 @@ The existing near panorama is extended to 14332×1448 using an original generated
   weight across tick positions. No new image model or external asset was used.
 
 
-## Ranged combat lab primitives — 2026-11-15
+## Ranged combat lab primitives - 2026-11-15
 
 - Source: original procedural geometry in RangedArena.cs; authored with OpenAI
   Codex on 2026-11-15, no external asset or image-generation model used.

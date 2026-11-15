@@ -1,6 +1,6 @@
 # Ranged combat prototype (#13)
 
-## Approved control concept — 2026-11-15
+## Approved control concept - 2026-11-15
 
 The user chose two attacks after comparing directional aiming, free aiming,
 straight shots, arcing throws and single-button tap/hold controls. A shared
@@ -10,7 +10,7 @@ release. Use separate buttons and movement-facing attacks, with no automatic aim
 - J / gamepad West: immediate straight paw pulse, one shot per press.
 - K / gamepad right trigger: hold to charge, release to throw a light orb.
 - Charging increases upward speed from 5 to 15 units/s over 0.8 seconds;
-  forward speed stays 7 units/s. Orb gravity is 18 units/s². Charge saturates.
+  forward speed stays 7 units/s. Orb gravity is 18 units/s^2. Charge saturates.
 - The pulse moves at 15 units/s without gravity. Both use the facing direction
   at firing/release and share a 0.25-second recovery. No ammo, reload or pickup.
 - A pulse cannot fire during an orb charge. Rejected cooldown presses are not
@@ -64,7 +64,7 @@ scene, prefab, package or project-setting edits are required.
 Behavioral checks cover immediate single shots, variable charge and release
 facing, shared recovery, pause, lifecycle cancellation, shield/open hits, defeat,
 projectile cleanup, moving-target sweeps and real keyboard/gamepad actions.
-Visual review must inspect the actual player in motion, also at 640×360 and in
+Visual review must inspect the actual player in motion, also at 640x360 and in
 grayscale. Player feel and human simultaneous move/jump/attack usability remain
 playtest judgments; automated checks do not establish owner acceptance.
 
@@ -72,3 +72,6 @@ Use the pinned Editor and the normal ready-PR exact-head Prepare merge workflow
 for final tests and Windows/Linux player/launcher/package checks. A preview can
 open the arena with `--preview-view ranged`; `--preview-capture` uses the existing
 actual-player screenshot path. No release or merge is authorized.
+
+
+Actual-player clips and compact/grayscale inspection are in the [review evidence](ranged-prototype/README.md).

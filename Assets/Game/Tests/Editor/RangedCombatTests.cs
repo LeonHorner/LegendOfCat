@@ -95,6 +95,21 @@ public class RangedCombatTests : InputTestFixture
         Assert.That(method.Invoke(null, new object[] { new Vector2(-2, 0), new Vector2(2, 0), Vector2.up, Vector2.down }), Is.True);
         Assert.That(method.Invoke(null, new object[] { new Vector2(-2, 3), new Vector2(2, 3), Vector2.up, Vector2.down }), Is.False);
     }
+    [Test] public void GroundedChargedOrbCanHitTheTargetWhileItIsHigh()
+    {
+        bool highHit = false;
+        for (int holdSteps = 10; holdSteps <= 40 && !highHit; holdSteps++) {
+            Call("Reset");
+            Step(1.6f);
+            Call("PressLob"); Step(holdSteps * .02f);
+            Call("ReleaseLob", new Vector2(-3, .6f));
+            for (int step = 0; step < 100; step++) {
+                Call("Advance", .02f);
+                if (Read<int>("Health") < 6) { highHit = Read<Vector2>("Target").y > 4.5f; break; }
+            }
+        }
+        Assert.That(highHit, Is.True, "A ground-level charged throw must reach the high flying target without auto-aim.");
+    }
     [Test] public void RealActionsAllowMoveJumpAndChargeAndCancelWithoutReleaseShot()
     {
         var keyboard = InputSystem.AddDevice<Keyboard>();
@@ -111,8 +126,10 @@ public class RangedCombatTests : InputTestFixture
             input.GetType().GetField("PulsePressed").SetValue(input, (Action)(() => Call("PressPulse", new Vector2(-4, .6f))));
             input.GetType().GetField("CombatCanceled").SetValue(input, (Action)(() => Call("CancelTransient")));
             Lifecycle(input, "OnApplicationFocus", true);
+            controller.GetType().GetProperty("Grounded").SetValue(controller, true);
             InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.D, Key.Space, Key.K)); InputSystem.Update();
             Assert.That(Read<bool>("Charging"), Is.True);
+            Assert.That(host.GetComponent<Rigidbody2D>().linearVelocity.y, Is.GreaterThan(0), "Jump and charge share the same input update.");
             Lifecycle(controller, "FixedUpdate");
             Assert.That(host.GetComponent<Rigidbody2D>().linearVelocity.x, Is.GreaterThan(0));
             Step(.4f);
