@@ -6,9 +6,10 @@ public sealed class CatInput : MonoBehaviour
 {
     public CatController controller;
     InputActionMap actions;
-    InputAction move, jump, restart, fullRestart, pause, menu, pulse, lob;
-    public System.Action PulsePressed, LobPressed, LobReleased, CombatCanceled;
+    InputAction move, jump, restart, fullRestart, pause, menu, attack, switchWeapon, reload;
+    public System.Action AttackPressed, AttackReleased, WeaponSwitched, ReloadPressed, CombatCanceled;
     public System.Action<float> FacingChanged;
+    public bool UseCombatReload;
     bool canceling;
     public InputActionMap Actions => actions;
     public System.Action BackToMenu;
@@ -35,13 +36,16 @@ public sealed class CatInput : MonoBehaviour
         pause.AddBinding("<Gamepad>/rightShoulder");
         menu = actions.AddAction("Menu", InputActionType.Button, "<Keyboard>/escape");
         menu.AddBinding("<Gamepad>/start");
-        pulse = actions.AddAction("Pulse", InputActionType.Button, "<Keyboard>/j");
-        pulse.AddBinding("<Gamepad>/buttonWest");
-        lob = actions.AddAction("Lob", InputActionType.Button, "<Keyboard>/k");
-        lob.AddBinding("<Gamepad>/rightTrigger");
-        pulse.performed += c => PulsePressed?.Invoke();
-        lob.performed += c => LobPressed?.Invoke();
-        lob.canceled += c => { if (!canceling) LobReleased?.Invoke(); };
+        attack = actions.AddAction("Attack", InputActionType.Button, "<Keyboard>/j");
+        attack.AddBinding("<Gamepad>/buttonWest");
+        switchWeapon = actions.AddAction("SwitchWeapon", InputActionType.Button, "<Keyboard>/k");
+        switchWeapon.AddBinding("<Gamepad>/rightTrigger");
+        reload = actions.AddAction("Reload", InputActionType.Button, "<Keyboard>/r");
+        reload.AddBinding("<Gamepad>/buttonNorth");
+        attack.performed += c => AttackPressed?.Invoke();
+        attack.canceled += c => { if (!canceling) AttackReleased?.Invoke(); };
+        switchWeapon.performed += c => WeaponSwitched?.Invoke();
+        reload.performed += c => { if (UseCombatReload) ReloadPressed?.Invoke(); };
         move.performed += c => {
             float value = c.ReadValue<float>();
             controller.Motion.SetMove(value);
@@ -50,7 +54,7 @@ public sealed class CatInput : MonoBehaviour
         move.canceled += c => controller.Motion.SetMove(0);
         jump.performed += c => controller.PressJump();
         jump.canceled += c => controller.Motion.ReleaseJump();
-        restart.performed += c => { if (RetryCheckpoint != null) RetryCheckpoint(); else controller.ReturnToStart(); };
+        restart.performed += c => { if (UseCombatReload) return; if (RetryCheckpoint != null) RetryCheckpoint(); else controller.ReturnToStart(); };
         fullRestart.performed += c => RestartRun?.Invoke();
         pause.performed += c => TogglePause?.Invoke();
         menu.performed += c => BackToMenu?.Invoke();

@@ -857,3 +857,9 @@ The existing near panorama is extended to 14332×1448 using an original generated
 - Prototype interpretation: cool narrow pulse, warm round orb, growing charge,
   square closed shield versus round open target, restrained hit/block marks.
 - Existing MikaOriginal artwork is reused with its recorded provenance unchanged.
+
+
+Ranged lab update (2026-11-15): the user selected a shared attack button, weapon
+switching, independent magazines and active-weapon-only reload. The original
+procedural presentation now labels the selected weapon, remaining rounds, charge
+and reload percentage; no additional external or generated artwork was used.

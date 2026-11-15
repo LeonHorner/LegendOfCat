@@ -368,14 +368,17 @@ public sealed partial class StarterScreen : MonoBehaviour
         System.Collections.IEnumerator HighThrow()
         {
             yield return new WaitForSeconds(1.6f);
-            input.LobPressed();
+            input.WeaponSwitched(); input.AttackPressed();
             yield return new WaitForSeconds(.56f);
-            input.LobReleased();
+            input.AttackReleased();
         }
         for (int frame = 0; frame < 100; frame++) {
-            if (frame == 0 || frame == 20 || frame == 80) input.PulsePressed();
-            if (frame == 36 || frame == 64) input.LobPressed();
-            if (frame == 44 || frame == 72) input.LobReleased();
+            if (frame == 0) { input.AttackPressed(); input.AttackReleased(); }
+            if (frame == 36) { input.ReloadPressed(); }
+            if (frame == 42) { input.WeaponSwitched(); }
+            if (frame >= 44 && frame <= 72 && frame % 2 == 0) { input.AttackPressed(); input.AttackReleased(); }
+            if (frame == 76) input.WeaponSwitched();
+            if (frame == 78) input.ReloadPressed();
             if (frame == 30 || frame == 60) rangedArena.Cat.PressJump();
             if (frame == 33 || frame == 63) rangedArena.Cat.Motion.ReleaseJump();
             if (frame == 32) rangedArena.Cat.Motion.SetMove(1);

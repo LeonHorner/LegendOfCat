@@ -11,13 +11,25 @@ public sealed class RangedCombat
         public float Age;
         public bool Lob;
     }
-    public const float ChargeSeconds = .8f, ShotPause = .25f, Gravity = 18;
+    public enum Weapon { Pulse, Orb }
+    public const float ChargeSeconds = .8f, Gravity = 18;
+    public const float PulsePause = .2f, OrbPause = .4f;
+    public const float PulseReload = 1, OrbReload = 1.5f;
+    public const int PulseCapacity = 8, OrbCapacity = 3;
+    readonly int[] ammo = { PulseCapacity, OrbCapacity };
+    readonly float[] cooldowns = new float[2];
+    public Weapon ActiveWeapon { get; private set; }
+    public int Ammo => ammo[(int)ActiveWeapon];
+    public int Capacity => ActiveWeapon == Weapon.Pulse ? PulseCapacity : OrbCapacity;
+    public float ReloadDuration => ActiveWeapon == Weapon.Pulse ? PulseReload : OrbReload;
+    public float ReloadRemaining { get; private set; }
+    public bool Reloading => ReloadRemaining > 0;
     public const int MaximumProjectiles = 8;
     readonly List<Projectile> shots = new List<Projectile>();
     public IReadOnlyList<Projectile> Projectiles => shots;
     public float Elapsed { get; private set; }
     public float Charge { get; private set; }
-    public float Cooldown { get; private set; }
+    public float Cooldown => cooldowns[(int)ActiveWeapon];
     public bool Charging { get; private set; }
     public bool Paused { get; private set; }
     public int Health { get; private set; } = 6;
@@ -31,8 +43,14 @@ public sealed class RangedCombat
     public int Facing { get; private set; } = 1;
 
     public void SetFacing(float direction) { if (!Paused && direction != 0) Facing = direction < 0 ? -1 : 1; }
-    public void PressLob() { if (!Paused && !Finished && !Charging && Cooldown <= 0) { Charging = true; Charge = 0; } }
-    public bool ReleaseLob(Vector2 origin)
+    public void PressAttack(Vector2 origin)
+    {
+        if (Paused || Finished || Reloading || Cooldown > 0 || Charging) return;
+        if (Ammo == 0) { Reload(); return; }
+        if (ActiveWeapon == Weapon.Pulse) Fire(origin, false, 0);
+        else { Charging = true; Charge = 0; }
+    }
+    public bool ReleaseAttack(Vector2 origin)
     {
         if (Paused) { CancelCharge(); return false; }
         if (!Charging) return false;
@@ -40,13 +58,28 @@ public sealed class RangedCombat
         CancelCharge();
         return Fire(origin, true, charge);
     }
-    public bool PressPulse(Vector2 origin) => !Charging && Fire(origin, false, 0);
+    public void SwitchWeapon()
+    {
+        if (Paused || Finished) return;
+        CancelCharge();
+        ReloadRemaining = 0;
+        ActiveWeapon = ActiveWeapon == Weapon.Pulse ? Weapon.Orb : Weapon.Pulse;
+        if (Ammo == 0) Reload();
+    }
+    public void Reload()
+    {
+        if (Paused || Finished || Reloading || Ammo == Capacity) return;
+        CancelCharge();
+        ReloadRemaining = ReloadDuration;
+    }
     bool Fire(Vector2 origin, bool lob, float charge)
     {
-        if (Paused || Finished || Cooldown > 0 || shots.Count >= MaximumProjectiles) return false;
+        if (Paused || Finished || Reloading || Ammo == 0 || Cooldown > 0 || shots.Count >= MaximumProjectiles) return false;
         shots.Add(new Projectile { Position = origin, Lob = lob,
             Velocity = new Vector2(Facing * (lob ? 7 : 15), lob ? Mathf.Lerp(5, 15, charge) : 0) });
-        Cooldown = ShotPause;
+        ammo[(int)ActiveWeapon]--;
+        cooldowns[(int)ActiveWeapon] = lob ? OrbPause : PulsePause;
+        if (Ammo == 0) Reload();
         return true;
     }
     public void CancelCharge() { Charging = false; Charge = 0; }
@@ -54,7 +87,10 @@ public sealed class RangedCombat
     public void SetPaused(bool paused) { Paused = paused; }
     public void Reset()
     {
-        CancelTransient(); Elapsed = Cooldown = HitFlash = BlockFlash = 0;
+        CancelTransient(); Elapsed = HitFlash = BlockFlash = ReloadRemaining = 0;
+        ActiveWeapon = Weapon.Pulse;
+        ammo[0] = PulseCapacity; ammo[1] = OrbCapacity;
+        cooldowns[0] = cooldowns[1] = 0;
         Health = 6; Facing = 1; Paused = false;
     }
     public static bool CrossesTarget(Vector2 start, Vector2 end, Vector2 targetStart, Vector2 targetEnd)
@@ -69,7 +105,12 @@ public sealed class RangedCombat
         if (Paused || Finished) return;
         Vector2 previousTarget = Target;
         bool open = Vulnerable;
-        Cooldown = Mathf.Max(0, Cooldown - dt);
+        cooldowns[0] = Mathf.Max(0, cooldowns[0] - dt);
+        cooldowns[1] = Mathf.Max(0, cooldowns[1] - dt);
+        if (Reloading) {
+            ReloadRemaining = Mathf.Max(0, ReloadRemaining - dt);
+            if (!Reloading) ammo[(int)ActiveWeapon] = Capacity;
+        }
         HitFlash = Mathf.Max(0, HitFlash - dt); BlockFlash = Mathf.Max(0, BlockFlash - dt);
         if (Charging) Charge = Mathf.Clamp01(Charge + dt / ChargeSeconds);
         Elapsed += dt;

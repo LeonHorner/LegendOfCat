@@ -9,12 +9,18 @@ The grayscale version converts the same rendered frames without changing contras
 - [Grayscale motion](combat-640-grayscale.gif)
 - [Shielded target](shielded-640.png)
 - [Partial charge](charge-640.png), [grayscale](charge-640-grayscale.png)
+- [Reload progress](reload-640.png)
 - [High grounded hit at 640x360](hit-640.png), [960x540](hit-960.png)
+
+Updated after the approved weapon-switch/reload decision. J uses the active
+weapon, K switches and R reloads early. Pulse: 8 rounds, 0.2-second recovery,
+1-second reload. Orb: 3 rounds, 0.4-second recovery, 1.5-second reload.
 
 The scripted demonstration forwards the shared attack actions and movement/jump
 signals to the actual runtime components. It shows a grounded charged orb hitting
 an elevated target, target health changing from 6 to 5, movement, jumps, facing
-changes, direct shots and full-charge throws. It is not a human usability test.
+changes, direct shots, early reload, switching during reload and automatic
+reload after the pulse magazine is emptied. It is not a human usability test.
 The recorder is compiled only into preview builds. No target damage is injected.
 
 The charge readout and target state remain visible at the compact size. Round
@@ -24,10 +30,11 @@ Both actual-player logs contain no exceptions or error entries. The preview's
 packed-art audit passed. No Linux graphical playtest or install/update smoke test
 is claimed by these captures.
 
-Local focused tests passed 10/10 after correcting the high-target fixture to use
-an appropriate grounded firing position. They include the real Input System and
-menu/retry/pause/re-entry lifecycle. The final exact-head full-suite and both
-platform player/launcher/package results belong to PR #88's Prepare merge run.
+Local focused tests passed 12/12, including per-weapon magazines/recovery,
+automatic/early reload, abandoned reload progress, switching while charging,
+real J/K/R and controller callbacks, and menu lifecycle. Other modes keep R retry.
+The exact-head full-suite and both platform player/launcher/package results
+belong to PR #88's updated Prepare merge run; the earlier green head is superseded.
 
 Reproduce after BuildGame.BuildPreview:
 

@@ -56,9 +56,11 @@ public sealed class RangedArena : MonoBehaviour
         Run.ResetTransientState += Combat.Reset;
         Cat.FellOutOfBounds += Retry;
         var input = player.AddComponent<CatInput>(); input.controller = Cat;
-        input.PulsePressed = () => Combat.PressPulse(Muzzle);
-        input.LobPressed = Combat.PressLob;
-        input.LobReleased = () => Combat.ReleaseLob(Muzzle);
+        input.UseCombatReload = true;
+        input.AttackPressed = () => Combat.PressAttack(Muzzle);
+        input.AttackReleased = () => Combat.ReleaseAttack(Muzzle);
+        input.WeaponSwitched = Combat.SwitchWeapon;
+        input.ReloadPressed = Combat.Reload;
         input.FacingChanged = Combat.SetFacing;
         input.CombatCanceled = Combat.CancelTransient;
         input.RetryCheckpoint = Retry; input.RestartRun = Restart;
@@ -130,10 +132,12 @@ public sealed class RangedArena : MonoBehaviour
         if (labelStyle == null) labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true, margin = new RectOffset(2, 2, 0, 0) };
         var viewport = ArenaCamera.pixelRect;
         GUILayout.BeginArea(new Rect(viewport.x + 8, Screen.height - viewport.yMax + 8, Mathf.Max(1, viewport.width - 16), 64), GUI.skin.box);
-        GUILayout.Label("RANGED COMBAT LAB | Target " + Combat.Health + "/6" +
-            (Combat.Charging ? " | Charge: " + Mathf.RoundToInt(Combat.Charge * 100) + "%" : " | R retry / Backspace restart"), labelStyle);
-        GUILayout.Label("A/D or arrows: move | Space: jump | J: pulse | Hold K, release: lob (0.8s max)", labelStyle);
-        GUILayout.Label("Gamepad: South jump, West pulse, RT lob | P/RB pause | Esc/Start menu", labelStyle);
+        string weapon = Combat.ActiveWeapon == RangedCombat.Weapon.Pulse ? "PULSE" : "LIGHT ORB";
+        string status = Combat.Reloading ? " | Reload: " + Mathf.CeilToInt(100 * (1 - Combat.ReloadRemaining / Combat.ReloadDuration)) + "%"
+            : Combat.Charging ? " | Charge: " + Mathf.RoundToInt(Combat.Charge * 100) + "%" : "";
+        GUILayout.Label(weapon + " " + Combat.Ammo + "/" + Combat.Capacity + status + " | Target " + Combat.Health + "/6", labelStyle);
+        GUILayout.Label("A/D: move | Space: jump | J: fire / hold-release orb | K: switch | R: reload", labelStyle);
+        GUILayout.Label("Pad: South jump, West attack, RT switch, North reload | P/RB pause, retry in pause menu", labelStyle);
         GUILayout.EndArea();
     }
     void OnDisable() => Combat.CancelTransient();
