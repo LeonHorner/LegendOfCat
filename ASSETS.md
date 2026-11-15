@@ -845,3 +845,15 @@ The existing near panorama is extended to 14332×1448 using an original generated
   The pointer is an original code-drawn tapered hand with filtered alpha
   edges. The user requested a classic profile and more consistent visual
   weight across tick positions. No new image model or external asset was used.
+
+
+## Ranged combat lab primitives — 2026-11-15
+
+- Source: original procedural geometry in RangedArena.cs; authored with OpenAI
+  Codex on 2026-11-15, no external asset or image-generation model used.
+- License: project-owned original code/geometry, under the repository license.
+- Human creative decisions: separate immediate paw pulse and charged arcing light
+  orb; J/K controls, height based on hold duration, movement-facing release.
+- Prototype interpretation: cool narrow pulse, warm round orb, growing charge,
+  square closed shield versus round open target, restrained hit/block marks.
+- Existing MikaOriginal artwork is reused with its recorded provenance unchanged.

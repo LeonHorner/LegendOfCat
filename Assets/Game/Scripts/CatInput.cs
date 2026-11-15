@@ -6,7 +6,10 @@ public sealed class CatInput : MonoBehaviour
 {
     public CatController controller;
     InputActionMap actions;
-    InputAction move, jump, restart, fullRestart, pause, menu;
+    InputAction move, jump, restart, fullRestart, pause, menu, pulse, lob;
+    public System.Action PulsePressed, LobPressed, LobReleased, CombatCanceled;
+    public System.Action<float> FacingChanged;
+    bool canceling;
     public InputActionMap Actions => actions;
     public System.Action BackToMenu;
     public System.Action RetryCheckpoint;
@@ -32,7 +35,18 @@ public sealed class CatInput : MonoBehaviour
         pause.AddBinding("<Gamepad>/rightShoulder");
         menu = actions.AddAction("Menu", InputActionType.Button, "<Keyboard>/escape");
         menu.AddBinding("<Gamepad>/start");
-        move.performed += c => controller.Motion.SetMove(c.ReadValue<float>());
+        pulse = actions.AddAction("Pulse", InputActionType.Button, "<Keyboard>/j");
+        pulse.AddBinding("<Gamepad>/buttonWest");
+        lob = actions.AddAction("Lob", InputActionType.Button, "<Keyboard>/k");
+        lob.AddBinding("<Gamepad>/rightTrigger");
+        pulse.performed += c => PulsePressed?.Invoke();
+        lob.performed += c => LobPressed?.Invoke();
+        lob.canceled += c => { if (!canceling) LobReleased?.Invoke(); };
+        move.performed += c => {
+            float value = c.ReadValue<float>();
+            controller.Motion.SetMove(value);
+            if (Mathf.Abs(value) > .1f) FacingChanged?.Invoke(Mathf.Sign(value));
+        };
         move.canceled += c => controller.Motion.SetMove(0);
         jump.performed += c => controller.PressJump();
         jump.canceled += c => controller.Motion.ReleaseJump();
@@ -42,7 +56,15 @@ public sealed class CatInput : MonoBehaviour
         menu.performed += c => BackToMenu?.Invoke();
     }
     void OnEnable() => actions.Enable();
-    void OnDisable() { actions.Disable(); controller.Motion.Reset(); }
-    void OnApplicationFocus(bool focused) { if (focused && isActiveAndEnabled) actions.Enable(); else { actions.Disable(); controller.Motion.Reset(); } }
+    void CancelActions()
+    {
+        canceling = true;
+        CombatCanceled?.Invoke();
+        actions.Disable();
+        controller.Motion.Reset();
+        canceling = false;
+    }
+    void OnDisable() => CancelActions();
+    void OnApplicationFocus(bool focused) { if (focused && isActiveAndEnabled) actions.Enable(); else CancelActions(); }
     void OnDestroy() => actions.Dispose();
 }

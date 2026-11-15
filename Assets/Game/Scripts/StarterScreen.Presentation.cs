@@ -95,8 +95,8 @@ public sealed partial class StarterScreen
 
     void OnGUI()
     {
-        if (course != null || stompArena != null) {
-            DrawRunTimer((course != null ? course.Run : stompArena.Run).ElapsedSeconds);
+        if (course != null || stompArena != null || rangedArena != null) {
+            DrawRunTimer(ActiveRun.ElapsedSeconds);
             DrawGameplayMenu();
             return;
         }
@@ -141,6 +141,7 @@ public sealed partial class StarterScreen
             if (Button("Golden River preview")) OpenLevelOne();
             if (Button("Movement lab")) page = "play";
             if (Button("Simple combat lab")) OpenStompArena();
+            if (Button("Ranged combat lab")) OpenRangedArena();
             if (Button(string.IsNullOrEmpty(available) ? "Settings" : "Settings - Update available")) page = "settings";
             if (Button("Quit")) Application.Quit();
         } else if (page == "play") {
@@ -321,8 +322,8 @@ public sealed partial class StarterScreen
 
     void DrawGameplayMenu()
     {
-        bool finished = stompArena != null && stompArena.Combat.Finished;
-        bool paused = (course != null ? course.Run : stompArena.Run)?.Paused ?? false;
+        bool finished = rangedArena != null ? rangedArena.Combat.Finished : stompArena != null && stompArena.Combat.Finished;
+        bool paused = ActiveRun?.Paused ?? false;
         if (!paused && !finished) {
             if (gameplayMenuVisible) {
                 previousFocus.Clear();
@@ -356,7 +357,7 @@ public sealed partial class StarterScreen
         NavigateFocus();
         focusable.Clear();
         GUILayout.BeginArea(new Rect((width - panelWidth) / 2, (height - panelHeight) / 2, panelWidth, panelHeight), panelStyle);
-        Label(finished ? (stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
+        Label(finished ? (rangedArena != null || stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
         bool resume = !finished && Button("Resume", fixedNavigation: true);
         bool retry = Button("Retry", fixedNavigation: true);
         bool restart = Button("Restart", fixedNavigation: true);
@@ -375,6 +376,11 @@ public sealed partial class StarterScreen
             else if (retry) course.RetryCheckpoint();
             else if (restart) course.RestartRun();
             else if (menu) CloseCourse();
+        } else if (rangedArena != null) {
+            if (resume) rangedArena.TogglePause();
+            else if (retry) rangedArena.Retry();
+            else if (restart) rangedArena.Restart();
+            else if (menu) CloseRangedArena();
         } else {
             if (resume) stompArena.TogglePause();
             else if (retry) stompArena.Retry();
@@ -414,6 +420,7 @@ public sealed partial class StarterScreen
     {
         if (course != null) { course.gameObject.SetActive(false); Destroy(course.gameObject); }
         if (stompArena != null) { stompArena.gameObject.SetActive(false); Destroy(stompArena.gameObject); }
+        if (rangedArena != null) { rangedArena.gameObject.SetActive(false); Destroy(rangedArena.gameObject); }
         foreach (var texture in new[] { panelTexture, buttonTexture, hoverTexture, focusTexture, runClockHand })
             if (texture != null) Destroy(texture);
     }

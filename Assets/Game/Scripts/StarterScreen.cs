@@ -36,6 +36,8 @@ public sealed partial class StarterScreen : MonoBehaviour
     Vector2 scroll;
     MovementCourse course;
     StompArena stompArena;
+    RangedArena rangedArena;
+    RunLifecycle ActiveRun => course != null ? course.Run : rangedArena != null ? rangedArena.Run : stompArena.Run;
     VersionedJsonFile displayFile;
     bool fullscreen;
     DisplayState display;
@@ -91,7 +93,7 @@ public sealed partial class StarterScreen : MonoBehaviour
 
     public void OpenLevel(string id)
     {
-        if (course != null || stompArena != null || popup || applying) return;
+        if (course != null || stompArena != null || rangedArena != null || popup || applying) return;
         course = LevelRegistry.Create(id);
         course.Progress.Visible = ShowLevelProgress;
         course.BackToMenu = CloseCourse;
@@ -109,9 +111,27 @@ public sealed partial class StarterScreen : MonoBehaviour
         }
     }
 
+    void OpenRangedArena()
+    {
+        if (course != null || stompArena != null || rangedArena != null || popup || applying) return;
+        rangedArena = new GameObject("Ranged combat lab").AddComponent<RangedArena>();
+        rangedArena.BackToMenu = CloseRangedArena;
+    }
+
+    void CloseRangedArena()
+    {
+        if (rangedArena == null) return;
+        rangedArena.gameObject.SetActive(false);
+        Destroy(rangedArena.gameObject);
+        rangedArena = null;
+        page = "menu";
+        lastPage = null;
+        previousFocus.Clear();
+    }
+
     void OpenStompArena()
     {
-        if (course != null || stompArena != null || popup || applying) return;
+        if (course != null || stompArena != null || rangedArena != null || popup || applying) return;
         stompArena = new GameObject("Simple combat lab").AddComponent<StompArena>();
         stompArena.BackToMenu = CloseStompArena;
     }
@@ -283,6 +303,8 @@ public sealed partial class StarterScreen : MonoBehaviour
         }
         string view = Argument("--preview-view");
         yield return null;
+        if (view == "ranged") OpenRangedArena();
+        else
         if (view == "course" || view == "course-end" || view == "course-paused" || view == "course-transformed") {
             page = "play";
             OpenCourse();
