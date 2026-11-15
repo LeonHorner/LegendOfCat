@@ -33,7 +33,7 @@ The user subsequently approved planning and implementing a 120â€“150-second
 
 ## Ranged prototype decision - 2026-11-15
 
-For #13 the user approved J for the active weapon, K to switch and R for early
+For #13 the user approved F/J for the active weapon, Q/K to switch and R for early
 reload. Pulse has 8 shots / 0.2-second recovery / 1-second reload; the charged orb
 has 3 shots / 0.4-second recovery after release / 1.5-second reload. Empty magazines
 automatically reload, only while active; switching discards reload progress.

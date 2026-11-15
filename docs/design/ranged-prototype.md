@@ -11,9 +11,9 @@ there is no automatic aim or aim stick.
 | Paw pulse | 8 | 0.2 seconds | 1 second |
 | Light orb | 3 | 0.4 seconds after release | 1.5 seconds |
 
-- J / gamepad West: use the selected weapon. Pulse fires on press; orb charges
+- F or J / gamepad West: use the selected weapon. Pulse fires on press; orb charges
   while held and fires on release. One shot per press/release, no auto-repeat.
-- K / gamepad right trigger: switch weapon. R / gamepad North: early reload.
+- Q or K / gamepad right trigger: switch weapon. R / gamepad North: early reload.
 - An empty magazine starts reloading immediately after the last shot. Reload
   and shot recovery overlap; each weapon's recovery keeps ticking while inactive.
 - Only the active weapon reloads. Switching discards all reload progress. On

@@ -153,7 +153,7 @@ public class RangedCombatTests : InputTestFixture
             input.GetType().GetField("CombatCanceled").SetValue(input, (Action)(() => Call("CancelTransient")));
             Lifecycle(input, "OnApplicationFocus", true);
             controller.GetType().GetProperty("Grounded").SetValue(controller, true);
-            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.D, Key.Space, Key.J)); InputSystem.Update();
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.D, Key.Space, Key.F)); InputSystem.Update();
             Assert.That(Read<bool>("Charging"), Is.True);
             Assert.That(host.GetComponent<Rigidbody2D>().linearVelocity.y, Is.GreaterThan(0), "Jump and charge share the same input update.");
             Lifecycle(controller, "FixedUpdate");
@@ -171,7 +171,7 @@ public class RangedCombatTests : InputTestFixture
             InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.R)); InputSystem.Update();
             Assert.That(Read<bool>("Reloading"), Is.True, "R starts reload rather than retry.");
             InputSystem.QueueStateEvent(keyboard, new KeyboardState()); InputSystem.Update();
-            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.K)); InputSystem.Update();
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Q)); InputSystem.Update();
             Assert.That(Read<bool>("Reloading"), Is.False);
             Assert.That(Read<int>("Capacity"), Is.EqualTo(8));
             InputSystem.QueueStateEvent(keyboard, new KeyboardState()); InputSystem.Update();

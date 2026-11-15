@@ -37,8 +37,10 @@ public sealed class CatInput : MonoBehaviour
         menu = actions.AddAction("Menu", InputActionType.Button, "<Keyboard>/escape");
         menu.AddBinding("<Gamepad>/start");
         attack = actions.AddAction("Attack", InputActionType.Button, "<Keyboard>/j");
+        attack.AddBinding("<Keyboard>/f");
         attack.AddBinding("<Gamepad>/buttonWest");
         switchWeapon = actions.AddAction("SwitchWeapon", InputActionType.Button, "<Keyboard>/k");
+        switchWeapon.AddBinding("<Keyboard>/q");
         switchWeapon.AddBinding("<Gamepad>/rightTrigger");
         reload = actions.AddAction("Reload", InputActionType.Button, "<Keyboard>/r");
         reload.AddBinding("<Gamepad>/buttonNorth");

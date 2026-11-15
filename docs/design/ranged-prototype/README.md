@@ -12,8 +12,8 @@ The grayscale version converts the same rendered frames without changing contras
 - [Reload progress](reload-640.png)
 - [High grounded hit at 640x360](hit-640.png), [960x540](hit-960.png)
 
-Updated after the approved weapon-switch/reload decision. J uses the active
-weapon, K switches and R reloads early. Pulse: 8 rounds, 0.2-second recovery,
+Updated after the approved weapon-switch/reload decision. F/J uses the active
+weapon, Q/K switches and R reloads early. Pulse: 8 rounds, 0.2-second recovery,
 1-second reload. Orb: 3 rounds, 0.4-second recovery, 1.5-second reload.
 
 The scripted demonstration forwards the shared attack actions and movement/jump
@@ -35,7 +35,7 @@ is claimed by these captures.
 
 Local focused tests passed 12/12, including per-weapon magazines/recovery,
 automatic/early reload, abandoned reload progress, switching while charging,
-real J/K/R and controller callbacks, and menu lifecycle. Other modes keep R retry.
+real F/Q/R and controller callbacks, and menu lifecycle. Other modes keep R retry.
 The exact-head full-suite and both platform player/launcher/package results
 belong to PR #88's updated Prepare merge run; the earlier green head is superseded.
 
@@ -51,3 +51,7 @@ the preview normally and choose Ranged combat lab, or use --preview-view ranged
 without recording arguments. Player feel and human simultaneous movement, jump
 and attack usability still need owner playtesting; this prototype does not select
 mobile touch controls or approve production bosses.
+
+The later F/Q keyboard alternatives leave the captured HUD and trajectories
+unchanged. Real Input System regression tests exercise those alternatives;
+the updated Windows preview build and packed-art audit also passed.
