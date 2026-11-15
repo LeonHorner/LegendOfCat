@@ -863,3 +863,11 @@ Ranged lab update (2026-11-15): the user selected a shared attack button, weapon
 switching, independent magazines and active-weapon-only reload. The original
 procedural presentation now labels the selected weapon, remaining rounds, charge
 and reload percentage; no additional external or generated artwork was used.
+
+The user requested filled/hollow ammunition dots on 2026-11-15. The HUD reuses
+the original procedural disc texture to draw cream circles with dark centers
+for spent rounds; no additional artwork or external asset was introduced.
+The follow-up HUD adds a reload progress bar and reuses the pulse/orb silhouettes
+as selected-weapon icons, alongside their English names.
+The compact weapon/ammo/reload HUD is anchored at bottom center at the user's
+request; the former upper control/debug panel is removed.

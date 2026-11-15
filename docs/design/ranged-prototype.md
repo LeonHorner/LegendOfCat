@@ -46,7 +46,13 @@ There are no enemy attacks, contact damage, campaign changes or boss artwork.
 Shots use relative swept collision against the moving target and disappear on
 hit, floor/wall/ceiling contact, or after 3 seconds. At most eight are active.
 Pulse and orb differ by silhouette as well as color. The muzzle indicator and
-visible growing orb show facing and charge; the small lab HUD gives controls.
+visible growing orb show facing and charge. The compact HUD sits at the bottom
+center, without the former upper controls/debug panel.
+Magazine ammunition uses one filled or hollow circle per round (eight for pulse,
+three for orb). Empty circles fill only when reload completes; the active weapon
+and charge/reload percentage remain beside them. A narrow progress bar fills
+beneath the dots during reload. A cool narrow pulse icon and warm round orb icon
+identify the selected weapon by shape and color alongside its name.
 
 Pause freezes charge, flight, target, recovery and reload. Releasing the charge while
 paused cancels it without firing. Retry/restart restore the encounter, charge,

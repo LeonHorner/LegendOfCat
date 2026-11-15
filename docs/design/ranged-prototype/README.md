@@ -18,12 +18,15 @@ weapon, K switches and R reloads early. Pulse: 8 rounds, 0.2-second recovery,
 
 The scripted demonstration forwards the shared attack actions and movement/jump
 signals to the actual runtime components. It shows a grounded charged orb hitting
-an elevated target, target health changing from 6 to 5, movement, jumps, facing
+an elevated target, a visible hit flash, movement, jumps, facing
 changes, direct shots, early reload, switching during reload and automatic
 reload after the pulse magazine is emptied. It is not a human usability test.
 The recorder is compiled only into preview builds. No target damage is injected.
 
-The charge readout and target state remain visible at the compact size. Round
+The bottom-center HUD uses filled/hollow round ammunition markers, a reload bar,
+charge/reload percentage and a distinct pulse/orb icon with the selected weapon
+name. The upper debug/control panel is removed. The indicator remains readable
+at the compact size. Round
 orbs and narrow pulses remain distinct in grayscale; closed protection also has
 a square silhouette and SHIELDED label. Landing edges and Mika remain unobscured.
 Both actual-player logs contain no exceptions or error entries. The preview's
