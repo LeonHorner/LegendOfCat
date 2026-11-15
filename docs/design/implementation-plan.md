@@ -12,7 +12,7 @@ See game-direction.md and art-direction.md before implementation. The following 
 
 5. **Prototype stomp combat and boss attack readability** — Create a small greybox stomp encounter with a target vulnerable to head jumps. Explore readable anticipation, attack, recovery and satisfying impact.
 
-6. **Prototype ranged combat against a flying target** — Try a compact ranged-combat concept against a moving flying target. The previous Yarn Launcher is optional; do not assume weapon pickup, magazine, reload or hold/tap rules.
+6. **Prototype ranged combat against a flying target** - The [approved prototype](ranged-prototype.md) uses an immediate paw pulse and a charged arcing light orb through shared actions, against a moving flying target. Full owl/dragon encounters remain separate.
 
 7. **Implement checkpoint, retry and run lifecycle** — Implement checkpoint activation, falls, retry and full-run restart as distinct operations, with a small reusable playable scene.
 

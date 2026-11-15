@@ -845,3 +845,29 @@ The existing near panorama is extended to 14332×1448 using an original generated
   The pointer is an original code-drawn tapered hand with filtered alpha
   edges. The user requested a classic profile and more consistent visual
   weight across tick positions. No new image model or external asset was used.
+
+
+## Ranged combat lab primitives - 2026-11-15
+
+- Source: original procedural geometry in RangedArena.cs; authored with OpenAI
+  Codex on 2026-11-15, no external asset or image-generation model used.
+- License: project-owned original code/geometry, under the repository license.
+- Human creative decisions: separate immediate paw pulse and charged arcing light
+  orb; J/K controls, height based on hold duration, movement-facing release.
+- Prototype interpretation: cool narrow pulse, warm round orb, growing charge,
+  square closed shield versus round open target, restrained hit/block marks.
+- Existing MikaOriginal artwork is reused with its recorded provenance unchanged.
+
+
+Ranged lab update (2026-11-15): the user selected a shared attack button, weapon
+switching, independent magazines and active-weapon-only reload. The original
+procedural presentation now labels the selected weapon, remaining rounds, charge
+and reload percentage; no additional external or generated artwork was used.
+
+The user requested filled/hollow ammunition dots on 2026-11-15. The HUD reuses
+the original procedural disc texture to draw cream circles with dark centers
+for spent rounds; no additional artwork or external asset was introduced.
+The follow-up HUD adds a reload progress bar and reuses the pulse/orb silhouettes
+as selected-weapon icons, alongside their English names.
+The compact weapon/ammo/reload HUD is anchored at bottom center at the user's
+request; the former upper control/debug panel is removed.

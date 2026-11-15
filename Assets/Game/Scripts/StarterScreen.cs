@@ -36,6 +36,8 @@ public sealed partial class StarterScreen : MonoBehaviour
     Vector2 scroll;
     MovementCourse course;
     StompArena stompArena;
+    RangedArena rangedArena;
+    RunLifecycle ActiveRun => course != null ? course.Run : rangedArena != null ? rangedArena.Run : stompArena.Run;
     VersionedJsonFile displayFile;
     bool fullscreen;
     DisplayState display;
@@ -91,7 +93,7 @@ public sealed partial class StarterScreen : MonoBehaviour
 
     public void OpenLevel(string id)
     {
-        if (course != null || stompArena != null || popup || applying) return;
+        if (course != null || stompArena != null || rangedArena != null || popup || applying) return;
         course = LevelRegistry.Create(id);
         course.Progress.Visible = ShowLevelProgress;
         course.BackToMenu = CloseCourse;
@@ -109,9 +111,27 @@ public sealed partial class StarterScreen : MonoBehaviour
         }
     }
 
+    void OpenRangedArena()
+    {
+        if (course != null || stompArena != null || rangedArena != null || popup || applying) return;
+        rangedArena = new GameObject("Ranged combat lab").AddComponent<RangedArena>();
+        rangedArena.BackToMenu = CloseRangedArena;
+    }
+
+    void CloseRangedArena()
+    {
+        if (rangedArena == null) return;
+        rangedArena.gameObject.SetActive(false);
+        Destroy(rangedArena.gameObject);
+        rangedArena = null;
+        page = "menu";
+        lastPage = null;
+        previousFocus.Clear();
+    }
+
     void OpenStompArena()
     {
-        if (course != null || stompArena != null || popup || applying) return;
+        if (course != null || stompArena != null || rangedArena != null || popup || applying) return;
         stompArena = new GameObject("Simple combat lab").AddComponent<StompArena>();
         stompArena.BackToMenu = CloseStompArena;
     }
@@ -283,7 +303,16 @@ public sealed partial class StarterScreen : MonoBehaviour
         }
         string view = Argument("--preview-view");
         yield return null;
-        if (view == "course" || view == "course-end" || view == "course-paused" || view == "course-transformed") {
+        if (view == "ranged") {
+            OpenRangedArena();
+            string recording = Argument("--ranged-record");
+            if (!string.IsNullOrEmpty(recording)) {
+                yield return RecordRangedPreview(recording);
+                Application.Quit();
+                yield break;
+            }
+        }
+        else if (view == "course" || view == "course-end" || view == "course-paused" || view == "course-transformed") {
             page = "play";
             OpenCourse();
             if (view == "course-transformed") {
@@ -323,6 +352,44 @@ public sealed partial class StarterScreen : MonoBehaviour
         ScreenCapture.CaptureScreenshot(capture);
         yield return new WaitForSecondsRealtime(1);
         Application.Quit();
+    }
+    System.Collections.IEnumerator RecordRangedPreview(string directory)
+    {
+        Directory.CreateDirectory(directory);
+        Application.runInBackground = true;
+        yield return new WaitForSecondsRealtime(2);
+        bool compact = Environment.GetCommandLineArgs().Contains("--ranged-compact");
+        Screen.SetResolution(compact ? 640 : 960, compact ? 360 : 540, FullScreenMode.Windowed);
+        yield return new WaitForSecondsRealtime(1);
+        var input = rangedArena.Cat.GetComponent<CatInput>();
+        rangedArena.Retry();
+        rangedArena.Cat.RespawnAt(new Vector2(-3.05f, .5f));
+        StartCoroutine(HighThrow());
+        System.Collections.IEnumerator HighThrow()
+        {
+            yield return new WaitForSeconds(1.6f);
+            input.WeaponSwitched(); input.AttackPressed();
+            yield return new WaitForSeconds(.56f);
+            input.AttackReleased();
+        }
+        for (int frame = 0; frame < 100; frame++) {
+            if (frame == 0) { input.AttackPressed(); input.AttackReleased(); }
+            if (frame == 36) { input.ReloadPressed(); }
+            if (frame == 42) { input.WeaponSwitched(); }
+            if (frame >= 44 && frame <= 72 && frame % 2 == 0) { input.AttackPressed(); input.AttackReleased(); }
+            if (frame == 76) input.WeaponSwitched();
+            if (frame == 78) input.ReloadPressed();
+            if (frame == 30 || frame == 60) rangedArena.Cat.PressJump();
+            if (frame == 33 || frame == 63) rangedArena.Cat.Motion.ReleaseJump();
+            if (frame == 32) rangedArena.Cat.Motion.SetMove(1);
+            if (frame == 42) rangedArena.Cat.Motion.SetMove(0);
+            if (frame == 56) { rangedArena.Cat.Motion.SetMove(-1); input.FacingChanged(-1); }
+            if (frame == 62) { rangedArena.Cat.Motion.SetMove(0); input.FacingChanged(1); }
+            yield return new WaitForEndOfFrame();
+            ScreenCapture.CaptureScreenshot(Path.Combine(directory, frame.ToString("D3") + ".png"));
+            yield return new WaitForSecondsRealtime(.1f);
+        }
+        yield return new WaitForSecondsRealtime(1);
     }
     System.Collections.IEnumerator PreviewDownload()
     {
