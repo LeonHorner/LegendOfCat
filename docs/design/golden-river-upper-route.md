@@ -1,6 +1,10 @@
 # Golden River upper route
 
-## Current shoreline revision — 2026-11-13
+## River-carved slate playtest — 2026-11-20
+
+The playable detour now follows a scoured channel between the two main-route shores. The [Linux debug start, recordings and review notes](golden-river-upper-route/river-channel-review/README.md) describe the current candidate for issue #72.
+
+## Shoreline revision — 2026-11-13
 
 The accepted isolated cleft is being integrated using permanent native shores, a fixed camera plane and a forward exit at ascent bank 39. See [current construction, test instructions and evidence](golden-river-upper-route/permanent-shores.md). The first campaign integration was rejected for water cuts, overlapping terrain and scenery transitions. The bank-49 layout and its 60.48-second measurement below belong to an older rejected prototype. PR #79 stays draft during player review.
 
