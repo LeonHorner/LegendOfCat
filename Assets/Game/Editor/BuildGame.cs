@@ -75,7 +75,14 @@ public static class BuildGame
     }
 
     // Local UI inspection only. No installer, update feed or release publication is produced.
-    public static void BuildPreview()
+    public static void BuildLinuxCavePreview()
+    {
+        CaveTerrainImport.BakeMasks();
+        BuildPreviewFor(BuildTarget.StandaloneLinux64, caveStart: true);
+    }
+    public static void BuildPreview() => BuildPreviewFor(BuildTarget.StandaloneWindows64);
+
+    static void BuildPreviewFor(BuildTarget target, bool caveStart = false)
     {
         CreateStarterScene();
         ConfigureDesktop();
@@ -96,13 +103,15 @@ public static class BuildGame
             Directory.CreateDirectory(Path.GetDirectoryName(output));
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
                 scenes = new[] { ScenePath },
-                target = BuildTarget.StandaloneWindows64,
+                target = target,
                 locationPathName = output,
                 options = BuildOptions.Development | BuildOptions.CleanBuildCache | BuildOptions.DetailedBuildReport,
-                extraScriptingDefines = new[] { "LEGEND_OF_CAT_PREVIEW" }
+                extraScriptingDefines = caveStart
+                    ? new[] { "LEGEND_OF_CAT_PREVIEW", "LEGEND_OF_CAT_CAVE_START" }
+                    : new[] { "LEGEND_OF_CAT_PREVIEW" }
             });
             if (report.summary.result != BuildResult.Succeeded)
-                throw new BuildFailedException("Windows preview build failed.");
+                throw new BuildFailedException(target + " preview build failed.");
             BuildScenery.ValidatePackedArt(report);
         }
         finally {

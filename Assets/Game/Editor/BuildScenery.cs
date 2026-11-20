@@ -46,7 +46,7 @@ public static class BuildScenery
 
     public static readonly string[] GoldenRiverArt = {
         "Descent/concept-entry-left-v1", "Descent/concept-entry-roof-v1", "Descent/concept-entry-recess-v1",
-        "Descent/concept-entry-rock-v1",
+        "Descent/concept-entry-rock-v1", "Descent/river-cut-slate", "Descent/fountain-fissure-wall", "Descent/rooted-channel-wall",
         "Descent/entry-module-0-v1", "Descent/entry-module-1-v1", "Descent/entry-module-2-v1",
         "Descent/entry-module-3-v1", "Descent/entry-module-4-v1", "Descent/entry-module-5-v1",
         "Descent/terrain-stone-v1", "Descent/discovery-floor-v2", "Descent/discovery-ceiling-v2", "Descent/discovery-rear-v1",

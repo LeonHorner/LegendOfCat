@@ -286,6 +286,9 @@ public sealed partial class StarterScreen : MonoBehaviour
             yield break;
         }
         string view = Argument("--preview-view");
+#if LEGEND_OF_CAT_CAVE_START
+        if (string.IsNullOrEmpty(view)) view = "level-one-descent";
+#endif
         yield return null;
         if (view == "course" || view == "course-end" || view == "course-paused" || view == "course-transformed") {
             page = "play";

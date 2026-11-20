@@ -576,6 +576,7 @@ public sealed partial class SceneryRenderer : MonoBehaviour
         terrainMaterial.SetFloat("_CourseScale", transform.lossyScale.y);
         View.transform.position = new Vector3(x, y, -10);
         var localView = transform.InverseTransformPoint(new Vector3(x, y, 0));
+        if (descentCoverage) cornerMaterial.SetFloat("_CornerDaylight", Mathf.SmoothStep(0, 1, Mathf.InverseLerp(-6, 0, localView.y)));
         // Distant scenery has no physical join to the world-space terrain or foreground water.
         for (int i = 0; i < 3; i++) {
             if (RouteLandmarks && i > 0) {

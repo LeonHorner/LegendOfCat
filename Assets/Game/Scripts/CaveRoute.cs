@@ -36,12 +36,14 @@ public static class CaveRoute
     {
         if(x<18)return -8.6f;
         if(x<34)return Mathf.Lerp(-8.6f,-8.2f,Mathf.InverseLerp(29,34,x));
-        if(x<44)return Mathf.Lerp(-8.2f,-5.7f,Mathf.InverseLerp(34,44,x));
-        if(x<58)return -5.7f;
-        if(x<72)return Mathf.Lerp(-5.7f,-7.5f,Mathf.InverseLerp(58,72,x));
-        if(x<104)return -7.5f;
-        if(x<179)return -6;
-        return Mathf.Lerp(-6,-4.6f,Mathf.InverseLerp(179,183,x));
+        // The roof opens over the fountain, drops across the deep cleft, and
+        // rises with the channel towards the far bank. Keep rock above the roof.
+        var bay = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(34, 46, x));
+        var fissure = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(58, 86, x));
+        var climb = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(107, 174, x));
+        float bed = -8.2f + 2.65f * bay - 7.6f * fissure + 7.3f * climb;
+        float erosion = (.43f * Mathf.Sin(x * .27f) + .19f * Mathf.Sin(x * .81f)) * bay;
+        return Mathf.Lerp(bed + erosion, -4.6f, Mathf.InverseLerp(178, 183, x));
     }
     public static bool TouchesRiver(Vector2 previous,Vector2 current)
     {

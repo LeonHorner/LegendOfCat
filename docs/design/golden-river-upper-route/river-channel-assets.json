@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-20",
+  "generator": "OpenAI built-in image generation",
+  "model": "Exact model identifier unavailable",
+  "license": "Project asset license (CC BY-NC 4.0 to the extent applicable rights exist)",
+  "assets": [
+    {
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/fountain-fissure-wall.png",
+      "prompt": "Create an original wide landscape background painting for a 2D side-scrolling platform game: an intimate dry river-carved slate cavern rear wall, entirely underground. Hand-painted gouache and oil on paper, lyrical varied brush marks, the blue-violet shadowed stone, muted teal moss and subdued ochre mineral deposits of a warm autumn river valley. Wall seen front-on at a gentle side angle. Weathered sinuous folded beds, a single oblique ancient flood line and scalloped water-worn flutes, with several large shadowed recesses between interlocking curving rock masses. Airy cool atmospheric separation, subtle midtone modeling, quiet edges. Center-right high up, ONE very narrow angled vertical fissure lets in a shaft of pale honey light falling leftwards downward to the lower center. Both side edges and lower border return naturally to deep cool violet-gray rock. Full bleed continuous image. No horizon, trees, grass carpet, clouds, exterior view, water surface, figures, fountain, objects, floor platforms, symbols, frame, text or UI. This will be the recessed chamber wall behind an existing rooted stone fountain; the foreground gameplay and fountain are added separately."
+    },
+    {
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/river-cut-slate.png",
+      "prompt": "Original landscape hand-painted game terrain material, a flat FRONT ELEVATION of river-cut blue violet slate, edge to edge unbroken exposed rock. Side view, camera perpendicular to the rock face. Long sweeping asymmetrical ribbons of weathered slate and broad blue-violet fractured planes, muted mauve mineral striations, very occasional rusty ochre sediment lines, a few pockets of dusty teal lichen embedded in the rock. Intricate but understated gouache brushwork, like an illustrated autumn valley adventure. Quiet ambient light from upper left, mineral striations run mostly horizontally, bending up gently on one side. Fill the entire frame with usable flat material, no roof, scene, sky, floor, plants, objects, openings, text, vignette, border, silhouettes, horizon or vanishing point. Similar scale and value at opposite edges. Wide 2:1 composition for an orthographic 2D riverbank platformer."
+    },
+    {
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/rooted-channel-wall.png",
+      "prompt": "A richly hand-painted background for a side-on 2D adventure in a river-carved cave. Wide landscape 2:1. Rear wall only, with a dramatic sweeping sculptural folded arch of blue-violet slate at left, and an ancient root system from an unseen tree wedged through a steep long natural fissure at the right. Exposed gnarled ochre bark with a few muted teal leaves, diagonal traces of an ancient waterline. Rounded scallops along the inside of the rock, angled slabs and a deep shadowed alcove far behind. Soft muted dusk-blue indirect light, deep painterly shadows under the arch, restrained cooler light entering softly from upper right, a few warm gold ochre highlights on the root. Brushwork like a gouache storybook fantasy river valley, quiet background depth. Fill edge to edge with artwork; side borders and base resolve to ordinary dark blue-violet rock. No horizon, bright spotlights, walkable foreground, floor cutaways, floating platforms, player, water, ruins, furnace, text or UI. Organic asymmetric rock patterns; intentional composition instead of tiling."
+    }
+  ]
+}

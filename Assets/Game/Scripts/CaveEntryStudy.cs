@@ -117,7 +117,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
         MeshObject(name,Rectangle(visible),bounds,z,material);
     }
     static Vector2[] Rectangle(Rect b)=>new[]{new Vector2(b.xMin,b.yMin),new Vector2(b.xMax,b.yMin),new Vector2(b.xMax,b.yMax),new Vector2(b.xMin,b.yMax)};
-    void MeshObject(string name,Vector2[] polygon,Rect uvBounds,float z,Material material)
+    MeshRenderer MeshObject(string name,Vector2[] polygon,Rect uvBounds,float z,Material material)
     {
         var item=new GameObject(name);item.transform.SetParent(transform,false);
 
@@ -127,7 +127,10 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
         for(int i=0;i<vertices.Length;i++) {vertices[i]=polygon[i];uv[i]=new Vector2((polygon[i].x-uvBounds.x)/uvBounds.width,(polygon[i].y-uvBounds.y)/uvBounds.height);}
         var triangles=CaveGeometry.Triangulate(polygon);
         mesh.vertices=vertices;mesh.uv=uv;mesh.triangles=triangles;mesh.RecalculateBounds();
-        item.AddComponent<MeshFilter>().sharedMesh=mesh;item.AddComponent<MeshRenderer>().sharedMaterial=material;
+        item.AddComponent<MeshFilter>().sharedMesh=mesh;
+        var renderer = item.AddComponent<MeshRenderer>();
+        renderer.sharedMaterial = material;
+        return renderer;
 
     }
     void AddWater()

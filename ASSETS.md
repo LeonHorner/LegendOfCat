@@ -964,3 +964,7 @@ The approved-concept entrance also uses concept-entry-rock-v1, an original gener
   The pointer is an original code-drawn tapered hand with filtered alpha
   edges. The user requested a classic profile and more consistent visual
   weight across tick positions. No new image model or external asset was used.
+
+### River-carved slate passage — 2026-11-20
+
+Three original paintings by OpenAI built-in image generation, exact model identifier unavailable. The project asset license applies to the extent applicable rights exist. The owner selected a dry river-carved passage. The slate painting follows one continuous bedding direction through the walkable shelves. The fountain wall places a single side fissure above the existing rooted ruin. A separate rooted recess marks the climb toward daylight. Painted grass recedes underground. Source paths and complete prompts are in [the generation record](docs/design/golden-river-upper-route/river-channel-assets.json).

@@ -447,7 +447,11 @@ public sealed class MovementCourse : MonoBehaviour
         RespawnWithProgress(LevelOneCheckpointSpawns[1]);
     }
     public void StartAscentPreview() => StartPreviewAt(LevelOneCheckpointSpawns[0]);
-    public void StartDescentPreview() { StartAscentPreview(); Cat.RespawnAt(transform.TransformPoint(CaveRoute.Approach)); }
+    public void StartDescentPreview()
+    {
+        StartAscentPreview();
+        RespawnWithProgress(CaveRoute.Entrance, true);
+    }
     public void StartVerticalLiftPreview()
     {
         var bank = AscentPlatforms[50];

@@ -24,6 +24,10 @@ public static class CaveRebuildReview
         var startup=System.Diagnostics.Stopwatch.StartNew();
         var root=new GameObject("Cave geometry review");root.SetActive(false);var course=root.AddComponent<MovementCourse>();course.LevelOne=true;root.SetActive(true);
         Debug.Log("Golden River review construction: "+startup.Elapsed.TotalMilliseconds.ToString("F1")+" ms");course.StartDescentPreview();
+        if (Vector2.Distance(course.Cat.transform.localPosition, CaveRoute.Entrance) > .01f ||
+            course.Run.Checkpoint != 1 || course.Run.Spawn != MovementCourse.LevelOneCheckpointSpawns[0])
+            throw new System.InvalidOperationException("Cave preview must start at the mouth with the main checkpoint active.");
+        course.Cat.RespawnAt(CaveRoute.Approach);
         IntegratedCaveReview.VerifyShoreRegistration(course);
         var cat=course.Cat;cat.GetComponent<CatInput>().enabled=false;cat.GetComponent<Rigidbody2D>().interpolation=RigidbodyInterpolation2D.None;
         var movers=root.GetComponentsInChildren<MovingSupport>();foreach(var m in movers)m.SendMessage("Start");
@@ -38,7 +42,8 @@ public static class CaveRebuildReview
         }
         bool recording=capture;int motionTick=0;string motion="entrance-motion";
         if(capture)System.IO.Directory.CreateDirectory("artifacts/cave-rebuild-review/"+motion);
-        void Tick(){foreach(var m in movers)m.SendMessage("FixedUpdate");cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(.02f);course.SendMessage("Update");follow.Follow(.02f);scenery.SendMessage("LateUpdate");
+        var water = cat.GetComponent<WaterRecovery>();
+        void Tick(){water.Advance(.02f);foreach(var m in movers)m.SendMessage("FixedUpdate");cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(.02f);course.SendMessage("Update");follow.Follow(.02f);scenery.SendMessage("LateUpdate");
             if(recording){cat.GetComponentInChildren<MikaSpritePresentation>().RenderPose(.02f);scenery.SetWaterTime(motionTick*.02f);
                 if(motionTick%5==0)SaveFrame(follow.GetComponent<Camera>(),"artifacts/cave-rebuild-review/"+motion+"/frame-"+(motionTick/5).ToString("D4")+".png");motionTick++;}}
         void Reach(Vector3 point){var target=CaveRoute.ToCourse(new Vector2(point.x,point.y+.46f));bool jumped=false,reached=false;
@@ -52,6 +57,18 @@ public static class CaveRebuildReview
         System.IO.Directory.CreateDirectory("artifacts/cave-rebuild-review");
         var path=CaveTerrainLayout.Path();path[0]=new Vector3(2.6f,-.045f,1);int index=0;foreach(var p in path){Reach(p);if(capture&&index<13){cat.GetComponentInChildren<MikaSpritePresentation>().RenderPose(.25f);Save(root.GetComponentInChildren<Camera>(),index);}if(capture&&index==9){recording=false;System.IO.File.WriteAllText("artifacts/cave-rebuild-review/"+motion+"/frames.txt",((motionTick+4)/5).ToString());}index++;}
         Debug.Log("Shared cave full forward geometry passed.");
+        var exitTreads = System.Array.FindAll(CaveTerrainLayout.Floors, tread => tread.x >= 204);
+        for (int i = exitTreads.Length - 1; i >= 0; i--) {
+            var tread = exitTreads[i];
+            Reach(new Vector3(tread.x + tread.z * .5f, tread.y, 0));
+        }
+        for (int i = 0; i < exitTreads.Length - 1; i++) {
+            var tread = exitTreads[i];
+            Reach(new Vector3(tread.x + tread.z - .65f, tread.y, 0));
+            var next = exitTreads[i + 1];
+            Reach(new Vector3(next.x + .7f, next.y, 1));
+        }
+        Debug.Log("Far cave mouth supports reverse entry and a return to daylight.");
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(101.5f,-19.49f)));for(int i=0;i<100;i++)Tick();
         if(!cat.Grounded||Mathf.Abs(CaveRoute.ToLocal(cat.transform.localPosition).y-(CaveTerrainLayout.CatchHeight+.51f))>.2f)throw new System.InvalidOperationException("The local miss did not reach its catch.");
         foreach(var p in new[]{new Vector3(95.7f,-26.5f,0),new Vector3(91.7f,-25.2f,1),new Vector3(87.7f,-23.9f,1),new Vector3(82.5f,-22.6f,1),new Vector3(81.3f,-21.3f,1),new Vector3(87.3f,-20,1),new Vector3(92.3f,-21.3f,0),new Vector3(98.7f,-20,1)})Reach(p);
@@ -78,6 +95,8 @@ public static class CaveRebuildReview
         if(Vector2.Distance(cat.transform.localPosition,MovementCourse.LevelOneCheckpointSpawns[0])>.01f)throw new System.InvalidOperationException("Cave retry changed the main checkpoint.");
         foreach(float x in new[]{28,55,95,150}){
             cat.RespawnAt(CaveRoute.ToCourse(new Vector2(x,-2.9f)));cat.Launch(new Vector2(0,-20));for(int i=0;i<10;i++)Tick();
+            if (!water.Active) throw new System.InvalidOperationException("Main river missed the water reaction at "+x);
+            for (int i=0; i<340 && water.Active; i++) Tick();
             if(cat.transform.localPosition.x>=CaveRoute.Origin-20)throw new System.InvalidOperationException("Main water admitted a fall into the cave at "+x);
         }
         course.RestartRun();if(course.Run.Checkpoint!=0||cat.transform.localPosition.x>=0)throw new System.InvalidOperationException("Restart did not return to the level beginning.");

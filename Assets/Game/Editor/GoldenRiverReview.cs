@@ -109,9 +109,11 @@ public static class GoldenRiverReview
         bool upperReview = System.Array.IndexOf(args, "-upperReview") >= 0;
         if (upperReview) {
             points = new[] { CaveRoute.Entrance,CaveRoute.ToCourse(new Vector2(6.5f,-2.69f)),
-                CaveRoute.ToCourse(new Vector2(98.7f,-10.65f)),CaveRoute.ToCourse(new Vector2(100,-16.99f)),
-                CaveRoute.ToCourse(new Vector2(44,-12.16f)),CaveRoute.Rejoin };
-            names = new[] { "descent-entrance", "descent-entry-bank", "descent-risk", "descent-catch", "descent-niche", "descent-rejoin" };
+                CaveRoute.ToCourse(new Vector2(98.7f,-19.5f)),CaveRoute.ToCourse(new Vector2(101.5f,-26)),
+                CaveRoute.ToCourse(new Vector2(48,-12.16f)),CaveRoute.Rejoin,
+                CaveRoute.ToCourse(new Vector2(28,-12.27f)),CaveRoute.ToCourse(new Vector2(135,-13.99f)),
+                CaveRoute.ToCourse(new Vector2(218,-1.88f)) };
+            names = new[] { "descent-entrance", "descent-entry-bank", "descent-risk", "descent-catch", "descent-niche", "descent-rejoin", "channel-sill", "return-bench", "exit-mouth" };
         }
         try {
             for (int index = 0; index < points.Length; index++) {
@@ -131,6 +133,7 @@ public static class GoldenRiverReview
                 presentation.RenderPose(0);
                 follow.Snap();
                 follow.SendMessage("LateUpdate");
+                if (upperReview) for (int step = 0; step < 90; step++) follow.Follow(.02f);
                 scenery.ApplyView(camera.transform.position.x, camera.transform.position.y);
                 scenery.SetWaterTime(12);
                 foreach (int width in new[] { 960, 640 }) {
@@ -268,7 +271,7 @@ public static class GoldenRiverReview
         course.RestartRun();
         if(!full) course.Cat.RespawnAt(CaveRoute.Entrance);
         if (catchOnly) {
-            course.Cat.RespawnAt(CaveRoute.ToCourse(new Vector2(98.7f,-10.65f)));
+            course.Cat.RespawnAt(CaveRoute.ToCourse(new Vector2(98.7f,-19.5f)));
         }
         var movers=course.GetComponentsInChildren<MovingSupport>();
         foreach(var mover in movers){mover.SendMessage("Start");mover.ResetPhase();}
@@ -287,7 +290,7 @@ public static class GoldenRiverReview
                 course.Cat.SendMessage("FixedUpdate");scene.GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);
                 course.Cat.transform.position=course.Cat.GetComponent<Rigidbody2D>().position;
                 course.SendMessage("Update");follow.Follow(Time.fixedDeltaTime);
-                course.GetComponent<DescentLight>()?.Advance(Time.fixedDeltaTime);
+                course.GetComponentInChildren<CaveEntryStudy>()?.AdvanceVisuals(Time.fixedDeltaTime);
                 if(tick%4==0) {
                     foreach(var mover in movers)mover.SendMessage("LateUpdate");
                     presentation.RenderPose(Time.fixedDeltaTime*4);
@@ -296,7 +299,7 @@ public static class GoldenRiverReview
                     File.WriteAllBytes($"{frames}/frame-{tick/4:00000}.png",pixels.EncodeToPNG());
                 }
                 bool complete = catchOnly ? tick > 150 && course.Cat.Grounded &&
-                    Mathf.Abs(course.Cat.transform.position.y-(-17.5f+CaveRoute.VerticalOffset+.51f)) < .15f
+                    Mathf.Abs(course.Cat.transform.position.y-(CaveTerrainLayout.CatchHeight+CaveRoute.VerticalOffset+.51f)) < .15f
                     : (bool)type.GetProperty("Complete").GetValue(pilot);
                 if(complete) {
                     Debug.Log("Scripted optional loop recording completed in "+(tick*Time.fixedDeltaTime).ToString("F2")+"s; not human-input evidence.");return;

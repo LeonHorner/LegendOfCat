@@ -49,6 +49,7 @@ public sealed partial class CaveEntryStudy
         var grain=Resources.Load<Texture2D>("GoldenRiver/Descent/concept-entry-rock-v1");
         material.mainTexture=grain?grain:Resources.Load<Texture2D>("GoldenRiver/Descent/terrain-stone-v1");
         material.SetTexture("_BaseTex",material.mainTexture);material.SetVector("_Frame",new Vector4(0,0,8,5.333333f));
+        material.SetTexture("_ChannelStone", Resources.Load<Texture2D>("GoldenRiver/Descent/river-cut-slate"));
         material.SetFloat("_Shade",shade);return material;
     }
     void AddEmbeddedLand()
@@ -67,13 +68,30 @@ public sealed partial class CaveEntryStudy
         }
         TerrainCollider.GenerateGeometry();Physics2D.SyncTransforms();AddEntranceDetails();AddAuthoredEntrance();AddExposedGrass();AddApproachGrass();
         var background=RockMaterial(.52f);
-        var rear=new[]{new Vector2(8,-42),new Vector2(205,-42),new Vector2(205,-4.5f),new Vector2(183,-4.5f),
-            new Vector2(179,-5.8f),new Vector2(104,-5.8f),new Vector2(72,-7.3f),new Vector2(44,-5.5f),new Vector2(34,-8),
+        background.SetFloat("_ChamberWall", 1);
+        background.SetTexture("_RootWall", Resources.Load<Texture2D>("GoldenRiver/Descent/rooted-channel-wall"));
+        background.SetTexture("_Fissure", Resources.Load<Texture2D>("GoldenRiver/Descent/fountain-fissure-wall"));
+        var rear=new[]{new Vector2(8,-42),new Vector2(210,-42),new Vector2(210,-8.3f),
+            new Vector2(207,-6.3f),new Vector2(205,-4.5f),new Vector2(34,-4.5f),
             new Vector2(18,-8.4f),new Vector2(14,-6.8f),new Vector2(12.3f,-5.7f),new Vector2(11.8f,-6.1f),
             new Vector2(11.5f,-6.5f),new Vector2(11.1f,-6.4f),new Vector2(10.8f,-6.8f),new Vector2(10.2f,-7.2f),
             new Vector2(10.4f,-7.6f),new Vector2(10,-7.9f),new Vector2(9.7f,-8.2f),new Vector2(9.8f,-8.7f),
             new Vector2(9.4f,-8.9f),new Vector2(9,-9.1f),new Vector2(9.1f,-9.5f),new Vector2(8.8f,-9.7f),new Vector2(8.7f,-10.1f),new Vector2(8,-10.5f)};
         MeshObject("Permanent recessed cave rock",rear,new Rect(0,0,24,24),2,background);
+        // The ledges around the catch project from a recessed wall. Give their
+        // bearing faces visible depth behind the plane Mika can pass underneath.
+        var bearing = RockMaterial(.74f);
+        foreach (var tread in CaveTerrainLayout.Floors) {
+            if (tread.x < 77 || tread.x >= 106) continue;
+            float x = tread.x, y = tread.y, width = tread.z;
+            var face = new[] {
+                new Vector2(x,y-.12f), new Vector2(x+width,y-.12f),
+                new Vector2(x+width-.22f,y-.88f), new Vector2(x+width*.57f,y-1.6f),
+                new Vector2(x+width*.32f,y-2.55f), new Vector2(x+.22f,y-2.87f),
+                new Vector2(x+.34f,y-1.38f), new Vector2(x-.14f,y-.74f)
+            };
+            MeshObject("Recessed bearing face",face,new Rect(0,0,8,8),1.3f,bearing);
+        }
         AddRecessedMouth();
         Painting("Rooted fountain landmark",new Rect(43,-12.976f,10.2f,6.8f),1.4f,"GoldenRiver/Descent/ruin-v1");
         var future=new GameObject("FutureCollectibleAnchor");future.transform.SetParent(transform,false);future.transform.localPosition=new Vector3(54.8f,-12.5f,0);
@@ -99,7 +117,7 @@ public sealed partial class CaveEntryStudy
     void AddRecessedMouth()
     {
         var texture=Resources.Load<Texture2D>("GoldenRiver/Descent/concept-entry-recess-v1");if(!texture)return;
-        var material=RockMaterial(.68f);material.mainTexture=texture;material.SetFloat("_WorldMapped",0);
+        var material=RockMaterial(.52f);material.SetFloat("_Alcove",1);material.mainTexture=texture;material.SetFloat("_WorldMapped",0);
         // The upper seam runs inside the opaque roof, rather than cutting across the
         // opening at a fixed height. The outer flank is permanent and behind Mika.
         var outline=new[]{new Vector2(5.9f,-24),new Vector2(36,-24),new Vector2(36,-7.8f),new Vector2(18,-8.3f),
@@ -156,10 +174,17 @@ public sealed partial class CaveEntryStudy
         exposed.Sort((a,b)=>Mathf.Abs(a.y-b.y)>.0001f?a.y.CompareTo(b.y):a.x.CompareTo(b.x));
         var merged=new List<Vector3>();
         foreach(var span in exposed){if(merged.Count>0){var previous=merged[merged.Count-1];if(Mathf.Abs(previous.y-span.y)<.0001f&&span.x<=previous.x+previous.z+.001f){previous.z=Mathf.Max(previous.x+previous.z,span.x+span.z)-previous.x;merged[merged.Count-1]=previous;continue;}}merged.Add(span);}
+        var material = new Material(Resources.Load<Material>("GoldenRiver/Descent/cave-grass-material"));
+        owned.Add(material);
+        RegisterMaterial(material);
+        material.mainTexture = Resources.Load<Texture2D>("GoldenRiver/bank-narrow-v3");
+        material.SetTexture("_ChannelStone", Resources.Load<Texture2D>("GoldenRiver/Descent/river-cut-slate"));
         foreach(var span in merged){
-            var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/cave-grass-material"));owned.Add(material);RegisterMaterial(material);
-            material.mainTexture=Resources.Load<Texture2D>("GoldenRiver/bank-narrow-v3");material.SetFloat("_Contact",span.y);
-            var bounds=new Rect(span.x,span.y-.12f,span.z,.72f);MeshObject("Vegetation over solid contact",Rectangle(bounds),bounds,-3.1f,material);
+            var bounds=new Rect(span.x,span.y-.12f,span.z,.72f);
+            var renderer = MeshObject("Vegetation over solid contact",Rectangle(bounds),bounds,-3.1f,material);
+            var properties = new MaterialPropertyBlock();
+            properties.SetFloat("_Contact", span.y);
+            renderer.SetPropertyBlock(properties);
         }
     }
     void AddApproachGrass()
