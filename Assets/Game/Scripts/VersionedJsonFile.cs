@@ -113,9 +113,12 @@ public static class MenuSettings
     public const int CurrentVersion = 0;
 
     public static VersionedJsonFile Open(string path) => new VersionedJsonFile(path, CurrentVersion,
-        () => new JObject { ["lastOfferedVersion"] = "" },
+        () => new JObject { ["lastOfferedVersion"] = "", ["showLevelProgress"] = true },
         data => {
             if (data["lastOfferedVersion"] == null) data["lastOfferedVersion"] = "";
+            if (data["showLevelProgress"] == null) data["showLevelProgress"] = true;
+            if (data["showLevelProgress"].Type != JTokenType.Boolean)
+                throw new InvalidDataException("showLevelProgress must be a boolean.");
             if (data["lastOfferedVersion"].Type != JTokenType.String)
                 throw new InvalidDataException("lastOfferedVersion must be a string.");
         });

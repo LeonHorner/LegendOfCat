@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 // A painted checkpoint prototype, reusable from the menu without campaign/save dependencies.
@@ -130,6 +131,8 @@ public sealed class MovementCourse : MonoBehaviour
     public static Vector2 UpperRouteRejoin => CaveRoute.Rejoin;
     public static readonly Vector2 LevelOneExit = new Vector2(FinaleRoute.Last.x + 4.5f, FinaleRoute.Last.y + 1.27f);
     Vector3[] ActivePlatforms => LevelOne ? CompletePlatforms : Platforms;
+    public static readonly Vector2 LabFinish = new Vector2(100, 0.52f);
+    public LevelProgress Progress { get; private set; }
     public CatController Cat { get; private set; }
     public RunLifecycle Run { get; private set; }
     public static readonly Vector2[] CheckpointSpawns = {
@@ -150,6 +153,10 @@ public sealed class MovementCourse : MonoBehaviour
     public float FinaleSeconds => finaleStarted < 0 ? -1 : finaleFinished >= 0 ? finaleFinished : Mathf.Max(0, Run.ElapsedSeconds - finaleStarted);
     public float AscentSeconds => IntroductionSeconds < 0 ? -1 :
         ascentFinished >= 0 ? ascentFinished : Mathf.Max(0, Run.ElapsedSeconds - ascentStarted);
+    public IReadOnlyList<Vector2> ProgressCheckpoints => ActiveCheckpoints;
+    static readonly float[] LabCheckpointHalfWidths = System.Array.ConvertAll(CheckpointSpawns, spawn =>
+        System.Array.Find(Platforms, platform => platform.x == spawn.x).z / 2);
+
     Vector2[] ActiveCheckpoints => LevelOne ? LevelOneCheckpointSpawns : CheckpointSpawns;
     public System.Action BackToMenu;
     readonly System.Collections.Generic.List<MovingSupport> supports = new System.Collections.Generic.List<MovingSupport>();
@@ -164,10 +171,6 @@ public sealed class MovementCourse : MonoBehaviour
     string previousPose;
     float landing;
     bool originalMika;
-    bool showHelp;
-    GUIStyle hudStyle;
-    string hudStatus;
-    float hudRefresh, frameSeconds;
     readonly System.Collections.Generic.List<CheckpointMarker> checkpointMarkers = new System.Collections.Generic.List<CheckpointMarker>();
 
     void Awake()
@@ -223,6 +226,7 @@ public sealed class MovementCourse : MonoBehaviour
         Cat.fallReference = transform;
         // Session spawn coordinates belong to this course, not its current world placement.
         Run = new RunLifecycle(player.transform.localPosition);
+        Progress = LevelProgress.ForCourse(LevelOne, Run.Start);
         Cat.FellOutOfBounds += RetryCheckpoint;
         var input = player.AddComponent<CatInput>();
         input.controller = Cat;
@@ -234,7 +238,8 @@ public sealed class MovementCourse : MonoBehaviour
         visual.SetParent(player.transform, false);
         var original = Resources.Load<GameObject>("MikaOriginal");
         if (original) {
-            Destroy(visual.gameObject);
+            if (Application.isPlaying) Destroy(visual.gameObject);
+            else DestroyImmediate(visual.gameObject);
             visual = Instantiate(original, player.transform).transform;
             visual.GetComponent<MikaSpritePresentation>().controller = Cat;
             originalMika = true;
@@ -280,6 +285,7 @@ public sealed class MovementCourse : MonoBehaviour
             sceneryRenderer.RouteLandmarks = true;
         }
         sceneryRenderer.InitializeForCourse(courseCamera, Cat, ActivePlatforms);
+        Cat.gameObject.AddComponent<WaterRecovery>().Initialize(Cat, courseCamera, transform, RetryCheckpoint);
         if (LevelOne)
             for (int i = 0; i < platformObjects.Count; i++)
                 if (sceneryRenderer.FloatingAt(i)&&!CaveRoute.ReplacesAscent(i-LevelOnePlatforms.Length)) SceneryRenderer.MatchFloatingCollider(platformObjects[i], sceneryRenderer.TerrainVisuals[i]);
@@ -349,15 +355,19 @@ public sealed class MovementCourse : MonoBehaviour
             var point = ActiveCheckpoints[i];
             if (LevelOne) {
                 int bankIndex = i == 0 ? LevelOnePlatforms.Length - 1 : LevelOnePlatforms.Length + OverlookIndex;
-                checkpointMarkers.Add(CheckpointMarker.Create(transform, point, i + 1, Run, sceneryRenderer.TerrainVisuals[bankIndex]));
+                var marker = CheckpointMarker.Create(transform, point, i + 1, Run, sceneryRenderer.TerrainVisuals[bankIndex]);
+                checkpointMarkers.Add(marker);
+                Progress.SetCheckpointVisual(i + 1, marker.WorldVisual, CheckpointMarker.ActiveArtworkUv);
                 continue;
             }
-            Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
+            var post = Block("Safe checkpoint " + (i + 1), new Vector2(point.x, point.y + 0.45f),
                 new Vector2(0.14f, 0.9f), new Color(0.95f, 0.75f, 0.36f));
+            // Match the world post's aspect ratio in the centered HUD icon.
+            Progress.SetCheckpointVisual(i + 1, post.GetComponent<SpriteRenderer>(), new Rect(0, 0, 1, 1));
             Label("CHECKPOINT " + (i + 1), new Vector2(point.x, point.y + 1.2f));
         }
         // Main-route landmarks and platform silhouettes communicate progression without floating labels.
-        if (!LevelOne) Label("FINISH / return or retry", new Vector2(100, 1));
+        if (!LevelOne) Label("FINISH / return or retry", LabFinish + Vector2.up * .48f);
     }
     void CreateDescentFloor(Vector3 p, SceneryRenderer scenery, string name)
     {
@@ -397,24 +407,22 @@ public sealed class MovementCourse : MonoBehaviour
     void Update()
     {
         if (Run == null) return;
-        frameSeconds = Mathf.Lerp(frameSeconds, Time.unscaledDeltaTime, 0.08f);
-        hudRefresh -= Time.unscaledDeltaTime;
-        if (hudRefresh <= 0) {
-            hudStatus = (Run.Paused ? "Paused | " : "") + "Checkpoint " + Run.Checkpoint + "/" + ActiveCheckpoints.Length
-                + (LevelOne ? " | Intro " + (IntroductionSeconds < 0 ? Run.ElapsedSeconds : IntroductionSeconds).ToString("F1")
-                    + "s" + (IntroductionSeconds >= 0 ? " | Ascent " + AscentSeconds.ToString("F1") + "s" : "") + (FinaleSeconds >= 0 ? " | Finale " + FinaleSeconds.ToString("F1") + "s" : "") : " | R: retry | P: pause");
-            hudRefresh = 0.25f;
-        }
         Run.Advance(Time.deltaTime);
         foreach (var marker in checkpointMarkers) marker.Refresh(Time.deltaTime);
-        if (Run.Paused || (!LevelOne && !Cat.Grounded)) return;
+        if (Run.Paused) return;
         Vector2 position = transform.InverseTransformPoint(catBody.position);
+        Vector2 finish = LevelOne ? LevelOneExit : LabFinish;
+        bool atExit = Cat.Grounded && position.x >= finish.x - 1 &&
+            position.x <= finish.x + 3 && Mathf.Abs(position.y - finish.y) <= 0.2f;
+        Progress.UpdatePosition(position, atExit);
+        if (!LevelOne && !Cat.Grounded) return;
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             Vector2 point = ActiveCheckpoints[i];
             // Marker/spawn follow the course transform when reused in another scene.
             // Touching the stone activates it; the saved spawn remains fixed on safe ground.
             bool inside = LevelOne ? checkpointMarkers[i].Touches(catShape)
-                : Mathf.Abs(position.x - point.x) <= .7f && Mathf.Abs(position.y - point.y) <= .2f;
+                : Mathf.Abs(position.x - point.x) <= LabCheckpointHalfWidths[i] && Mathf.Abs(position.y - point.y) <= .2f;
+            if (inside) Progress.MarkCheckpointReached(i + 1);
             if (inside &&
                 Run.TryActivateCheckpoint(i + 1, point, true) && LevelOne && i == 0)
             {
@@ -423,10 +431,10 @@ public sealed class MovementCourse : MonoBehaviour
             }
         }
         if (LevelOne && Run.Checkpoint == 2 && ascentFinished < 0) { ascentFinished = Mathf.Max(0,AscentSeconds); finaleStarted = Run.ElapsedSeconds; }
-        if (LevelOne && Cat.Grounded && !HasReachedExit && position.x >= LevelOneExit.x - 1 && position.x <= LevelOneExit.x + 3 &&
-            Mathf.Abs(position.y - LevelOneExit.y) <= 0.2f) {
+        if (atExit && !HasReachedExit) {
             HasReachedExit = true;
             finaleFinished = FinaleSeconds;
+            Run.Complete();
             ExitReached?.Invoke();
         }
     }
@@ -434,8 +442,9 @@ public sealed class MovementCourse : MonoBehaviour
     public void StartFinalePreview() {
         StartAscentPreview();
         Run.TryActivateCheckpoint(2, LevelOneCheckpointSpawns[1], true);
+        Progress.MarkCheckpointReached(2);
         ascentFinished=0; finaleStarted=Run.ElapsedSeconds; finaleFinished=-1;
-        Cat.RespawnAt(transform.TransformPoint(LevelOneCheckpointSpawns[1]));
+        RespawnWithProgress(LevelOneCheckpointSpawns[1]);
     }
     public void StartAscentPreview() => StartPreviewAt(LevelOneCheckpointSpawns[0]);
     public void StartDescentPreview() { StartAscentPreview(); Cat.RespawnAt(transform.TransformPoint(CaveRoute.Approach)); }
@@ -447,12 +456,19 @@ public sealed class MovementCourse : MonoBehaviour
     void StartPreviewAt(Vector2 spawn)
     {
         Run.TryActivateCheckpoint(1, spawn, true);
+        Progress.MarkCheckpointReached(1);
         IntroductionSeconds = 0;
         ascentStarted = Run.ElapsedSeconds;
-        Cat.RespawnAt(transform.TransformPoint(spawn));
+        RespawnWithProgress(spawn, true);
     }
-    public void RetryCheckpoint() { if (LevelOne && Run.Checkpoint == 2) { finaleStarted=Run.ElapsedSeconds; finaleFinished=-1; } if (LevelOne && Run.Checkpoint == 1) ascentStarted = Run.ElapsedSeconds; foreach (var support in supports) support.ResetPhase(); HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Retry())); }
-    public void RestartRun() { finaleStarted=finaleFinished=-1; ascentStarted = ascentFinished = -1; foreach (var support in supports) support.ResetPhase(); IntroductionSeconds = -1; HasReachedExit = false; Cat.RespawnAt(transform.TransformPoint(Run.Restart())); }
+    public void RetryCheckpoint() { if (LevelOne && Run.Checkpoint == 2) { finaleStarted=Run.ElapsedSeconds; finaleFinished=-1; } if (LevelOne && Run.Checkpoint == 1) ascentStarted = Run.ElapsedSeconds; foreach (var support in supports) support.ResetPhase(); HasReachedExit = false; RespawnWithProgress(Run.Retry(), LevelOne && Run.Checkpoint == 1 && Run.Spawn != LevelOneCheckpointSpawns[0]); }
+    public void RestartRun() { finaleStarted=finaleFinished=-1; ascentStarted = ascentFinished = -1; foreach (var support in supports) support.ResetPhase(); IntroductionSeconds = -1; HasReachedExit = false; RespawnWithProgress(Run.Restart()); }
+    void RespawnWithProgress(Vector2 spawn, bool preview = false)
+    {
+        Cat.RespawnAt(transform.TransformPoint(spawn));
+        Progress.Reset(spawn, Run.Checkpoint, preview);
+    }
+
     public void TogglePause() => Cat.SetPaused(Run.TogglePause());
 
     void LateUpdate()
@@ -477,38 +493,13 @@ public sealed class MovementCourse : MonoBehaviour
     }
     void OnGUI()
     {
-        if (Run == null || !courseCamera) return;
-        if (hudStyle == null) hudStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true };
-        var viewport = courseCamera.rect;
-        float width = Mathf.Min(350, Screen.width * viewport.width - 20);
-        bool expanded = showHelp || Run.Paused;
-        var area = new Rect(Screen.width * viewport.x + 10,
-            Screen.height * (1 - viewport.yMax) + 10, width, expanded ? 176 : 52);
-        var oldColor = GUI.color;
-        GUI.color = new Color(1, 1, 1, 0.4f);
-        GUI.Box(area, GUIContent.none);
-        GUI.color = oldColor;
-        GUILayout.BeginArea(new Rect(area.x + 6, area.y + 3, area.width - 12, area.height - 6));
-        GUILayout.Label(hudStatus ?? ("Checkpoint 0/" + ActiveCheckpoints.Length + " | R: retry | P: pause"), hudStyle);
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("A/D: move | Space: jump | Esc: menu", hudStyle);
-        if (GUILayout.Button(showHelp ? "Less" : "Controls", GUILayout.Width(62), GUILayout.Height(19))) {
-            showHelp = !showHelp; GUI.FocusControl(null);
-        }
-        GUILayout.EndHorizontal();
-        if (expanded) {
-            GUILayout.Label("Arrows/W/Up also work. Backspace: restart entire run. Cross gold markers on safe ground.", hudStyle);
-            GUILayout.Label("Controller: South jump, Select retry, LB restart, RB pause, Start menu.", hudStyle);
-            GUILayout.Label("Retries " + Run.Retries + " | " + Run.ElapsedSeconds.ToString("F1")
-                + "s | " + (1 / Mathf.Max(frameSeconds, 0.001f)).ToString("F0") + " fps", hudStyle);
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Retry")) { RetryCheckpoint(); GUI.FocusControl(null); }
-            if (GUILayout.Button("Restart")) { RestartRun(); GUI.FocusControl(null); }
-            if (GUILayout.Button(Run.Paused ? "Resume" : "Pause")) { TogglePause(); GUI.FocusControl(null); }
-            if (GUILayout.Button("Menu")) { BackToMenu?.Invoke(); GUI.FocusControl(null); }
-            GUILayout.EndHorizontal();
-        }
-        GUILayout.EndArea();
+        if (Run == null || !courseCamera || !Progress.Visible || !Progress.HasArtwork) return;
+        var viewport = courseCamera.pixelRect;
+        float width = Mathf.Min(LevelProgress.Width, viewport.width - 20);
+        if (width <= 0) return;
+        float height = Mathf.Min(1, width / 290) * LevelProgress.Height;
+        float top = Screen.height - viewport.yMax + 10;
+        Progress.Draw(new Rect(viewport.center.x - width / 2, top, width, height), Run.Checkpoint);
     }
     void OnDestroy() { Destroy(square); Destroy(texture); }
 }

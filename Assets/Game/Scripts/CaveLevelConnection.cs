@@ -19,6 +19,8 @@ public sealed partial class CaveEntryStudy
         foreach(var item in owned)if(item is Material material&&material.HasProperty("_UseDryMask")){
             var bounds=CaveRoute.MaskBounds;material.SetTexture("_DryMask",coverage);material.SetVector("_DryRect",new Vector4(bounds.x,bounds.y,bounds.width,bounds.height));material.SetFloat("_UseDryMask",1);
         }
+        var water = Cat.GetComponent<WaterRecovery>();
+        if (water) water.RiverContact = CaveRoute.TouchesRiver;
         Cat.RecoveryBoundary=CaveRoute.ShouldRecover;Cat.ReturnedToStart+=ResetLevelView;
         Follow.PassageHeightGuide=LevelHeight;
     }

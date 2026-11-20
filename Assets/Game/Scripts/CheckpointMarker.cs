@@ -3,6 +3,8 @@ using UnityEngine;
 // World-space landmarks share a paw language, but each checkpoint has its own setting.
 public sealed class CheckpointMarker : MonoBehaviour
 {
+    public SpriteRenderer WorldVisual { get; private set; }
+    public static Rect ActiveArtworkUv => new Rect(1f / 3, 0, 1f / 3, 1);
     public int State { get; private set; }
     RunLifecycle run;
     int sequence;
@@ -34,6 +36,7 @@ public sealed class CheckpointMarker : MonoBehaviour
         var atlas = Resources.Load<Texture2D>("GoldenRiver/checkpoint-states-v1");
         marker.stoneSprite = Sprite.Create(atlas, new Rect(0, 0, atlas.width, atlas.height), Vector2.one * .5f, atlas.height, 0, SpriteMeshType.FullRect);
         var stone = new GameObject("Engraved paw").AddComponent<SpriteRenderer>();
+        marker.WorldVisual = stone;
         stone.transform.SetParent(root.transform, false);
         // The shader selects one square cell from the three-state atlas.
         stone.transform.localPosition = new Vector3(sequence == 1 ? 0 : .8f, .77f, 0);

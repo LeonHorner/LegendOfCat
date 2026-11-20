@@ -66,7 +66,7 @@ Movement feedback does not change collision dimensions or delay movement.
 
 The movement course is a reusable painted checkpoint prototype. Four visible
 checkpoint markers sit on safe main-route platforms (X=9, X=34, X=65 and X=83). They activate only when the cat
-is grounded beside the marker; progress is forward-only, so going backwards does
+is grounded on the marked platform; progress is forward-only, so going backwards does
 not replace a safer recovery point. Spawn positions are fixed safe standing centers,
 never arbitrary mid-jump coordinates. A fall below the course automatically retries
 at the latest checkpoint, or the starting point if none is active. Manual retry uses

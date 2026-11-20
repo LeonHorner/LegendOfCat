@@ -826,3 +826,141 @@ Natural shore correction (2026-11-14): the owner rejected the three small terrac
 Original OpenAI built-in image_gen artwork; model revision not disclosed. Original generated artwork under the applicable service terms, permitted for public source redistribution. The owner approved the entrance concept and requested gameplay integration. Sources, exact production prompts and human decisions are recorded in docs/design/golden-river-upper-route/concept-entry-assets.json. New concept-entry-left-v1, concept-entry-roof-v1 and concept-entry-recess-v1 paintings remain separate permanent world layers, registered to solid collision; they are not a screen overlay. The approved reference is stored outside Resources. Existing contact vegetation is reused. No external stock, package or character is introduced.
 
 The approved-concept entrance also uses concept-entry-rock-v1, an original generated slate-only material with no landmark or painted walking surfaces. Its exact prompt and native source are in the same manifest. The first thin-overhang trial was rejected locally; the retained roof asset follows the wider massive-cliff stencil and includes both original main landing contacts.
+
+## Mika water-recovery prototype — 2026-10-31
+
+- Asset: `Assets/Game/Resources/WaterRecovery/reactions.png`, four complete-character
+  reaction drawings in a horizontal atlas. Original generated artwork from the
+  built-in OpenAI image generation tool; exact model ID was not exposed.
+- Reference: existing original Mika artwork, specifically
+  `Assets/Game/Art/Mika/Original/original-apex-isolated.png`. No third-party input.
+- License: project `ASSET-LICENSE.md` where rights exist; no claim that a license
+  creates copyright in unprotectable generated output.
+- Human direction: user requested a splash, zoom focused on facial animation,
+  head submersion, brief black fade and checkpoint return, and explicitly asked
+  to evaluate an implemented first version. Natural orange/cream quadruped identity
+  retained; surprised eyes, lifted chin, blink and closed eyes selected for review.
+- Generation specification: transparent four-cell horizontal sheet, complete cat
+  facing right, same dimensions/markings/registration, sturdy paws tucked downward,
+  green eyes, ears slightly back, restrained expressions, no water/background/text,
+  no stretched body or detached pieces. The original reference was supplied as
+  identity/style guidance. Source pixels are retained in the atlas.
+- Integration decisions: rigid frame changes and mirrored facing, world-space
+  submersion mask, code-drawn droplets/ripples and camera zoom. No optical flow,
+  cutout rig or whole-body deformation. Editor import preserves native proportions
+  without mipmaps or compression. Visual acceptance remains pending under #60.
+
+## Mika storyboard water-entry revision — 2026-10-31
+
+- Active asset: `Assets/Game/Resources/WaterRecovery/turn-reactions.png`, eight
+  connected head-and-neck drawings in a four-column/two-row atlas. Original
+  generated artwork from the built-in OpenAI image generation tool; exact model
+  ID was not exposed. Uses project `ASSET-LICENSE.md` where rights exist.
+- Reference: original generated six-panel storyboard archived at
+  `docs/design/water-recovery/storyboard/approved-storyboard.png`, accepted by the
+  user in this chat after rejecting the first version's floating-body animation.
+  The storyboard itself used existing Mika and the game screenshot as references.
+  No third-party input or new outside dependency is used.
+- Human decisions: preserve the accepted zoom/fade; submerge chest/shoulders early;
+  turn Mika's eyes and head from profile toward the viewer in three-quarter view;
+  blink while descending; use an early shoulder splash to connect the drawings.
+- Full generation prompt, selection and registration notes are in
+  `docs/design/water-recovery/storyboard/generation.md`. An initial atlas attempt
+  lacked adequate cell separation; the selected second atlas added explicit
+  padding constraints. Native alpha/source pixels are retained.
+- Implementation uses one pixel scale for all drawings and a registered bottom-row
+  pivot. No optical flow, cutout rig, morphing or whole-body deformation is used.
+  The current falling drawing continues through initial impact for 0.14 seconds;
+  the original prototype reaction sheet above is superseded at runtime. New
+  source is confined to water recovery, with existing locomotion artwork retained.
+- Concept approval permits implementation; final in-game visual acceptance
+  remains pending.
+
+## Golden River shark — 2026-11-13
+
+- Water recovery shark frames at `Assets/Game/Resources/WaterRecovery/shark-frames.png`.
+- Original artwork drawn and exported through PhotoCraft 0.23.1 MCP using manually specified filled curves and ellipses. The four registered poses cover approach, opening jaws, full gape and closing jaws. No external source artwork or generative model was used.
+- The requested creative direction was a rare shark encounter. The artwork uses a stylized blue-gray silhouette and a bloodless bite followed by checkpoint recovery. License is the repository license.
+
+## Golden River shark breach — 2026-11-13
+
+- Runtime atlas: `Assets/Game/Resources/WaterRecovery/shark-breach-frames.png`.
+- Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP cropped and exported the registered transparent atlas. The earlier PhotoCraft drawing remains archived in Git history.
+- Human direction: realistic great white anatomy and muted shading, high breach, downward catch and larger water impacts. Repository asset terms apply. See [artwork and prompt](docs/design/water-recovery/shark-breach-art.md).
+
+## Golden River shark splash — 2026-11-13
+
+- Runtime atlas at `Assets/Game/Resources/WaterRecovery/shark-splash-frames.png`.
+- Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP resized and exported the alpha atlas. Repository asset terms apply.
+- Human direction used irregular water sheets, foam and receding surface ripples to match the painted river. See [artwork and prompt](docs/design/water-recovery/shark-breach-art.md).
+
+## Golden River camera-facing shark — 2026-11-13
+
+- Runtime atlas at `Assets/Game/Resources/WaterRecovery/shark-lunge-frames.png`.
+- Original OpenAI ImageGen artwork, exact model ID unavailable. PhotoCraft 0.23.1 MCP resized and exported the alpha atlas. Repository asset terms apply.
+- Human direction specified a jump scare with an attack from directly below Mika and an open-jaw lunge toward the camera. See [artwork and prompt](docs/design/water-recovery/shark-lunge-art.md).
+
+## Level progress HUD
+
+- **Golden River and Movement Lab progress artwork**, 2026-11-13. Original layered
+  PhotoCraft shape artwork authored for this project, with no external assets or image
+  generation model. The first concept was selected for implementation. Golden River
+  uses violet masonry, ivy, and gold pigment. Movement Lab uses rounded river stones
+  and a blue-green fill. Both use a diamond for the active checkpoint and a pennant
+  for the finish. The editable PhotoCraft review files live in
+  `docs/design/level-progress/`. Transparent runtime exports live in
+  `Assets/Game/Resources/LevelProgress/`. Licensed under the repository license.
+  The top-center revision adds a deterministic pigment and brush-texture pass
+  with Pillow, using the PhotoCraft exports as source. No external texture or
+  generation model was used.
+
+- **Mika progress portrait**, 2026-11-13. Original layered PhotoCraft illustration
+  with a warm tabby coat, striped forehead, and pale muzzle. Licensed under the
+  repository license. The HUD checkpoint markers reuse each course's world
+  renderer artwork. The stroke retains each course's painted fill.
+
+- The revised progress portrait crops Mika's existing original gameplay
+  sprite at the neck and downsamples it for HUD use. It retains the source
+  artwork's license and uses no new generation model.
+  The portrait now uses the near-frontal frame from Mika's existing painted
+  water-recovery turn atlas. The frame preserves the source colors and is
+  cropped and downsampled for the HUD.
+
+- **Front-facing Mika progress portrait**, 2026-11-13. Original layered
+  PhotoCraft illustration based on Mika's painted orange coat, tabby markings,
+  pale muzzle, and green eyes. The symmetric eye and nose placement establishes
+  a head-on view. Licensed under the repository license. No generation model
+  or external artwork was used.
+
+- **Playable Mika reference portrait**, 2026-11-13. Generated with OpenAI
+  ImageGen (built-in image model, exact revision undisclosed), using the
+  playable apex sprite and revision 3 movement identity artwork as references.
+  The brief specified the playable cat's narrow face, tall pink ears,
+  olive eyes, irregular orange tabby markings and cream muzzle, with a
+  straight-on gaze. The selected output was cropped and downsampled for HUD
+  use. Distributed under the repository license.
+
+- **Run stopwatch**, 2026-11-14. Runtime asset
+  `Assets/Game/Resources/Menu/run-stopwatch.png`. Original artwork generated
+  with the built-in OpenAI ImageGen tool (exact model revision undisclosed).
+  The user supplied a painted river and waterwheel scene as a style reference
+  and asked for a fresh, detailed clock with no HUD backdrop. The generation
+  brief specified a weathered brass stopwatch, an ivory face with bold hands,
+  and gold-green ivy. The selected image was cropped and downsampled to fit a
+  128-pixel RGBA texture with transparent padding. See ASSET-LICENSE.md for
+  the project's CC BY-NC 4.0 terms.
+
+  The animated revision uses a built-in ImageGen edit of the same icon. The
+  edit brief removed the fixed hands and retained the brass case, ivory
+  dial, gold pin, hour marks, ivy, and transparent edges. The game draws
+  a decorative hand that snaps forward 30 degrees each elapsed second.
+
+  The simplified HUD trial uses a built-in ImageGen edit of the handless
+  revision. At the user's request the brief reduced detail to a clean brass
+  rim, ivory dial, four hour marks, simple crown, and one ivy leaf. The icon
+  was cropped and downsampled with alpha, and the moving hand was aligned
+  to the new dial pin.
+
+  The pointer is an original code-drawn tapered hand with filtered alpha
+  edges. The user requested a classic profile and more consistent visual
+  weight across tick positions. No new image model or external asset was used.

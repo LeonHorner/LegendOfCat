@@ -43,7 +43,7 @@ public static class CaveRoute
         if(x<179)return -6;
         return Mathf.Lerp(-6,-4.6f,Mathf.InverseLerp(179,183,x));
     }
-    public static bool ShouldRecover(Vector2 previous,Vector2 current)
+    public static bool TouchesRiver(Vector2 previous,Vector2 current)
     {
         const float immersedCenter=-2.65f;
         if(previous.y<immersedCenter&&previous.y> -4.4f&&!InOpening(ToLocal(previous-Vector2.up*.45f)))return true;
@@ -52,7 +52,11 @@ public static class CaveRoute
             if(!InOpening(ToLocal(crossing-Vector2.up*.45f)))return true;
         }
         if(current.y<immersedCenter&&current.y> -4.4f&&!InOpening(ToLocal(current-Vector2.up*.45f)))return true;
-        return current.y<(IsDry(current)?DeathFloor+VerticalOffset:-7);
+        return false;
+    }
+    public static bool ShouldRecover(Vector2 previous,Vector2 current)
+    {
+        return TouchesRiver(previous, current) || current.y < (IsDry(current) ? DeathFloor + VerticalOffset : -7);
     }
     public static bool WaterRemoved(Vector2 local)
     {

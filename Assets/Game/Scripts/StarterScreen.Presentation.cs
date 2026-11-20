@@ -4,6 +4,8 @@ using UnityEngine;
 public sealed partial class StarterScreen
 {
     GUIStyle titleStyle, headingStyle, textStyle, smallStyle, buttonStyle, panelStyle;
+    GUIStyle runTimerStyle;
+    Texture2D runClockIcon, runClockHand;
     Texture2D backdrop, panelTexture, buttonTexture, hoverTexture, focusTexture;
     readonly List<string> focusable = new List<string>();
     readonly List<string> previousFocus = new List<string>();
@@ -14,6 +16,7 @@ public sealed partial class StarterScreen
     bool simulateCutout;
     float guiScale = 1;
     bool revealFocus;
+    bool gameplayMenuVisible;
     bool UpdatesSupported {
         get {
 #if LEGEND_OF_CAT_PREVIEW
@@ -67,7 +70,7 @@ public sealed partial class StarterScreen
         bool keyboard = GUI.enabled && !Event.current.alt && GUI.GetNameOfFocusedControl() == control && Event.current.type == EventType.KeyDown &&
             (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter);
         if (keyboard) Event.current.Use();
-        bool clicked = GUILayout.Button(label, buttonStyle, GUILayout.MinHeight(Mathf.Max(48, 48 / guiScale)));
+        bool clicked = GUILayout.Button(label, buttonStyle, GUILayout.MinHeight(gameplayMenuVisible ? 48 : Mathf.Max(48, 48 / guiScale)));
         if (revealFocus && Event.current.type == EventType.Repaint && GUI.GetNameOfFocusedControl() == control) {
             var rect = GUILayoutUtility.GetLastRect();
             if (popup) popupScroll.y = Mathf.Max(0, rect.y - 80);
@@ -92,7 +95,13 @@ public sealed partial class StarterScreen
 
     void OnGUI()
     {
-        if (course != null || stompArena != null || entryStudy != null) return;
+        if (entryStudy != null) return;
+        if (course != null || stompArena != null) {
+            DrawRunTimer((course != null ? course.Run : stompArena.Run).ElapsedSeconds);
+            DrawGameplayMenu();
+            return;
+        }
+        gameplayMenuVisible = false;
         PrepareStyles();
         var oldColor = GUI.color;
         var oldMatrix = GUI.matrix;
@@ -156,6 +165,8 @@ public sealed partial class StarterScreen
                 GUI.enabled = !popup;
                 Label("Resize the window by dragging its borders. F11 or Alt+Enter toggles fullscreen.", smallStyle);
             }
+            if (Button(ShowLevelProgress ? "Level progress bar: On" : "Level progress bar: Off"))
+                SetShowLevelProgress(!ShowLevelProgress);
             if (Button(string.IsNullOrEmpty(available) ? "Versions & updates" : "Versions & updates - Available")) page = "updates";
             if (Button("Back to menu")) page = "menu";
         } else {
@@ -228,6 +239,151 @@ public sealed partial class StarterScreen
         GUI.matrix = oldMatrix;
     }
 
+    void DrawRunTimer(float elapsedSeconds)
+    {
+        if (Event.current.type != EventType.Repaint) return;
+        if (runTimerStyle == null) {
+            runClockIcon = Resources.Load<Texture2D>("Menu/run-stopwatch");
+            runClockHand = CreateRunClockHand();
+            runTimerStyle = new GUIStyle(GUI.skin.label) {
+                alignment = TextAnchor.MiddleRight, fontSize = 25, fontStyle = FontStyle.Bold,
+                padding = new RectOffset()
+            };
+        }
+
+        var region = MenuLayout.ContentRegion(Screen.width, Screen.height, Screen.safeArea);
+        var viewport = MenuLayout.Letterbox16By9(Screen.width, Screen.height);
+        float right = Mathf.Min(region.xMax, viewport.xMax * Screen.width);
+        float top = Mathf.Max(region.y, (1 - viewport.yMax) * Screen.height);
+        int seconds = Mathf.FloorToInt(elapsedSeconds);
+        var label = new GUIContent($"{seconds / 60:00}:{seconds % 60:00}");
+        float width = Mathf.Ceil(runTimerStyle.CalcSize(label).x);
+        var digits = new Rect(right - width - 12, Mathf.Ceil(top) + 10, width, 36);
+        const float clockSize = 36;
+        if (runClockIcon != null) {
+            var clock = new Rect(digits.x - clockSize - 4, digits.center.y - clockSize / 2, clockSize, clockSize);
+            GUI.DrawTexture(clock, runClockIcon);
+
+            // The painted dial sits below the winding crown within the texture.
+            var pin = new Vector2(
+                Mathf.Floor(clock.x + clock.width * 0.510f) + 0.5f,
+                Mathf.Floor(clock.y + clock.height * 0.567f) + 0.5f);
+            var previousColor = GUI.color;
+            GUI.color = new Color(0.39f, 0.22f, 0.10f);
+            for (int mark = 1; mark < 12; mark++) {
+                if (mark % 3 == 0) continue;
+                float angle = mark * Mathf.PI / 6f;
+                var dot = pin + new Vector2(Mathf.Sin(angle), -Mathf.Cos(angle)) * 9f;
+                GUI.DrawTexture(new Rect(Mathf.Floor(dot.x), Mathf.Floor(dot.y), 1f, 1f), Texture2D.whiteTexture);
+            }
+            GUI.color = previousColor;
+
+            var matrix = GUI.matrix;
+            // The decorative hand makes one full turn every twelve elapsed seconds.
+            GUIUtility.RotateAroundPivot((seconds % 12) * 30f, pin);
+            GUI.DrawTexture(new Rect(pin.x - 2.5f, pin.y - 9, 5, 9), runClockHand);
+            GUI.matrix = matrix;
+        }
+        runTimerStyle.normal.textColor = new Color(0.13f, 0.09f, 0.17f);
+        for (int y = -1; y <= 1; y++)
+            for (int x = -1; x <= 1; x++)
+                if (x != 0 || y != 0)
+                    GUI.Label(new Rect(digits.x + x, digits.y + y, width, digits.height), label, runTimerStyle);
+        runTimerStyle.normal.textColor = Ink;
+        GUI.Label(digits, label, runTimerStyle);
+    }
+
+    static Texture2D CreateRunClockHand()
+    {
+        const int pixelsPerPoint = 8;
+        const int width = 5 * pixelsPerPoint + 1;
+        const int height = 9 * pixelsPerPoint;
+        var hand = new Texture2D(width, height, TextureFormat.RGBA32, false) {
+            hideFlags = HideFlags.HideAndDontSave,
+            wrapMode = TextureWrapMode.Clamp,
+            filterMode = FilterMode.Bilinear
+        };
+        var pixels = new Color32[width * height];
+        for (int y = 0; y < height; y++) {
+            float distanceFromPin = (y + 0.5f) / pixelsPerPoint;
+            // Use a narrow stem at the hub, then flare into the blade.
+            float shoulder = Mathf.Lerp(0.4f, 1.1f, Mathf.InverseLerp(2f, 4f, distanceFromPin));
+            float halfWidth = Mathf.Min(shoulder, (8.2f - distanceFromPin) * 0.3f);
+            for (int x = 0; x < width; x++) {
+                float distanceFromCenter = Mathf.Abs(x - width / 2) * (5f / width);
+                float coverage = Mathf.Clamp01(0.5f + halfWidth - distanceFromCenter);
+                pixels[y * width + x] = new Color32(75, 42, 23, (byte)Mathf.RoundToInt(255 * coverage));
+            }
+        }
+        hand.SetPixels32(pixels);
+        hand.Apply(false, true);
+        return hand;
+    }
+
+    void DrawGameplayMenu()
+    {
+        bool finished = stompArena != null && stompArena.Combat.Finished;
+        bool paused = (course != null ? course.Run : stompArena.Run)?.Paused ?? false;
+        if (!paused && !finished) {
+            if (gameplayMenuVisible) {
+                previousFocus.Clear();
+                GUI.FocusControl(null);
+                revealFocus = false;
+                gameplayMenuVisible = false;
+            }
+            return;
+        }
+
+        PrepareStyles();
+        var region = MenuLayout.ContentRegion(Screen.width, Screen.height, Screen.safeArea);
+        var oldMatrix = GUI.matrix;
+        var oldColor = GUI.color;
+        int oldDepth = GUI.depth;
+        GUI.depth = -10;
+        guiScale = Mathf.Min(MenuLayout.Scale(region), Mathf.Max(1, region.height - 16) / 320);
+        GUI.matrix = Matrix4x4.TRS(new Vector3(region.x, region.y), Quaternion.identity, Vector3.one * guiScale);
+        GUI.color = Color.white;
+        float width = region.width / guiScale;
+        float height = region.height / guiScale;
+        float panelWidth = Mathf.Max(1, Mathf.Min(320, width - 16));
+        float panelHeight = Mathf.Max(1, Mathf.Min(320, height - 16));
+
+        if (!gameplayMenuVisible) {
+            previousFocus.Clear();
+            GUI.FocusControl(null);
+            revealFocus = false;
+            gameplayMenuVisible = true;
+        }
+        NavigateFocus();
+        focusable.Clear();
+        GUILayout.BeginArea(new Rect((width - panelWidth) / 2, (height - panelHeight) / 2, panelWidth, panelHeight), panelStyle);
+        Label(finished ? (stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
+        bool resume = !finished && Button("Resume", fixedNavigation: true);
+        bool retry = Button("Retry", fixedNavigation: true);
+        bool restart = Button("Restart", fixedNavigation: true);
+        bool menu = Button("Main menu", fixedNavigation: true);
+        GUILayout.EndArea();
+        if (Event.current.type == EventType.Repaint) {
+            previousFocus.Clear();
+            previousFocus.AddRange(focusable);
+        }
+        GUI.matrix = oldMatrix;
+        GUI.color = oldColor;
+        GUI.depth = oldDepth;
+
+        if (course != null) {
+            if (resume) course.TogglePause();
+            else if (retry) course.RetryCheckpoint();
+            else if (restart) course.RestartRun();
+            else if (menu) CloseCourse();
+        } else {
+            if (resume) stompArena.TogglePause();
+            else if (retry) stompArena.Retry();
+            else if (restart) stompArena.Restart();
+            else if (menu) CloseStompArena();
+        }
+    }
+
 #if LEGEND_OF_CAT_PREVIEW
     bool previewTools;
     void DrawPreviewTools()
@@ -260,7 +416,7 @@ public sealed partial class StarterScreen
         if (course != null) { course.gameObject.SetActive(false); Destroy(course.gameObject); }
         if (entryStudy != null) { entryStudy.gameObject.SetActive(false); Destroy(entryStudy.gameObject); }
         if (stompArena != null) { stompArena.gameObject.SetActive(false); Destroy(stompArena.gameObject); }
-        foreach (var texture in new[] { panelTexture, buttonTexture, hoverTexture, focusTexture })
+        foreach (var texture in new[] { panelTexture, buttonTexture, hoverTexture, focusTexture, runClockHand })
             if (texture != null) Destroy(texture);
     }
 }

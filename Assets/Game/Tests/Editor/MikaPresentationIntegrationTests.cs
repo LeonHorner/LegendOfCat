@@ -234,6 +234,7 @@ public class MikaPresentationIntegrationTests
         Assert.That(Read(run, "ElapsedSeconds"), Is.EqualTo(elapsed));
         body.position = course.transform.TransformPoint(new Vector2(checkpoints[1].x, -8));
         controller.SendMessage("FixedUpdate");
+        WaterRecoveryTests.CompleteCourseRecovery(controller);
         AssertSpawn(checkpoints[1]);
         Assert.That(Read(run, "Retries"), Is.EqualTo(2));
         AtCheckpoint(0);
@@ -258,6 +259,7 @@ public class MikaPresentationIntegrationTests
         Assert.That(Read(run, "Retries"), Is.EqualTo(0), "A valid course below world y=-7 must not repeatedly fall/retry.");
         body.position = course.transform.TransformPoint(new Vector2(-3, -8));
         controller.SendMessage("FixedUpdate");
+        WaterRecoveryTests.CompleteCourseRecovery(controller);
         AssertSpawn(new Vector2(-3, 0.48f));
         Assert.That(Read(run, "Checkpoint"), Is.EqualTo(0));
         Assert.That(Read(run, "Retries"), Is.EqualTo(1));
@@ -300,6 +302,7 @@ public class MikaPresentationIntegrationTests
             Assert.That(body.linearVelocity, Is.EqualTo(Vector2.zero));
             body.position = new Vector2(19, -8);
             controller.SendMessage("FixedUpdate");
+            WaterRecoveryTests.CompleteCourseRecovery(controller);
             Assert.That(Vector2.Distance(body.position, spawnPoint), Is.LessThan(0.001f),
                 "Falling must restore the active checkpoint, not the art lab's opening spawn.");
             camera.GetComponent(Runtime("CatCamera")).SendMessage("LateUpdate");
