@@ -64,6 +64,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
     {
         if(!Cat.Paused)waterTime+=seconds;
         UpdateDiscoveryDust(waterTime);
+        if (grottoWall) grottoWall.SetFloat("_StreamClock",waterTime);
         foreach(var material in waterMaterials) material.SetFloat("_WaterTime",waterTime);
     }
     void OnGUI()
@@ -98,7 +99,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
         var rock=new GameObject(name);rock.transform.SetParent(transform,false);
         rock.AddComponent<PolygonCollider2D>().points=contour;
     }
-    void Painting(string name,Rect bounds,float z,string path,bool recessed=false,bool valley=false,float maximumY=float.PositiveInfinity)
+    MeshRenderer Painting(string name,Rect bounds,float z,string path,bool recessed=false,bool valley=false,float maximumY=float.PositiveInfinity)
     {
         var material=new Material(Resources.Load<Material>(valley?"BackgroundStudy/background-material":"GoldenRiver/Descent/entry-study-material"));
         owned.Add(material);material.mainTexture=Resources.Load<Texture2D>(path);
@@ -114,7 +115,7 @@ public sealed partial class CaveEntryStudy : MonoBehaviour
         if(Embedded&&name=="Connected cave floor"){material.SetFloat("_FloorJoin",1);z=-3.05f;}
         if(Embedded&&name=="Discovery floor and return steps"){z=-3;material.SetFloat("_DiscoveryJoin",1);}
         var visible=bounds;visible.yMax=Mathf.Min(visible.yMax,maximumY);
-        MeshObject(name,Rectangle(visible),bounds,z,material);
+        return MeshObject(name,Rectangle(visible),bounds,z,material);
     }
     static Vector2[] Rectangle(Rect b)=>new[]{new Vector2(b.xMin,b.yMin),new Vector2(b.xMax,b.yMin),new Vector2(b.xMax,b.yMax),new Vector2(b.xMin,b.yMax)};
     MeshRenderer MeshObject(string name,Vector2[] polygon,Rect uvBounds,float z,Material material)

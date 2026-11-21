@@ -71,15 +71,15 @@ public static class CaveRebuildReview
         Debug.Log("Far cave mouth supports reverse entry and a return to daylight.");
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(101.5f,-19.49f)));for(int i=0;i<100;i++)Tick();
         if(!cat.Grounded||Mathf.Abs(CaveRoute.ToLocal(cat.transform.localPosition).y-(CaveTerrainLayout.CatchHeight+.51f))>.2f)throw new System.InvalidOperationException("The local miss did not reach its catch.");
-        foreach(var p in new[]{new Vector3(95.7f,-26.5f,0),new Vector3(91.7f,-25.2f,1),new Vector3(87.7f,-23.9f,1),new Vector3(82.5f,-22.6f,1),new Vector3(81.3f,-21.3f,1),new Vector3(87.3f,-20,1),new Vector3(92.3f,-21.3f,0),new Vector3(98.7f,-20,1)})Reach(p);
+        foreach(var p in new[]{new Vector3(95.7f,-26.5f,0),new Vector3(91.7f,-25.2f,1),new Vector3(87.7f,-23.9f,1),new Vector3(83.3f,-22.6f,1),new Vector3(80.75f,-21.3f,1),new Vector3(87.3f,-20,1),new Vector3(92.3f,-21.3f,0),new Vector3(98.7f,-20,1)})Reach(p);
         Debug.Log("Shared cave local recovery geometry passed.");
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(31,-11.49f)));for(int i=0;i<15;i++)Tick();
         Reach(new Vector3(35.3f,-12,0));Reach(new Vector3(31,-12,0));
         Debug.Log("Shared cave formerly mismatched seam passed in both directions without jumping.");
-        cat.RespawnAt(CaveRoute.ToCourse(new Vector2(17.2f,-11.49f)));for(int i=0;i<15;i++)Tick();
+        cat.RespawnAt(CaveRoute.ToCourse(new Vector2(21.6f,-11.49f)));for(int i=0;i<15;i++)Tick();
         if(capture){motion="entrance-reverse";motionTick=0;recording=true;System.IO.Directory.CreateDirectory("artifacts/cave-rebuild-review/"+motion);}
-        foreach(var p in new[]{new Vector3(14.7f,-10.7f,1),new Vector3(12,-9.3f,1),new Vector3(10.3f,-8,1),new Vector3(9,-6.405f,1),new Vector3(7.8f,-4.774f,1),new Vector3(6.5f,-3.234f,1),new Vector3(5,-1.585f,1),new Vector3(2.6f,-.045f,1)})Reach(p);
-        Debug.Log("Shared cave entrance is reversible with actual jump input.");
+        Reach(new Vector3(2.6f,-.045f,0));
+        Debug.Log("Shared cave entrance can be climbed continuously without jumping.");
         Reach(new Vector3(-10,-1.245f,0));Reach(new Vector3(2.6f,-.045f,0));
         Debug.Log("Connected approach shore passed in both directions.");
         if(capture){recording=false;System.IO.File.WriteAllText("artifacts/cave-rebuild-review/"+motion+"/frames.txt",((motionTick+4)/5).ToString());}
@@ -88,6 +88,17 @@ public static class CaveRebuildReview
         if(!cat.Grounded||Vector2.Distance(standing,cat.transform.localPosition)>.06f)throw new System.InvalidOperationException("Natural bank incline drifts while idle.");
         cat.PressJump();Tick();if(cat.GetComponent<Rigidbody2D>().linearVelocity.y<5)throw new System.InvalidOperationException("Jump from the natural bank incline failed.");
         Debug.Log("Natural bank incline supports idle and jumping.");
+        cat.RespawnAt(CaveRoute.ToCourse(new Vector2(10,CaveTerrainLayout.AlongFace(CaveTerrainLayout.LeftShore,10)+1)));
+        for(int i=0;i<75;i++)Tick();
+        var pose=cat.GetComponentInChildren<MikaSpritePresentation>();
+        pose.RenderPose(0);
+        var pivot=CaveRoute.ToLocal(pose.transform.position);
+        var tangent=pose.transform.right;
+        foreach(float side in new[]{-.28f,.28f}) {
+            var paw=pivot+(Vector2)tangent*side;
+            if(!cat.Grounded || Mathf.Abs(paw.y-CaveTerrainLayout.AlongFace(CaveTerrainLayout.LeftShore,paw.x))>.09f)
+                throw new System.InvalidOperationException("The cave ramp leaves a visible gap beneath the planted stance.");
+        }
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(44,-12.16f)));for(int i=0;i<15;i++)Tick();
         course.TogglePause();var paused=cat.transform.position;for(int i=0;i<20;i++)Tick();
         if(cat.transform.position!=paused)throw new System.InvalidOperationException("Pause moved the cave player.");course.TogglePause();

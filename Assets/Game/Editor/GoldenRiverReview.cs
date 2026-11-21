@@ -108,12 +108,17 @@ public static class GoldenRiverReview
         }
         bool upperReview = System.Array.IndexOf(args, "-upperReview") >= 0;
         if (upperReview) {
-            points = new[] { CaveRoute.Entrance,CaveRoute.ToCourse(new Vector2(6.5f,-2.69f)),
+            points = new[] { CaveRoute.Entrance,CaveRoute.ToCourse(new Vector2(10,CaveTerrainLayout.AlongFace(CaveTerrainLayout.LeftShore,10)+.52f)),
                 CaveRoute.ToCourse(new Vector2(98.7f,-19.5f)),CaveRoute.ToCourse(new Vector2(101.5f,-26)),
                 CaveRoute.ToCourse(new Vector2(48,-12.16f)),CaveRoute.Rejoin,
                 CaveRoute.ToCourse(new Vector2(28,-12.27f)),CaveRoute.ToCourse(new Vector2(135,-13.99f)),
-                CaveRoute.ToCourse(new Vector2(218,-1.88f)) };
-            names = new[] { "descent-entrance", "descent-entry-bank", "descent-risk", "descent-catch", "descent-niche", "descent-rejoin", "channel-sill", "return-bench", "exit-mouth" };
+                CaveRoute.ToCourse(new Vector2(215,-2.98f)), CaveRoute.Approach,
+                CaveRoute.ToCourse(new Vector2(226,-.32f)), CaveRoute.ToCourse(new Vector2(121,-16.83f)),
+                new Vector2(MovementCourse.AscentPlatforms[4].x,MovementCourse.AscentPlatforms[4].y+1.27f),
+                CaveRoute.ToCourse(new Vector2(75,-16.08f)),CaveRoute.ToCourse(new Vector2(128,-15.43f)),
+                CaveRoute.ToCourse(new Vector2(201,-7.62f)),CaveRoute.ToCourse(new Vector2(208,-5.45f)) };
+            names = new[] { "descent-entrance", "descent-entry-bank", "descent-risk", "descent-catch", "descent-niche", "descent-rejoin", "channel-sill", "return-bench", "exit-mouth", "approach", "daylight", "spillway-approach", "surface-reference",
+                "outflow-rock", "spillway-foot", "inner-exit", "arch-foot" };
         }
         try {
             for (int index = 0; index < points.Length; index++) {

@@ -3,6 +3,7 @@ Shader "LegendOfCat/EntryStudyPaint"
     Properties {
         _MainTex ("Native painting", 2D) = "white" {}
         _Recessed ("Recessed wall", Float) = 0
+        _RightFeather ("Recessed buttress end in source UV", Float) = 0
         _RoofJoin ("Roof overlap", Float) = 0
         _RoofEndJoin ("Fixed native roof seam", Float) = 0
         _CaveOrigin ("Cave frame origin", Vector) = (0,0,0,0)
@@ -38,7 +39,7 @@ Shader "LegendOfCat/EntryStudyPaint"
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            sampler2D _MainTex; float _Recessed,_RoofJoin,_RoofEndJoin;
+            sampler2D _MainTex; float _Recessed,_RoofJoin,_RoofEndJoin,_RightFeather;
             float4 _CaveOrigin;float _CaveScale;
             float _ReturnDoor;
             sampler2D _SecondTex;float _Band,_BandFloorBlend;float4 _BandProfile,_BandRect;
@@ -135,6 +136,7 @@ Shader "LegendOfCat/EntryStudyPaint"
                         (1-smoothstep(0,.7,abs(bank)))*smoothstep(bed-.8,bed,i.world.y)*_WetShore);
                     c.rgb*=lerp(float3(1,1,1),float3(.64,.76,.79),damp);
                 }
+                if(_RightFeather>0)c.a*=1-smoothstep(_RightFeather-.14,_RightFeather,i.uv.x);
                 return c;
             }
             ENDCG

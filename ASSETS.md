@@ -968,3 +968,11 @@ The approved-concept entrance also uses concept-entry-rock-v1, an original gener
 ### River-carved slate passage — 2026-11-20
 
 Three original paintings by OpenAI built-in image generation, exact model identifier unavailable. The project asset license applies to the extent applicable rights exist. The owner selected a dry river-carved passage. The slate painting follows one continuous bedding direction through the walkable shelves. The fountain wall places a single side fissure above the existing rooted ruin. A separate rooted recess marks the climb toward daylight. Painted grass recedes underground. Source paths and complete prompts are in [the generation record](docs/design/golden-river-upper-route/river-channel-assets.json).
+
+### Golden River fern grotto and daylight arch, 2026-11-20
+
+The player requested a living cave at the detail level of the surface, with the fountain retained. Four original paintings from OpenAI built-in image generation (exact model revision unavailable) add a fern-lined waterfall, a broken masonry spillway, a daylight arch and a sheet of maidenhair ferns, fiddleheads and fungi. The game animates the falling water and registers the existing Golden River bank and rooted shelf paintings to the new walkable contours. Distributed under the project asset license, CC BY-NC 4.0 to the extent applicable rights exist. [Sources, generation briefs and placement decisions](docs/design/golden-river-upper-route/river-channel-assets.json).
+
+### Golden River bedrock and cave vault, 2026-11-21
+
+Two original transparent paintings from OpenAI built-in image generation (exact model revision unavailable) show a mossy boulder face and a rooted, fluted ceiling. The player requested the stone detail of the new grotto along its bare floor and roof. The lower painting follows the rounded banks and seats the spillway. The upper painting follows the underside of the overhangs into daylight. Distributed under the project asset license, CC BY-NC 4.0 to the extent applicable rights exist. [Source files and generation briefs](docs/design/golden-river-upper-route/river-channel-assets.json).

@@ -12,6 +12,9 @@ public static class CaveTerrainLayout
         public readonly string Name;
         public readonly Vector2[] Outline;
         public readonly Vector3[] Treads;
+        internal TerrainArtProfile Shelf;
+        internal Rect ArtFrame;
+        internal Vector2[] ExposedBed;
         public Section(string name,Vector2[] outline,params Vector3[] treads){Name=name;Outline=outline;Treads=treads;}
     }
     public static readonly Vector3[] Floors={
@@ -28,21 +31,16 @@ public static class CaveTerrainLayout
         new Vector3(165.8f,-10.9f,6.4f), new Vector3(173.5f,-9.6f,6),
         new Vector3(181,-8.14f,4), new Vector3(187,-8.14f,5.6f),
         new Vector3(194,-9.54f,4.4f), new Vector3(199.6f,-8.14f,3.4f),
-        new Vector3(204.18f,-6.64955f,4.18f),new Vector3(208.36f,-5.195f,3.96f),new Vector3(212.32f,-3.70409f,3.89f),
-        new Vector3(216.21f,-2.395f,4.18f),new Vector3(220.39f,-.90409f,3.89f),new Vector3(224.28f,.58682f,3.96f),
-        new Vector3(228.24f,2.15045f,3.89f),new Vector3(232.13f,3.64136f,3.56f),new Vector3(235.69f,5.205f,10)
+        new Vector3(204.18f,-6.65f,1.8f), new Vector3(214,-3.5f,3.6f),
+        new Vector3(219,-2.15f,3.7f), new Vector3(224,-.85f,3.1f),
+        new Vector3(235.69f,5.205f,10)
     };
     public static readonly Vector3[] Recovery={new Vector3(95,CatchHeight,9),new Vector3(91,-25.2f,3),
-        new Vector3(87,-23.9f,3),new Vector3(81.5f,-22.6f,3),new Vector3(78.5f,-21.3f,3.5f)};
+        new Vector3(87,-23.9f,3),new Vector3(81.5f,-22.6f,3),new Vector3(78,-21.3f,3.25f)};
     public static readonly Vector2[][] RecoveryAir={Box(78,-28,27,8.5f)};
-    public static readonly Vector2[] LeftShore=RoundWetShore(new[]{new Vector2(-2.65f,-.045f),new Vector2(3.79f,-.045f),new Vector2(3.79f,-.7f),
-        new Vector2(3.6f,-1.585f),new Vector2(5.57f,-1.585f),new Vector2(5.57f,-2.15f),new Vector2(4.8f,-2.6f),
-        new Vector2(4.2f,-3.234f),new Vector2(7.1f,-3.234f),new Vector2(7.1f,-3.8f),new Vector2(5.4f,-4.4f),
-        new Vector2(5,-4.774f),new Vector2(8.49f,-4.774f),new Vector2(8.49f,-5.4f),new Vector2(6.8f,-6.1f),
-        new Vector2(6.2f,-6.405f),new Vector2(9.82f,-6.405f),new Vector2(9.82f,-7),new Vector2(7.7f,-7.8f),
-        new Vector2(7.2f,-8),new Vector2(10.9f,-8),new Vector2(10.9f,-8.6f),new Vector2(8.8f,-9.2f),
-        new Vector2(10.4f,-9.3f),new Vector2(13.6f,-9.3f),new Vector2(13.6f,-10.7f),new Vector2(16.3f,-10.7f),
-        new Vector2(16.3f,-11.3f),new Vector2(15.7f,-12),new Vector2(18.06f,-12),new Vector2(18.06f,Bottom),new Vector2(-14,Bottom),
+    public static readonly Vector2[] LeftShore=RoundWetShore(new[]{new Vector2(-2.65f,-.045f),new Vector2(3.3f,-.045f),new Vector2(4,-.58f),new Vector2(5,-1.47f),
+        new Vector2(8,-3.85f), new Vector2(12,-6.95f), new Vector2(16,-9.57f),
+        new Vector2(18.5f,-11.46f), new Vector2(19.7f,-12), new Vector2(20.34f,-12),new Vector2(20.34f,Bottom),new Vector2(-14,Bottom),
         new Vector2(-14,-7),new Vector2(-11.8f,-6.4f),new Vector2(-10.6f,-5.9f),new Vector2(-10.1f,-5.4f),
         new Vector2(-9.7f,-5.3f),new Vector2(-9.1f,-4.9f),new Vector2(-8.9f,-4.4f),new Vector2(-8.2f,-4.2f),
         new Vector2(-8,-3.7f),new Vector2(-7.3f,-3.6f),new Vector2(-7.1f,-3.05f),new Vector2(-6.6f,-2.85f),
@@ -72,6 +70,35 @@ public static class CaveTerrainLayout
         return new Section("Connected approach shore",outline.ToArray(),new Vector3(left+.12f,floor,ApproachRiseStart-left-.12f));
     }
     public static float RiverbedSurface(float x)=>-4.45f+.16f*Mathf.Sin(x*2.7f)+.07f*Mathf.Sin(x*5.9f);
+    // Quadratic fillets preserve the authored endpoints and round changes of direction.
+    static Vector2[] RoundedEdge(Vector2[] knots, float radius)
+    {
+        var edge=new List<Vector2> { knots[0] };
+        for (int i=1;i<knots.Length-1;i++) {
+            var p=knots[i];
+            var incoming=p-knots[i-1];
+            var outgoing=knots[i+1]-p;
+            float cut=Mathf.Min(radius, .38f*Mathf.Min(incoming.magnitude,outgoing.magnitude));
+            var start=p-incoming.normalized*cut;
+            var end=p+outgoing.normalized*cut;
+            for(int k=0;k<=4;k++) {
+                float t=k*.25f;
+                edge.Add(Vector2.Lerp(Vector2.Lerp(start,p,t),Vector2.Lerp(p,end,t),t));
+            }
+        }
+        edge.Add(knots[knots.Length-1]);
+        return edge.ToArray();
+    }
+    public static readonly Vector2[] EntranceSoffit=RoundedEdge(new[] {
+        new Vector2(6.15f,-.12f),new Vector2(7,-.18f),new Vector2(8,-.55f),new Vector2(10,-1.8f),
+        new Vector2(12,-3.45f),new Vector2(14,-4.4f),new Vector2(16,-5.6f),new Vector2(18,-6.7f),
+        new Vector2(20,-7.3f),new Vector2(24,-8.2f),new Vector2(29,-8.6f),new Vector2(34,-8.2f)},1.4f);
+    public static readonly Vector2[] DaylightSoffit=RoundedEdge(new[] {
+        new Vector2(183,-4.6f),new Vector2(187.8f,-4.71f),new Vector2(192,-4.88f),
+        new Vector2(198,-4.54f),new Vector2(202.4f,-4.66f),new Vector2(204.35f,-4.43f),
+        new Vector2(205.08f,-3.96f),new Vector2(205.28f,-3.22f),new Vector2(205.04f,-2.3f),
+        new Vector2(205.58f,-.86f),new Vector2(205.72f,.45f),new Vector2(205.47f,1.95f),
+        new Vector2(205.85f,3.15f),new Vector2(205.79f,4.155f)},.85f);
     public static readonly Vector2[] EntryRoof=BuildEntranceRoof();
     static Vector2[] BuildEntranceRoof()
     {
@@ -81,69 +108,77 @@ public static class CaveTerrainLayout
             new Vector2(11.35f,-.35f),new Vector2(11.79f,.955f),new Vector2(17.79f,.955f),new Vector2(18.25f,.55f),
             new Vector2(18.7f,-.6f),new Vector2(19.2f,-1.7f),new Vector2(20.3f,-3.1f)};
         for(float x=22;x<=34;x+=.5f)points.Add(new Vector2(x,RiverbedSurface(x)));
-        points.AddRange(new[]{new Vector2(34,-8.2f),new Vector2(29,-8.6f),new Vector2(24,-8.6f),new Vector2(18,-8.6f),
-            new Vector2(16,-7.8f),new Vector2(14,-7),new Vector2(12,-5.8f),new Vector2(11.53f,-5.5f),new Vector2(10.7f,-5.15f),new Vector2(10.01f,-4.5f),
-            new Vector2(9.23f,-3),new Vector2(8.7f,-2.7f),new Vector2(8.04f,-1.6f),new Vector2(7.5f,-1.35f),new Vector2(7,-.7f),new Vector2(6.2f,-.2f)});
+        for (int i=EntranceSoffit.Length-1;i>=0;i--) points.Add(EntranceSoffit[i]);
         return points.ToArray();
     }
     public static Vector2[] Box(float x,float y,float w,float h)=>new[]{new Vector2(x,y),new Vector2(x+w,y),new Vector2(x+w,y+h),new Vector2(x,y+h)};
-    // Flat bearing faces sit on water-undercut shoulders. The broad submerged foot
-    // reaches the neighboring pillar without advertising another landing in the gap.
-    static Section Bank(string name, Vector3 tread)
+    // Register the native Golden River shelf painting and the stone underside together.
+    static Section RootShelf(Vector3 tread)
     {
-        float left = tread.x, right = left + tread.z, top = tread.y;
-        float notch = Mathf.Min(.65f, tread.z * .14f);
-        var outline = new[] {
-            new Vector2(left, top), new Vector2(right, top),
-            new Vector2(right - .04f, top - .25f), new Vector2(right - notch, top - .86f),
-            new Vector2(right - notch * .8f, top - 1.45f), new Vector2(right, top - 2.5f),
-            new Vector2(right, Bottom), new Vector2(left, Bottom),
-            new Vector2(left, top - 2.1f), new Vector2(left + notch, top - 1.1f),
-            new Vector2(left + notch * .7f, top - .55f), new Vector2(left, top - .23f)
-        };
-        return new Section(name, outline, tread);
+        bool compact = tread.z <= 4.25f;
+        var profile = TerrainArtProfile.Find(compact ? "shelf-root-compact-v3" : "shelf-root");
+        float width = tread.z / profile.LandingFraction;
+        float height = width / (compact ? 2f : 3f);
+        var frame = new Rect(tread.x - (width-tread.z)/2, tread.y - profile.ContactUV*height, width, height);
+        var edge = new List<Vector2> { new Vector2(tread.x,tread.y), new Vector2(tread.x+tread.z,tread.y) };
+        foreach (var uv in profile.Underside) edge.Add(frame.min + Vector2.Scale(uv, frame.size));
+        return new Section("Painted rooted shelf",edge.ToArray(),tread) { Shelf=profile, ArtFrame=frame };
     }
-    // A single continuous shoulder supports adjoining treads, including the daylight exit.
-    static Section SteppedShore(string name, Vector3[] treads)
+    // Heights along the entrance and exits are sampled from the same segments that paint them.
+    public static float AlongFace(Vector2[] outline, float x)
     {
-        var edge = new List<Vector2>();
-        for (int i = 0; i < treads.Length; i++) {
-            var p = treads[i];
-            edge.Add(new Vector2(p.x, p.y));
-            edge.Add(new Vector2(p.x + p.z, p.y));
-            if (i + 1 < treads.Length) {
-                var next = treads[i + 1];
-                float lip = Mathf.Sign(next.y - p.y) * .16f;
-                edge.Add(new Vector2(next.x + lip, Mathf.Lerp(p.y, next.y, .34f)));
-                edge.Add(new Vector2(next.x + lip * .6f, Mathf.Lerp(p.y, next.y, .71f)));
-            }
+        for (int i=1; i<outline.Length; i++) {
+            var a=outline[i-1]; var b=outline[i];
+            if (a.x <= x && x <= b.x && a.x < b.x) return Mathf.Lerp(a.y,b.y,(x-a.x)/(b.x-a.x));
         }
-        var last = treads[treads.Length - 1];
-        float end = last.x + last.z;
-        edge.Add(new Vector2(end + .5f, last.y - 1.2f));
-        edge.Add(new Vector2(end + .2f, last.y - 3.3f));
-        edge.Add(new Vector2(end + 4, last.y - 10.25f));
-        edge.Add(new Vector2(end + 4, Bottom));
-        edge.Add(new Vector2(treads[0].x, Bottom));
-        return new Section(name, edge.ToArray(), treads);
+        return outline[0].y;
+    }
+    public static readonly Vector2[] ExitLower = { new Vector2(204.18f,-6.65f), new Vector2(205.98f,-6.65f),
+        new Vector2(208,-6.05f),new Vector2(212.4f,-3.88f),new Vector2(214,-3.5f),new Vector2(217.6f,-3.5f) };
+    public static readonly Vector2[] ExitUpper = { new Vector2(224,-.85f),new Vector2(227.1f,-.85f),
+        new Vector2(228.4f,-.35f),new Vector2(233.8f,4.46f),new Vector2(235.69f,5.205f),new Vector2(245.69f,5.205f) };
+    static Section Ground(string name, Vector2[] face, bool riverFoot=false)
+    {
+        var outline = new List<Vector2>(face);
+        var end = face[face.Length-1];
+        outline.AddRange(RoundedEdge(new[] {end+new Vector2(.03f,-.22f),
+            end+new Vector2(-.18f,-1.15f),end+new Vector2(.30f,-2.55f),
+            end+new Vector2(riverFoot?4:1.6f,riverFoot?-10.25f:-4.7f)},.5f));
+        outline.Add(new Vector2(outline[outline.Count-1].x,Bottom));
+        var foot=face[0];
+        outline.Add(new Vector2(foot.x-2.7f,Bottom));
+        outline.Add(foot+new Vector2(-2.7f,-5.2f));
+        outline.Add(foot+new Vector2(-1.15f,-3.55f));
+        outline.Add(foot+new Vector2(.28f,-1.85f));
+        outline.Add(foot+new Vector2(.42f,-.62f));
+        return new Section(name,outline.ToArray());
+    }
+    // The flanks descend into the ravine as part of the same outcrop.
+    static Section Outcrop(string name,Vector2[] crest)
+    {
+        var first=crest[0]; var last=crest[crest.Length-1];
+        var knots=new List<Vector2> { first+new Vector2(-4.1f,-10),first+new Vector2(-2.7f,-6.5f),
+            first+new Vector2(-2.3f,-3.3f),first+new Vector2(-.9f,-1.2f) };
+        knots.AddRange(crest);
+        knots.Add(last+new Vector2(.8f,-.8f));
+        knots.Add(last+new Vector2(1.2f,-2.6f));
+        knots.Add(last+new Vector2(2.8f,-5.4f));
+        knots.Add(last+new Vector2(3.5f,-9));
+        var edge=RoundedEdge(knots.ToArray(),1.7f);
+        var outline=new List<Vector2>(edge) {
+            new Vector2(edge[edge.Length-1].x,Bottom),new Vector2(edge[0].x,Bottom) };
+        return new Section(name,outline.ToArray()) { ExposedBed=edge };
     }
     public static List<Section> Build()
     {
-        var result=new List<Section>{ApproachShore(),new Section("Entrance shore",LeftShore,
-            new Vector3(-2.65f,-.045f,6.44f),new Vector3(3.6f,-1.585f,1.97f),new Vector3(4.2f,-3.234f,2.9f),
-            new Vector3(5,-4.774f,3.49f),new Vector3(6.2f,-6.405f,3.62f),new Vector3(7.2f,-8,3.7f),
-            new Vector3(10.4f,-9.3f,3.2f),new Vector3(13.6f,-10.7f,2.7f)),
+        var result=new List<Section>{ApproachShore(),new Section("Entrance shore",LeftShore),
             new Section("Massive entrance overhang",EntryRoof,new Vector3(5.99f,.755f,4),new Vector3(11.79f,.955f,6))};
-        var first=(Vector2[])CaveEntryStudy.FloorLeft.Clone();
-        for(int i=0;i<first.Length;i++)first[i].y=first[i].y< -18?Bottom:first[i].y-2;
-        result.Add(new Section("First passage floor",first,new Vector3(-1,-12,19.06f)));
-        result.Add(SteppedShore("Scoured channel sill", new[] {
-            new Vector3(20.34f,-12,5.2f), new Vector3(25.54f,-12.78f,4.95f),
-            new Vector3(30.49f,-12,5.386f)
-        }));
-        result.Add(new Section("Fountain room floor",new[]{new Vector2(32,-12),new Vector2(35.876f,-12),new Vector2(35.876f,-12.3f),
-            new Vector2(38.839f,-12.3f),new Vector2(38.839f,-12.67f),new Vector2(57.106f,-12.67f),
-            new Vector2(57.106f,Bottom),new Vector2(32,Bottom)},new Vector3(32,-12,3.876f),new Vector3(35.876f,-12.3f,2.963f),new Vector3(38.839f,-12.67f,18.267f)));
+        result.Add(Outcrop("Fountain channel bed",new[]{new Vector2(20.34f,-12),
+            new Vector2(24.8f,-12),new Vector2(26.7f,-12.78f),new Vector2(29.1f,-12.78f),
+            new Vector2(30.85f,-12),new Vector2(35.5f,-12),new Vector2(36.65f,-12.3f),
+            new Vector2(37.9f,-12.3f),new Vector2(39.5f,-12.67f),new Vector2(56.1f,-12.67f),
+            new Vector2(58.1f,-13.6f),new Vector2(60.2f,-13.6f),new Vector2(64,-15),new Vector2(66,-17.4f),new Vector2(71,-16.4f),
+            new Vector2(74,-18.4f),new Vector2(76.8f,-19.3f)}));
         for(float x=34;x<183;x+=8){
             float right=Mathf.Min(183,x+8);var outline=new List<Vector2>();
             for(float sample=x;sample<right;sample+=.5f)outline.Add(new Vector2(sample,RiverbedSurface(sample)));
@@ -152,30 +187,24 @@ public static class CaveTerrainLayout
             outline.Add(new Vector2(x,CaveRoute.Ceiling(x)));
             result.Add(new Section("Cave roof "+x,outline.ToArray()));
         }
-        result.Add(new Section("Main exit cliff",new[]{new Vector2(183,-3.45f),new Vector2(184.5f,-3.1f),new Vector2(185,-1.7f),
-            new Vector2(186.2f,.655f),new Vector2(186.99f,4.755f),new Vector2(191.99f,4.755f),new Vector2(191.99f,4.155f),
-            new Vector2(205.79f,4.155f),new Vector2(205.9f,3.6f),new Vector2(205.3f,2.4f),new Vector2(205.8f,1.1f),
-            new Vector2(205.5f,-.5f),new Vector2(205.9f,-1.6f),new Vector2(205.1f,-3.1f),new Vector2(205.79f,-4.6f),
-            new Vector2(202,-4.8f),new Vector2(198,-4.65f),new Vector2(194,-4.6f),new Vector2(190,-4.9f),new Vector2(186,-4.6f),new Vector2(183,-4.6f)},
-            new Vector3(186.99f,4.755f,5),new Vector3(191.99f,4.155f,13.8f)));
-        var exitTreads = new List<Vector3>();
-        foreach (var tread in Floors) {
-            if (tread.x >= 204) {
-                exitTreads.Add(tread);
-                continue;
-            }
-            var section = Bank("Climbing bank " + tread.x, tread);
-            if (tread.x < 77 || tread.x >= 106) {
-                result.Add(section);
-                continue;
-            }
-            var pieces = new List<Vector2[]> { section.Outline };
-            foreach (var air in RecoveryAir) pieces = CaveGeometry.Subtract(pieces, air);
-            foreach (var piece in pieces) result.Add(new Section(section.Name, piece));
-            result.Add(new Section("Recovery roof contact " + tread.x, Box(tread.x,tread.y-.3f,tread.z,.3f), tread));
-        }
-        result.Add(SteppedShore("Outer exit shore", exitTreads.ToArray()));
-        foreach(var p in Recovery)result.Add(Bank("Recovery stair "+p.x,p));
+        var exitCliff=new List<Vector2> {new Vector2(183,-3.45f),new Vector2(184.5f,-3.1f),new Vector2(185,-1.7f),
+            new Vector2(186.2f,.655f),new Vector2(186.99f,4.755f),new Vector2(191.99f,4.755f),new Vector2(191.99f,4.155f)};
+        for(int i=DaylightSoffit.Length-1;i>=0;i--)exitCliff.Add(DaylightSoffit[i]);
+        result.Add(new Section("Main exit cliff",exitCliff.ToArray(),new Vector3(186.99f,4.755f,5),
+            new Vector3(191.99f,4.155f,13.8f)));
+        // Broad stone benches rise into selected shelves. Open fissures remain between benches.
+        result.Add(Outcrop("Lower catch footing",new[]{new Vector2(78.5f,-23),new Vector2(83,-25.5f),new Vector2(90,-26.7f),new Vector2(95,-27.3f),new Vector2(103.8f,-27.7f)}));
+        result.Add(Outcrop("Rooted climbing bank",new[]{new Vector2(108,-22.1f),new Vector2(115,-20.4f),new Vector2(122,-18.4f),new Vector2(127,-17.6f),new Vector2(129,-16.52f),new Vector2(134,-16.34f),new Vector2(138.7f,-16.49f),new Vector2(141,-17.85f),new Vector2(147,-17.1f),new Vector2(151,-16.8f),new Vector2(159,-14.6f)}));
+        result.Add(Outcrop("Upper seep bank",new[]{new Vector2(166,-12.9f),new Vector2(172,-12.4f),new Vector2(181,-10.2f),new Vector2(190,-9.4f),new Vector2(193,-11),new Vector2(200,-10.2f),new Vector2(204.18f,-9.1f)}));
+        foreach (var tread in Floors)
+            if (tread.x < 204 || tread.x == 219) result.Add(RootShelf(tread));
+        foreach (var tread in Recovery) result.Add(RootShelf(tread));
+        result.Add(Outcrop("Talus below the daylight arch", new[] {
+            new Vector2(201,-11),new Vector2(206,-9.4f),new Vector2(212,-7.4f),
+            new Vector2(216,-5.8f),new Vector2(219,-5.45f),new Vector2(221.4f,-4.1f),
+            new Vector2(224.8f,-3.8f),new Vector2(231,-1.3f),new Vector2(238,2.7f) }));
+        result.Add(Ground("Exit stream bank",ExitLower));
+        result.Add(Ground("Outer exit shore",ExitUpper,true));
         foreach(var side in new[]{new Vector2(-44,-5.8f),new Vector2(247,290)}){
             float left=side.x,right=side.y;var edge=new List<Vector2>();
             for(float x=left;x<right;x+=.4f)edge.Add(new Vector2(x,-4.85f+.1f*Mathf.Sin(x*2.7f)+.06f*Mathf.Sin(x*5.9f)));
@@ -185,14 +214,13 @@ public static class CaveTerrainLayout
     }
     public static List<Vector3> Path()
     {
-        var result=new List<Vector3>{new Vector3(2.6f,-.045f,0),new Vector3(5,-1.585f,0),new Vector3(6.5f,-3.234f,0),
-            new Vector3(7.8f,-4.774f,0),new Vector3(9,-6.405f,0),new Vector3(10.3f,-8,0),new Vector3(12,-9.3f,0),
-            new Vector3(14.7f,-10.7f,0),new Vector3(17.2f,-12,0),new Vector3(22,-12,1),new Vector3(29.85f,-12.78f,0),new Vector3(34,-12,1),new Vector3(37.5f,-12.3f,0),
+        var result=new List<Vector3>{new Vector3(2.6f,-.045f,0),new Vector3(21.9f,-12,0),new Vector3(28.4f,-12.78f,0),new Vector3(34,-12,1),new Vector3(37.5f,-12.3f,0),
             new Vector3(44,-12.67f,0),new Vector3(55.8f,-12.67f,0)};
         float previous=-12.67f,end=57.106f;
         for(int i=0;i<Floors.Length;i++){var p=Floors[i];bool right=i+1==Floors.Length||Floors[i+1].x>=p.x;
-            float target=p.x>232&&p.x<233?234.3f:right?p.x+p.z-.7f:p.x+.7f;
+            float target=right?p.x+p.z-.7f:p.x+.7f;
             bool jump=p.y>previous+.15f||Mathf.Abs(p.y-previous)<.15f&&p.x>end+.1f;
+            if (p.x == 214 || p.x == 235.69f) jump=false;
             result.Add(new Vector3(target,p.y,jump?1:0));previous=p.y;end=p.x+p.z;}
         var exit=CaveRoute.ToLocal(CaveRoute.Rejoin);result.Add(new Vector3(exit.x,exit.y-.52f,0));return result;
     }

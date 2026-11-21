@@ -63,6 +63,8 @@ public static class CaveRoute
     public static bool WaterRemoved(Vector2 local)
     {
         if(InOpening(local))return true;
+        // The rock overhang hides the river behind the recessed entrance wall.
+        if (local.x >= 8 && local.x <= 22 && local.y < -.8f) return true;
         // The lower render boundary lies inside the permanent solid riverbed, never in open air.
         return local.y< -5.2f;
     }

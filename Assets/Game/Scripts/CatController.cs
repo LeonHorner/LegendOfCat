@@ -95,7 +95,9 @@ public sealed class CatController : MonoBehaviour
             var origin=new Vector2(bounds.center.x+Mathf.Sign(body.linearVelocity.x)*(bounds.extents.x+.05f),bounds.min.y+.18f);
             var ahead=gameObject.scene.GetPhysicsScene2D().Raycast(origin,Vector2.down,.3f);
             if(ahead.collider&&!ahead.collider.isTrigger&&ahead.distance>.001f&&ahead.normal.y>.7f&&ahead.normal.y<.999999f&&
-                ahead.collider.GetComponent<MovingSupport>()==null){groundNormal=ahead.normal;staticSlope=true;}
+                ahead.collider.GetComponent<MovingSupport>()==null &&
+                // Driving downward before the trailing foot leaves a flat crest pins a box against the lip.
+                (staticSlope || ahead.normal.x * body.linearVelocity.x < 0)){groundNormal=ahead.normal;staticSlope=true;}
         }
         var relativeVelocity = body.linearVelocity - (Grounded ? nextSupportVelocity : supportVelocity);
         body.linearVelocity = Motion.Step(Time.fixedDeltaTime, Grounded, relativeVelocity);
