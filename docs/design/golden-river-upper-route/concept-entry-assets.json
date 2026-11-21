@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-14",
+  "generator": "OpenAI image_gen built-in tool",
+  "model": "Not disclosed",
+  "license": "Original generated artwork under the applicable generation service terms; approved for public source redistribution.",
+  "approvedReference": "approved-entrance-concept.png",
+  "referenceSource": "exec-cd4eca15-992f-4013-8f6e-f551b5f40c50.png",
+  "decisions": "The approved concept is the visual target for the entrance slice, not whole-route acceptance. Native foreground faces share the actual collider contours. Main landings 11 and 12 form a massive cliff retaining their original contacts. A permanent recessed alcove joins inside the opaque roof, narrowing the valley opening during descent. The reference stays outside Resources. Existing grass marks contacts; slate-only foundation art avoids a material change after the paintings. Prepared masks keep generation out of level startup. In-game evidence and traversal are separate from concept approval.",
+  "assets": [
+    {
+      "name": "left",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-5b13a806-1c90-4dc1-b0c7-3419e72eeb71.png",
+      "prompt": "Production 2D game terrain painting, matching the approved painterly reference (image 2). Image 1 is an EXACT registration stencil, preserve its canvas aspect ratio, framing, grey solid silhouette and all golden horizontal landing positions pixel-exact. Paint ONLY the grey cliff as natural heavy layered blue-violet slate, varied irregular interlocking slabs, angled strata, detailed small teal ivy, roots, sparse ferns tucked at back of ledges, warm restrained golden moss on exposed ledges and cool blue shadow under overhangs, like image 2. Organic rounded rock detail WITHIN the stencil, do not move landing heights or endpoints. All grey areas are solid opaque rock, no holes, no sky painted inside rock, no separate floating blocks. Golden lines indicate top foot contact (not literal yellow lines); paint natural thin grassy moss edges there, do not add grass across arbitrary horizontal internal lines. Dark navy outside the stencil stays plain flat navy. No cat, water, architecture, UI, text, invented platforms, glow or blur. This is a separated cliff asset, not a scene. Crisp fine brush grain, high resolution, strong material continuity, avoid repeating rows or uniform brick pattern. Fill rock all the way to left and bottom image edges where stencil touches them.",
+      "frame": [
+        -1,
+        -10,
+        13,
+        11
+      ],
+      "stencil": "concept-entry-left-stencil.png",
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/concept-entry-left-v1.png"
+    },
+    {
+      "name": "rear",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-08d03900-7446-43a9-8f1c-1539ac5b3239.png",
+      "prompt": "Separated production background asset for the approved 2D game cave reference. Use reference only for the exact painterly slate material, palette and atmosphere. Create a fully opaque landscape 3:2 image, edge to edge a recessed natural cave in violet blue slate. A quiet, cool shadowed rock alcove recedes toward the lower right center, with a few layered large slate planes, soft contact darkness in deep cracks, sparse small teal ivy, small ferns at the lower corners. Gentle warm reflected light only at the far upper left edge, much dimmer cool indirect light overall. Preserve crisp natural brush detail but lower contrast than foreground rocks. Absolutely NO floor contact lines, no walking platforms, steps, bright horizontal moss strips, sunlight shaft, black void, sky, cat, water, ruins, UI, text or border. No repeated tiling pattern. This is only the permanent recessed cave wall behind separate collision terrain, not a complete game screenshot.",
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/concept-entry-recess-v1.png"
+    },
+    {
+      "name": "roof",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-78705e46-8977-40b3-91ce-d8f329d42840.png",
+      "prompt": "Production foreground cliff asset for a hand-painted 2D game. Image 1 is the EXACT shape stencil: maintain exact framing, proportions, top horizontal landing positions and outer silhouette. Image 2 is the approved style and MASS/HEAVINESS target. Replace ONLY grey pixels with a massive thick angular slate rock overhang. Treat this as a wide heavy cliff cut from a larger landscape, filled edge-to-edge in its shape. A broad stepped shoulder across the top, natural fractured large blue-violet slate slabs facing the viewer, broken layered dark undersides with real painted depth, subdued muted golden moss on the top landing surfaces and sparse small teal ivy and roots in fissures. Main light comes from upper left; cool indirect light below. Along the low upper-right riverbank edge, add rounded dark damp shore boulders with restrained natural vegetation. NO actual water. Preserve all solid gray areas fully opaque rock, no holes, no inset border. Outside the stencil remains perfectly flat dark navy. No cat, valley, sky, separate floating blocks, architecture, text or UI. Crisp high-resolution fine painterly grain matching image 2; diverse slab directions and sizes, no repetitive masonry/cobblestones or smooth curved arm. This image is one separate native foreground cliff, NOT a game screenshot.",
+      "frame": [
+        5.5,
+        -9,
+        18,
+        11
+      ],
+      "stencil": "concept-entry-roof-stencil.png",
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/concept-entry-roof-v1.png"
+    },
+    {
+      "name": "rock",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-64fea835-0414-4b54-8450-eb56130050d0.png",
+      "prompt": "Original production 2D painterly stone MATERIAL, opaque edge-to-edge 3:2 landscape texture, for a game matching the supplied approved cave concept (style reference only). Fill the entire canvas with tightly interlocking naturally fractured blue-violet grey SLATE slabs, varied medium and small angular shapes with strong geological layering, fine crisp granular painted detail, restrained muted golden mineral flecks and cool crevices. Uniform scale approximately 10 varied slabs across width. No rounded cobblestone/masonry rows. Subtle upper-left light, consistent modest contrast; not dramatically lit. Seamless tiling all four sides, no dominant standout landmark or large direction pattern. Material only: no ledges, floors, grass edges, plants, roots, hanging ivy, cave holes, water, sky, architecture, characters, text, fog, vignettes or transparency. No scene layout. This will fill connected solid foundations underneath separately authored native cliff paintings; match their slate palette and brush grain, never stretch an entire cliff picture.",
+      "frame": [
+        0,
+        0,
+        8,
+        5.333333
+      ],
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/concept-entry-rock-v1.png"
+    }
+  ],
+  "rejected": [
+    {
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-31e70e9d-1206-4c20-bf6c-1d6ca36f367b.png",
+      "reason": "The initial thin overhang preserved the rejected arm silhouette. Not retained in Resources."
+    }
+  ]
+}

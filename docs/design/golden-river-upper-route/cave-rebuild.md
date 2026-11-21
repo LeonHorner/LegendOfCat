@@ -1,0 +1,68 @@
+# Cave terrain rebuild
+
+The owner rejected the terrain-correction candidate on 2026-11-14. Its screenshots and prior 236-test result are historical evidence, not acceptance of this rebuild.
+
+## Scope and sequencing
+
+Replace the disconnected, stretched terrain with one authored solid model. Keep the approved fountain position and the distant rejoin. The new deeper fissure starts after the fountain. The return climbs through three short reversals rather than a long flat lane.
+
+The first visual review gate is the actual level entrance, both shore connections, and the first fully enclosed passage. Complete that slice before producing the remaining final artwork. Physics validation alone does not open this gate. Keep PR #79 as a draft; do not merge or release.
+
+## Current implementation
+
+The owner subsequently removed the hard memory cap and prioritized Golden River startup performance. Memory measurements remain informational and must not limit artwork quality.
+
+- `CaveTerrainLayout` supplies both rock meshes and source polygons for a static manual `CompositeCollider2D`. Moving main supports remain independent.
+- Opaque rock bodies extend to Y -42. Vegetation is a separate layer and cannot punch holes through solid rock. Exposed contact spans exclude buried portions and merge adjoining coplanar crowns.
+- Two additional descending ledges give the first closed passage real roof thickness and jump headroom. The formerly inconsistent passage/fountain join shares the same Y -12 contact.
+- The post-fountain fissure descends to Y -21.3. The local concealed catch is at Y -26.5; the cave death boundary is -34.
+- The full forward path, the local catch return and the flat passage join in both directions passed the isolated actual-controller geometry runner. These are scripted physics results, not human timing or artwork acceptance.
+- Water uses separate permanent shore envelopes. Surface-crossing tests use the player's foot location. Opaque foundations cover the lower water boundary. Camera depth and zoom stay fixed.
+- Six native entrance modules preserve a common rounded slate material at six-unit source frames. Unity import preserves the 1254x1254 original resolution. Vegetation and painted edge detail remain over opaque bodies; internal material joins do not change world opacity.
+- The permanent riverbed uses a small irregular solid contour, shared by collision and rendering, so its contact with water is not a straight image-bottom rectangle.
+- The generated water/dry mask keeps 4096 horizontal samples and 256 vertical samples; its render boundary stays buried in solid rock. Continuous hazard queries still use the original world polygons. See the latest evidence for informational texture memory measurements.
+
+## Startup performance
+
+The same editor review construction on the same hardware measured 3237.0 ms before precomputation and 802.1 ms after it, about 75% less startup time. Cave terrain/detail setup dropped from 2009.0 to 62.8 ms and coverage setup from 370.4 to 3.8 ms. These are single editor observations with authoring assets already imported, not a cold-player benchmark or an FPS claim. Raw timing lines are retained in `rebuild-evidence/startup-before.txt` and `startup-after.txt`.
+
+Seven linear data masks are now prepared in the editor and loaded as Resources when the level opens. A source SHA-256 signature invalidates the preparation cache after changes to the route, solid contours or generator. Build checks require the prepared masks. A regression compares every saved pixel with the current procedural generator; gameplay danger queries still use the world polygons. Shared prepared textures are not destroyed when one course instance closes. Fragment clipping also rejects pixels outside native detail frames before the expensive stone sampling.
+
+The rebuilt Windows preview measured 486.8 ms for the first `OpenLevelOne` construction in a fresh player process, with OS and graphics-driver caches left intact. This is the method invoked by the Golden River menu button. Its result is recorded separately from the editor comparison.
+
+## Entrance review candidate
+
+### Approved concept implementation
+
+The owner approved [this new entrance concept](approved-entrance-concept.png) and requested its in-game implementation. It supersedes the earlier thin curved-overhang treatment as the entrance target. Concept approval is not acceptance of the game captures or the rest of the route.
+
+The entrance now uses separate native left cliff and massive right cliff paintings, a quieter recessed alcove and a slate-only foundation material. The two right-hand main landings (ascent 11 and 12) belong to the same solid cliff, with their original contact heights and widths preserved. The old ascent-12 painting and collider are replaced together. A shallow top cleft separates their contacts; the normal route can continue by jumping as before. Below them, the wide overhang is visibly anchored in the larger cliff rather than forming a thin arm.
+
+The alcove's upper seam is buried inside the roof contour, including where that roof rises above the riverbed; it cannot cross the main-route sky. Its irregular outer flank narrows the remaining valley opening through actual world-space descent. The camera does not toggle or move any of these renderers. The native paintings are clipped to the same outlines as collision and do not determine contact through their grass alpha. Slate grain continues into the underlying foundations; the grass darkens gradually with indirect cave light.
+
+See [source images, exact production prompts and decisions](concept-entry-assets.json). The retained stencils show the authored registration. The first thin roof trial and a visible fixed-height rear-wall edge were rejected during local in-game comparison. The concept is stored outside Resources and is never overlaid as a screenshot.
+
+### Connected approach correction
+
+The owner requested a continuous connection instead of the hard cut between the preceding bank and entrance, then rejected the small three-terrace candidate. Ascent platform 9 now joins the shared terrain registration through a continuous gently curved rock rise. The grass follows the same sampled curve as collision. Static-incline grounding follows the surface tangent so walking, standing without drift and jumping work; moving-support behavior remains independently tested. The legacy platform painting/collider is replaced, not overlaid.
+
+The wet-shore outline is rounded and extends in front of the hidden water-mask edge. The upstream river foundation has an irregular top instead of a straight lower water cut. The preceding bank stays behind the river; the dry throat stays in front. Actual controller traversal verifies the connection in both directions.
+
+See `rebuild-evidence/natural-approach-960.png`, the 640-pixel/grayscale variants, and `natural-bank-physics.txt`. The older connected-approach images and three-terrace validation are retained as owner-rejected history.
+
+The actual approach, descent into the first closed passage and reverse entrance are recorded in [rebuild evidence](rebuild-evidence/README.md), alongside color and grayscale camera poses. Evaluate the wet shoreline contacts, permanent throat, contact correspondence and material consistency in motion before extending this art treatment. The first slice is a review candidate, not owner-accepted final art.
+
+The remaining full-route artwork is intentionally not presented as finished. The stronger climbing return currently uses the same shared solid model as a tested geometry prototype. Earlier evidence does not substitute for this revision's checks.
+
+## Later production work after the first visual review
+
+Finish the fissure, rooted catch stairs, fountain lighting and climbing chambers with the same accepted module language. Finish the far exit mouth and its shores; prove it remains present when reversing. The 27 unused rejected terrain Resources have been archived through Unity with metadata preserved; the standalone accepted study inputs remain active. Track memory and frame rate without the superseded hard texture cap, and keep human and scripted duration separate. Complete exact-head Windows/Linux player, launcher, package and merge-ready validation only when the feature is ready.
+
+## Coordination
+
+This work owns the cave layout, cave rendering, cave shaders and cave review helpers. PR #82 also touches `MovementCourse.cs` and `ASSETS.md`; this rebuild has not changed `MovementCourse.cs`. Any later shared entry-point integration must preserve both features. Asset provenance changes are append-only because the existing `ASSETS.md` contains legacy non-UTF-8 bytes.
+Startup measurement also touches `StarterScreen.OpenLevelOne`; its gameplay behavior and UI text are unchanged.
+
+## Rejected new art experiment
+
+A built-in image-generation trial on 2026-11-14 produced a 1254x1254 upper-rock module with inset contact and a different outer silhouette. It was not imported into Resources: at the requested eight-unit frame it misses the 192 px/unit requirement, and its inset surface would recreate the contact mismatch. Generator/model revision was not disclosed. No generated candidate is accepted solely because the image looks attractive in isolation.

@@ -1,0 +1,79 @@
+{
+  "date": "2026-11-14",
+  "tool": "Built-in image_gen",
+  "model": "Not disclosed",
+  "license": "Original generated artwork; project owner permits public source redistribution",
+  "frameWorldUnits": 6,
+  "minimumSourcePixelsPerWorldUnit": 192,
+  "modules": [
+    {
+      "index": 0,
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/entry-module-0-v1.png",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-dae84b73-e3bc-4883-87e1-3ca92b650c97.png",
+      "prompt": "Production 2D game rock module, transparent PNG, square. Reference 1 is the exact alpha silhouette stencil; reference 2 is style only. Paint ONLY purple stencil pixels: upper shore, flat walkable contact at the exact canvas top edge. Maintain the stencil's spatial registration without centering, resizing, padding or insetting. Rock touching a canvas edge must continue fully to that edge, no inset border. Continuous original painterly violet slate boulders, finely textured sharp grain, warm highlights from upper right, olive moss and small ivy in crevices; match the style reference's restrained natural palette. SIX world-unit closeup; varied connected stones about 0.4-1.1 units. Keep all horizontal contact edges exact. No glow, blurred alpha, sky, distant scenery, water sheet, character, extra platforms, UI or text. Alpha follows the supplied silhouette. No transparency inside solid stone. Do not invent a floating island or additional landings.",
+      "status": "Imported candidate; in-level visual acceptance pending"
+    },
+    {
+      "index": 1,
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/entry-module-1-v1.png",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-5c9e069a-3d0d-4e13-b2e7-5495d07d318e.png",
+      "prompt": "Paint ONLY the purple solid region of reference 1 and keep all its exact boundaries. Reference 2 is the master STONE MATERIAL: match its rounded violet boulders, fine granular brush detail, thin olive moss highlights, ivy shape, light direction and restrained colors precisely. Do not copy the shape of reference 2. This is ONE CONTINUOUS FILLED ROCK WALL, no steps, no ledges, no grass tops. Only a tiny diagonal corner at the upper left is transparent. Preserve stencil pixel registration without centering, insetting or resizing. Fill solid regions fully to the image edges. Original sharp 2D side-view painted game art; six world units across. Genuine alpha outside the stencil, no fog, white underlay, sky, water, background scenery, character or text. No hard rectangular decoration pasted onto stone.",
+      "status": "Imported candidate, master stone style preserved; visual review pending"
+    },
+    {
+      "index": 2,
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/entry-module-2-v1.png",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-3820e331-f572-43bc-87bc-970589cd6574.png",
+      "prompt": "Production game asset, transparent PNG, square. Image 1 is a STRICT stencil target, image 2 is STYLE ONLY. Paint the purple rock region of stencil 1 with the fine painterly violet slate boulders, olive moss and ivy of style reference 2. Preserve the stencil shape, all THREE flat ledge elevations, their exact horizontal endpoints and the exact outer boundaries at the canvas edges. Do not inset, center, shrink or redesign the shape. The alpha silhouette MUST follow the stencil, with only tiny natural stone chips within the boundary. This is a close-up SIX world-unit rock module, stone boulders varying 0.4 to 1.1 world units across, finely detailed crisp grain, shadows naturally in crevices. Restrained moss on contact edges, sparse hanging ivy. Warm daylight upper right, cool rock shadows. No external glow, blur, sky, backgrounds, water, character, hidden platform, extra rock detached from the stencil, text or UI. Purple fill is actual continuous solid rock, not empty air. Transparent stencil regions must stay transparent. Source pixels will be used directly in the game without enlargement.",
+      "status": "Imported candidate; in-level visual acceptance pending"
+    },
+    {
+      "index": 3,
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/entry-module-3-v1.png",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-fdf73883-95ce-4adf-b09e-977eea1f4181.png",
+      "prompt": "Production 2D game rock module, transparent PNG, square. Reference 1 is the exact alpha silhouette stencil; reference 2 is style only. Paint ONLY purple stencil pixels: opposite massive overhang, its flat top contact at canvas top, shadowed irregular stone undersurface following the diagonal stencil. Maintain the stencil's spatial registration without centering, resizing, padding or insetting. Rock touching a canvas edge must continue fully to that edge, no inset border. Continuous original painterly violet slate boulders, finely textured sharp grain, warm highlights from upper right, olive moss and small ivy in crevices; match the style reference's restrained natural palette. SIX world-unit closeup; varied connected stones about 0.4-1.1 units. Keep all horizontal contact edges exact. No glow, blurred alpha, sky, distant scenery, water sheet, character, extra platforms, UI or text. Alpha follows the supplied silhouette. No transparency inside solid stone. Do not invent a floating island or additional landings.",
+      "status": "Imported candidate; in-level visual acceptance pending"
+    },
+    {
+      "index": 4,
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/entry-module-4-v1.png",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-974b9904-e278-40c8-a5aa-11fe53e7fe6f.png",
+      "prompt": "Paint ONLY the purple solid region of reference 1 and keep all its exact boundaries. Reference 2 is the master STONE MATERIAL: match its rounded violet boulders, fine granular brush detail, thin olive moss highlights, ivy shape, light direction and restrained colors precisely. Do not copy the shape of reference 2. This module has exactly the horizontal step elevations supplied in the stencil, no additional ledge or grass stripe inside solid stone. Maintain the cropped fragment at upper left and the two lower contacts exactly. Preserve stencil pixel registration without centering, insetting or resizing. Fill solid regions fully to the image edges. Original sharp 2D side-view painted game art; six world units across. Genuine alpha outside the stencil, no fog, white underlay, sky, water, background scenery, character or text. No hard rectangular decoration pasted onto stone.",
+      "status": "Imported candidate, master stone style preserved; visual review pending"
+    },
+    {
+      "index": 5,
+      "path": "Assets/Game/Resources/GoldenRiver/Descent/entry-module-5-v1.png",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-a18b4ae4-9b57-4400-a678-c240a952fc14.png",
+      "prompt": "Production 2D game rock module, transparent PNG, square. Reference 1 is the exact alpha silhouette stencil; reference 2 is style only. Paint ONLY purple stencil pixels: closed cave ceiling, no walkable grass on its underside, cool shaded stone with sparse root ends. Maintain the stencil's spatial registration without centering, resizing, padding or insetting. Rock touching a canvas edge must continue fully to that edge, no inset border. Continuous original painterly violet slate boulders, finely textured sharp grain, warm highlights from upper right, olive moss and small ivy in crevices; match the style reference's restrained natural palette. SIX world-unit closeup; varied connected stones about 0.4-1.1 units. Keep all horizontal contact edges exact. No glow, blurred alpha, sky, distant scenery, water sheet, character, extra platforms, UI or text. Alpha follows the supplied silhouette. No transparency inside solid stone. Do not invent a floating island or additional landings.",
+      "status": "Imported candidate; in-level visual acceptance pending"
+    }
+  ],
+  "rejected": [
+    {
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-9dcd2b90-08e3-456a-abf4-a2b640ca300b.png",
+      "prompt": "Create one production 2D side-view game rock module, 1536x1536. Reference 1 is the exact solid-region stencil: fill only its purple region, preserve its exact outer contact contour and transparent area. Reference 2 supplies the approved painterly visual style only. This module is an eight-world-unit wide and tall upper shore rock body viewed straight-on, its walkable flat contact is the very top edge. Large irregular connected violet slate boulders with finely painted stone grain and crevices, subtle olive moss, a few hanging ivy vines. Consistent warm light from upper right. Stone size varied 0.5-1.5 world units, not a repeating brick pattern. No grass surface floating separately, no distant scenery, sky, water, characters, platforms or UI. No glow or blur or painted shadow outside the actual rock. Internal module boundaries at left/bottom/right should consist of complete irregular boulder outlines with genuinely transparent scalloped outer edges; the shared opaque rock behind this detail provides the remaining foundation. Keep top contact exactly horizontal and fully solid. High detail appropriate to the original sharp main-level assets, no magnified soft low-resolution texture.",
+      "reason": "1254px source is below 192px/unit at requested eight-unit frame; inset contact."
+    },
+    {
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-fdd567ac-5cd6-4923-b994-9377933c97a6.png",
+      "prompt": "Production 2D game rock module, transparent PNG, square. Reference 1 is the exact alpha silhouette stencil; reference 2 is style only. Paint ONLY purple stencil pixels: lower wet shore face, naturally dark damp stone at the upper-left boundary, no painted water. Maintain the stencil's spatial registration without centering, resizing, padding or insetting. Rock touching a canvas edge must continue fully to that edge, no inset border. Continuous original painterly violet slate boulders, finely textured sharp grain, warm highlights from upper right, olive moss and small ivy in crevices; match the style reference's restrained natural palette. SIX world-unit closeup; varied connected stones about 0.4-1.1 units. Keep all horizontal contact edges exact. No glow, blurred alpha, sky, distant scenery, water sheet, character, extra platforms, UI or text. Alpha follows the supplied silhouette. No transparency inside solid stone. Do not invent a floating island or additional landings.",
+      "reason": "Generated additional ledges inconsistent with the supplied solid contour."
+    },
+    {
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-7191629c-3172-4364-b41d-a72c57908ed4.png",
+      "prompt": "Production 2D game rock module, transparent PNG, square. Reference 1 is the exact alpha silhouette stencil; reference 2 is style only. Paint ONLY purple stencil pixels: lower descending ledges, maintain both exact horizontal contact levels and all irregular undercuts. Maintain the stencil's spatial registration without centering, resizing, padding or insetting. Rock touching a canvas edge must continue fully to that edge, no inset border. Continuous original painterly violet slate boulders, finely textured sharp grain, warm highlights from upper right, olive moss and small ivy in crevices; match the style reference's restrained natural palette. SIX world-unit closeup; varied connected stones about 0.4-1.1 units. Keep all horizontal contact edges exact. No glow, blurred alpha, sky, distant scenery, water sheet, character, extra platforms, UI or text. Alpha follows the supplied silhouette. No transparency inside solid stone. Do not invent a floating island or additional landings.",
+      "reason": "Generated additional ledges inconsistent with the supplied solid contour."
+    },
+    {
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-1b3837c5-3fd7-43fb-938e-b2c5eb967d56.png",
+      "prompt": "Paint this exact mask as one continuous close-up WET SHORE ROCK WALL. Purple is entirely SOLID stone all the way to all canvas edges, except the tiny triangular transparent corner at upper left. There are ZERO STEPS, ZERO LEDGES, ZERO TOP GRASS SURFACES in this image. Do not draw a staircase or add any platforms. Keep the whole square filled with connected finely painted violet slate boulders and a few olive ivy stems, irregular stone sizes 1/12 to 1/6 of canvas. A subtle dark damp stain follows the small diagonal upper-left shoreline corner; no actual water. Detailed original 2D side-view painted game art, warm upper-right light and blue-violet crevice shadows. Match the exact solid silhouette of the mask. No inset border, sky, scenery, fog, glow, detached stones, text or character. Only the tiny stencil corner is transparent; everything else is solid rock.",
+      "reason": "Angular stone style and palette differ from the master material."
+    },
+    {
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-7ee6f513-cec4-4f9a-9d3a-2ca6bacf12f8.png",
+      "prompt": "Strict texture painting of the supplied silhouette. This is NOT a redesign. Reference is an alpha mask with purple continuous rock and transparent air. Paint ONLY inside purple, preserve exactly the two horizontal step elevations and the cropped upper-left sloping undercut. Do not add any third step or grassy ledge anywhere. Do not shift, scale, center or inset the mask. All purple at the left/right/bottom canvas edges must remain fully painted to that edge. Paint finely detailed original violet slate boulders in a restrained hand-painted 2D platform game style, small olive moss along ONLY the two supplied horizontal boundaries and a few small ivy strands in stone crevices, warm daylight from upper right with cool blue-violet shadows. Varied boulders 1/12 to1/6 of the total canvas width. No distant background, sky, water, fog, glow, alpha haze, extra platform, text or character. Maintain genuine transparent alpha in every area outside the supplied solid silhouette. The canvas is one SIX-world-unit square building block in a larger continuous cliff.",
+      "reason": "Angular stone style and palette differ from the master material."
+    }
+  ]
+}

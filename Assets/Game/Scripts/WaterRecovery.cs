@@ -63,6 +63,15 @@ public sealed class WaterRecovery : MonoBehaviour
         cat.ReturnedToStart += OnRespawn;
     }
 
+    public System.Func<Vector2, Vector2, bool> RiverContact;
+    public bool TryEnterAt(Vector2 previous, Vector2 current)
+    {
+        if (RiverContact == null) return TryEnter();
+        if (!RiverContact(previous, current) || Active || cat.Paused || !body.simulated || body.linearVelocity.y > 0) return false;
+        Begin();
+        return true;
+    }
+
     public bool TryEnter()
     {
         if (Active || !cat || cat.Paused || !body.simulated || body.linearVelocity.y > 0) return false;

@@ -1,10 +1,14 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 public sealed class CatController : MonoBehaviour
 {
     // Optional placement frame for the course's fall boundary; motor units stay world-space.
     public Transform fallReference;
+    public System.Func<Vector2, Vector2, bool> RecoveryBoundary;
+    Vector2 previousLocalPosition;
+    bool hasPreviousPosition;
     public readonly CatMotion Motion = new CatMotion();
     public bool Grounded { get; private set; }
     public Vector2 PresentationVelocity => body ? body.linearVelocity - supportVelocity : Vector2.zero;
@@ -60,12 +64,14 @@ public sealed class CatController : MonoBehaviour
     void FixedUpdate()
     {
         if (Paused || Recovering) return;
+        Vector2 localPosition = fallReference ? (Vector2)fallReference.InverseTransformPoint(body.position) : body.position;
         var water = GetComponent<WaterRecovery>();
-        if (water && water.TryEnter()) return;
+        if (water && water.TryEnterAt(hasPreviousPosition ? previousLocalPosition : localPosition, localPosition)) return;
         Grounded = false;
         var filter = new ContactFilter2D { useTriggers = false };
         var count = shape.Cast(Vector2.down, filter, hits, 0.04f);
         Vector2 nextSupportVelocity = Vector2.zero;
+        Vector2 groundNormal=Vector2.up;bool staticSlope=false,staticGround=false;
         if (leaveGroundSteps == 0)
             for (int i = 0; i < count; i++) {
                 var hit = hits[i];
@@ -73,18 +79,33 @@ public sealed class CatController : MonoBehaviour
                 var moving = hit.collider.GetComponent<MovingSupport>();
                 Vector2 candidateVelocity = moving ? moving.Velocity : Vector2.zero;
                 // A newly landed rider can rise in world space while resting on an ascending lift.
-                if (body.linearVelocity.y - candidateVelocity.y > 0.1f) continue;
+                var contactVelocity=body.linearVelocity-candidateVelocity;
+                bool slope=moving==null&&hit.normal.y<.999999f;
+                if (contactVelocity.y>0.1f&&(!slope||Mathf.Abs(Vector2.Dot(contactVelocity,hit.normal))>.15f)) continue;
                 // Casts do not apply one-way collision rules. An overlapping underside is not ground.
                 if (hit.collider.usedByEffector && shape.bounds.min.y < hit.collider.bounds.max.y - 0.07f) continue;
                 Grounded = true;
                 nextSupportVelocity = candidateVelocity;
+                groundNormal=hit.normal;staticSlope=slope;staticGround=moving==null;
                 break;
             }
         if (leaveGroundSteps > 0) leaveGroundSteps--;
+        if(Grounded&&staticGround&&Mathf.Abs(body.linearVelocity.x)>.05f){
+            var bounds=shape.bounds;
+            var origin=new Vector2(bounds.center.x+Mathf.Sign(body.linearVelocity.x)*(bounds.extents.x+.05f),bounds.min.y+.18f);
+            var ahead=gameObject.scene.GetPhysicsScene2D().Raycast(origin,Vector2.down,.3f);
+            if(ahead.collider&&!ahead.collider.isTrigger&&ahead.distance>.001f&&ahead.normal.y>.7f&&ahead.normal.y<.999999f&&
+                ahead.collider.GetComponent<MovingSupport>()==null &&
+                // Driving downward before the trailing foot leaves a flat crest pins a box against the lip.
+                (staticSlope || ahead.normal.x * body.linearVelocity.x < 0)){groundNormal=ahead.normal;staticSlope=true;}
+        }
         var relativeVelocity = body.linearVelocity - (Grounded ? nextSupportVelocity : supportVelocity);
         body.linearVelocity = Motion.Step(Time.fixedDeltaTime, Grounded, relativeVelocity);
         supportVelocity = Grounded && !Motion.Jumped ? nextSupportVelocity : Vector2.zero;
         body.linearVelocity += supportVelocity;
+        // Follow a static incline tangentially; do not inject gravity drift while standing.
+        if(Grounded&&staticSlope&&!Motion.Jumped)
+            body.linearVelocity=new Vector2(body.linearVelocity.x,-groundNormal.x/groundNormal.y*body.linearVelocity.x);
         if (!Grounded && relativeVelocity.y <= 0.1f) {
             int contacts = shape.GetContacts(filter, sideContacts);
             for (int i = 0; i < contacts; i++) {
@@ -99,8 +120,9 @@ public sealed class CatController : MonoBehaviour
             }
         }
         if (Motion.Jumped) { Grounded = false; leaveGroundSteps = 2; }
-        float fallY = fallReference ? fallReference.InverseTransformPoint(body.position).y : body.position.y;
-        if (fallY < -7) {
+        bool recover = RecoveryBoundary != null ? RecoveryBoundary(hasPreviousPosition ? previousLocalPosition : localPosition, localPosition) : localPosition.y < -7;
+        previousLocalPosition = localPosition; hasPreviousPosition = true;
+        if (recover) {
             if (FellOutOfBounds != null) FellOutOfBounds();
             else ReturnToStart();
         }
@@ -118,6 +140,7 @@ public sealed class CatController : MonoBehaviour
     // The course chooses the spawn; the controller always resets motor and physics.
     public void RespawnAt(Vector2 position)
     {
+        hasPreviousPosition = false;
         SetRecovering(false);
         SetPaused(false);
         Motion.Reset();

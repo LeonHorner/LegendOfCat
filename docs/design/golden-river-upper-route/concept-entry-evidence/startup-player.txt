@@ -1,0 +1,3 @@
+Cave terrain startup: 130,9 ms
+Cave coverage startup: 6,4 ms
+Golden River startup: 640,0 ms
