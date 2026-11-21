@@ -869,3 +869,12 @@ Location: art/audio/auditions-2026-11-21, outside Unity Assets and player packag
 River: Park ambiences by Thimras, https://opengameart.org/content/park-ambiences, CC0 1.0. Movement: Fantozzi recordings from https://opengameart.org/content/fantozzis-footsteps-grasssand-stone, CC0 1.0. Original checkpoint studies: OpenAI Codex-authored deterministic modal synthesis, project PolyForm Noncommercial 1.0.0 license. No generative audio model. Third-party recordings and derivatives retain their CC0 license.
 
 Exact source URLs, checksums, excerpt times, processing, licenses, creative response to the rejection and reproduction steps are in the audition README and tools/prepare-golden-river-auditions.py. Integration requires the owner to hear and approve the actual clips first. These recordings are candidates, not approved cat-paw recordings or final loop/mix assets.
+
+
+## Golden River river approval and wind/magic auditions - 2026-11-21
+
+Owner decision: art/audio/auditions-2026-11-21/river-natural.wav is approved as the river sound; final loop/mix review remains. Movement sounds are deferred and may be omitted. The owner requested occasional softly fading wind instead, plus a magical checkpoint sound matching the orange glow and sparks. Dry material checkpoint taps are superseded.
+
+New unapproved standalone samples: art/audio/wind-and-magic-review/wind-gusts.wav and checkpoint-magic-comparison.wav. No new Unity import, gameplay references or integration. Wind source: Park ambiences by Thimras, https://opengameart.org/content/park-ambiences, CC0 1.0; source WAV SHA-256 5c381856745b4706e7eba55eb9271a61a530e90c05df8126adb2db89ecfa6c5a. Field recording and derivatives retain CC0.
+
+Checkpoint variants: original deterministic synthesis authored through OpenAI Codex, project PolyForm Noncommercial 1.0.0 license; no generative audio model or external sampled instrument. Preparation uses Python and FFmpeg. Exact excerpt times, processing, envelopes, synthesis decisions and reproduction are in the review README and tools/prepare-golden-river-wind-and-magic.py. Actual clips require owner listening approval before integration; fixed production wind intervals are not yet decided.

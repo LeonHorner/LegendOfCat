@@ -1,4 +1,8 @@
-# Standalone sound auditions — not approved for integration
+# Standalone sound auditions and owner decisions
+
+## Latest owner feedback — 2026-11-21
+
+`river-natural.wav` is approved as the river sound. Final loop and in-game mix still require review. Movement sounds are deferred and may be omitted. The dry checkpoint A/B study is superseded: the owner requested a magical sound matching the orange glow and sparks. The new wind/magic auditions live in `art/audio/wind-and-magic-review` and remain outside Unity until heard and explicitly approved. Historical descriptions below do not override these decisions.
 
 The owner rejected the original #74 sound candidate on 2026-11-21 and requires listening before integration. These files are outside Assets, are not referenced by gameplay and must not enter Unity or a player package before explicit clip approval. The original sounds are now Editor-only rejected fixtures. The completion menu remains usable without them.
 

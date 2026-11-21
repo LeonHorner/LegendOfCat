@@ -1,5 +1,14 @@
 # Golden River audio and completion
 
+## Owner selection and new sound direction — 2026-11-21
+
+- The owner approved the standalone `art/audio/auditions-2026-11-21/river-natural.wav` excerpt as the river sound. Preserve that selection; final looping and in-game mix remain separate review steps.
+- Movement sounds may be unnecessary. Leave footsteps and the first candidate's jump/landing noises out for now; do not treat the earlier contact studies as selected.
+- Instead, audition occasional wind gusts that arrive gently and fade away. Wind is environmental, independent of Mika's movement, not a continuous rushing loop. Exact production spacing and mix have not been locked.
+- Checkpoint sound should be magical and match the orange illumination and sparks. The dry stone/wood audition direction is superseded. Present warm glowing and sparkling alternatives as standalone audio before integration.
+
+Current new auditions: `art/audio/wind-and-magic-review`. Wind and magical checkpoint clips remain unapproved and outside Unity Assets. River approval does not waive the listening gate for the other categories.
+
 ## Owner rejection and audition gate — 2026-11-21
 
 The owner rejected the first water texture, movement sounds and checkpoint cue as unconvincing or unsuitable. The original sound candidate is not accepted. GoldenRiverAudio is no longer attached to the playable level; all five original clips have moved out of Resources into Editor-only rejected regression fixtures with their metadata preserved. Completion/menu functionality remains available without the candidate sounds.
