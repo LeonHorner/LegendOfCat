@@ -145,6 +145,8 @@ public sealed class MovementCourse : MonoBehaviour
     // Configure before enabling the object. The movement lab retains its original course.
     public bool LevelOne;
     public event System.Action ExitReached;
+    public event System.Action<LevelCompletion> Completed;
+    public LevelCompletion Completion { get; private set; }
     public bool HasReachedExit { get; private set; }
     // Session time includes retries, excludes pauses; frozen on the first checkpoint.
     public float IntroductionSeconds { get; private set; } = -1;
@@ -267,6 +269,8 @@ public sealed class MovementCourse : MonoBehaviour
         bars.cullingMask = 0;
         var follow = courseCamera.gameObject.AddComponent<CatCamera>();
         follow.target = player.transform;
+        if (LevelOne && !FindFirstObjectByType<AudioListener>())
+            courseCamera.gameObject.AddComponent<AudioListener>();
         follow.courseRoot = transform;
         follow.fixedHeight = true;
         var last = ActivePlatforms[ActivePlatforms.Length - 1];
@@ -356,6 +360,7 @@ public sealed class MovementCourse : MonoBehaviour
         }
         // Main-route landmarks and platform silhouettes communicate progression without floating labels.
         if (!LevelOne) Label("FINISH / return or retry", LabFinish + Vector2.up * .48f);
+        if (LevelOne) gameObject.AddComponent<GoldenRiverAudio>().Initialize(this);
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
     {
@@ -412,6 +417,11 @@ public sealed class MovementCourse : MonoBehaviour
             HasReachedExit = true;
             finaleFinished = FinaleSeconds;
             Run.Complete();
+            if (LevelOne) {
+                Completion = new LevelCompletion("golden-river", Run.ElapsedSeconds, Run.Retries);
+                Cat.SetPaused(true);
+                Completed?.Invoke(Completion);
+            }
             ExitReached?.Invoke();
         }
     }
@@ -441,11 +451,16 @@ public sealed class MovementCourse : MonoBehaviour
     public void RestartRun() { finaleStarted=finaleFinished=-1; ascentStarted = ascentFinished = -1; foreach (var support in supports) support.ResetPhase(); IntroductionSeconds = -1; HasReachedExit = false; RespawnWithProgress(Run.Restart()); }
     void RespawnWithProgress(Vector2 spawn, bool preview = false)
     {
+        Completion = null;
         Cat.RespawnAt(transform.TransformPoint(spawn));
         Progress.Reset(spawn, Run.Checkpoint, preview);
     }
 
-    public void TogglePause() => Cat.SetPaused(Run.TogglePause());
+    public void TogglePause()
+    {
+        if (LevelOne && HasReachedExit) return;
+        Cat.SetPaused(Run.TogglePause());
+    }
 
     void LateUpdate()
     {

@@ -845,3 +845,11 @@ The existing near panorama is extended to 14332×1448 using an original generated
   The pointer is an original code-drawn tapered hand with filtered alpha
   edges. The user requested a classic profile and more consistent visual
   weight across tick positions. No new image model or external asset was used.
+
+
+## Golden River audio review - 2026-11-21
+
+- Assets: Assets/Game/Resources/GoldenRiverAudio/{river,jump,land,checkpoint,complete}.wav.
+- Source: original procedural PCM authored with tools/generate-golden-river-audio.py; deterministic Python standard-library synthesis, no recordings, external samples or third-party music. Generator: OpenAI Codex-authored script; no generative audio model.
+- License: project PolyForm Noncommercial 1.0.0 license; source script and generated waveforms may be publicly redistributed under its terms.
+- Human creative direction: issue #74 requests restrained river ambience and meaningful jump/landing/checkpoint/completion sounds. The initial candidate uses cyclic filtered noise, soft contacts and short ascending chimes; no background music. Final timbre, mix and in-game presentation remain pending player review.

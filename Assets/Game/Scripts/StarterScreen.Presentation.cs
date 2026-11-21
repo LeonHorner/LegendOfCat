@@ -152,6 +152,13 @@ public sealed partial class StarterScreen
         } else if (page == "settings") {
             Label("Settings", headingStyle);
             Label("A few comforts for the journey.");
+            Label("Sound volume: " + Mathf.RoundToInt(MasterVolume * 100) + "%", smallStyle);
+            GUILayout.BeginHorizontal();
+            GUI.enabled = !popup && MasterVolume > 0;
+            if (Button("Quieter")) SetMasterVolume(MasterVolume - .1f);
+            GUI.enabled = !popup && MasterVolume < 1;
+            if (Button("Louder")) SetMasterVolume(MasterVolume + .1f);
+            GUILayout.EndHorizontal();
             GUI.enabled = false;
             Button("Language - Coming later");
             GUI.enabled = !popup;
@@ -321,7 +328,8 @@ public sealed partial class StarterScreen
 
     void DrawGameplayMenu()
     {
-        bool finished = stompArena != null && stompArena.Combat.Finished;
+        bool levelFinished = course != null && course.LevelOne && course.HasReachedExit;
+        bool finished = levelFinished || stompArena != null && stompArena.Combat.Finished;
         bool paused = (course != null ? course.Run : stompArena.Run)?.Paused ?? false;
         if (!paused && !finished) {
             if (gameplayMenuVisible) {
@@ -356,7 +364,9 @@ public sealed partial class StarterScreen
         NavigateFocus();
         focusable.Clear();
         GUILayout.BeginArea(new Rect((width - panelWidth) / 2, (height - panelHeight) / 2, panelWidth, panelHeight), panelStyle);
-        Label(finished ? (stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
+        Label(levelFinished ? "Golden River complete" : finished ?
+            (stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
+        if (levelFinished) Label("You made it through the valley.", smallStyle);
         bool resume = !finished && Button("Resume", fixedNavigation: true);
         bool retry = Button("Retry", fixedNavigation: true);
         bool restart = Button("Restart", fixedNavigation: true);

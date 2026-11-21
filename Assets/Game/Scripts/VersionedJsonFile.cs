@@ -113,8 +113,14 @@ public static class MenuSettings
     public const int CurrentVersion = 0;
 
     public static VersionedJsonFile Open(string path) => new VersionedJsonFile(path, CurrentVersion,
-        () => new JObject { ["lastOfferedVersion"] = "", ["showLevelProgress"] = true },
+        () => new JObject { ["lastOfferedVersion"] = "", ["showLevelProgress"] = true, ["masterVolume"] = .7f },
         data => {
+            if (data["masterVolume"] == null) data["masterVolume"] = .7f;
+            var volume = data["masterVolume"];
+            if ((volume.Type != JTokenType.Float && volume.Type != JTokenType.Integer) ||
+                double.IsNaN((double)volume) || double.IsInfinity((double)volume) ||
+                (double)volume < 0 || (double)volume > 1)
+                throw new InvalidDataException("masterVolume must be a finite number between zero and one.");
             if (data["lastOfferedVersion"] == null) data["lastOfferedVersion"] = "";
             if (data["showLevelProgress"] == null) data["showLevelProgress"] = true;
             if (data["showLevelProgress"].Type != JTokenType.Boolean)

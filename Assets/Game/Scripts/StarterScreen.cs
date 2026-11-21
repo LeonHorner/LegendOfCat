@@ -85,6 +85,19 @@ public sealed partial class StarterScreen : MonoBehaviour
     }
 
     public bool ShowLevelProgress { get; private set; } = true;
+    public float MasterVolume { get; private set; } = .7f;
+
+    void SetMasterVolume(float value)
+    {
+        MasterVolume = Mathf.Round(Mathf.Clamp01(value) * 10) / 10;
+        AudioListener.volume = MasterVolume;
+        try {
+            settingsFile.Data["masterVolume"] = MasterVolume;
+            settingsFile.Save();
+        } catch (Exception) {
+            warning = "The sound preference could not be saved. Existing settings were preserved.";
+        }
+    }
 
     void OpenCourse() => OpenLevel("movement-lab");
     void OpenLevelOne() => OpenLevel("golden-river");
@@ -162,6 +175,8 @@ public sealed partial class StarterScreen : MonoBehaviour
         settingsFile = MenuSettings.Open(preferencesPath);
         preferences.lastOfferedVersion = (string)settingsFile.Data["lastOfferedVersion"];
         ShowLevelProgress = (bool)settingsFile.Data["showLevelProgress"];
+        MasterVolume = (float)settingsFile.Data["masterVolume"];
+        AudioListener.volume = MasterVolume;
         warning = settingsFile.Warning;
     }
     void Send(string command)
@@ -297,8 +312,13 @@ public sealed partial class StarterScreen : MonoBehaviour
                 course.TogglePause();
             }
         }
-        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale") {
+        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale" || view == "level-one-complete") {
             OpenLevelOne();
+            if (view == "level-one-complete") {
+                course.Cat.RespawnAt(MovementCourse.LevelOneExit - Vector2.right * 3);
+                course.Cat.Motion.SetMove(1);
+                while (!course.HasReachedExit) yield return null;
+            }
             if (view == "level-one-finale") course.StartFinalePreview();
             if (view == "level-one-ascent") course.StartAscentPreview();
             if (view == "level-one-lift") course.StartVerticalLiftPreview();
@@ -318,6 +338,10 @@ public sealed partial class StarterScreen : MonoBehaviour
         simulateCutout = args.Contains("--preview-cutout");
         string capture = Argument("--preview-capture");
         if (string.IsNullOrEmpty(capture)) yield break;
+        if (int.TryParse(Argument("--preview-width"), out int captureWidth) &&
+            int.TryParse(Argument("--preview-height"), out int captureHeight))
+            Screen.SetResolution(Mathf.Clamp(captureWidth, 640, 3840),
+                Mathf.Clamp(captureHeight, 360, 2160), FullScreenMode.Windowed);
         yield return new WaitForSecondsRealtime(12);
         yield return new WaitForEndOfFrame();
         ScreenCapture.CaptureScreenshot(capture);
