@@ -1,0 +1,20 @@
+[
+  {
+    "name": "entry-study-right-v2.png",
+    "prompt": "Edit the provided native game cliff cutout. Preserve canvas, scale, overall silhouette, upper walking surface, rock style and left overhang. Main correction: the cave-ceiling/end-wall junction at about x=1080 y=720 of this 1536x1024 picture must become a believable organically rounded rock recess. Replace its perfectly horizontal cut ceiling and exact right-angle inside corner with interlocking irregular shaded boulders, small roots, deep crevice shadows, a rounded concave corner of radius about100px. The horizontal ceiling can undulate by 15-25px; keep route free air below it. The descending right wall has individual natural bulges 10-30px, not a straight cut line. The same violet-grey stone masses remain connected to the enormous top bank. Remove all yellow glow/haze outside solid rock; truly transparent background. Keep the upper contact line exactly where it is and preserve other framing and painting registration. No extra objects, no detached leaves, no characters, no background. The image is a production game asset, not a scene. Do not shrink rock away from the cropped right or bottom canvas edges.",
+    "source": "Generated images are saved to C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d as C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-4cb75088-dff6-4df9-ba6e-bb18bfbd3f4e.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "model": "Not disclosed",
+    "generator": "Built-in image_gen",
+    "date": "2026-11-13",
+    "decision": "Round ceiling/end-wall junction and register collision to painted boulder contour. Replaces rejected right-v1."
+  },
+  {
+    "name": "entry-study-valley-v1.png",
+    "prompt": "Production painted 2D game distant background. Use attached project-owned reference for art style only, but EXCLUDE all foreground rocks, ledges, cat and vegetation close to viewer. Create ONLY the hazy green-grey wooded mountain valley seen in the distance between the reference cliffs. Soft layered forest slopes, distant evergreen silhouettes, small pale river winding far below, blue-grey hills and a calm pale blue sky. Wide landscape16:9 composition, all objects far away and low contrast, no strong foreground tree, no ruins or bridge, no horizon cutout. Rich hand-painted atmospheric depth and warm muted sunlight from upper right. Completely OPAQUE edge-to-edge image including sky across entire top, terrain fills bottom, no transparent regions. Do not recreate the foreground scene; this is the separate remote valley backdrop behind gameplay cliffs. No text or characters.",
+    "source": "Generated images are saved to C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d as C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-557443a7-cd6b-4ccf-ae97-5f045744e331.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "model": "Not disclosed",
+    "generator": "Built-in image_gen",
+    "date": "2026-11-13",
+    "decision": "Opaque separate distant valley to eliminate transparent sky gaps; not a gameplay scene composite."
+  }
+]

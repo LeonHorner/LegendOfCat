@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-12",
+  "generator": "Built-in OpenAI image generation",
+  "model": "Not exposed",
+  "license": "ASSET-LICENSE.md",
+  "assets": [
+    {
+      "name": "short",
+      "prompt": "Edit the supplied original game ledge artwork into a polished cave-wall edge trim. Retain the wide 3:1 transparent canvas, the same approximately centered horizontal standable contact line, violet-gray painted stone palette and warm light from upper right. This trim is placed ON TOP OF a massive solid cliff body: it must not look like a floating island. Replace the repeated scalloped row of round stones on the underside with one continuous fractured natural rock lip, with roughly 3 varied principal stone faces across its width. Crisp flat continuous walkable top, tiny irregular natural end bevels, a modest darker rock front that blends into the cliff below. Sparse muted ochre moss and a few attached short blades, substantially less bright and less garden-like than the source. NO flowers, ferns, large ivy curtains, loose gravel floating above the surface, yellow flecks, detached particles, haze, glow, background, floor shadow or tiny isolated alpha components. Every visible pixel belongs to the connected stone or attached moss. Preserve real transparent background. Production 2D side elevation, no perspective. Keep a common stone scale: this short trim covers 3 world units.",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-fd3c5529-ac70-49db-a65e-aca68b26ee0f.png",
+      "file": "Assets/Game/Resources/GoldenRiver/Descent/cave-edge-short-v2.png"
+    },
+    {
+      "name": "medium",
+      "prompt": "Edit the supplied original game ledge artwork into a polished cave-wall edge trim. Retain the wide 3:1 transparent canvas, the same approximately centered horizontal standable contact line, violet-gray painted stone palette and warm light from upper right. This trim is placed ON TOP OF a massive solid cliff body: it must not look like a floating island. Replace the repeated scalloped row of round stones on the underside with one continuous fractured natural rock lip, with roughly 5 varied principal stone faces across its width. Crisp flat continuous walkable top, tiny irregular natural end bevels, a modest darker rock front that blends into the cliff below. Sparse muted ochre moss and a few attached short blades, substantially less bright and less garden-like than the source. NO flowers, ferns, large ivy curtains, loose gravel floating above the surface, yellow flecks, detached particles, haze, glow, background, floor shadow or tiny isolated alpha components. Every visible pixel belongs to the connected stone or attached moss. Preserve real transparent background. Production 2D side elevation, no perspective. Keep a common stone scale: this medium trim covers 5 world units.",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-78642b0f-1241-43d3-8594-a9afb709a525.png",
+      "file": "Assets/Game/Resources/GoldenRiver/Descent/cave-edge-medium-v2.png"
+    },
+    {
+      "name": "wide",
+      "prompt": "Edit the supplied original game ledge artwork into a polished cave-wall edge trim. Retain the wide 3:1 transparent canvas, the same approximately centered horizontal standable contact line, violet-gray painted stone palette and warm light from upper right. This trim is placed ON TOP OF a massive solid cliff body: it must not look like a floating island. Replace the repeated scalloped row of round stones on the underside with one continuous fractured natural rock lip, with roughly 8 varied principal stone faces across its width. Crisp flat continuous walkable top, tiny irregular natural end bevels, a modest darker rock front that blends into the cliff below. Sparse muted ochre moss and a few attached short blades, substantially less bright and less garden-like than the source. NO flowers, ferns, large ivy curtains, loose gravel floating above the surface, yellow flecks, detached particles, haze, glow, background, floor shadow or tiny isolated alpha components. Every visible pixel belongs to the connected stone or attached moss. Preserve real transparent background. Production 2D side elevation, no perspective. Keep a common stone scale: this wide trim covers 8 world units.",
+      "source": "C:\\Users\\Leon\\.codex\\generated_images\\01a1c14f-56cc-7002-95a3-43bd77b1a62d\\exec-43d36a3b-2a2e-48f3-9827-f5bfcac2c0a6.png",
+      "file": "Assets/Game/Resources/GoldenRiver/Descent/cave-edge-wide-v2.png"
+    }
+  ]
+}

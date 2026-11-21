@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Painted parallax, terrain and water renderer for the playable course.
 [DefaultExecutionOrder(100)]
-public sealed class SceneryRenderer : MonoBehaviour
+public sealed partial class SceneryRenderer : MonoBehaviour
 {
     public const float SkyTravel = 0.05f, ValleyTravel = 0.14f, CanopyTravel = 0.08f;
     public const float FinaleRuinTravel = .22f;
@@ -165,7 +165,9 @@ public sealed class SceneryRenderer : MonoBehaviour
         var platforms = coursePlatforms;
         for (int index = 0; index < platforms.Length; index++) {
             var p = platforms[index];
-            Terrain(p, FloatingAt(index), index);
+            if(RouteLandmarks&&index>=MovementCourse.LevelOnePlatforms.Length&&CaveRoute.ReplacesAscent(index-MovementCourse.LevelOnePlatforms.Length)){
+                var registration=new GameObject("Native shore visual registration");registration.transform.SetParent(transform,false);TerrainVisuals.Add(registration.transform);
+            }else Terrain(p, FloatingAt(index), index);
         }
         if (RouteLandmarks) {
             CreateLandmarks();
@@ -459,6 +461,28 @@ public sealed class SceneryRenderer : MonoBehaviour
         return item.transform;
     }
 
+    Texture2D descentCoverage;
+    Rect? descentWorldBounds;
+    public void SetDescentCoverage(Texture2D coverage,Rect? worldBounds=null)
+    {
+        descentCoverage = coverage;
+        descentWorldBounds=worldBounds;
+        terrainMaterial.SetTexture("_DryMask", coverage);
+        riverFrontMaterial.SetTexture("_DryMask", coverage);
+        terrainMaterial.SetFloat("_UseDryMask", 1);
+        riverFrontMaterial.SetFloat("_UseDryMask", 1);
+    }
+    void UpdateDescentCoverage()
+    {
+        if (!descentCoverage) return;
+        var bounds = descentWorldBounds??new Rect(UpperRoute.Origin+UpperRoute.MaskBounds.x,UpperRoute.MaskBounds.y,UpperRoute.MaskBounds.width,UpperRoute.MaskBounds.height);
+        var minimum = transform.TransformPoint(new Vector3(bounds.xMin, bounds.yMin));
+        var maximum = transform.TransformPoint(new Vector3(bounds.xMax, bounds.yMax));
+        var rect = new Vector4(minimum.x, minimum.y, maximum.x - minimum.x, maximum.y - minimum.y);
+        terrainMaterial.SetVector("_DryRect", rect);
+        riverFrontMaterial.SetVector("_DryRect", rect);
+    }
+
     void UpdateFish(float seconds)
     {
         if (!easterEggs[1]) return;
@@ -546,11 +570,13 @@ public sealed class SceneryRenderer : MonoBehaviour
 
     public void ApplyView(float x, float y)
     {
+        UpdateDescentCoverage();
         // Keep the damp-foot tint registered with the placed shore/water grid too.
         terrainMaterial.SetFloat("_CourseOriginY", transform.position.y);
         terrainMaterial.SetFloat("_CourseScale", transform.lossyScale.y);
         View.transform.position = new Vector3(x, y, -10);
         var localView = transform.InverseTransformPoint(new Vector3(x, y, 0));
+        if (descentCoverage) cornerMaterial.SetFloat("_CornerDaylight", Mathf.SmoothStep(0, 1, Mathf.InverseLerp(-6, 0, localView.y)));
         // Distant scenery has no physical join to the world-space terrain or foreground water.
         for (int i = 0; i < 3; i++) {
             if (RouteLandmarks && i > 0) {
@@ -633,6 +659,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         foreach (var material in materials) Release(material);
         foreach (var mesh in terrainMeshes) Release(mesh);
         Release(quadMesh);
+        Release(caveDistances);
         Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial); Release(landmarkMaterial); Release(fortressMaterial); Release(finaleMaterial);
     }
 

@@ -1,0 +1,17 @@
+Name,Width,Height,RuntimeBytes,Format
+ceiling-v1,2048,512,2098048,BC7
+entry-left-v1,1024,1024,2098048,BC7
+entry-overhang-v1,2048,1024,4195200,BC7
+floor-v1,2048,512,2098048,BC7
+inner-corner-v1,1024,1024,2098048,BC7
+rear-rock-v1,1024,1024,2098048,BC7
+rock-face-v1,1024,1024,2098048,BC7
+rooted-face-v1,1024,1024,2098048,BC7
+ruin-v1,2048,1024,4195200,BC7
+shore-entry-v1,2048,1024,4195200,BC7
+shore-exit-v1,2048,1024,4195200,BC7
+tread-medium-v1,2048,512,2098048,BC7
+tread-short-v1,2048,512,2098048,BC7
+tread-wide-v1,2048,512,2098048,BC7
+vegetation-v1,2048,512,2098048,BC7
+Total,,,39859328

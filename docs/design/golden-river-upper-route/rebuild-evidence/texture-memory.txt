@@ -1,0 +1,3 @@
+Distinct cave renderer textures and coverage masks: 16
+Unity runtime memory estimate: 106608320 bytes
+This is not a hardware frame-rate benchmark.

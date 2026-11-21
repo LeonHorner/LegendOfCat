@@ -7,7 +7,10 @@ public sealed class MikaSpritePresentation : MonoBehaviour
     public CatController controller;
     public Sprite[] frames;
     public readonly MikaAnimation Animation = new MikaAnimation();
+    // The long cave ramps allow a full paw stance on one continuous rock plane.
+    public Collider2D RiverbankTerrain { private get; set; }
     SpriteRenderer target;
+    float gradeAngle, gradeOffset;
     Vector3 previousPosition;
     BoxCollider2D shape;
     readonly RaycastHit2D[] contacts = new RaycastHit2D[8];
@@ -30,6 +33,7 @@ public sealed class MikaSpritePresentation : MonoBehaviour
         Animation.Reset();
         previousPosition = controller.transform.position;
         groundCorrection = 0;
+        gradeAngle=gradeOffset=0;
         ApplyFrame();
         AlignPaws(0, true);
     }
@@ -39,6 +43,7 @@ public sealed class MikaSpritePresentation : MonoBehaviour
         if (!shape) return;
         float floor = shape.transform.TransformPoint(shape.offset - Vector2.up * shape.size.y * 0.5f).y;
         float correction = 0;
+        float angle=0, centerOffset=0;
         if (controller.Grounded) {
             int count = shape.Cast(Vector2.down, new ContactFilter2D { useTriggers = false }, contacts, MaximumCorrection);
             float nearest = float.PositiveInfinity;
@@ -50,15 +55,35 @@ public sealed class MikaSpritePresentation : MonoBehaviour
                     && contacts[i].distance < nearest) {
                     nearest = contacts[i].distance;
                     correction = offset;
+                    angle=centerOffset=0;
+                    var hit=contacts[i];
+                    if (hit.collider==RiverbankTerrain && hit.normal.y<.996f) {
+                        float grade=-hit.normal.x/hit.normal.y;
+                        float center=shape.bounds.center.x;
+                        float height=hit.point.y+(center-hit.point.x)*grade;
+                        float span=shape.bounds.extents.x*.8f;
+                        // Both sides must still be on this plane. Keep the neutral stance on a ledge lip.
+                        bool Supported(float side) {
+                            var sole=new Vector2(center+side,height+side*grade);
+                            return hit.collider.OverlapPoint(sole-Vector2.up*.045f) &&
+                                !hit.collider.OverlapPoint(sole+Vector2.up*.045f);
+                        }
+                        if(Supported(-span) && Supported(span)) {
+                            angle=Mathf.Atan(grade)*Mathf.Rad2Deg;
+                            centerOffset=height-floor-offset;
+                        }
+                    }
                 }
             }
         }
         groundCorrection = snap ? correction : Mathf.MoveTowards(groundCorrection, correction,
             0.4f * Mathf.Max(0, deltaTime));
         var position = transform.position;
-        // Airborne and unsupported frames return continuously to the collider anchor.
-        // Do not force a rigid drawing to conform to a slope by sinking the cat.
-        position.y = floor + groundCorrection;
+        bool immediate=snap || deltaTime<=0;
+        gradeAngle=immediate?angle:Mathf.MoveTowards(gradeAngle,angle,260f*deltaTime);
+        gradeOffset=immediate?centerOffset:Mathf.MoveTowards(gradeOffset,centerOffset,5f*deltaTime);
+        if (RiverbankTerrain) transform.localRotation=Quaternion.Euler(0,0,gradeAngle);
+        position.y = floor + groundCorrection + gradeOffset;
         transform.position = position;
     }
 

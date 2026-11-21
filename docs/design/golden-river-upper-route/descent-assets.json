@@ -1,0 +1,101 @@
+{
+  "generator": "Built-in OpenAI image generation",
+  "model": "Not exposed",
+  "date": "2026-11-10",
+  "referenceImages": [
+    "descent-entry-reference.png",
+    "descent-niche-reference.png"
+  ],
+  "assets": [
+    {
+      "name": "entry-left",
+      "file": "entry-left-v1.png",
+      "source": "exec-84dc29fb-1da8-43c0-8ca1-73155a803858.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. A substantial natural riverbank cliff face, tall roughly 3:4 aspect, irregular upper rim hidden behind an existing main-route grass cap in game. Massive violet stone bends inward on its RIGHT side to create a sheltered lower recess; golden moss and sparse ivy cling to outer edges. No separate floating shelves or extra painted steps. Complete silhouette, not clipped; lower stone continues to a narrow natural base. The right-side indentation invites an attached descending tread, no doorway or masonry wall."
+    },
+    {
+      "name": "entry-overhang",
+      "file": "entry-overhang-v1.png",
+      "source": "exec-efc7b87a-4c0b-4860-8244-034265453cd1.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. A broad roughly 3:2 natural rock overhang, a massive hooked cliff projecting LEFT over a dark recess. Complete irregular outer shape, dark violet undersides, warm moss only along upper exposed rim, sparse hanging ivy at the tip. No floor beneath it, no independent platforms, no water. Designed to frame and naturally conceal a descending passage beneath a continuing main-route bank."
+    },
+    {
+      "name": "inner-corner",
+      "file": "inner-corner-v1.png",
+      "source": "exec-4fcca15a-df74-429f-8420-6eb8146483e8.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. An L-shaped connected natural rock formation for the left inner corner of a dry cleft, violet stone with warm subtle edges, the massive rock fills LEFT side and bottom LEFT, an irregular concave hollow opens toward the RIGHT. Around square aspect. No walkable grass ledge painted inside; actual treads will be separate. No background in the hollow; fully transparent there."
+    },
+    {
+      "name": "ceiling",
+      "file": "ceiling-v1.png",
+      "source": "exec-4aaebebb-3556-4a92-ab08-2530bad1d302.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. One wide shallow natural cave ceiling/overhang module, about 3:1 aspect, massive opaque violet rock along the TOP, a naturally broken rounded underside descending unevenly with two short broad rock noses, not sharp stalactites. Sparse hanging teal ivy. The empty space below and around the complete irregular isolated rock is truly transparent. No painted extra shelves or roots suggesting bridges."
+    },
+    {
+      "name": "rock-face",
+      "file": "rock-face-v1.png",
+      "source": "exec-f78ca689-9c54-4c3f-ac1b-b0a51e510cfc.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. One tall roughly 3:4 aspect irregular natural violet rock face with a quiet solid center, a curved jagged outline, varied broad stone masses, golden moss on a few exposed upper edges. No square-cut perimeter, no repeated brickwork, no stairs, no arches. Usable as a supporting rock mass behind separate thin walkable stone outcrops."
+    },
+    {
+      "name": "rooted-face",
+      "file": "rooted-face-v1.png",
+      "source": "exec-b2162bae-057f-4833-82a3-a7d92ae56273.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. One tall roughly 3:4 aspect curving right-side natural rock formation embracing a dry recess open to LEFT, an old nonstandable root follows the face vertically with teal ivy and small golden leaves. Quiet violet stone center and natural uneven silhouette. No horizontal root bridge, no separate platforms or doorway."
+    },
+    {
+      "name": "tread-short",
+      "file": "tread-short-v1.png",
+      "source": "exec-61b0d155-102f-4e4e-b0e8-087cd4baf414.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. One SHORT very shallow natural rock outcrop, approximately 4:1 width to total height, crisp FLAT horizontal golden moss/stone contact line across the central 90 percent of width. Tiny moss tufts only just above that line. A thin dark violet load-bearing stone lip beneath it with slightly irregular corners, no long dangling boulders or ivy. Intended stone body depth in game 0.5 units at 3-unit landing width. Broad flat landing, no slopes, complete isolated shape."
+    },
+    {
+      "name": "tread-medium",
+      "file": "tread-medium-v1.png",
+      "source": "exec-dc9c531d-9f60-438b-bece-630a6e9bf527.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. One MEDIUM shallow natural rock outcrop, approximately 6:1 width to total height, crisp FLAT horizontal golden moss/stone contact line across central 90 percent of width. Thin dark violet rock lip with a few flat fractured layers and soft irregular underside, no deep pillar, no long hanging greenery. Intended body depth 0.5 units at 5-unit landing width. Distinct outline from a short rock, coherent palette, no slopes on landing."
+    },
+    {
+      "name": "tread-wide",
+      "file": "tread-wide-v1.png",
+      "source": "exec-805e4bde-f78d-44ff-9cae-b31c64015593.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. One WIDE shallow natural rock terrace lip, approximately 8:1 width to total height, crisp FLAT horizontal warm moss contact line across central 90 percent of width, minimal leaf tufts, a thin dark violet fractured stone front. No deep pillar, no floating smaller rocks, no hanging roots, no stairs. Intended body depth 0.5 units at 8-unit landing width. Distinct broad quiet rest landing."
+    },
+    {
+      "name": "rear-rock",
+      "file": "rear-rock-v1.png",
+      "source": "exec-9e9f945e-7c1a-4974-8796-c0665c84dbeb.png",
+      "prompt": "Original hand-painted SEAMLESS TILE of subdued cool violet-blue natural cave rock, square full opaque image with no alpha holes, no borders. Flat 2D quiet background surface for LegendOfCat's dry cleft, matching the low-contrast rear rock in reference 2. Soft broad rock masses and subtle crevices, very low contrast, no recognizable landmark, plants, shelves, bright spots, masonry, dramatic black holes, characters, sky, text or watermark. All four edges must tile naturally. Indirect cool ambient light, no directional bright sun patch."
+    },
+    {
+      "name": "ruin",
+      "file": "ruin-v1.png",
+      "source": "exec-7dde793a-c030-46d7-abbb-17208073137e.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. ONE unique forgotten dry stone fountain and broken partial carved arch, interwoven with ancient roots, small fern and a tiny living plant growing from the DRY basin. Faithfully follow the central ruin/fountain of reference 2. Warm angled daylight from upper right on the basin, muted violet stone in shade. Include low fallen carved fragments and a small EMPTY flat stone plinth to the RIGHT for a future collectible; no object or magical glow. Common flat baseline at bottom, no floor slab or background rock wall, no sky. Arch holes transparent. The fountain and arch are background decoration, not playable platforms. Full complete asset roughly 3:2."
+    },
+    {
+      "name": "floor",
+      "file": "floor-v1.png",
+      "source": "exec-08b1a747-f327-422d-91d3-e8e874690dd6.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. A single broad solid dry stone floor terrace with golden moss and a few tiny pale flowers at its FLAT continuous upper contact edge across central 94 percent of width. Thick supporting violet natural rock front below, broad flat masses without any lower horizontal walkable-looking ledge. Width about 4 times height, substantial foundation. Sparse teal ivy stays below the contact line along the sides; nothing hides feet. Fits the quiet safe floor beneath reference 2's dry fountain; no fountain included."
+    },
+    {
+      "name": "vegetation",
+      "file": "vegetation-v1.png",
+      "source": "exec-025eb4d6-067a-45a5-9372-6a5432bce3a8.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. One small low botanical cluster of ferns, a few pale tiny flowers, golden moss and a short ivy sprig on a common flat baseline. Four modest distinct plants in a compact group, natural side elevation, restrained height, no ground slab, no pot, no tree. Used along the edges of a dry ruin floor; transparent all around."
+    },
+    {
+      "name": "shore-entry",
+      "file": "shore-entry-v1.png",
+      "source": "exec-152f0afa-2d25-4d32-a51d-783262ca8b08.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. A compact irregular violet riverbank rock buttress, warm moss and a few ferns along its dry upper rim, a dark cool damp stain only on its LOWER LEFT outer foot. About 3:2 aspect. The RIGHT outline curls inward around a dry narrow crevice, no actual water painted. It will cover the permanent seam where foreground river ends beside a dry entrance. No straight rectangular bottom silhouette, no painted stairs."
+    },
+    {
+      "name": "shore-exit",
+      "file": "shore-exit-v1.png",
+      "source": "exec-a117c3e8-177c-4dc6-b42c-91dc242d3966.png",
+      "prompt": "Original production asset for LegendOfCat, hand-painted flat side-on 2D platformer. Match violet-blue natural rock, warm golden moss, teal ivy and warm sunlight from UPPER RIGHT in reference images. Reference 1 shows entrance style, reference 2 shows the dry niche mood; use as style reference only, do NOT copy either full scene. ONE isolated asset with genuine transparent alpha outside its natural silhouette. No cat, character, sky, river, ground plane outside asset, UI, text, watermark, rectangular backdrop, stray paint specks or shadow outside the asset. No 3D/isometric view. A compact irregular violet riverbank rock buttress for a dry return opening, about 3:2 aspect. A broader RIGHT shoulder with golden moss and sparse teal ivy, dark cool damp tone only on the LOWER RIGHT outer foot; LEFT side curves into a dry cleft. No actual water painted, no extra platforms, no masonry. Complete natural isolated silhouette to hide a permanent river/rock seam."
+    }
+  ]
+}

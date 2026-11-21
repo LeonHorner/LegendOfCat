@@ -1,0 +1,3 @@
+Unity 6000.3.27f2: 237/237 tests passed, zero failures.
+Windows preview build passed. Packed-art validation passed: 60 paintings, five shader-reference materials, seven prepared masks; archived paintings excluded.
+Actual-controller traversal passed for the connected approach in both directions, the complete cave route, recovery and lifecycle.

@@ -1,0 +1,1 @@
+Upper standing paw gap <= 0.03 world units; upper and lower painted exits release Mika within two physics ticks after the last visible idle paw passes the rock. Player collider and motor unchanged.

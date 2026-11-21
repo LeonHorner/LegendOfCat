@@ -1,0 +1,11 @@
+{
+  "asset": "terrain-stone-v1.png",
+  "source": "exec-f40beeed-eda5-4b46-93f1-b0fd521a8881.png",
+  "date": "2026-11-13",
+  "generator": "OpenAI image_gen, built-in tool",
+  "model": "Not disclosed",
+  "license": "Original generated artwork under the applicable generation service terms",
+  "prompt": "Use case: stylized-concept. Asset type: original production 2D platformer stone material, fully opaque seamless 3:2 landscape texture, about 1536x1024 or higher. Input image is STYLE AND PALETTE reference only; do not reproduce its grass, horizontal contact line, ivy, or big composition. Fill the entire canvas edge to edge with tightly interlocking natural irregular violet grey boulders in the same charming crisp hand-painted game style. Roughly 12-16 varied rocks across the width, smaller secondary rock gaps, tiny sharp brush grain, warm muted gold upper-right highlights and cooler blue-violet crevices. Moderate readable contrast, no painted deep cave holes or directional shafts. Avoid a dominant diagonal pattern: vary rock sizes, directions and shapes irregularly; no repeated rows, masonry grid, unique conspicuous hero rock or repeated foliage. Tile naturally on all four edges with uniform detail/lighting and no border or vignette. Flat orthographic side-view surface, NO perspective. No grass, moss blanket, ivy, roots, plants, platforms, ground edge, sky, water, background scene, architecture, objects, text, blur, haze, glow or transparency. This is the fine stone material INSIDE existing contour-shaped terrain, not a new complete scenery picture. Maintain crisp fine details for matching existing main-path assets at about 128 pixels per world unit.",
+  "style_reference": "Assets/Game/Resources/GoldenRiver/Descent/return-floor-a-v1.png",
+  "decisions": "Use a material-only opaque texture at fixed world density inside registered terrain silhouettes; do not stretch whole cliff paintings. Reuse the existing main-route grass texture. Reject the first trial that repeated a landmark cliff painting into an obvious stair-wall pattern. Share the continuous stone sample across adjacent banks, overhangs and grounded supports."
+}

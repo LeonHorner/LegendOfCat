@@ -1,0 +1,5 @@
+Unity 6000.3.27f2 EditMode suite on 2026-11-14
+Result: Passed
+Total: 237; passed: 237; failed: 0
+Includes every prepared mask pixel compared with current procedural generation, full main route with/without cave, catch recovery, reverse entrance, camera, water, pause, retry and restart.
+Human artwork acceptance, human timing and final release validation remain separate.
