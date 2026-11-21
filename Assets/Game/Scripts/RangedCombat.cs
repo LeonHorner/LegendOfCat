@@ -43,29 +43,34 @@ public sealed class RangedCombat
     public int Facing { get; private set; } = 1;
 
     public void SetFacing(float direction) { if (!Paused && direction != 0) Facing = direction < 0 ? -1 : 1; }
-    public void PressAttack(Vector2 origin)
+    bool PrepareAttack(Weapon weapon)
     {
-        if (Paused || Finished || Reloading || Cooldown > 0 || Charging) return;
-        if (Ammo == 0) { Reload(); return; }
-        if (ActiveWeapon == Weapon.Pulse) Fire(origin, false, 0);
-        else { Charging = true; Charge = 0; }
+        if (Paused || Finished) return false;
+        if (ActiveWeapon != weapon) {
+            CancelCharge();
+            ReloadRemaining = 0;
+            ActiveWeapon = weapon;
+        }
+        if (Reloading || Cooldown > 0) return false;
+        if (Ammo == 0) { Reload(); return false; }
+        return true;
     }
-    public bool ReleaseAttack(Vector2 origin)
+    public bool PressPulse(Vector2 origin) => PrepareAttack(Weapon.Pulse) && Fire(origin, false, 0);
+    public bool PressLob()
+    {
+        if (!PrepareAttack(Weapon.Orb) || Charging) return false;
+        Charging = true; Charge = 0;
+        return true;
+    }
+    public bool ReleaseLob(Vector2 origin)
     {
         if (Paused) { CancelCharge(); return false; }
-        if (!Charging) return false;
+        if (!Charging || ActiveWeapon != Weapon.Orb) return false;
         float charge = Charge;
         CancelCharge();
         return Fire(origin, true, charge);
     }
-    public void SwitchWeapon()
-    {
-        if (Paused || Finished) return;
-        CancelCharge();
-        ReloadRemaining = 0;
-        ActiveWeapon = ActiveWeapon == Weapon.Pulse ? Weapon.Orb : Weapon.Pulse;
-        if (Ammo == 0) Reload();
-    }
+    public int AmmoFor(Weapon weapon) => ammo[(int)weapon];
     public void Reload()
     {
         if (Paused || Finished || Reloading || Ammo == Capacity) return;

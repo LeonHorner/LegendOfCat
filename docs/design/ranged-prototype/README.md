@@ -1,57 +1,56 @@
-# Ranged lab player review - 2026-11-15
+# Ranged lab player review
 
-Actual Windows development-player captures from Unity 6000.3.27f2, Direct3D 11.
-Both 960x540 and 640x360 are actual player window sizes, not resized screenshots.
-The compact clips contain 100 frames sampled at approximately 0.1-second intervals.
-The grayscale version converts the same rendered frames without changing contrast.
+The owner accepted this initial prototype on 2026-11-15. Finalization resumed on
+2026-11-21. Controls are J/left click for the paw pulse and K/right click
+hold/release for the orb, with no explicit weapon switching or F/Q attacks.
+R reloads the most recently used attack; using the other interrupts charge/reload.
 
-- [Color motion](combat-640.gif)
-- [Grayscale motion](combat-640-grayscale.gif)
+Actual Windows development-player captures use Unity 6000.3.27f2 and Direct3D 11.
+The accepted runtime's 960x540 captures and enlarged pause-menu captures were made
+on 2026-11-15; current 640x360 motion was captured on 2026-11-21. Both sizes are
+actual player windows, not resized screenshots. The compact clips contain 100
+frames sampled at approximately 0.1-second intervals. Grayscale converts the same
+frames without changing contrast.
+
+- [Color motion](combat-640.gif), [grayscale motion](combat-640-grayscale.gif)
 - [Shielded target](shielded-640.png)
 - [Partial charge](charge-640.png), [grayscale](charge-640-grayscale.png)
-- [Reload progress](reload-640.png)
-- [High grounded hit at 640x360](hit-640.png), [960x540](hit-960.png)
+- [Reload bar and empty magazine](reload-640.png)
+- [Elevated grounded throw at 640x360](hit-640.png), [960x540](hit-960.png)
+- [Enlarged pause menu and input descriptions](pause-controls-640.png)
 
-Updated after the approved weapon-switch/reload decision. F/J uses the active
-weapon, Q/K switches and R reloads early. Pulse: 8 rounds, 0.2-second recovery,
-1-second reload. Orb: 3 rounds, 0.4-second recovery, 1.5-second reload.
+The preview-only recorder forwards the shared attack and movement/jump actions
+to runtime components. It demonstrates an elevated grounded orb, movement, jumps,
+facing, direct pulse shots, charge/release and automatic/early reload. No damage
+is injected. Scripted clips are evidence of rendering and reachability, not a
+human usability test.
 
-The scripted demonstration forwards the shared attack actions and movement/jump
-signals to the actual runtime components. It shows a grounded charged orb hitting
-an elevated target, a visible hit flash, movement, jumps, facing
-changes, direct shots, early reload, switching during reload and automatic
-reload after the pulse magazine is emptied. It is not a human usability test.
-The recorder is compiled only into preview builds. No target damage is injected.
+The bottom-center HUD shows both magazines using paw/orb symbols, filled/hollow
+dots, charge/reload percentages and a reload progress bar. There is no permanent
+blue bar in front of Mika. The enlarged pause menu puts actions beside keyboard,
+mouse and controller guidance at wide sizes, with scrolling on smaller surfaces.
+Round orbs and narrow pulses stay distinct in grayscale; protection uses a square
+silhouette and SHIELDED label. Landing edges and Mika remain unobscured in play.
 
-The bottom-center HUD uses filled/hollow round ammunition markers, a reload bar,
-charge/reload percentage and a distinct pulse/orb icon with the selected weapon
-name. The upper debug/control panel is removed. The indicator remains readable
-at the compact size. Round
-orbs and narrow pulses remain distinct in grayscale; closed protection also has
-a square silhouette and SHIELDED label. Landing edges and Mika remain unobscured.
-Both actual-player logs contain no exceptions or error entries. The preview's
-packed-art audit passed. No Linux graphical playtest or install/update smoke test
-is claimed by these captures.
+The accepted preview build and packed-art audit passed. The final compact player
+log has no runtime exceptions/error entries. Focused direct-attack regression
+tests passed 12/12 on 2026-11-21, including real mouse/keyboard/controller actions,
+move/jump/charge, safe paused clicks, independent recovery, interrupted reload and
+menu lifecycle. Earlier passing CI for weapon-switch controls is superseded.
+The final exact-head full-suite and Windows/Linux player/launcher/package/Delta
+results belong to PR #88's Prepare merge run.
 
-Local focused tests passed 12/12, including per-weapon magazines/recovery,
-automatic/early reload, abandoned reload progress, switching while charging,
-real F/Q/R and controller callbacks, and menu lifecycle. Other modes keep R retry.
-The exact-head full-suite and both platform player/launcher/package results
-belong to PR #88's updated Prepare merge run; the earlier green head is superseded.
+No Linux graphical playtest or install/update smoke result is claimed here.
+This prototype does not select mobile touch controls or approve production bosses.
 
 Reproduce after BuildGame.BuildPreview:
 
 ```text
 LegendOfCatPreview.exe -force-d3d11 --preview-view ranged --ranged-record <absolute-frame-directory>
 LegendOfCatPreview.exe -force-d3d11 --preview-view ranged --ranged-compact --ranged-record <absolute-frame-directory>
+LegendOfCatPreview.exe -force-d3d11 --preview-view ranged-paused --ranged-compact --preview-capture <absolute-path>.png
 ```
 
-These commands run the scripted demonstration and exit. To play manually, launch
-the preview normally and choose Ranged combat lab, or use --preview-view ranged
-without recording arguments. Player feel and human simultaneous movement, jump
-and attack usability still need owner playtesting; this prototype does not select
-mobile touch controls or approve production bosses.
-
-The later F/Q keyboard alternatives leave the captured HUD and trajectories
-unchanged. Real Input System regression tests exercise those alternatives;
-the updated Windows preview build and packed-art audit also passed.
+Recording arguments run the scripted demonstration and exit. For manual play,
+choose Ranged combat lab in the main menu, or use --preview-view ranged without
+recording arguments. Press P to see the enlarged pause menu.

@@ -10,7 +10,7 @@ public sealed class RangedArena : MonoBehaviour
     public System.Action BackToMenu;
     Texture2D texture;
     Sprite square, disc;
-    SpriteRenderer target, shield, charge, facing, feedback, playerSprite;
+    SpriteRenderer target, shield, charge, feedback, playerSprite;
     readonly SpriteRenderer[] projectiles = new SpriteRenderer[RangedCombat.MaximumProjectiles];
     TextMesh targetLabel;
     Rigidbody2D body;
@@ -47,7 +47,6 @@ public sealed class RangedArena : MonoBehaviour
         visual.GetComponent<MikaSpritePresentation>().controller = Cat;
         playerSprite = visual.GetComponent<SpriteRenderer>();
         charge = Part("Charged light orb", Vector2.zero, Vector2.one * .2f, new Color(1, .79f, .35f), true);
-        facing = Part("Facing indicator", Vector2.zero, new Vector2(.3f, .07f), new Color(.7f, .9f, 1), false);
         for (int i = 0; i < projectiles.Length; i++) {
             projectiles[i] = Part("Player projectile", Vector2.zero, Vector2.one, Color.white, true);
             projectiles[i].sortingOrder = 4;
@@ -57,9 +56,9 @@ public sealed class RangedArena : MonoBehaviour
         Cat.FellOutOfBounds += Retry;
         var input = player.AddComponent<CatInput>(); input.controller = Cat;
         input.UseCombatReload = true;
-        input.AttackPressed = () => Combat.PressAttack(Muzzle);
-        input.AttackReleased = () => Combat.ReleaseAttack(Muzzle);
-        input.WeaponSwitched = Combat.SwitchWeapon;
+        input.PulsePressed = () => Combat.PressPulse(Muzzle);
+        input.LobPressed = () => Combat.PressLob();
+        input.LobReleased = () => Combat.ReleaseLob(Muzzle);
         input.ReloadPressed = Combat.Reload;
         input.FacingChanged = Combat.SetFacing;
         input.CombatCanceled = Combat.CancelTransient;
@@ -107,7 +106,6 @@ public sealed class RangedArena : MonoBehaviour
         charge.enabled = Combat.Charging;
         charge.transform.localPosition = Muzzle;
         charge.transform.localScale = Vector3.one * Mathf.Lerp(.15f, .48f, Combat.Charge);
-        facing.transform.localPosition = Muzzle;
         feedback.enabled = Combat.HitFlash > 0 || Combat.BlockFlash > 0;
         feedback.transform.localPosition = Combat.LastContact;
         feedback.transform.localRotation = Quaternion.Euler(0, 0, Combat.BlockFlash > 0 ? 45 : 0);
@@ -130,43 +128,56 @@ public sealed class RangedArena : MonoBehaviour
     {
         if (!ArenaCamera) return;
         if (labelStyle == null) labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true, margin = new RectOffset(2, 2, 0, 0) };
-        float width = Mathf.Max(1, Mathf.Min(360, Screen.width - 16));
-        GUILayout.BeginArea(new Rect((Screen.width - width) * .5f, Screen.height - 38, width, 34), GUI.skin.box);
-        string weapon = Combat.ActiveWeapon == RangedCombat.Weapon.Pulse ? "PULSE" : "LIGHT ORB";
-        string status = Combat.Reloading ? " | Reload: " + Mathf.CeilToInt(100 * (1 - Combat.ReloadRemaining / Combat.ReloadDuration)) + "%"
-            : Combat.Charging ? " | Charge: " + Mathf.RoundToInt(Combat.Charge * 100) + "%" : "";
-        GUILayout.BeginHorizontal();
-        Color hudColor = GUI.color;
-        bool orbSelected = Combat.ActiveWeapon == RangedCombat.Weapon.Orb;
-        var icon = GUILayoutUtility.GetRect(18, 20, GUILayout.Width(18), GUILayout.Height(20));
-        GUI.color = orbSelected ? new Color(1, .8f, .35f) : new Color(.7f, .93f, 1);
-        GUI.DrawTexture(orbSelected ? new Rect(icon.x + 3, icon.y + 2, 12, 12)
-            : new Rect(icon.x, icon.y + 6, 18, 5), texture);
-        GUILayout.Label(weapon, labelStyle, GUILayout.Width(70));
-        GUI.color = hudColor;
-        var rounds = GUILayoutUtility.GetRect(Combat.Capacity * 16, 20, GUILayout.Width(Combat.Capacity * 16), GUILayout.Height(20));
-        Color previousColor = GUI.color;
-        for (int i = 0; i < Combat.Capacity; i++) {
-            var dot = new Rect(rounds.x + i * 16, rounds.y + 2, 12, 12);
+        float width = Mathf.Max(1, Mathf.Min(440, Screen.width - 16));
+        var area = new Rect((Screen.width - width) * .5f, Screen.height - 40, width, 40);
+        GUI.Box(area, GUIContent.none);
+        GUI.BeginGroup(area);
+        float slotWidth = (width - 20) * .5f;
+        DrawWeaponHud(RangedCombat.Weapon.Pulse, new Rect(8, 2, slotWidth, 36));
+        DrawWeaponHud(RangedCombat.Weapon.Orb, new Rect(12 + slotWidth, 2, slotWidth, 36));
+        GUI.EndGroup();
+    }
+    void DrawWeaponHud(RangedCombat.Weapon weapon, Rect slot)
+    {
+        bool orb = weapon == RangedCombat.Weapon.Orb;
+        bool recent = Combat.ActiveWeapon == weapon;
+        bool reloading = recent && Combat.Reloading;
+        Color previous = GUI.color;
+        GUI.color = orb ? new Color(1, .8f, .35f) : new Color(.7f, .93f, 1);
+        if (orb) GUI.DrawTexture(new Rect(slot.x + 4, slot.y, 12, 12), texture);
+        else {
+            GUI.DrawTexture(new Rect(slot.x + 5, slot.y + 7, 10, 8), texture);
+            GUI.DrawTexture(new Rect(slot.x + 1, slot.y + 3, 5, 6), texture);
+            GUI.DrawTexture(new Rect(slot.x + 5, slot.y - 1, 5, 6), texture);
+            GUI.DrawTexture(new Rect(slot.x + 11, slot.y, 5, 6), texture);
+            GUI.DrawTexture(new Rect(slot.x + 15, slot.y + 4, 5, 6), texture);
+            GUI.color = new Color(1, .89f, .65f);
+            GUI.DrawTexture(new Rect(slot.x + 19, slot.y - 1, 1, 5), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(slot.x + 17, slot.y + 1, 5, 1), Texture2D.whiteTexture);
+        }
+        GUI.color = previous;
+        string name = orb ? "ORB  K / RMB" : "PAW  J / LMB";
+        string status = reloading ? "  Reload " + Mathf.RoundToInt(100 * (1 - Combat.ReloadRemaining / Combat.ReloadDuration)) + "%"
+            : orb && Combat.Charging ? "  Charge " + Mathf.RoundToInt(100 * Combat.Charge) + "%" : "";
+        GUI.Label(new Rect(slot.x + 26, slot.y - 1, slot.width - 26, 18), name + status, labelStyle);
+        int capacity = orb ? RangedCombat.OrbCapacity : RangedCombat.PulseCapacity;
+        for (int i = 0; i < capacity; i++) {
+            var dot = new Rect(slot.x + i * 14, slot.y + 20, 10, 10);
             GUI.color = new Color(1, .89f, .65f);
             GUI.DrawTexture(dot, texture);
-            if (i >= Combat.Ammo) {
+            if (i >= Combat.AmmoFor(weapon)) {
                 GUI.color = new Color(.07f, .12f, .16f);
-                GUI.DrawTexture(new Rect(dot.x + 1.5f, dot.y + 1.5f, 9, 9), texture);
+                GUI.DrawTexture(new Rect(dot.x + 1.5f, dot.y + 1.5f, 7, 7), texture);
             }
         }
-        if (Combat.Reloading) {
-            var track = new Rect(rounds.x, rounds.y + 17, Combat.Capacity * 16 - 4, 2);
-            GUI.color = new Color(.35f, .43f, .49f);
-            GUI.DrawTexture(track, Texture2D.whiteTexture);
+        if (reloading) {
+            var track = new Rect(slot.x, slot.y + 33, slot.width - 4, 2);
+            GUI.color = new Color(.35f, .43f, .49f); GUI.DrawTexture(track, Texture2D.whiteTexture);
             GUI.color = new Color(1, .89f, .65f);
             track.width *= Mathf.Clamp01(1 - Combat.ReloadRemaining / Combat.ReloadDuration);
             GUI.DrawTexture(track, Texture2D.whiteTexture);
         }
-        GUI.color = previousColor;
-        GUILayout.Label(status, labelStyle);
-        GUILayout.EndHorizontal();
-        GUILayout.EndArea();
+        GUI.color = previous;
     }
     void OnDisable() => Combat.CancelTransient();
     void OnDestroy()

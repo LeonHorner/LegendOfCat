@@ -1,32 +1,32 @@
 # Ranged combat prototype (#13)
 
-## Approved control concept - 2026-11-15
+## Accepted initial prototype controls - 2026-11-15
 
-The user first tested separate direct-attack buttons, then approved switching
-between two magazines with one shared attack button. Movement-facing aim remains;
-there is no automatic aim or aim stick.
+The user rejected explicit weapon switching and F/Q near the movement keys.
+The owner accepted the initial prototype with two direct attacks and mouse
+alternatives on 2026-11-15, authorizing regression checks and PR readiness.
+Movement-facing aim remains; the mouse position does not aim shots.
 
-| Weapon | Magazine | Shot recovery | Reload |
+| Attack | Magazine | Shot recovery | Reload |
 | --- | --- | --- | --- |
 | Paw pulse | 8 | 0.2 seconds | 1 second |
 | Light orb | 3 | 0.4 seconds after release | 1.5 seconds |
 
-- F or J / gamepad West: use the selected weapon. Pulse fires on press; orb charges
-  while held and fires on release. One shot per press/release, no auto-repeat.
-- Q or K / gamepad right trigger: switch weapon. R / gamepad North: early reload.
-- An empty magazine starts reloading immediately after the last shot. Reload
-  and shot recovery overlap; each weapon's recovery keeps ticking while inactive.
-- Only the active weapon reloads. Switching discards all reload progress. On
-  returning to an empty weapon a fresh full reload starts; a partly full weapon
-  waits for R or emptying. Reserve ammo is unlimited; there are no ammo pickups.
-- Switching or early reload cancels an orb charge without spending ammo. Ammo is
-  consumed only when a projectile is emitted. Rejected presses are not buffered.
-- Charging increases upward speed from 5 to 15 units/s over 0.8 seconds;
-  forward speed stays 7 units/s. Orb gravity is 18 units/s^2. Pulse speed is 15.
-- Movement and jumping remain free during charge, recovery and reload.
-- A/D/arrows, Space, P/RB pause, Esc/Start menu and Backspace/LB restart remain.
-  Retry is in the pause menu for this arena. Other game modes keep R/Select retry.
-  No mouse attacks, touch UI or mobile build are included.
+- J / left mouse / gamepad West: immediate paw pulse, one shot per press.
+- K / right mouse / gamepad RT: hold to charge the orb, release to throw.
+- No weapon-switch action and no F/Q combat bindings. Both magazines are shown
+  together at bottom center, with paw/orb icons, filled/hollow dots and progress.
+- For this trial, only the most recently used attack reloads. Using the other
+  attack cancels charge/reload and discards reload progress, without charging
+  ammo for a canceled throw. R / gamepad North reloads the last-used attack early.
+- Empty magazines automatically start a full reload when used or emptied.
+  Recovery runs independently for each attack, including while the other is used.
+  Ammo is consumed only when a projectile is emitted. Reserve ammo is unlimited.
+- Orb upward speed increases from 5 to 15 units/s over 0.8 seconds; forward speed
+  stays 7 units/s. Orb gravity is 18 units/s^2. Pulse speed is 15 units/s.
+- Movement and jump remain free during charge, recovery and reload. A/D/arrows,
+  Space/W/Up, P/RB pause, Esc/Start menu and Backspace/LB restart remain.
+  Retry is in the pause menu here; other game modes retain R/Select retry.
 
 The maximum ground-level orb apex is about 6.9 units; the flying target ranges
 from 1.2 to 5.4 units. High targets are reachable without waiting for a descent.
@@ -45,25 +45,26 @@ There are no enemy attacks, contact damage, campaign changes or boss artwork.
 
 Shots use relative swept collision against the moving target and disappear on
 hit, floor/wall/ceiling contact, or after 3 seconds. At most eight are active.
-Pulse and orb differ by silhouette as well as color. The muzzle indicator and
-visible growing orb show facing and charge. The compact HUD sits at the bottom
+Pulse and orb differ by silhouette as well as color. Mika's facing and the visible growing orb show direction and charge. The compact HUD sits at the bottom
 center, without the former upper controls/debug panel.
 Magazine ammunition uses one filled or hollow circle per round (eight for pulse,
-three for orb). Empty circles fill only when reload completes; the active weapon
+three for orb). Empty circles fill only when reload completes; each attack's binding
 and charge/reload percentage remain beside them. A narrow progress bar fills
-beneath the dots during reload. A cool narrow pulse icon and warm round orb icon
-identify the selected weapon by shape and color alongside its name.
+beneath the dots during reload. A cool paw icon with a small light spark and a warm round orb icon
+identify the two direct attacks by shape and color alongside their bindings.
+The permanent blue muzzle bar is removed. The enlarged pause menu shows actions beside the current keyboard/mouse/controller
+bindings at wide sizes, stacking them with scrolling in narrow windows.
 
 Pause freezes charge, flight, target, recovery and reload. Releasing the charge while
 paused cancels it without firing. Retry/restart restore the encounter, charge,
-projectiles, magazines, reload, active weapon and facing. Focus loss and disabling clear charge/projectiles without
+projectiles, magazines, reload, last-used attack and facing. Focus loss and disabling clear charge/projectiles without
 treating Input Action cancellation as a throw. Return disables the arena before
 deferred destruction; re-entry creates a fresh test. Defeat stops combat and
 uses the existing gameplay result menu. No persistent data format changes.
 
 ## Input and integration boundaries
 
-CatInput owns Attack, SwitchWeapon and Reload bindings and forwards press/release, facing and
+CatInput owns Pulse, Lob and Reload bindings and forwards press/release, facing and
 cancellation actions. RangedCombat owns charge, recovery, trajectory, collision
 and target rules without reading devices. RangedArena connects these rules to
 CatController, RunLifecycle and presentation. Future touch adapters can provide
@@ -71,14 +72,16 @@ the same actions; no touch aiming or automatic assistance has been selected.
 
 This branch owns the new combat rules/arena/tests and the small CatInput/menu
 integration. PR #79 overlaps StarterScreen and ASSETS.md; preserve its startup
-measurement and append-only provenance during integration. No shared terrain,
+measurement and append-only provenance during integration. PR #89 overlaps the
+shared pause/menu code; its recorded integration owner must reconcile its level
+completion and audio/settings hooks with this menu before that feature is ready. No shared terrain,
 scene, prefab, package or project-setting edits are required.
 
 ## Review and validation
 
 Behavioral checks cover immediate single shots, variable charge and release
-facing, independent recovery, magazines, automatic/manual reload, switching, pause, lifecycle cancellation, shield/open hits, defeat,
-projectile cleanup, moving-target sweeps and real keyboard/gamepad actions.
+facing, independent recovery, magazines, automatic/manual reload, alternating attacks, pause, lifecycle cancellation, shield/open hits, defeat,
+projectile cleanup, moving-target sweeps and real keyboard/mouse/gamepad actions.
 Visual review must inspect the actual player in motion, also at 640x360 and in
 grayscale. Player feel and human simultaneous move/jump/attack usability remain
 playtest judgments; automated checks do not establish owner acceptance.
@@ -90,3 +93,7 @@ actual-player screenshot path. No release or merge is authorized.
 
 
 Actual-player clips and compact/grayscale inspection are in the [review evidence](ranged-prototype/README.md).
+
+The owner accepted this initial version on 2026-11-15. Regression tests now cover
+the direct attacks and mouse buttons. Final exact-head validation is required;
+historical checks for the superseded switching controls do not validate this head.

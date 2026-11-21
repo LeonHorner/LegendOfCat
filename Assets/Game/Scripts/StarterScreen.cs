@@ -303,8 +303,14 @@ public sealed partial class StarterScreen : MonoBehaviour
         }
         string view = Argument("--preview-view");
         yield return null;
-        if (view == "ranged") {
+        if (view == "ranged" || view == "ranged-paused" || view == "ranged-controls") {
             OpenRangedArena();
+            if (view != "ranged") {
+                yield return new WaitForSecondsRealtime(2);
+                bool compact = args.Contains("--ranged-compact");
+                Screen.SetResolution(compact ? 640 : 960, compact ? 360 : 540, FullScreenMode.Windowed);
+                rangedArena.TogglePause();
+            }
             string recording = Argument("--ranged-record");
             if (!string.IsNullOrEmpty(recording)) {
                 yield return RecordRangedPreview(recording);
@@ -368,16 +374,16 @@ public sealed partial class StarterScreen : MonoBehaviour
         System.Collections.IEnumerator HighThrow()
         {
             yield return new WaitForSeconds(1.6f);
-            input.WeaponSwitched(); input.AttackPressed();
+            input.LobPressed();
             yield return new WaitForSeconds(.56f);
-            input.AttackReleased();
+            input.LobReleased();
         }
         for (int frame = 0; frame < 100; frame++) {
-            if (frame == 0) { input.AttackPressed(); input.AttackReleased(); }
+            if (frame == 0) input.PulsePressed();
             if (frame == 36) { input.ReloadPressed(); }
-            if (frame == 42) { input.WeaponSwitched(); }
-            if (frame >= 44 && frame <= 72 && frame % 2 == 0) { input.AttackPressed(); input.AttackReleased(); }
-            if (frame == 76) input.WeaponSwitched();
+            if (frame == 42) { input.LobPressed(); }
+            if (frame >= 44 && frame <= 72 && frame % 2 == 0) input.PulsePressed();
+            if (frame == 76) input.LobPressed();
             if (frame == 78) input.ReloadPressed();
             if (frame == 30 || frame == 60) rangedArena.Cat.PressJump();
             if (frame == 33 || frame == 63) rangedArena.Cat.Motion.ReleaseJump();

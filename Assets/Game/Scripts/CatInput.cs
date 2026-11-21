@@ -6,8 +6,8 @@ public sealed class CatInput : MonoBehaviour
 {
     public CatController controller;
     InputActionMap actions;
-    InputAction move, jump, restart, fullRestart, pause, menu, attack, switchWeapon, reload;
-    public System.Action AttackPressed, AttackReleased, WeaponSwitched, ReloadPressed, CombatCanceled;
+    InputAction move, jump, restart, fullRestart, pause, menu, pulse, lob, reload;
+    public System.Action PulsePressed, LobPressed, LobReleased, ReloadPressed, CombatCanceled;
     public System.Action<float> FacingChanged;
     public bool UseCombatReload;
     bool canceling;
@@ -36,17 +36,17 @@ public sealed class CatInput : MonoBehaviour
         pause.AddBinding("<Gamepad>/rightShoulder");
         menu = actions.AddAction("Menu", InputActionType.Button, "<Keyboard>/escape");
         menu.AddBinding("<Gamepad>/start");
-        attack = actions.AddAction("Attack", InputActionType.Button, "<Keyboard>/j");
-        attack.AddBinding("<Keyboard>/f");
-        attack.AddBinding("<Gamepad>/buttonWest");
-        switchWeapon = actions.AddAction("SwitchWeapon", InputActionType.Button, "<Keyboard>/k");
-        switchWeapon.AddBinding("<Keyboard>/q");
-        switchWeapon.AddBinding("<Gamepad>/rightTrigger");
+        pulse = actions.AddAction("Pulse", InputActionType.Button, "<Keyboard>/j");
+        pulse.AddBinding("<Mouse>/leftButton");
+        pulse.AddBinding("<Gamepad>/buttonWest");
+        lob = actions.AddAction("Lob", InputActionType.Button, "<Keyboard>/k");
+        lob.AddBinding("<Mouse>/rightButton");
+        lob.AddBinding("<Gamepad>/rightTrigger");
         reload = actions.AddAction("Reload", InputActionType.Button, "<Keyboard>/r");
         reload.AddBinding("<Gamepad>/buttonNorth");
-        attack.performed += c => AttackPressed?.Invoke();
-        attack.canceled += c => { if (!canceling) AttackReleased?.Invoke(); };
-        switchWeapon.performed += c => WeaponSwitched?.Invoke();
+        pulse.performed += c => PulsePressed?.Invoke();
+        lob.performed += c => LobPressed?.Invoke();
+        lob.canceled += c => { if (!canceling) LobReleased?.Invoke(); };
         reload.performed += c => { if (UseCombatReload) ReloadPressed?.Invoke(); };
         move.performed += c => {
             float value = c.ReadValue<float>();

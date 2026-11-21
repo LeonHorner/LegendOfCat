@@ -17,6 +17,7 @@ public sealed partial class StarterScreen
     float guiScale = 1;
     bool revealFocus;
     bool gameplayMenuVisible;
+    Vector2 gameplayControlsScroll, gameplayMenuScroll;
     bool UpdatesSupported {
         get {
 #if LEGEND_OF_CAT_PREVIEW
@@ -340,28 +341,35 @@ public sealed partial class StarterScreen
         var oldColor = GUI.color;
         int oldDepth = GUI.depth;
         GUI.depth = -10;
-        guiScale = Mathf.Min(MenuLayout.Scale(region), Mathf.Max(1, region.height - 16) / 320);
-        GUI.matrix = Matrix4x4.TRS(new Vector3(region.x, region.y), Quaternion.identity, Vector3.one * guiScale);
+        guiScale = 1;
+        GUI.matrix = Matrix4x4.TRS(new Vector3(region.x, region.y), Quaternion.identity, Vector3.one);
         GUI.color = Color.white;
-        float width = region.width / guiScale;
-        float height = region.height / guiScale;
-        float panelWidth = Mathf.Max(1, Mathf.Min(320, width - 16));
-        float panelHeight = Mathf.Max(1, Mathf.Min(320, height - 16));
-
+        float panelWidth = Mathf.Max(1, Mathf.Min(900, region.width - 24));
+        float panelHeight = Mathf.Max(1, Mathf.Min(620, region.height - 24));
+        bool wide = panelWidth >= 600;
         if (!gameplayMenuVisible) {
-            previousFocus.Clear();
-            GUI.FocusControl(null);
-            revealFocus = false;
+            previousFocus.Clear(); GUI.FocusControl(null); revealFocus = false;
             gameplayMenuVisible = true;
+            gameplayMenuScroll = gameplayControlsScroll = Vector2.zero;
         }
-        NavigateFocus();
-        focusable.Clear();
-        GUILayout.BeginArea(new Rect((width - panelWidth) / 2, (height - panelHeight) / 2, panelWidth, panelHeight), panelStyle);
+        NavigateFocus(); focusable.Clear();
+        GUILayout.BeginArea(new Rect((region.width - panelWidth) / 2, (region.height - panelHeight) / 2, panelWidth, panelHeight), panelStyle);
         Label(finished ? (rangedArena != null || stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
+        GUILayout.Space(8);
+        if (wide) { GUILayout.BeginHorizontal(); GUILayout.BeginVertical(GUILayout.Width(220)); }
+        else gameplayMenuScroll = GUILayout.BeginScrollView(gameplayMenuScroll);
         bool resume = !finished && Button("Resume", fixedNavigation: true);
         bool retry = Button("Retry", fixedNavigation: true);
         bool restart = Button("Restart", fixedNavigation: true);
         bool menu = Button("Main menu", fixedNavigation: true);
+        if (wide) {
+            GUILayout.EndVertical(); GUILayout.Space(20); GUILayout.BeginVertical();
+            Label("Controls", textStyle);
+            gameplayControlsScroll = GUILayout.BeginScrollView(gameplayControlsScroll);
+        } else { GUILayout.Space(16); Label("Controls", textStyle); }
+        DrawGameplayControls();
+        if (wide) { GUILayout.EndScrollView(); GUILayout.EndVertical(); GUILayout.EndHorizontal(); }
+        else GUILayout.EndScrollView();
         GUILayout.EndArea();
         if (Event.current.type == EventType.Repaint) {
             previousFocus.Clear();
@@ -387,6 +395,21 @@ public sealed partial class StarterScreen
             else if (restart) stompArena.Restart();
             else if (menu) CloseStompArena();
         }
+    }
+
+    void DrawGameplayControls()
+    {
+        Label("Keyboard / mouse", textStyle);
+        if (rangedArena != null)
+            Label("J / Left mouse: paw pulse\nK / Right mouse: hold to charge the light orb, release to throw\nR: reload the last-used attack\nUsing the other attack interrupts reload.", smallStyle);
+        Label("Move: A/D or Left/Right arrows\nJump: Space, W or Up arrow\nPause / resume: P\nMain menu: Esc\nRestart run: Backspace", smallStyle);
+        Label(rangedArena != null ? "Retry: choose Retry in this menu" : "Retry checkpoint: R", smallStyle);
+        GUILayout.Space(12);
+        Label("Controller", textStyle);
+        if (rangedArena != null)
+            Label("West button: paw pulse\nRT: hold / release light orb\nNorth button: reload last-used attack", smallStyle);
+        Label("Move: left stick or D-pad\nJump: South button\nPause / resume: RB\nMain menu: Start\nRestart run: LB", smallStyle);
+        if (rangedArena == null) Label("Retry checkpoint: Select", smallStyle);
     }
 
 #if LEGEND_OF_CAT_PREVIEW

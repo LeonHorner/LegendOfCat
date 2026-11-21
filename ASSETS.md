@@ -871,3 +871,14 @@ The follow-up HUD adds a reload progress bar and reuses the pulse/orb silhouette
 as selected-weapon icons, alongside their English names.
 The compact weapon/ammo/reload HUD is anchored at bottom center at the user's
 request; the former upper control/debug panel is removed.
+
+Accepted initial visual revision (2026-11-15): the user selected an original
+procedural paw with a small light spark to replace the pulse HUD stripe. The paw
+uses five existing disc-texture stamps and a small cross-shaped spark. The
+permanent blue facing bar in front of Mika is removed. No external artwork, new
+image model or additional source asset was used.
+
+The local direct-attack trial shows the paw and orb indicators together, retaining
+their original procedural symbols and filled/hollow ammunition dots. The user
+requested a larger pause menu with directly visible input descriptions. No new
+external artwork or image generator is involved; the owner accepted this initial prototype on 2026-11-15.

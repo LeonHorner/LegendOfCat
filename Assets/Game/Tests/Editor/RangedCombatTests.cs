@@ -23,93 +23,96 @@ public class RangedCombatTests : InputTestFixture
     {
         for (int i = 0; i < 8; i++) {
             int before = Read<int>("Ammo");
-            Call("PressAttack", new Vector2(7.9f, 1));
+            Call("PressPulse", new Vector2(7.9f, 1));
             Assert.That(Read<int>("Ammo"), Is.EqualTo(before - 1));
             if (i < 7) Step(.22f);
         }
         Assert.That(Read<bool>("Reloading"), Is.True);
         Assert.That(Read<float>("ReloadRemaining"), Is.EqualTo(1));
-        Call("PressAttack", Vector2.zero); Assert.That(Read<int>("Ammo"), Is.Zero);
+        Call("PressPulse", Vector2.zero); Assert.That(Read<int>("Ammo"), Is.Zero);
         Step(1.02f);
         Assert.That(Read<int>("Ammo"), Is.EqualTo(8));
         Assert.That(Shots.Count, Is.Zero, "Reload completion must not repeat a held attack.");
-        Call("PressAttack", new Vector2(-4, .6f)); Assert.That(Read<int>("Ammo"), Is.EqualTo(7));
+        Call("PressPulse", new Vector2(-4, .6f)); Assert.That(Read<int>("Ammo"), Is.EqualTo(7));
         Assert.That(Velocity(0), Is.EqualTo(new Vector2(15, 0)));
     }
     [Test] public void OrbChargeConsumesOneRoundOnReleaseAndHasItsOwnRecovery()
     {
-        Call("SwitchWeapon"); Call("PressAttack", Vector2.zero);
+        Call("PressLob");
         Step(1.2f); Assert.That(Read<float>("Charge"), Is.EqualTo(1));
         Assert.That(Read<int>("Ammo"), Is.EqualTo(3));
-        Call("SetFacing", -1f); Call("ReleaseAttack", new Vector2(4, .6f));
+        Call("SetFacing", -1f); Call("ReleaseLob", new Vector2(4, .6f));
         Assert.That(Velocity(0), Is.EqualTo(new Vector2(-7, 15)));
         Assert.That(Read<int>("Ammo"), Is.EqualTo(2));
         Assert.That(Read<float>("Cooldown"), Is.EqualTo(.4f));
-        Call("PressAttack", Vector2.zero); Assert.That(Read<bool>("Charging"), Is.False);
-        Step(.42f); Call("PressAttack", Vector2.zero); Call("ReleaseAttack", new Vector2(4, .6f));
-        Step(.42f); Call("PressAttack", Vector2.zero); Call("ReleaseAttack", new Vector2(4, .6f));
+        Call("PressLob"); Assert.That(Read<bool>("Charging"), Is.False);
+        Step(.42f); Call("PressLob"); Call("ReleaseLob", new Vector2(4, .6f));
+        Step(.42f); Call("PressLob"); Call("ReleaseLob", new Vector2(4, .6f));
         Assert.That(Read<int>("Ammo"), Is.Zero);
         Assert.That(Read<float>("ReloadRemaining"), Is.EqualTo(1.5f));
         Step(1.52f); Assert.That(Read<int>("Ammo"), Is.EqualTo(3));
     }
-    [Test] public void SwitchingCancelsReloadAndEmptyWeaponRestartsFromFullDuration()
+    [Test] public void OtherAttackCancelsReloadAndEmptyMagazineRestartsFromFullDuration()
     {
-        for (int i = 0; i < 8; i++) { Call("PressAttack", new Vector2(7.9f, 1)); if (i < 7) Step(.22f); }
-        Step(.4f); Call("SwitchWeapon");
+        for (int i = 0; i < 8; i++) { Call("PressPulse", new Vector2(7.9f, 1)); if (i < 7) Step(.22f); }
+        Step(.4f); Call("PressLob");
         Assert.That(Read<bool>("Reloading"), Is.False);
-        Step(2); Call("SwitchWeapon");
+        Step(2);
+        Assert.That(Call("PressPulse", Vector2.zero), Is.False);
         Assert.That(Read<int>("Ammo"), Is.Zero);
         Assert.That(Read<float>("ReloadRemaining"), Is.EqualTo(1));
         Step(1.02f); Assert.That(Read<int>("Ammo"), Is.EqualTo(8));
     }
-    [Test] public void EarlyReloadKeepsAmmoUntilCompleteAndSwitchingDiscardsProgress()
+    [Test] public void EarlyReloadKeepsAmmoUntilCompleteAndOtherAttackDiscardsProgress()
     {
         Call("Reload"); Assert.That(Read<bool>("Reloading"), Is.False);
-        Call("PressAttack", new Vector2(7.9f, 1)); Call("Reload"); Step(.4f);
+        Call("PressPulse", new Vector2(7.9f, 1)); Call("Reload"); Step(.4f);
         Assert.That(Read<int>("Ammo"), Is.EqualTo(7));
-        Call("SwitchWeapon"); Step(2); Call("SwitchWeapon");
-        Assert.That(Read<int>("Ammo"), Is.EqualTo(7));
+        Call("PressLob"); Step(2);
+        Call("PressPulse", new Vector2(7.9f, 1));
+        Assert.That(Read<int>("Ammo"), Is.EqualTo(6), "The other attack must not refill an abandoned partial magazine.");
         Assert.That(Read<bool>("Reloading"), Is.False);
         Call("Reload"); Step(1.02f); Assert.That(Read<int>("Ammo"), Is.EqualTo(8));
     }
-    [Test] public void SwitchingCannotBypassCooldownAndChargeCancellationCostsNothing()
+    [Test] public void AlternatingAttacksCannotBypassRecoveryAndCanceledOrbCostsNothing()
     {
-        Call("PressAttack", new Vector2(-4, .6f));
-        Call("SwitchWeapon"); Call("PressAttack", Vector2.zero); Step(.06f);
-        Call("SwitchWeapon"); Assert.That(Read<int>("Ammo"), Is.EqualTo(7));
-        Call("PressAttack", Vector2.zero); Assert.That(Read<int>("Ammo"), Is.EqualTo(7));
-        Step(.16f); Call("PressAttack", new Vector2(-4, .6f)); Assert.That(Read<int>("Ammo"), Is.EqualTo(6));
-        Call("SwitchWeapon"); Assert.That(Read<int>("Ammo"), Is.EqualTo(3));
+        Call("PressPulse", new Vector2(-4, .6f));
+        Call("PressLob"); Step(.06f);
+        Assert.That(Call("PressPulse", Vector2.zero), Is.False);
+        Assert.That(Read<int>("Ammo"), Is.EqualTo(7));
         Assert.That(Read<bool>("Charging"), Is.False);
-        Assert.That(Call("ReleaseAttack", Vector2.zero), Is.False);
+        Assert.That(Call("ReleaseLob", Vector2.zero), Is.False);
+        Step(.16f); Call("PressPulse", new Vector2(-4, .6f)); Assert.That(Read<int>("Ammo"), Is.EqualTo(6));
+        Call("PressLob"); Assert.That(Read<int>("Ammo"), Is.EqualTo(3), "Canceled charge spends no orb ammunition.");
+        Call("CancelTransient"); Assert.That(Call("ReleaseLob", Vector2.zero), Is.False);
     }
     [Test] public void PauseFreezesReloadAndFocusCancellationCannotFire()
     {
-        Call("PressAttack", new Vector2(-4, .6f)); Call("Reload"); Step(.2f);
+        Call("PressPulse", new Vector2(-4, .6f)); Call("Reload"); Step(.2f);
         float remaining = Read<float>("ReloadRemaining"), elapsed = Read<float>("Elapsed");
-        Call("SetPaused", true); Step(1); Call("SwitchWeapon");
+        Call("SetPaused", true); Call("PressLob"); Step(1);
         Assert.That(Read<float>("ReloadRemaining"), Is.EqualTo(remaining));
         Assert.That(Read<float>("Elapsed"), Is.EqualTo(elapsed));
-        Call("SetPaused", false); Call("SwitchWeapon"); Call("PressAttack", Vector2.zero); Step(.2f);
-        Call("CancelTransient"); Assert.That(Call("ReleaseAttack", Vector2.zero), Is.False);
+        Call("SetPaused", false); Call("PressLob"); Step(.2f);
+        Call("CancelTransient"); Assert.That(Call("ReleaseLob", Vector2.zero), Is.False);
         Assert.That(Read<int>("Ammo"), Is.EqualTo(3)); Assert.That(Shots.Count, Is.Zero);
         Call("Reset"); Assert.That(Read<int>("Ammo"), Is.EqualTo(8));
         Assert.That(Read<bool>("Reloading"), Is.False); Assert.That(Read<float>("Cooldown"), Is.Zero);
     }
     [Test] public void ShieldBlocksOpenTargetTakesDamageAndDefeatStopsAttacks()
     {
-        Call("PressAttack", Read<Vector2>("Target")); Step(.02f);
+        Call("PressPulse", Read<Vector2>("Target")); Step(.02f);
         Assert.That(Read<int>("Health"), Is.EqualTo(6)); Assert.That(Read<float>("BlockFlash"), Is.GreaterThan(0));
         Step(1.6f);
-        for (int i = 0; i < 6; i++) { Call("PressAttack", Read<Vector2>("Target")); Step(.22f); }
+        for (int i = 0; i < 6; i++) { Call("PressPulse", Read<Vector2>("Target")); Step(.22f); }
         Assert.That(Read<bool>("Finished"), Is.True); Assert.That(Shots.Count, Is.Zero);
-        int ammo = Read<int>("Ammo"); Call("PressAttack", Vector2.zero); Call("Reload"); Call("SwitchWeapon");
+        int ammo = Read<int>("Ammo"); Call("PressPulse", Vector2.zero); Call("Reload"); Call("PressLob");
         Assert.That(Read<int>("Ammo"), Is.EqualTo(ammo));
     }
     [Test] public void ProjectilesExpireAtFloorAndWalls()
     {
-        Call("PressAttack", new Vector2(7.9f, 1)); Step(.02f); Assert.That(Shots.Count, Is.Zero);
-        Call("Reset"); Call("SwitchWeapon"); Call("PressAttack", Vector2.zero); Call("ReleaseAttack", new Vector2(-7, .6f)); Step(1.2f);
+        Call("PressPulse", new Vector2(7.9f, 1)); Step(.02f); Assert.That(Shots.Count, Is.Zero);
+        Call("Reset"); Call("PressLob"); Call("ReleaseLob", new Vector2(-7, .6f)); Step(1.2f);
         Assert.That(Shots.Count, Is.Zero);
     }
     [Test] public void RelativeSweepCatchesFastProjectileAndMovingTarget()
@@ -124,8 +127,8 @@ public class RangedCombatTests : InputTestFixture
         for (int holdSteps = 10; holdSteps <= 40 && !highHit; holdSteps++) {
             Call("Reset");
             Step(1.6f);
-            Call("SwitchWeapon"); Call("PressAttack", Vector2.zero); Step(holdSteps * .02f);
-            Call("ReleaseAttack", new Vector2(-3, .6f));
+            Call("PressLob"); Step(holdSteps * .02f);
+            Call("ReleaseLob", new Vector2(-3, .6f));
             for (int step = 0; step < 100; step++) {
                 Call("Advance", .02f);
                 if (Read<int>("Health") < 6) { highHit = Read<Vector2>("Target").y > 4.5f; break; }
@@ -133,9 +136,10 @@ public class RangedCombatTests : InputTestFixture
         }
         Assert.That(highHit, Is.True, "A ground-level charged throw must reach the high flying target without auto-aim.");
     }
-    [Test] public void RealActionsAllowMoveJumpAndChargeAndCancelWithoutReleaseShot()
+    [Test] public void DirectKeyboardMouseAndControllerActionsPreserveMovementAndSafeCancellation()
     {
         var keyboard = InputSystem.AddDevice<Keyboard>();
+        var mouse = InputSystem.AddDevice<Mouse>();
         var pad = InputSystem.AddDevice<Gamepad>();
         var host = new GameObject("Ranged input fixture");
         Component controller = host.AddComponent(Runtime("CatController"));
@@ -144,45 +148,55 @@ public class RangedCombatTests : InputTestFixture
         try {
             Lifecycle(controller, "Awake");
             input.GetType().GetField("controller").SetValue(input, controller); Lifecycle(input, "Awake");
-            input.GetType().GetField("AttackPressed").SetValue(input, (Action)(() => Call("PressAttack", new Vector2(-4, .6f))));
-            input.GetType().GetField("AttackReleased").SetValue(input, (Action)(() => Call("ReleaseAttack", new Vector2(-4, .6f))));
+            input.GetType().GetField("PulsePressed").SetValue(input, (Action)(() => Call("PressPulse", new Vector2(-4, .6f))));
+            input.GetType().GetField("LobPressed").SetValue(input, (Action)(() => Call("PressLob")));
+            input.GetType().GetField("LobReleased").SetValue(input, (Action)(() => Call("ReleaseLob", new Vector2(-4, .6f))));
             input.GetType().GetField("UseCombatReload").SetValue(input, true);
-            input.GetType().GetField("WeaponSwitched").SetValue(input, (Action)(() => Call("SwitchWeapon")));
             input.GetType().GetField("ReloadPressed").SetValue(input, (Action)(() => Call("Reload")));
-            Call("SwitchWeapon");
             input.GetType().GetField("CombatCanceled").SetValue(input, (Action)(() => Call("CancelTransient")));
+            int retries = 0;
+            input.GetType().GetField("RetryCheckpoint").SetValue(input, (Action)(() => retries++));
             Lifecycle(input, "OnApplicationFocus", true);
             controller.GetType().GetProperty("Grounded").SetValue(controller, true);
-            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.D, Key.Space, Key.F)); InputSystem.Update();
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.D, Key.Space, Key.K)); InputSystem.Update();
             Assert.That(Read<bool>("Charging"), Is.True);
-            Assert.That(host.GetComponent<Rigidbody2D>().linearVelocity.y, Is.GreaterThan(0), "Jump and charge share the same input update.");
+            Assert.That(host.GetComponent<Rigidbody2D>().linearVelocity.y, Is.GreaterThan(0));
             Lifecycle(controller, "FixedUpdate");
             Assert.That(host.GetComponent<Rigidbody2D>().linearVelocity.x, Is.GreaterThan(0));
-            Step(.4f);
-            Lifecycle(input, "OnApplicationFocus", false);
+            Step(.4f); Lifecycle(input, "OnApplicationFocus", false);
             Assert.That(Read<bool>("Charging"), Is.False); Assert.That(Shots.Count, Is.Zero);
             InputSystem.QueueStateEvent(keyboard, new KeyboardState()); InputSystem.Update();
             Lifecycle(input, "OnApplicationFocus", true);
-            InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.West)); InputSystem.Update();
-            Assert.That(Read<bool>("Charging"), Is.True);
-            Step(.4f);
-            InputSystem.QueueStateEvent(pad, new GamepadState()); InputSystem.Update();
-            Assert.That(Shots.Count, Is.EqualTo(1));
+            Call("SetPaused", true);
+            Press(mouse.leftButton); Release(mouse.leftButton);
+            Press(mouse.rightButton); Release(mouse.rightButton);
+            Assert.That(Shots.Count, Is.Zero, "Pause-menu clicks must not attack.");
+            Assert.That(Read<bool>("Charging"), Is.False);
+            Call("SetPaused", false);
+            Press(mouse.leftButton); Release(mouse.leftButton);
+            Assert.That(Shots.Count, Is.EqualTo(1)); Step(.22f);
+            Press(mouse.rightButton); Step(.4f); Release(mouse.rightButton);
+            Assert.That(Shots.Count, Is.EqualTo(2));
+            Assert.That(Read<int>("Ammo"), Is.EqualTo(2));
             InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.R)); InputSystem.Update();
-            Assert.That(Read<bool>("Reloading"), Is.True, "R starts reload rather than retry.");
+            Assert.That(Read<bool>("Reloading"), Is.True);
+            Assert.That(retries, Is.Zero, "R reload must not also retry the arena.");
             InputSystem.QueueStateEvent(keyboard, new KeyboardState()); InputSystem.Update();
-            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Q)); InputSystem.Update();
-            Assert.That(Read<bool>("Reloading"), Is.False);
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.J)); InputSystem.Update();
             Assert.That(Read<int>("Capacity"), Is.EqualTo(8));
+            Assert.That(Read<bool>("Reloading"), Is.False);
             InputSystem.QueueStateEvent(keyboard, new KeyboardState()); InputSystem.Update();
+            Step(.42f);
             InputSystem.QueueStateEvent(pad, new GamepadState { rightTrigger = 1 }); InputSystem.Update();
-            Assert.That(Read<int>("Capacity"), Is.EqualTo(3));
+            Assert.That(Read<bool>("Charging"), Is.True);
+            Step(.2f);
             InputSystem.QueueStateEvent(pad, new GamepadState()); InputSystem.Update();
             InputSystem.QueueStateEvent(pad, new GamepadState().WithButton(GamepadButton.North)); InputSystem.Update();
             Assert.That(Read<bool>("Reloading"), Is.True);
             Lifecycle(input, "OnDisable"); Assert.That(Shots.Count, Is.Zero);
         } finally { UnityEngine.Object.DestroyImmediate(host); }
     }
+
 }
 
 public class RangedIntegrationTests
@@ -203,7 +217,7 @@ public class RangedIntegrationTests
         Assert.That(arena, Is.Not.Null);
         var combat = arena.GetType().GetField("Combat").GetValue(arena);
         var cat = (Component)Property(arena, "Cat");
-        Invoke(combat, "SwitchWeapon"); Invoke(combat, "PressAttack", Vector2.zero); Invoke(combat, "Advance", .4f);
+        Invoke(combat, "PressLob"); Invoke(combat, "Advance", .4f);
         Invoke(arena, "TogglePause");
         Assert.That(cat.GetComponent<Rigidbody2D>().simulated, Is.False);
         Assert.That(Property(combat, "Paused"), Is.True);
@@ -211,7 +225,7 @@ public class RangedIntegrationTests
         Assert.That(cat.GetComponent<Rigidbody2D>().simulated, Is.True);
         Assert.That(Property(combat, "Charging"), Is.False);
         Assert.That(Property(combat, "Elapsed"), Is.EqualTo(0));
-        Invoke(combat, "PressAttack", new Vector2(-4, .6f));
+        Invoke(combat, "PressPulse", new Vector2(-4, .6f));
         Invoke(arena, "Restart");
         Assert.That(((IList)Property(combat, "Projectiles")).Count, Is.Zero);
         Assert.That(cat.transform.localPosition.x, Is.EqualTo(-4).Within(.001));
