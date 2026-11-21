@@ -4,14 +4,14 @@ using System.Linq;
 
 public static class CaveTerrainImport
 {
-    public static readonly string[] MaskNames={"cave-coverage-v1","entry-boundary-0-v1","entry-boundary-1-v1","entry-boundary-2-v1",
-        "entry-boundary-3-v1","entry-boundary-4-v1","entry-boundary-5-v1"};
+    public static readonly string[] MaskNames=new[]{"cave-coverage-v1"}.Concat(
+        CaveTerrainLayout.PaintedEntranceModules.Select(index=>"entry-boundary-"+index+"-v1")).ToArray();
     [InitializeOnLoadMethod]static void Install(){EditorApplication.playModeStateChanged-=BeforePlay;EditorApplication.playModeStateChanged+=BeforePlay;}
     static void BeforePlay(PlayModeStateChange state){if(state==PlayModeStateChange.ExitingEditMode)BakeMasks();}
     public static void Prepare()
     {
         ArchiveRejectedTerrain();
-        foreach(var name in new[]{"concept-entry-left-v1","concept-entry-roof-v1","concept-entry-recess-v1","concept-entry-rock-v1"}){
+        foreach(var name in new[]{"concept-entry-roof-v1","concept-entry-recess-v1","concept-entry-rock-v1"}){
             string path="Assets/Game/Resources/GoldenRiver/Descent/"+name+".png";
             var importer=AssetImporter.GetAtPath(path) as TextureImporter;if(!importer)continue;
             importer.textureType=TextureImporterType.Default;importer.alphaIsTransparency=false;importer.wrapMode=TextureWrapMode.Clamp;
@@ -20,7 +20,7 @@ public static class CaveTerrainImport
             var platform=importer.GetPlatformTextureSettings("Standalone");platform.overridden=true;platform.maxTextureSize=4096;
             platform.format=TextureImporterFormat.RGBA32;importer.SetPlatformTextureSettings(platform);importer.SaveAndReimport();
         }
-        for(int i=0;i<6;i++){
+        foreach(int i in CaveTerrainLayout.PaintedEntranceModules){
             string path="Assets/Game/Resources/GoldenRiver/Descent/entry-module-"+i+"-v1.png";
             var importer=AssetImporter.GetAtPath(path) as TextureImporter;if(!importer)continue;
             importer.textureType=TextureImporterType.Default;importer.alphaIsTransparency=true;importer.wrapMode=TextureWrapMode.Clamp;
@@ -53,9 +53,9 @@ public static class CaveTerrainImport
         }
         if(MaskNames.All(name=>AssetImporter.GetAtPath(folder+name+".png") is TextureImporter importer&&importer.userData==hash))return;
         for(int i=0;i<MaskNames.Length;i++){
-            int index=i-1;
+            int index=i==0?-1:CaveTerrainLayout.PaintedEntranceModules[i-1];
             var texture=i==0?CaveRoute.CreateMask(true):CaveEntryStudy.EntranceBoundary(
-                index==3||index==5?CaveTerrainLayout.EntryRoof:CaveTerrainLayout.LeftShore,CaveTerrainLayout.EntranceFrames[index],true);
+                CaveTerrainLayout.EntryRoof,CaveTerrainLayout.EntranceFrames[index],true);
             string path=folder+MaskNames[i]+".png";
             try{var bytes=texture.EncodeToPNG();if(!System.IO.File.Exists(path)||!System.IO.File.ReadAllBytes(path).SequenceEqual(bytes))System.IO.File.WriteAllBytes(path,bytes);}
             finally{Object.DestroyImmediate(texture);}

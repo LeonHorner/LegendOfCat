@@ -5,6 +5,7 @@ using UnityEngine;
 public static class CaveTerrainLayout
 {
     public const float Bottom=-42, CatchHeight=-26.5f;
+    public static readonly int[] PaintedEntranceModules={3,5};
     public static readonly Rect[] EntranceFrames={new Rect(-2.21f,-6.045f,6,6),new Rect(-6,-8.8f,6,6),new Rect(3.4f,-6.4f,6,6),
         new Rect(5.99f,-5.245f,6,6),new Rect(9,-13,6,6),new Rect(12,-10.5f,6,6)};
     public sealed class Section

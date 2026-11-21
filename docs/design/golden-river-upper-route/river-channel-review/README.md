@@ -9,12 +9,12 @@ Open a Linux cave development player directly to start at the lip. Use A/D or th
 To reproduce the local executable, use the Unity version in ProjectSettings/ProjectVersion.txt with Linux standalone build support. Run the following from the project root with the Editor executable in UNITY_EDITOR. Use a project copy with its own Library when the main working copy is open in Unity. The graphics device must support the existing wide landscape panorama.
 
 ```sh
-mkdir -p artifacts/cave-polish-linux
+mkdir -p artifacts/cave-perf-linux
 "$UNITY_EDITOR" -batchmode -quit -projectPath "$PWD" -buildTarget Linux64 \
   -executeMethod BuildGame.BuildLinuxCavePreview \
-  -previewOutput "$PWD/artifacts/cave-polish-linux/GoldenRiverCave.x86_64" \
-  -logFile "$PWD/artifacts/cave-polish-linux/build.log"
-./artifacts/cave-polish-linux/GoldenRiverCave.x86_64
+  -previewOutput "$PWD/artifacts/cave-perf-linux/GoldenRiverCave.x86_64" \
+  -logFile "$PWD/artifacts/cave-perf-linux/build.log"
+./artifacts/cave-perf-linux/GoldenRiverCave.x86_64
 ```
 
 ## In-game evidence
@@ -30,6 +30,6 @@ The two full-level recordings use real movement input and fixed-step simulation.
 
 The rounded entrance lip and grassy upper path use Golden River’s bank painting. At the far mouth a single mossy bank stands out against the valley. Mossy bedrock takes over as the descent passes into shade. A continuous fluted edge with hanging roots follows the ceiling around the far bluff. The broken spillway rests on its stone footing with the foreground path below its opening. The jumping shelves use the same root paintings and stone outlines as Golden River. Ferns, fiddleheads and bracket fungi mark the dry banks. The waterfall moves while the game runs and freezes when paused. Mika follows the incline only when the stone supports both sides of the grounded stance. The controller checks include a fall between the seep shelves, a landing at the former exit pocket and walking uphill from both. They also exercise the upper entrance path, both choices at the fork, the recovery climb, pause, retry, restart and the river’s water-entry sequence.
 
-Player review remains open for entrance discovery, perceived difficulty, first-play timing, texture continuity and the composition of the climb. The scripted runs do not measure hardware frame rate. Exact-head desktop packaging and merge-ready validation follow player review on the draft PR.
+Player review remains open for entrance discovery, perceived difficulty, first-play timing, texture continuity and the composition of the climb. Exact-head desktop packaging and merge-ready validation follow player review on the draft PR.
 
-[Paintings, generation prompts and provenance](../river-channel-assets.json)
+[Linux render timings and build-size comparison](performance.md) · [Paintings, generation prompts and provenance](../river-channel-assets.json)

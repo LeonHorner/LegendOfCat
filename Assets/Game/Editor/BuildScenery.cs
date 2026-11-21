@@ -37,6 +37,12 @@ public static class BuildScenery
         foreach(string name in CaveTerrainImport.MaskNames)
             if(!paths.Contains("Assets/Game/Resources/GoldenRiver/Descent/"+name+".png"))
                 throw new BuildFailedException("Missing precomputed cave mask: "+name);
+        const string caveFolder="Assets/Game/Resources/GoldenRiver/Descent/";
+        var selected=new System.Collections.Generic.HashSet<string>(GoldenRiverArt.Select(n=>"Assets/Game/Resources/GoldenRiver/"+n+".png"));
+        selected.UnionWith(CaveTerrainImport.MaskNames.Select(n=>caveFolder+n+".png"));
+        foreach (string path in paths)
+            if (path.StartsWith(caveFolder,System.StringComparison.Ordinal) && path.EndsWith(".png",System.StringComparison.Ordinal) && !selected.Contains(path))
+                throw new BuildFailedException("Unselected cave artwork in player: "+path);
         long descentBytes = GoldenRiverArt.Where(n => n.StartsWith("Descent/", System.StringComparison.Ordinal))
             .Sum(n => UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(
                 AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Game/Resources/GoldenRiver/" + n + ".png")));
@@ -45,10 +51,9 @@ public static class BuildScenery
     }
 
     public static readonly string[] GoldenRiverArt = {
-        "Descent/concept-entry-left-v1", "Descent/concept-entry-roof-v1", "Descent/concept-entry-recess-v1",
+        "Descent/concept-entry-roof-v1", "Descent/concept-entry-recess-v1",
         "Descent/concept-entry-rock-v1", "Descent/river-cut-slate", "Descent/fountain-fissure-wall", "Descent/rooted-channel-wall", "Descent/fern-falls", "Descent/fern-arch", "Descent/old-spillway", "Descent/cave-plants", "Descent/mossy-bedrock", "Descent/rooted-vault",
-        "Descent/entry-module-0-v1", "Descent/entry-module-1-v1", "Descent/entry-module-2-v1",
-        "Descent/entry-module-3-v1", "Descent/entry-module-4-v1", "Descent/entry-module-5-v1",
+        "Descent/entry-module-3-v1", "Descent/entry-module-5-v1",
         "Descent/terrain-stone-v1", "Descent/discovery-floor-v2", "Descent/discovery-ceiling-v2", "Descent/discovery-rear-v1",
         "Descent/entry-study-left-v2", "Descent/entry-study-right-v2", "Descent/entry-study-floor-v1",
         "Descent/entry-study-rear-v1", "Descent/entry-study-valley-v1", "Descent/ruin-v1",

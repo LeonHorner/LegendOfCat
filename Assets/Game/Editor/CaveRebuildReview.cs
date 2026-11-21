@@ -17,6 +17,17 @@ public static class CaveRebuildReview
         try{Run(true);}catch(System.Exception e){Debug.LogException(e);result=1;}
         if(Application.isBatchMode)EditorApplication.Exit(result);else EditorApplication.ExitPlaymode();
     }
+    public static HashSet<Texture> BoundTextures(CaveEntryStudy cave)
+    {
+        var textures=new HashSet<Texture>();
+        foreach (var renderer in cave.GetComponentsInChildren<Renderer>())
+            foreach (var material in renderer.sharedMaterials)
+                foreach (var property in material.GetTexturePropertyNames()) {
+                    var texture=material.GetTexture(property);
+                    if(texture) textures.Add(texture);
+                }
+        return textures;
+    }
     public static void Run(bool capture)
     {
         if(capture)Stencils();
@@ -33,9 +44,7 @@ public static class CaveRebuildReview
         var movers=root.GetComponentsInChildren<MovingSupport>();foreach(var m in movers)m.SendMessage("Start");
         var follow=root.GetComponentInChildren<CatCamera>();var scenery=root.GetComponentInChildren<SceneryRenderer>();
         if(capture){
-            var textures=new HashSet<Texture>();var cave=root.GetComponentInChildren<CaveEntryStudy>();
-            foreach(var renderer in cave.GetComponentsInChildren<Renderer>())foreach(var material in renderer.sharedMaterials)
-                foreach(var property in material.GetTexturePropertyNames()){var texture=material.GetTexture(property);if(texture)textures.Add(texture);}
+            var textures=BoundTextures(root.GetComponentInChildren<CaveEntryStudy>());
             long bytes=0;foreach(var texture in textures)bytes+=UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(texture);
             System.IO.Directory.CreateDirectory("artifacts/cave-rebuild-review");System.IO.File.WriteAllText("artifacts/cave-rebuild-review/texture-memory.txt",
                 "Distinct cave renderer textures and coverage masks: "+textures.Count+"\nUnity runtime memory estimate: "+bytes+" bytes\nThis is not a hardware frame-rate benchmark.\n");

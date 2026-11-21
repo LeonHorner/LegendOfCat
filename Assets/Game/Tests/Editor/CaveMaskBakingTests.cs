@@ -14,7 +14,7 @@ public sealed class CaveMaskBakingTests
     {
         var layout=Runtime("CaveTerrainLayout");
         var frames=(Rect[])layout.GetField("EntranceFrames").GetValue(null);
-        for(int index=-1;index<frames.Length;index++){
+        foreach(int index in new[]{-1,3,5}){
             string name=index<0?"cave-coverage-v1":"entry-boundary-"+index+"-v1";
             string path="Assets/Game/Resources/GoldenRiver/Descent/"+name+".png";
             var importer=AssetImporter.GetAtPath(path) as TextureImporter;
@@ -27,7 +27,7 @@ public sealed class CaveMaskBakingTests
                 actual.LoadImage(File.ReadAllBytes(path));
                 if(index<0)expected=(Texture2D)Runtime("CaveRoute").GetMethod("CreateMask").Invoke(null,new object[]{true});
                 else{
-                    var outline=(Vector2[])layout.GetField(index==3||index==5?"EntryRoof":"LeftShore").GetValue(null);
+                    var outline=(Vector2[])layout.GetField("EntryRoof").GetValue(null);
                     expected=(Texture2D)Runtime("CaveEntryStudy").GetMethod("EntranceBoundary").Invoke(null,new object[]{outline,frames[index],true});
                 }
                 Assert.That(actual.width,Is.EqualTo(expected.width));Assert.That(actual.height,Is.EqualTo(expected.height));

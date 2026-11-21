@@ -74,7 +74,7 @@ public sealed partial class CaveEntryStudy
                 if (!shelfMaterials.TryGetValue(section.Shelf, out var painted)) {
                     painted = RockMaterial();
                     painted.mainTexture = Resources.Load<Texture2D>(section.Shelf.TexturePath);
-                    painted.SetFloat("_NativeShelf", 1);
+                    painted.EnableKeyword("CAVE_SHELF");
                     shelfMaterials.Add(section.Shelf, painted);
                 }
                 MeshObject(section.Name,Rectangle(section.ArtFrame),section.ArtFrame,-3.06f,painted);
@@ -84,18 +84,24 @@ public sealed partial class CaveEntryStudy
         }
         TerrainCollider.GenerateGeometry();Physics2D.SyncTransforms();AddEntranceDetails();AddAuthoredEntrance();AddExposedGrass();AddPaintedBanks();AddCaveMargins();
         var background=RockMaterial(.52f);
-        background.renderQueue=(int)UnityEngine.Rendering.RenderQueue.Transparent;
         grottoWall = background;
         background.SetTexture("_Falls", Resources.Load<Texture2D>("GoldenRiver/Descent/fern-falls"));
-        background.SetFloat("_ChamberWall", 1);
+        background.EnableKeyword("CAVE_WALL");
         background.SetTexture("_RootWall", Resources.Load<Texture2D>("GoldenRiver/Descent/rooted-channel-wall"));
         background.SetTexture("_Fissure", Resources.Load<Texture2D>("GoldenRiver/Descent/fountain-fissure-wall"));
-        var rear=new[]{new Vector2(8,-42),new Vector2(206,-42),new Vector2(206,-4.5f),new Vector2(34,-4.5f),
+        // The opaque interior writes depth before Unity draws the surface panoramas behind it.
+        // Only the last few metres need transparency to reveal the valley.
+        const float daylightStart=196.5f;
+        var rear=new[]{new Vector2(8,-42),new Vector2(daylightStart,-42),new Vector2(daylightStart,-4.5f),new Vector2(34,-4.5f),
             new Vector2(18,-8.4f),new Vector2(14,-6.8f),new Vector2(12.3f,-5.7f),new Vector2(11.8f,-6.1f),
             new Vector2(11.5f,-6.5f),new Vector2(11.1f,-6.4f),new Vector2(10.8f,-6.8f),new Vector2(10.2f,-7.2f),
             new Vector2(10.4f,-7.6f),new Vector2(10,-7.9f),new Vector2(9.7f,-8.2f),new Vector2(9.8f,-8.7f),
             new Vector2(9.4f,-8.9f),new Vector2(9,-9.1f),new Vector2(9.1f,-9.5f),new Vector2(8.8f,-9.7f),new Vector2(8.7f,-10.1f),new Vector2(8,-10.5f)};
         MeshObject("Permanent recessed cave rock",rear,new Rect(0,0,24,24),2,background);
+        var daylight=new Material(background){renderQueue=(int)UnityEngine.Rendering.RenderQueue.Transparent};
+        owned.Add(daylight);
+        var mouth=Rect.MinMaxRect(daylightStart,-42,206,-4.5f);
+        MeshObject("Daylight behind the exit bank",Rectangle(mouth),mouth,2,daylight);
         Painting("Disused spring spillway",new Rect(125.9f,-16.8f,14.4f,7.2f),1.45f,"GoldenRiver/Descent/old-spillway");
         AddUnderstory();
         AddRecessedMouth();
@@ -110,7 +116,7 @@ public sealed partial class CaveEntryStudy
         // Crop each isolated plant at its original aspect ratio and bury its roots in a tread.
         var material=RockMaterial();
         material.mainTexture=Resources.Load<Texture2D>("GoldenRiver/Descent/cave-plants");
-        material.SetFloat("_NativeShelf",1);
+        material.EnableKeyword("CAVE_SHELF");
         int[] columns={0,499,896,1536};
         void Plant(int cell,float x,float ground,float width) {
             float scale=width/(columns[cell+1]-columns[cell]);
@@ -157,10 +163,10 @@ public sealed partial class CaveEntryStudy
     void AddEntranceDetails()
     {
         var frames=CaveTerrainLayout.EntranceFrames;
-        foreach(int i in new[]{3,5}){
+        foreach(int i in CaveTerrainLayout.PaintedEntranceModules){
             var texture=Resources.Load<Texture2D>("GoldenRiver/Descent/entry-module-"+i+"-v1");if(!texture)continue;
             var material=RockMaterial();material.mainTexture=texture;material.SetFloat("_WorldMapped",0);material.SetFloat("_Cutout",1);
-            var outline=i==3||i==5?CaveTerrainLayout.EntryRoof:CaveTerrainLayout.LeftShore;
+            var outline=CaveTerrainLayout.EntryRoof;
             var boundary=Resources.Load<Texture2D>("GoldenRiver/Descent/entry-boundary-"+i+"-v1");
             if(!boundary){boundary=EntranceBoundary(outline,frames[i]);owned.Add(boundary);}
             material.SetTexture("_EdgeMask",boundary);
@@ -218,6 +224,7 @@ public sealed partial class CaveEntryStudy
     {
         var bed=RockMaterial();
         bed.mainTexture=Resources.Load<Texture2D>("GoldenRiver/Descent/mossy-bedrock");
+        bed.EnableKeyword("CAVE_RIM");
         bed.SetFloat("_RockMargin",1);
         bed.renderQueue=2450;
         foreach (var section in terrain)
@@ -232,6 +239,7 @@ public sealed partial class CaveEntryStudy
 
         var vault=RockMaterial();
         vault.mainTexture=Resources.Load<Texture2D>("GoldenRiver/Descent/rooted-vault");
+        vault.EnableKeyword("CAVE_RIM");
         vault.SetFloat("_RockMargin",2);
         vault.renderQueue=2450;
         // One margin crosses all roof collider sections and wraps around the daylight bluff.
@@ -279,7 +287,7 @@ public sealed partial class CaveEntryStudy
     {
         var paint = RockMaterial();
         paint.mainTexture = Resources.Load<Texture2D>("GoldenRiver/bank-medium-v3");
-        paint.SetFloat("_BankFace",1);
+        paint.EnableKeyword("CAVE_BANK");
         paint.renderQueue=2451;
         paint.SetTexture("_Bedrock",Resources.Load<Texture2D>("GoldenRiver/Descent/mossy-bedrock"));
         var left = MovementCourse.AscentPlatforms[9];

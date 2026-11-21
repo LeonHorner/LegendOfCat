@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -47,15 +48,6 @@ public static class GoldenRiverReview
             ? args[outputIndex + 1]
             : "docs/design/golden-river-main-route/variety-evidence";
         Directory.CreateDirectory(output);
-        long textureBytes = 0;
-        var textureAudit = new System.Text.StringBuilder("Name,Width,Height,RuntimeBytes,Format\n");
-        foreach (var texture in Resources.LoadAll<Texture2D>("GoldenRiver/Descent")) {
-            long bytes = UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(texture);
-            textureBytes += bytes;
-            textureAudit.AppendLine(texture.name + "," + texture.width + "," + texture.height + "," + bytes + "," + texture.format);
-        }
-        textureAudit.AppendLine("Total,,," + textureBytes);
-        File.WriteAllText(output + "/descent-texture-memory.csv", textureAudit.ToString());
         var previousScene = SceneManager.GetActiveScene();
         var scene = SceneManager.CreateScene("Golden River visual review", new CreateSceneParameters(LocalPhysicsMode.Physics2D));
         SceneManager.SetActiveScene(scene);
@@ -67,6 +59,17 @@ public static class GoldenRiverReview
         var cat = course.Cat;
         cat.GetComponent<CatInput>().enabled = false;
         cat.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.None;
+        long textureBytes = 0;
+        var textureAudit = new System.Text.StringBuilder("BoundTexture,Width,Height,RuntimeBytes,Format\n");
+        foreach (var texture in CaveRebuildReview.BoundTextures(root.GetComponentInChildren<CaveEntryStudy>())
+            .OfType<Texture2D>().Where(t => AssetDatabase.GetAssetPath(t).StartsWith(
+                "Assets/Game/Resources/GoldenRiver/Descent/", System.StringComparison.Ordinal)).OrderBy(t => t.name)) {
+            long bytes = UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(texture);
+            textureBytes += bytes;
+            textureAudit.AppendLine(texture.name + "," + texture.width + "," + texture.height + "," + bytes + "," + texture.format);
+        }
+        textureAudit.AppendLine("Total,,," + textureBytes);
+        File.WriteAllText(output + "/descent-texture-memory.csv", textureAudit.ToString());
         var follow = root.GetComponentInChildren<CatCamera>();
         var camera = follow.GetComponent<Camera>();
         var scenery = root.GetComponentInChildren<SceneryRenderer>();
