@@ -2,7 +2,7 @@
 
 ## River-carved slate playtest — 2026-11-20
 
-The playable detour now follows a scoured channel between the two main-route shores. The [Linux debug start, recordings and review notes](golden-river-upper-route/river-channel-review/README.md) describe the current candidate for issue #72.
+A walkable bank descends from the main route past the fountain. Rooted shelves cross a fern-lined waterfall, and a broken spillway leads up through the daylight arch. The [Linux debug start, recordings and review notes](golden-river-upper-route/river-channel-review/README.md) describe the current candidate for issue #72.
 
 ## Shoreline revision — 2026-11-13
 
