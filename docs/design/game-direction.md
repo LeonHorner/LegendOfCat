@@ -6,6 +6,8 @@ A charming, adventurous cat platformer in Unity, presented entirely in 2D. The J
 Retain three boss ideas: one grounded boss defeated by jumping on its head, a flying owl fought at range, and a flying dragon fought at range. Refine their identities and attacks as needed. The ranged weapon may be entirely different and does not have to be a pickup. Movement, attacks and animation should feel fluid, responsive and readable.
 
 ## Decisions and review gates
+The user selected optional exploration keepsakes without gameplay bonuses for issue #15 on 2026-10-24. See [reward scope and remaining demonstration work](rewards.md). This does not approve additional abilities or a currency economy.
+
 The cat remains the protagonist. Art direction and initial concepts are in [art-direction.md](art-direction.md). Do not prescribe new dash/double-jump abilities, weapon resources, collectibles, campaign themes or save import without checking with the user. Propose bounded options and use small playable prototypes before committing production content. Ask when requirements are unclear before creating a replacement issue plan.
 
 Difficulty is experiential: compare learning load, jump precision, attack density, recovery windows and checkpoint retry cost. Java constants may inform prototype tuning but are not immutable. Improving animation must not delay input or hide actual collision timing. Telegraph, active attack and recovery should be distinguishable.

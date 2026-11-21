@@ -1,6 +1,8 @@
 # Six-level adventure and challenge curve
 
 ## Status and scope
+Reward decision update, 2026-10-24: the user selected optional exploration keepsakes without gameplay bonuses for issue #15. See [reward scope](rewards.md). References below to undecided collectibles describe the original campaign approval; this later decision selects their category without fixing counts, artwork or campaign records.
+
 
 Approved campaign plan for issue #8; see the user decision record below. This document establishes design scope; dependent implementation still requires its own issue and prototype gates. Read [game direction](game-direction.md), [art direction](art-direction.md), the [implementation plan](implementation-plan.md) and [legacy reference](legacy-gameplay-reference.md) alongside it.
 
