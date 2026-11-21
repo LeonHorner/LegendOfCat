@@ -2,6 +2,8 @@
 
 ## Owner selection and new sound direction — 2026-11-21
 
+Follow-up: the owner approved the wind audition. The magical checkpoint must be shorter to match the brief orange activation flash. New 0.6-second A/B cues in `art/audio/wind-and-magic-review/checkpoint-magic-short.wav` await listening approval. River and wind are selected; movement remains deferred. The earlier long magical cues are superseded. No new audio has been integrated during this audition revision.
+
 - The owner approved the standalone `art/audio/auditions-2026-11-21/river-natural.wav` excerpt as the river sound. Preserve that selection; final looping and in-game mix remain separate review steps.
 - Movement sounds may be unnecessary. Leave footsteps and the first candidate's jump/landing noises out for now; do not treat the earlier contact studies as selected.
 - Instead, audition occasional wind gusts that arrive gently and fade away. Wind is environmental, independent of Mika's movement, not a continuous rushing loop. Exact production spacing and mix have not been locked.

@@ -878,3 +878,8 @@ Owner decision: art/audio/auditions-2026-11-21/river-natural.wav is approved as 
 New unapproved standalone samples: art/audio/wind-and-magic-review/wind-gusts.wav and checkpoint-magic-comparison.wav. No new Unity import, gameplay references or integration. Wind source: Park ambiences by Thimras, https://opengameart.org/content/park-ambiences, CC0 1.0; source WAV SHA-256 5c381856745b4706e7eba55eb9271a61a530e90c05df8126adb2db89ecfa6c5a. Field recording and derivatives retain CC0.
 
 Checkpoint variants: original deterministic synthesis authored through OpenAI Codex, project PolyForm Noncommercial 1.0.0 license; no generative audio model or external sampled instrument. Preparation uses Python and FFmpeg. Exact excerpt times, processing, envelopes, synthesis decisions and reproduction are in the review README and tools/prepare-golden-river-wind-and-magic.py. Actual clips require owner listening approval before integration; fixed production wind intervals are not yet decided.
+
+
+## Approved wind and shortened magical checkpoint audition - 2026-11-21
+
+The owner approved wind-gusts.wav and requested a shorter checkpoint sound matching the brief orange flash. River and wind clips are selected; movement sounds remain deferred. New standalone checkpoint-magic-short.wav contains two 0.6-second variants with rapid bloom, concentrated sparks and compact reflections. It remains outside Assets and requires listening approval before integration. Source/generator: original deterministic OpenAI Codex-authored tools/prepare-short-checkpoint-audition.py, no external samples or generative audio model, project PolyForm Noncommercial 1.0.0 license. Earlier long magical cues are superseded; wind cadence and final mix remain review work.

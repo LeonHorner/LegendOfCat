@@ -1,5 +1,11 @@
 # Wind and magical checkpoint auditions
 
+## Latest owner decision and shorter checkpoint
+
+Wind is approved. The owner requested a shorter checkpoint sound to match the brief orange activation flash. `checkpoint-magic-short.wav` presents A at 0.3 seconds and B at 2.3 seconds, each lasting 0.6 seconds including its fade. They retain the warm/sparkling timbres but concentrate the bloom and sparks at activation, with compact reflections instead of a long tail. These short cues remain unapproved and outside Unity. The previous long magical comparison is historical.
+
+Reproduce the short cues independently with `python tools/prepare-short-checkpoint-audition.py`. Original deterministic OpenAI Codex-authored synthesis, project PolyForm Noncommercial 1.0.0 license; no external samples or generative audio model. Prepared 2026-11-21 in response to the owner's duration feedback. Approval of the wind clip does not approve exact production gust intervals or final mix.
+
 Standalone listening samples only. Neither file is imported into Unity or referenced by gameplay. Obtain explicit approval of the actual clips before integration.
 
 The owner approved the previous natural river excerpt, deferred movement sounds and asked instead for occasional wind that fades gently. The checkpoint should support the orange illumination and sparks with a magical sound. Dry material taps are superseded.
