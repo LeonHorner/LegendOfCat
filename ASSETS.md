@@ -883,3 +883,10 @@ Checkpoint variants: original deterministic synthesis authored through OpenAI Co
 ## Approved wind and shortened magical checkpoint audition - 2026-11-21
 
 The owner approved wind-gusts.wav and requested a shorter checkpoint sound matching the brief orange flash. River and wind clips are selected; movement sounds remain deferred. New standalone checkpoint-magic-short.wav contains two 0.6-second variants with rapid bloom, concentrated sparks and compact reflections. It remains outside Assets and requires listening approval before integration. Source/generator: original deterministic OpenAI Codex-authored tools/prepare-short-checkpoint-audition.py, no external samples or generative audio model, project PolyForm Noncommercial 1.0.0 license. Earlier long magical cues are superseded; wind cadence and final mix remain review work.
+
+
+## Checkpoint rejection and short magical success audition - 2026-11-21
+
+The owner explicitly rejected the previous short checkpoint A/B as completely unsuitable. The replacement should be magical and clearly communicate accomplishment. New standalone checkpoint-success-cue.wav lasts 0.75 seconds; checkpoint-success-audition.wav repeats it twice for listening. Both remain in art/audio/wind-and-magic-review outside Assets, unapproved for integration. River and wind approvals remain; movement is deferred.
+
+Source/generator: original deterministic OpenAI Codex-authored tools/prepare-checkpoint-success-audition.py, project PolyForm Noncommercial 1.0.0 license, no external samples, copied tune or generative audio model. Creative decisions: rapid consonant rising glass/harp-like voices, warm resolving harmony and concentrated fine sparks with a compact fade. This is a proposed response to feedback, not a claim that the sound is accepted.

@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Latest checkpoint rejection — 2026-11-21
+
+The owner clarified “absolutely unsuitable” and rejected the short 0.6-second checkpoint variants. The replacement must be magical and clearly communicate that the player accomplished something. The new standalone `art/audio/wind-and-magic-review/checkpoint-success-audition.wav` presents one 0.75-second success gesture twice. It awaits listening approval and is not integrated. River and wind remain approved; movement sounds remain deferred. Earlier notes describing the short variants as awaiting selection are superseded by this rejection.
+
 ## Owner selection and new sound direction — 2026-11-21
 
 Follow-up: the owner approved the wind audition. The magical checkpoint must be shorter to match the brief orange activation flash. New 0.6-second A/B cues in `art/audio/wind-and-magic-review/checkpoint-magic-short.wav` await listening approval. River and wind are selected; movement remains deferred. The earlier long magical cues are superseded. No new audio has been integrated during this audition revision.

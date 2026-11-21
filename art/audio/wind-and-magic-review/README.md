@@ -1,5 +1,13 @@
 # Wind and magical checkpoint auditions
 
+## Latest rejection and new success cue
+
+The owner explicitly confirmed that the 0.6-second magical A/B cues were completely unsuitable. They are rejected, not approved pending routine integration. The requested replacement must sound magical and clearly communicate an accomplishment while staying short. River and wind approval remains intact; movement remains deferred.
+
+`checkpoint-success-audition.wav` repeats one new 0.75-second cue at 0.2 and 1.9 seconds for listening. The separate `checkpoint-success-cue.wav` contains the single cue. This new direction uses a rapid consonant rising glass/harp-like gesture, a warm resolving voicing and a few fine sparks rather than the rejected muted modal taps. Its character and success readability are design intentions awaiting owner review, not established acceptance.
+
+Prepared 2026-11-21 with `tools/prepare-checkpoint-success-audition.py`, original deterministic OpenAI Codex-authored synthesis, project PolyForm Noncommercial 1.0.0 license. No external samples, copied tune or generative audio model. No Unity import or gameplay references; obtain explicit listening approval before integration. All earlier checkpoint studies below are historical.
+
 ## Latest owner decision and shorter checkpoint
 
 Wind is approved. The owner requested a shorter checkpoint sound to match the brief orange activation flash. `checkpoint-magic-short.wav` presents A at 0.3 seconds and B at 2.3 seconds, each lasting 0.6 seconds including its fade. They retain the warm/sparkling timbres but concentrate the bloom and sparks at activation, with compact reflections instead of a long tail. These short cues remain unapproved and outside Unity. The previous long magical comparison is historical.
