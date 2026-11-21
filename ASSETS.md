@@ -976,3 +976,5 @@ The player requested a living cave at the detail level of the surface, with the 
 ### Golden River bedrock and cave vault, 2026-11-21
 
 Two original transparent paintings from OpenAI built-in image generation (exact model revision unavailable) show a mossy boulder face and a rooted, fluted ceiling. The player requested the stone detail of the new grotto along its bare floor and roof. The lower painting follows the rounded banks and seats the spillway. The upper painting follows the underside of the overhangs into daylight. Distributed under the project asset license, CC BY-NC 4.0 to the extent applicable rights exist. [Source files and generation briefs](docs/design/golden-river-upper-route/river-channel-assets.json).
+
+The November 21 playtest revision reuses these paintings. The rooted pillar frames the descending entrance. The spillway opens onto a low stone path, and the cave bed rises into a single Golden River bank at the far mouth.

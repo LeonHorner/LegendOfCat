@@ -110,7 +110,7 @@ Shader "LegendOfCat/CaveRock"
                     bank=lerp(bank,bed,sheltered);
                     clip(bank.a-.40);
                     float depth=i.uv.y+.17*sin(i.world.x*1.2);
-                    c=fixed4(bank.rgb,bank.a*smoothstep(-2.36,-.95,depth));
+                    c=fixed4(bank.rgb,bank.a*smoothstep(-2.36,-.95,depth)*smoothstep(0,min(.65,i.limit),i.uv.y+i.limit));
                     clip(c.a-.025);
                 }
                 else if(_WorldMapped>.5){
@@ -148,6 +148,10 @@ Shader "LegendOfCat/CaveRock"
                     grotto*=smoothstep(-.045,.08,fallsUV.y)*(1-smoothstep(.93,1.05,fallsUV.y));
                     c.rgb=lerp(c.rgb,falls,grotto);
                     c.rgb=lerp(baseRock.rgb,c.rgb,smoothstep(33,42,i.world.x));
+                    // Lose the recessed wall in daylight behind the lip of the bluff.
+                    float opening=i.world.x+.65*sin(i.world.y*1.1)+.24*sin(i.world.y*2.3);
+                    c.a*=1-smoothstep(197.5,205,opening);
+                    clip(c.a-.015);
                 }
                 if(_Cutout>.5)clip(c.a-.95);
                 float shade=1-smoothstep(-10,-1,i.world.y);

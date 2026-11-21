@@ -57,21 +57,47 @@ public static class CaveRebuildReview
         System.IO.Directory.CreateDirectory("artifacts/cave-rebuild-review");
         var path=CaveTerrainLayout.Path();path[0]=new Vector3(2.6f,-.045f,1);int index=0;foreach(var p in path){Reach(p);if(capture&&index<13){cat.GetComponentInChildren<MikaSpritePresentation>().RenderPose(.25f);Save(root.GetComponentInChildren<Camera>(),index);}if(capture&&index==9){recording=false;System.IO.File.WriteAllText("artifacts/cave-rebuild-review/"+motion+"/frames.txt",((motionTick+4)/5).ToString());}index++;}
         Debug.Log("Shared cave full forward geometry passed.");
-        var exitTreads = System.Array.FindAll(CaveTerrainLayout.Floors, tread => tread.x >= 204);
-        for (int i = exitTreads.Length - 1; i >= 0; i--) {
-            var tread = exitTreads[i];
-            Reach(new Vector3(tread.x + tread.z * .5f, tread.y, 0));
+        void DropToFloor(float x,float release,float floor)
+        {
+            cat.RespawnAt(CaveRoute.ToCourse(new Vector2(x,release)));
+            cat.Motion.SetMove(0);
+            for(int i=0;i<100;i++) Tick();
+            var landed=CaveRoute.ToLocal(cat.transform.localPosition);
+            if(!cat.Grounded || Mathf.Abs(landed.x-x)>.5f || Mathf.Abs(landed.y-floor-.5f)>.3f)
+                throw new System.InvalidOperationException("Miss at "+x+" did not land on its bank: "+landed);
         }
-        for (int i = 0; i < exitTreads.Length - 1; i++) {
-            var tread = exitTreads[i];
-            Reach(new Vector3(tread.x + tread.z - .65f, tread.y, 0));
-            var next = exitTreads[i + 1];
-            Reach(new Vector3(next.x + .7f, next.y, 1));
+        void WalkTo(float x)
+        {
+            var start=CaveRoute.ToLocal(cat.transform.localPosition);
+            float direction=Mathf.Sign(x-start.x);
+            cat.Motion.SetMove(direction);
+            for(int i=0;i<650;i++){
+                var previous=CaveRoute.ToLocal(cat.transform.localPosition);
+                Tick();
+                var current=CaveRoute.ToLocal(cat.transform.localPosition);
+                if(water.Active || Vector2.Distance(previous,current)>.8f)
+                    throw new System.InvalidOperationException("Recovery interrupted the walk from "+start+" to "+x);
+                if(direction*(current.x-x)>=0 && cat.Grounded){
+                    cat.Motion.SetMove(0);
+                    for(int j=0;j<8;j++) Tick();
+                    return;
+                }
+            }
+            throw new System.InvalidOperationException("Walk from "+start+" to "+x+" stopped at "+CaveRoute.ToLocal(cat.transform.localPosition));
         }
-        Debug.Log("Far cave mouth supports reverse entry and a return to daylight.");
+        WalkTo(195); WalkTo(240);
+        DropToFloor(203.5f,-5.8f,CaveTerrainLayout.AlongFace(CaveTerrainLayout.ExitBank,203.5f));
+        WalkTo(196); WalkTo(216);
+        // A missed jump between the two high shelves used to drop Mika into a narrow V.
+        DropToFloor(160.05f,-12,-16.6f);
+        WalkTo(153); WalkTo(190); WalkTo(211);
+        DropToFloor(8,.755f+1.5f,.755f);
+        WalkTo(14); WalkTo(7);
+        Debug.Log("Both reported pockets have walkable exits. The daylight bank and upper entrance crown pass in both directions.");
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(101.5f,-19.49f)));for(int i=0;i<100;i++)Tick();
         if(!cat.Grounded||Mathf.Abs(CaveRoute.ToLocal(cat.transform.localPosition).y-(CaveTerrainLayout.CatchHeight+.51f))>.2f)throw new System.InvalidOperationException("The local miss did not reach its catch.");
-        foreach(var p in new[]{new Vector3(95.7f,-26.5f,0),new Vector3(91.7f,-25.2f,1),new Vector3(87.7f,-23.9f,1),new Vector3(83.3f,-22.6f,1),new Vector3(80.75f,-21.3f,1),new Vector3(87.3f,-20,1),new Vector3(92.3f,-21.3f,0),new Vector3(98.7f,-20,1)})Reach(p);
+        WalkTo(106); Reach(new Vector3(81.8f,-21.3f,0));
+        Reach(new Vector3(87.3f,-20,1));Reach(new Vector3(92.3f,-21.3f,0));Reach(new Vector3(98.7f,-20,1));
         Debug.Log("Shared cave local recovery geometry passed.");
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(31,-11.49f)));for(int i=0;i<15;i++)Tick();
         Reach(new Vector3(35.3f,-12,0));Reach(new Vector3(31,-12,0));

@@ -67,7 +67,7 @@ public sealed partial class CaveEntryStudy
         foreach(var section in terrain){
             // The upstream bank stays behind the river; the dry throat remains in front.
             bool upstream=section.Name=="Connected approach shore" || section.Name=="Entrance shore";
-            float depth=upstream ? -1.8f : section.Name=="Talus below the daylight arch" ? -2.82f : -3;
+            float depth=upstream ? -1.8f : -3;
             if (section.Shelf == null)
                 MeshObject(section.Name,section.Outline,new Rect(0,0,8,8),depth,stone);
             else {
@@ -84,18 +84,18 @@ public sealed partial class CaveEntryStudy
         }
         TerrainCollider.GenerateGeometry();Physics2D.SyncTransforms();AddEntranceDetails();AddAuthoredEntrance();AddExposedGrass();AddPaintedBanks();AddCaveMargins();
         var background=RockMaterial(.52f);
+        background.renderQueue=(int)UnityEngine.Rendering.RenderQueue.Transparent;
         grottoWall = background;
         background.SetTexture("_Falls", Resources.Load<Texture2D>("GoldenRiver/Descent/fern-falls"));
         background.SetFloat("_ChamberWall", 1);
         background.SetTexture("_RootWall", Resources.Load<Texture2D>("GoldenRiver/Descent/rooted-channel-wall"));
         background.SetTexture("_Fissure", Resources.Load<Texture2D>("GoldenRiver/Descent/fountain-fissure-wall"));
-        var rear=new[]{new Vector2(8,-42),new Vector2(201.4f,-42),new Vector2(201.4f,-4.5f),new Vector2(34,-4.5f),
+        var rear=new[]{new Vector2(8,-42),new Vector2(206,-42),new Vector2(206,-4.5f),new Vector2(34,-4.5f),
             new Vector2(18,-8.4f),new Vector2(14,-6.8f),new Vector2(12.3f,-5.7f),new Vector2(11.8f,-6.1f),
             new Vector2(11.5f,-6.5f),new Vector2(11.1f,-6.4f),new Vector2(10.8f,-6.8f),new Vector2(10.2f,-7.2f),
             new Vector2(10.4f,-7.6f),new Vector2(10,-7.9f),new Vector2(9.7f,-8.2f),new Vector2(9.8f,-8.7f),
             new Vector2(9.4f,-8.9f),new Vector2(9,-9.1f),new Vector2(9.1f,-9.5f),new Vector2(8.8f,-9.7f),new Vector2(8.7f,-10.1f),new Vector2(8,-10.5f)};
         MeshObject("Permanent recessed cave rock",rear,new Rect(0,0,24,24),2,background);
-        Painting("Fern-lined daylight arch",new Rect(198,-13.1f,29,17.1f),1.65f,"GoldenRiver/Descent/fern-arch");
         Painting("Disused spring spillway",new Rect(125.9f,-16.8f,14.4f,7.2f),1.45f,"GoldenRiver/Descent/old-spillway");
         AddUnderstory();
         AddRecessedMouth();
@@ -127,7 +127,6 @@ public sealed partial class CaveEntryStudy
         Plant(1,150,-15,1.4f);
         Plant(2,169,-10.9f,2.5f);
         Plant(0,188,-8.14f,2.15f);
-        Plant(1,214.4f,-3.5f,1.5f);
     }
     bool SolidAt(Vector2 point)
     {
@@ -151,7 +150,7 @@ public sealed partial class CaveEntryStudy
         // opening at a fixed height. The outer flank is permanent and behind Mika.
         var outline=new[]{new Vector2(5.9f,-24),new Vector2(36,-24),new Vector2(36,-7.8f),new Vector2(24,-7.9f),
             new Vector2(20,-7),new Vector2(18,-6.4f),new Vector2(16,-5.3f),new Vector2(14,-4.15f),new Vector2(12,-3.2f),
-            new Vector2(10,-1.55f),new Vector2(8,-.35f),new Vector2(7,.03f),new Vector2(6.3f,.1f),
+            new Vector2(10,-1.55f),new Vector2(8,-.35f),new Vector2(7,.03f),new Vector2(6.4f,.32f),
             new Vector2(6.7f,-1.4f),new Vector2(6.8f,-4.5f),new Vector2(6.1f,-8),new Vector2(5.9f,-11.6f)};
         MeshObject("Layered recessed entrance alcove",outline,new Rect(5.9f,-20,30.1f,20.06667f),1.8f,material);
     }
@@ -222,8 +221,7 @@ public sealed partial class CaveEntryStudy
         bed.SetFloat("_RockMargin",1);
         bed.renderQueue=2450;
         foreach (var section in terrain)
-            if (section.ExposedBed!=null) DrawRockEdge(section.ExposedBed,bed,false,
-                section.Name=="Talus below the daylight arch" ? -2.84f : -3.025f);
+            if (section.ExposedBed!=null) DrawRockEdge(section.ExposedBed,bed,false,-3.025f);
         // This inset ledge seats the entire ruined drain behind the playable shelves.
         var plinth=new[]{new Vector2(120,-20),new Vector2(123.6f,-17.15f),new Vector2(126.2f,-15.81f),
             new Vector2(128,-15.72f),new Vector2(134,-15.95f),new Vector2(138.5f,-15.85f),
@@ -296,29 +294,36 @@ public sealed partial class CaveEntryStudy
             if (p.x > CaveTerrainLayout.ApproachRiseEnd) approach.Add(p);
         }
         DrawBankFace(approach, paint, true);
-        DrawBankFace(CaveTerrainLayout.ExitLower, paint);
-        DrawBankFace(CaveTerrainLayout.ExitUpper, paint);
+        DrawBankFace(CaveTerrainLayout.EntranceCrown, paint, overhang:true);
+        DrawBankFace(CaveTerrainLayout.ExitBank, paint);
     }
-    void DrawBankFace(IList<Vector2> face, Material paint, bool upstream=false)
+    void DrawBankFace(IList<Vector2> face, Material paint, bool upstream=false, bool overhang=false)
     {
         // Sample the river bank painting at a constant scale along the physical contour.
         var vertices = new Vector3[face.Count*2];
         var uv = new Vector2[vertices.Length];
         var triangles = new int[(face.Count-1)*6];
+        var limits = new Vector2[vertices.Length];
         for (int i=0;i<face.Count;i++) {
             var p=face[i]; int j=2*i;
-            if(i==0)p.x-=.84f;
+            if(i==0 && !overhang)p.x-=.84f;
             if(i+1==face.Count)p.x+=.84f;
             float depth=upstream ? Mathf.Lerp(-1.815f,-3.055f,Mathf.InverseLerp(-5.9f,-3.4f,p.x)) : -3.055f;
-            vertices[j]=new Vector3(p.x,p.y-5,depth);
+            float thickness=5;
+            if(overhang){
+                float soffit=CaveTerrainLayout.AlongFace(CaveTerrainLayout.EntranceSoffit,p.x);
+                thickness=Mathf.Clamp(p.y-soffit,.045f,5);
+            }
+            limits[j]=limits[j+1]=new Vector2(thickness,0);
+            vertices[j]=new Vector3(p.x,p.y-thickness,depth);
             vertices[j+1]=new Vector3(p.x,p.y+.75f,depth);
-            uv[j]=new Vector2(p.x,-5); uv[j+1]=new Vector2(p.x,.75f);
+            uv[j]=new Vector2(p.x,-thickness); uv[j+1]=new Vector2(p.x,.75f);
             if(i+1==face.Count)continue;
             int t=6*i;
             triangles[t]=j; triangles[t+1]=j+1; triangles[t+2]=j+2;
             triangles[t+3]=j+2; triangles[t+4]=j+1; triangles[t+5]=j+3;
         }
-        var renderer=SetStripMesh("Painted riverbank contour",vertices,uv,triangles,paint);
+        var renderer=SetStripMesh("Painted riverbank contour",vertices,uv,triangles,paint,limits);
         var properties=new MaterialPropertyBlock();
         properties.SetVector("_BankEnds",new Vector4(face[0].x-.84f,face[face.Count-1].x+.84f,0,0));
         renderer.SetPropertyBlock(properties);
