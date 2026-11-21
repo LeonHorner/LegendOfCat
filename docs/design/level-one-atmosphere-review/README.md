@@ -1,5 +1,7 @@
 # Golden River completion candidate
 
+The first audio candidate was rejected on 2026-11-21 and removed from normal gameplay. These images still document the completion UI. Replacement sounds must be heard and explicitly approved as standalone auditions before integration; see art/audio/auditions-2026-11-21/README.md.
+
 These are actual Windows development-player screenshots of the first #74 candidate. The preview starts three course units before the real exit and walks through it; it does not simulate a complete player run or measure human timing. The sub-second timer belongs to this focused preview.
 
 - [960×540 completion](complete-960.png)

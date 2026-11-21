@@ -6,6 +6,7 @@ using System.Reflection;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Unity.Collections;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -64,15 +65,27 @@ public class GoldenRiverAtmosphereTests
         var course = (Behaviour)Runtime("LevelRegistry").GetMethod("Create").Invoke(null, new object[] { "golden-river" });
         yield return null;
         var cat = (Behaviour)Read(course, "Cat");
-        var audio = (Behaviour)course.GetComponent(Runtime("GoldenRiverAudio"));
         var run = Read(course, "Run");
         Assert.That(cat, Is.Not.Null, "The course must initialize its player.");
-        Assert.That(audio, Is.Not.Null, "Golden River must own an initialized audio component.");
+        Assert.That(course.GetComponent(Runtime("GoldenRiverAudio")), Is.Null,
+            "Unapproved sound candidates must not attach to the playable level.");
+        Assert.That(course.GetComponentsInChildren<AudioSource>(), Is.Empty);
+        Assert.That(Resources.Load<AudioClip>("GoldenRiverAudio/river"), Is.Null,
+            "Rejected clips must not be included through Resources.");
+        // Retain technical lifecycle coverage with explicitly installed Editor-only fixtures.
+        course.gameObject.AddComponent<AudioListener>();
+        var audio = (Behaviour)course.gameObject.AddComponent(Runtime("GoldenRiverAudio"));
+        Call(audio, "Initialize", course);
+        AudioClip Fixture(string name) => AssetDatabase.LoadAssetAtPath<AudioClip>(
+            "Assets/Game/Tests/Editor/Fixtures/RejectedGoldenRiverAudio/" + name + ".wav");
+        foreach (string cue in new[] { "jump", "land", "checkpoint", "complete" })
+            audio.GetType().GetField(cue, Methods).SetValue(audio, Fixture(cue));
         exits = 0;
         course.GetType().GetEvent("ExitReached").AddEventHandler(course, (Action)CountExit);
         course.enabled = cat.enabled = audio.enabled = false;
         ((Behaviour)cat.GetComponent(Runtime("CatInput"))).enabled = false;
         var river = course.transform.Find("River ambience").GetComponent<AudioSource>();
+        river.clip = Fixture("river");
         var movement = course.transform.Find("Movement sounds").GetComponent<AudioSource>();
         var landmark = course.transform.Find("Landmark sounds").GetComponent<AudioSource>();
         int captureRate = Time.captureFramerate;

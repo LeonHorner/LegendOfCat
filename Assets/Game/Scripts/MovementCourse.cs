@@ -269,8 +269,6 @@ public sealed class MovementCourse : MonoBehaviour
         bars.cullingMask = 0;
         var follow = courseCamera.gameObject.AddComponent<CatCamera>();
         follow.target = player.transform;
-        if (LevelOne && !FindFirstObjectByType<AudioListener>())
-            courseCamera.gameObject.AddComponent<AudioListener>();
         follow.courseRoot = transform;
         follow.fixedHeight = true;
         var last = ActivePlatforms[ActivePlatforms.Length - 1];
@@ -360,7 +358,7 @@ public sealed class MovementCourse : MonoBehaviour
         }
         // Main-route landmarks and platform silhouettes communicate progression without floating labels.
         if (!LevelOne) Label("FINISH / return or retry", LabFinish + Vector2.up * .48f);
-        if (LevelOne) gameObject.AddComponent<GoldenRiverAudio>().Initialize(this);
+        // Audio is deliberately unattached until standalone auditions receive owner approval.
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
     {

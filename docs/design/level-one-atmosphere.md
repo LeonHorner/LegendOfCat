@@ -1,8 +1,16 @@
 # Golden River audio and completion
 
+## Owner rejection and audition gate — 2026-11-21
+
+The owner rejected the first water texture, movement sounds and checkpoint cue as unconvincing or unsuitable. The original sound candidate is not accepted. GoldenRiverAudio is no longer attached to the playable level; all five original clips have moved out of Resources into Editor-only rejected regression fixtures with their metadata preserved. Completion/menu functionality remains available without the candidate sounds.
+
+Before any further audio integration, present standalone listening samples outside Assets and obtain explicit owner approval of the actual clips. Do not substitute mixer tests, a running prototype or a new procedural pass for this listening gate. After clip approval, review levels, repetition, contact timing and pause/retry behavior in-game separately. Approval of an isolated clip does not establish final mix acceptance. Do not add constant footstep playback until the owner has heard and selected its sound and cadence.
+
+The implementation and executed checks below describe the first candidate and technical infrastructure. They do not establish sound approval. New auditions belong under art/audio, outside Unity import and player packaging.
+
 Issue #74 adds a reviewable first version of river ambience, restrained movement and checkpoint sounds, and a clear success state through the existing menu. Music is outside this initial pass. No campaign records or collectibles are saved.
 
-## Implemented candidate
+## First candidate (audio rejected)
 
 Golden River owns three audio sources: looping river ambience, a bounded movement voice, and a bounded checkpoint/success voice. The river becomes quieter at higher elevations. Pause preserves playback position; retry/restart clear transient voices and restart one ambience loop. Deactivating the level stops all sources immediately. Initial spawn and recovery respawns do not produce landing sounds. Master volume is adjustable in Settings with keyboard-accessible Quieter/Louder buttons; zero mutes all game sounds.
 

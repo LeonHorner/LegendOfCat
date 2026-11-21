@@ -853,3 +853,19 @@ The existing near panorama is extended to 14332×1448 using an original generated
 - Source: original procedural PCM authored with tools/generate-golden-river-audio.py; deterministic Python standard-library synthesis, no recordings, external samples or third-party music. Generator: OpenAI Codex-authored script; no generative audio model.
 - License: project PolyForm Noncommercial 1.0.0 license; source script and generated waveforms may be publicly redistributed under its terms.
 - Human creative direction: issue #74 requests restrained river ambience and meaningful jump/landing/checkpoint/completion sounds. The initial candidate uses cyclic filtered noise, soft contacts and short ascending chimes; no background music. Final timbre, mix and in-game presentation remain pending player review.
+
+
+## Golden River audio rejection and listening gate - 2026-11-21
+
+The owner rejected the original procedural river, movement and checkpoint candidate. All five original clips now live in Assets/Game/Tests/Editor/Fixtures/RejectedGoldenRiverAudio as Editor-only technical fixtures; they are not production-approved and are no longer loaded by the playable level. Their source and original license remain as recorded above. The existing generator now reproduces only these rejected fixtures.
+
+New sound candidates must first be presented as standalone auditions outside Assets and approved explicitly before any game integration. This applies to replacement water, movement, checkpoint and completion sounds. Technical test success is not artistic acceptance.
+
+
+## Standalone Golden River listening samples - 2026-11-21
+
+Location: art/audio/auditions-2026-11-21, outside Unity Assets and player packaging. Status: unapproved auditions only; no gameplay references.
+
+River: Park ambiences by Thimras, https://opengameart.org/content/park-ambiences, CC0 1.0. Movement: Fantozzi recordings from https://opengameart.org/content/fantozzis-footsteps-grasssand-stone, CC0 1.0. Original checkpoint studies: OpenAI Codex-authored deterministic modal synthesis, project PolyForm Noncommercial 1.0.0 license. No generative audio model. Third-party recordings and derivatives retain their CC0 license.
+
+Exact source URLs, checksums, excerpt times, processing, licenses, creative response to the rejection and reproduction steps are in the audition README and tools/prepare-golden-river-auditions.py. Integration requires the owner to hear and approve the actual clips first. These recordings are candidates, not approved cat-paw recordings or final loop/mix assets.

@@ -1,4 +1,4 @@
-"""Original deterministic review sounds. Python standard library; no sampled audio.
+"""Reproduce the rejected first candidate for Editor-only regression fixtures.
 
 Run from the repository root. PCM sources remain editable through this script.
 """
@@ -9,7 +9,7 @@ import struct
 import wave
 
 RATE = 44100
-OUT = Path("Assets/Game/Resources/GoldenRiverAudio")
+OUT = Path("Assets/Game/Tests/Editor/Fixtures/RejectedGoldenRiverAudio")
 OUT.mkdir(parents=True, exist_ok=True)
 
 
