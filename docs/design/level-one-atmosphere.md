@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Shorter crest and irregular in-game wind - 2026-11-22
+
+After hearing the long continuous-air study, the owner requested a shorter loud part and several irregular in-game variations. This authorizes the same-timbre runtime revision: four deterministic filtered-noise variants with 11.5–14-second lengths, earlier/steeper decay, slightly different air-band balance, independent noise seeds and strengths. Random selection excludes the previous clip; complete gusts have 10–24-second quiet gaps. River/checkpoint stay unchanged. The earlier field-recording wind and forest proposals are superseded. No new timbre approval is inferred beyond this scoped request. Keep PR #89 draft pending in-game acceptance.
+
 ## Longer wind correction - 2026-11-22
 
 The owner rejected all four forest gusts as rain-like and asked for longer receding wind. Those proposals are not selected. A single 17-second continuous filtered-noise study in `art/audio/long-wind-review` replaces leaf texture with slowly shifting air bands, a gentle rise and long release. Standalone listening only; runtime wind/repetition remains unchanged pending selection. River and checkpoint remain unchanged.

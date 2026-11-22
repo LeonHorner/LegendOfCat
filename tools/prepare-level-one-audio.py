@@ -3,6 +3,7 @@ from array import array
 import math
 from pathlib import Path
 import shutil
+import runpy
 import wave
 
 OUT = Path("Assets/Game/Resources/GoldenRiverAudio")
@@ -36,9 +37,7 @@ for i in range(overlap):
         loop.append(round(max(-32768, min(32767, tail * math.cos(phase) + head * math.sin(phase)))))
 write("river-loop.wav", rate, channels, loop)
 
-rate, channels, samples = read("art/audio/wind-and-magic-review/wind-gusts.wav")
-for name, start in (("wind-01.wav", 1), ("wind-02.wav", 15)):
-    write(name, rate, channels, samples[start * rate * channels:(start + 8) * rate * channels])
+runpy.run_path("tools/prepare-runtime-wind.py")
 
 # Preserve the chosen 220 ms soft-entry checkpoint audition byte-for-byte.
 shutil.copyfile("art/audio/checkpoint-achievement-reference/checkpoint-achievement-soft-start.wav",

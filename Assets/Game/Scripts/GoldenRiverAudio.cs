@@ -9,7 +9,7 @@ public sealed class GoldenRiverAudio : MonoBehaviour
     AudioClip checkpoint;
     AudioClip[] gusts;
     readonly System.Random variation = new System.Random();
-    int previousCheckpoint, nextGust;
+    int previousCheckpoint, previousGust;
     float windWait, gustAge = -1;
     bool wasPaused, finished;
 
@@ -22,7 +22,9 @@ public sealed class GoldenRiverAudio : MonoBehaviour
         wind = Source("Passing wind", .75f);
         landmark = Source("Checkpoint sound", .7f);
         gusts = new[] { Resources.Load<AudioClip>("GoldenRiverAudio/wind-01"),
-            Resources.Load<AudioClip>("GoldenRiverAudio/wind-02") };
+            Resources.Load<AudioClip>("GoldenRiverAudio/wind-02"),
+            Resources.Load<AudioClip>("GoldenRiverAudio/wind-03"),
+            Resources.Load<AudioClip>("GoldenRiverAudio/wind-04") };
         checkpoint = Resources.Load<AudioClip>("GoldenRiverAudio/checkpoint");
         course.Run.ResetTransientState += ResetSounds;
         course.ExitReached += Finish;
@@ -43,7 +45,7 @@ public sealed class GoldenRiverAudio : MonoBehaviour
         StopSources();
         previousCheckpoint = course.Run.Checkpoint;
         wasPaused = finished = false;
-        nextGust = 0;
+        previousGust = -1;
         gustAge = -1;
         windWait = 4;
         if (isActiveAndEnabled && Application.isPlaying && river.clip) river.Play();
@@ -80,14 +82,16 @@ public sealed class GoldenRiverAudio : MonoBehaviour
             gustAge += deltaSeconds;
             if (gustAge >= wind.clip.length) {
                 wind.Stop(); gustAge = -1;
-                windWait = 8 + (float)variation.NextDouble() * 8;
+                windWait = 10 + (float)variation.NextDouble() * 14;
             }
             return;
         }
         windWait -= deltaSeconds;
         if (windWait > 0) return;
-        wind.clip = gusts[nextGust];
-        nextGust = (nextGust + 1) % gusts.Length;
+        int selected = variation.Next(previousGust < 0 ? gusts.Length : gusts.Length - 1);
+        if (previousGust >= 0 && selected >= previousGust) selected++;
+        previousGust = selected;
+        wind.clip = gusts[selected];
         if (!wind.clip) { windWait = 8; return; }
         gustAge = 0;
         if (Application.isPlaying) wind.Play();

@@ -110,7 +110,12 @@ public class GoldenRiverAtmosphereTests
             Call(audio, "ResetSounds");
             Assert.That(wind.isPlaying, Is.False);
             Call(audio, "AdvanceAmbience", 4f);
-            Assert.That(wind.clip.name, Is.EqualTo("wind-01"));
+            var bank = (AudioClip[])Field(audio, "gusts");
+            Assert.That(bank.Length, Is.EqualTo(4));
+            Assert.That(bank.All(clip => clip && clip.length >= 11 && clip.length <= 14.1f), Is.True);
+            Assert.That(bank.Distinct().Count(), Is.EqualTo(4));
+            Assert.That(bank, Does.Contain(wind.clip));
+            var firstGust = wind.clip;
             Assert.That(wind.isPlaying, Is.True);
             Assert.That(wind.volume, Is.GreaterThan(river.volume * 4));
             river.Pause();
@@ -133,12 +138,24 @@ public class GoldenRiverAtmosphereTests
             Call(audio, "AdvanceAmbience", wind.clip.length);
             Assert.That(wind.isPlaying, Is.False);
             float gap = (float)Field(audio, "windWait");
-            Assert.That(gap, Is.InRange(8f, 16f));
+            Assert.That(gap, Is.InRange(10f, 24f));
             Call(audio, "AdvanceAmbience", gap - .1f);
             Assert.That(wind.isPlaying, Is.False, "A quiet interval separates complete gusts.");
             Call(audio, "AdvanceAmbience", .2f);
-            Assert.That(wind.clip.name, Is.EqualTo("wind-02"));
+            Assert.That(wind.clip, Is.Not.SameAs(firstGust));
             Assert.That(wind.isPlaying, Is.True);
+            for (int i = 0; i < 20; i++) {
+                var previous = wind.clip;
+                Call(audio, "AdvanceAmbience", previous.length);
+                Assert.That(wind.isPlaying, Is.False);
+                gap = (float)Field(audio, "windWait");
+                Assert.That(gap, Is.InRange(10f, 24f));
+                Call(audio, "AdvanceAmbience", gap - .1f);
+                Assert.That(wind.isPlaying, Is.False);
+                Call(audio, "AdvanceAmbience", .2f);
+                Assert.That(bank, Does.Contain(wind.clip));
+                Assert.That(wind.clip, Is.Not.SameAs(previous), "Consecutive wind gestures must differ.");
+            }
             Call(course, "RetryCheckpoint");
             Assert.That(wind.isPlaying, Is.False);
             Assert.That(Field(audio, "windWait"), Is.EqualTo(4f));

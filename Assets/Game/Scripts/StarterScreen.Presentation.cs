@@ -183,9 +183,10 @@ public sealed partial class StarterScreen
             Label("Checkpoint: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran. CC BY 4.0. Adapted with a shorter excerpt and softer entrance.");
             if (Button("Checkpoint source and author")) Application.OpenURL("https://freesound.org/people/TommasoMotteran/sounds/859080/");
             if (Button("CC BY 4.0 license")) Application.OpenURL("https://creativecommons.org/licenses/by/4.0/");
-            Label("River and wind: Park ambiences by Thimras. CC0 1.0. Adapted into a river loop and passing gusts.");
-            if (Button("River and wind source")) Application.OpenURL("https://opengameart.org/content/park-ambiences");
+            Label("River: Park ambiences by Thimras. CC0 1.0. Adapted into a river loop.");
+            if (Button("River source")) Application.OpenURL("https://opengameart.org/content/park-ambiences");
             if (Button("CC0 1.0 dedication")) Application.OpenURL("https://creativecommons.org/publicdomain/zero/1.0/");
+            Label("Wind: original continuous-air sound effects. PolyForm Noncommercial 1.0.0.");
             if (Button("Back to settings")) page = "settings";
         } else {
             Label("Versions & updates", headingStyle);
