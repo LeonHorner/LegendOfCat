@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Residual checkpoint background bing - 2026-11-22
+
+The owner still hears a quiet background bing in the reduced-knock audition. New standalone `checkpoint-achievement-reduced-ring.wav` uses narrow attenuation of five measured upper resonances, keeping the earlier cue/timing and low foundation. The spectral peaks are candidate targets, not verified identification of the subjective defect. Source/processing/rights/checks: art/audio/checkpoint-achievement-reference/README.md. Await owner hearing before runtime replacement; river/wind unchanged.
+
 ## Checkpoint upper-band knocking correction - 2026-11-22
 
 The owner reports knocking among the checkpoint cue's higher tones. A standalone `art/audio/checkpoint-achievement-reference/checkpoint-achievement-reduced-knock.wav` attenuates upper-band transients and bright ringing while preserving the selected cue's duration/entrance. Same TommasoMotteran CC BY 4.0 source and attribution; preparation/limits are in the review README. Owner hearing remains the gate before runtime replacement. No new Unity integration, wind/river change or final sound acceptance.
