@@ -1,5 +1,7 @@
 # Movement prototype
 
+Retired from the player on 2026-11-22. No menu/LevelRegistry entry or player Resources prefab remains. The original prefab/GUID is retained only at `Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab` for editor authoring and regression tests. The launch instructions and controls below are historical.
+
 Issue #9 supplies a temporary movement lab through **Movement lab (prototype) > Enter movement lab**
 on the painted menu integrated from PR #31. Escape or P opens/closes pause. Return through **Main menu** in the pause menu or controller Start.
 This is a tuning baseline, not approval of final character art, campaign geometry or difficulty.

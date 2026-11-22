@@ -93,10 +93,8 @@ public sealed class LevelProgressTests
     {
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         yield return new EnterPlayMode();
-        var host = new GameObject("Checkpoint activation test");
-        var screen = host.AddComponent(RuntimeType("StarterScreen"));
-        Call(screen, "OpenLevel", "movement-lab");
-        var course = screen.GetType().GetField("course", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(screen);
+        var root = UnityEngine.Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab"));
+        var course = root.GetComponent(RuntimeType("MovementCourse"));
         var hud = Read(course, "Progress");
         var run = Read(course, "Run");
         var cat = (Component)Read(course, "Cat");
@@ -120,8 +118,7 @@ public sealed class LevelProgressTests
         Assert.That(active, Is.EqualTo(1), "Landing beyond the post on its platform should activate the checkpoint.");
         Assert.That(Call(hud, "UpdateGuideCheckpoint", active, 20f), Is.EqualTo(2));
 
-        Call(screen, "CloseCourse");
-        UnityEngine.Object.DestroyImmediate(host);
+        UnityEngine.Object.DestroyImmediate(root);
         yield return new ExitPlayMode();
     }
 

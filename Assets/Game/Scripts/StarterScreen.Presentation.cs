@@ -18,7 +18,7 @@ public sealed partial class StarterScreen
     bool simulateCutout;
     float guiScale = 1;
     bool revealFocus;
-    bool gameplayMenuVisible;
+    bool gameplayMenuVisible, gameplaySettings;
     Vector2 gameplayControlsScroll, gameplayMenuScroll;
     bool UpdatesSupported {
         get {
@@ -113,6 +113,9 @@ public sealed partial class StarterScreen
             DrawGameplayMenu();
             return;
         }
+        if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape && BackFromMenu()) {
+            Event.current.Use(); GUI.FocusControl(null);
+        }
         gameplayMenuVisible = false;
         PrepareStyles();
         var oldColor = GUI.color;
@@ -152,39 +155,17 @@ public sealed partial class StarterScreen
             Label("Explore the current build and make yourself at home. Mika's campaign is still in development.");
             GUILayout.Space(18);
             if (Button("Golden River preview")) OpenLevelOne();
-            if (Button("Movement lab")) page = "play";
             if (Button("Simple combat lab")) OpenStompArena();
             if (Button("Ranged combat lab")) OpenRangedArena();
             if (Button(string.IsNullOrEmpty(available) ? "Settings" : "Settings - Update available")) page = "settings";
             if (Button("Quit")) Application.Quit();
-        } else if (page == "play") {
-            Label("Movement lab prototype", headingStyle);
-            Label("Run and jump through a longer painted river course with four checkpoints. Mika's campaign is still in development; this is a movement prototype.");
-            GUILayout.Space(16);
-            if (Button("Enter movement lab")) OpenCourse();
-            if (Button("Back to menu")) page = "menu";
         } else if (page == "settings") {
             Label("Settings", headingStyle);
             Label("A few comforts for the journey.");
-            Label("Sound volume: " + Mathf.RoundToInt(MasterVolume * 100) + "%", smallStyle);
-            GUI.enabled = !popup;
-            GUI.SetNextControlName("Sound volume");
-            if (GUI.enabled) focusable.Add("Sound volume");
-            SetMasterVolume(GUILayout.HorizontalSlider(MasterVolume, 0, 1, volumeTrackStyle, volumeThumbStyle));
+            DrawPlaySettings(false);
             GUI.enabled = false;
             Button("Language - Coming later");
             GUI.enabled = !popup;
-            if (display != null) {
-                GUILayout.Space(12);
-                Label("Display", headingStyle);
-                GUI.enabled = !popup && !display.Switching;
-                if (Button(fullscreen ? "Fullscreen: On" : "Fullscreen: Off"))
-                    SetFullscreen(!fullscreen);
-                GUI.enabled = !popup;
-                Label("Resize the window by dragging its borders. F11 or Alt+Enter toggles fullscreen.", smallStyle);
-            }
-            if (Button(ShowLevelProgress ? "Level progress bar: On" : "Level progress bar: Off"))
-                SetShowLevelProgress(!ShowLevelProgress);
             if (Button("Sound credits")) page = "sound-credits";
             if (Button(string.IsNullOrEmpty(available) ? "Versions & updates" : "Versions & updates - Available")) page = "updates";
             if (Button("Back to menu")) page = "menu";
@@ -351,12 +332,32 @@ public sealed partial class StarterScreen
         return hand;
     }
 
+    void DrawPlaySettings(bool inGame)
+    {
+        Label("Sound volume: " + Mathf.RoundToInt(MasterVolume * 100) + "%", smallStyle);
+        GUI.enabled = inGame || !popup;
+        GUI.SetNextControlName("Sound volume");
+        if (GUI.enabled) focusable.Add("Sound volume");
+        SetMasterVolume(GUILayout.HorizontalSlider(MasterVolume, 0, 1, volumeTrackStyle, volumeThumbStyle));
+        if (display != null) {
+            GUILayout.Space(12);
+            Label("Display", headingStyle);
+            GUI.enabled = (inGame || !popup) && !display.Switching;
+            if (Button(fullscreen ? "Fullscreen: On" : "Fullscreen: Off")) SetFullscreen(!fullscreen);
+            GUI.enabled = inGame || !popup;
+            if (!inGame) Label("Resize the window by dragging its borders. F11 or Alt+Enter toggles fullscreen.", smallStyle);
+        }
+        if ((!inGame || course != null) && Button(ShowLevelProgress ? "Level progress bar: On" : "Level progress bar: Off"))
+            SetShowLevelProgress(!ShowLevelProgress);
+    }
+
     void DrawGameplayMenu()
     {
         bool levelFinished = course != null && course.LevelOne && course.HasReachedExit;
         bool finished = levelFinished || (rangedArena != null ? rangedArena.Combat.Finished : stompArena != null && stompArena.Combat.Finished);
         bool paused = ActiveRun?.Paused ?? false;
         if (!paused && !finished) {
+            gameplaySettings = false;
             if (gameplayMenuVisible) {
                 previousFocus.Clear();
                 GUI.FocusControl(null);
@@ -371,7 +372,8 @@ public sealed partial class StarterScreen
         var oldMatrix = GUI.matrix;
         var oldColor = GUI.color;
         int oldDepth = GUI.depth;
-        GUI.depth = -10;
+        // Keep pause controls above the water-recovery blackout.
+        GUI.depth = -2000;
         guiScale = 1;
         GUI.matrix = Matrix4x4.TRS(new Vector3(region.x, region.y), Quaternion.identity, Vector3.one);
         GUI.color = Color.white;
@@ -385,24 +387,34 @@ public sealed partial class StarterScreen
         }
         NavigateFocus(); focusable.Clear();
         GUILayout.BeginArea(new Rect((region.width - panelWidth) / 2, (region.height - panelHeight) / 2, panelWidth, panelHeight), panelStyle);
-        Label(levelFinished ? "Golden River complete" : finished ?
-            (rangedArena != null || stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
-        if (levelFinished) Label("You made it through the valley.", smallStyle);
-        GUILayout.Space(8);
-        if (wide) { GUILayout.BeginHorizontal(); GUILayout.BeginVertical(GUILayout.Width(220)); }
-        else gameplayMenuScroll = GUILayout.BeginScrollView(gameplayMenuScroll);
-        bool resume = !finished && Button("Resume", fixedNavigation: true);
-        bool retry = Button("Retry", fixedNavigation: true);
-        bool restart = Button("Restart", fixedNavigation: true);
-        bool menu = Button("Main menu", fixedNavigation: true);
-        if (wide) {
-            GUILayout.EndVertical(); GUILayout.Space(20); GUILayout.BeginVertical();
-            Label("Controls", textStyle);
-            gameplayControlsScroll = GUILayout.BeginScrollView(gameplayControlsScroll);
-        } else { GUILayout.Space(16); Label("Controls", textStyle); }
-        DrawGameplayControls();
-        if (wide) { GUILayout.EndScrollView(); GUILayout.EndVertical(); GUILayout.EndHorizontal(); }
-        else GUILayout.EndScrollView();
+        bool resume = false, retry = false, restart = false, menu = false, settings = false, back = false;
+        if (gameplaySettings) {
+            Label("Settings", headingStyle);
+            gameplayMenuScroll = GUILayout.BeginScrollView(gameplayMenuScroll);
+            DrawPlaySettings(true);
+            GUILayout.EndScrollView();
+            back = Button("Back to pause", fixedNavigation: true);
+        } else {
+            Label(levelFinished ? "Golden River complete" : finished ?
+                (rangedArena != null || stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
+            if (levelFinished) Label("You made it through the valley.", smallStyle);
+            GUILayout.Space(8);
+            if (wide) { GUILayout.BeginHorizontal(); GUILayout.BeginVertical(GUILayout.Width(220)); }
+            else gameplayMenuScroll = GUILayout.BeginScrollView(gameplayMenuScroll);
+            resume = !finished && Button("Resume", fixedNavigation: true);
+            retry = Button("Retry", fixedNavigation: true);
+            restart = Button("Restart", fixedNavigation: true);
+            settings = !finished && Button("Settings", fixedNavigation: true);
+            menu = Button("Main menu", fixedNavigation: true);
+            if (wide) {
+                GUILayout.EndVertical(); GUILayout.Space(20); GUILayout.BeginVertical();
+                Label("Controls", textStyle);
+                gameplayControlsScroll = GUILayout.BeginScrollView(gameplayControlsScroll);
+            } else { GUILayout.Space(16); Label("Controls", textStyle); }
+            DrawGameplayControls();
+            if (wide) { GUILayout.EndScrollView(); GUILayout.EndVertical(); GUILayout.EndHorizontal(); }
+            else GUILayout.EndScrollView();
+        }
         GUILayout.EndArea();
         if (Event.current.type == EventType.Repaint) {
             previousFocus.Clear();
@@ -412,6 +424,8 @@ public sealed partial class StarterScreen
         GUI.color = oldColor;
         GUI.depth = oldDepth;
 
+        if (back) { CloseGameplaySettings(); return; }
+        if (settings) { OpenGameplaySettings(); return; }
         if (course != null) {
             if (resume) course.TogglePause();
             else if (retry) course.RetryCheckpoint();

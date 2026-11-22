@@ -4,13 +4,13 @@ using UnityEngine;
 
 public static class BuildMovementCourse
 {
-    [MenuItem("LegendOfCat/Create movement course prefab")]
+    [MenuItem("LegendOfCat/Create editor movement fixture")]
     public static void Create()
     {
-        Directory.CreateDirectory("Assets/Game/Resources");
+        Directory.CreateDirectory(Path.GetDirectoryName(MovementLabArchive.FixturePath));
         var root = new GameObject("MovementCourse");
         root.AddComponent<MovementCourse>();
-        PrefabUtility.SaveAsPrefabAsset(root, "Assets/Game/Resources/MovementCourse.prefab");
+        PrefabUtility.SaveAsPrefabAsset(root, MovementLabArchive.FixturePath);
         Object.DestroyImmediate(root);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();

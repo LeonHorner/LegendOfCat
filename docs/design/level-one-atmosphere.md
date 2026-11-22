@@ -1,5 +1,11 @@
 # Golden River audio and completion
 
+## Quieter wind, hierarchical back navigation and round settings - 2026-11-22
+
+The owner found the wind too loud: reduce its source mix from 0.75 to 0.4 (about -5.5 dB) without changing the approved clips or timing. The actual mixer/pause lifecycle regression passed after this gain change. They also request Esc back navigation across menus, complete removal of the player-facing Movement Lab and relevant settings within pause. Settings/credits/updates now return to their parent; update notices dismiss first. A round settings subview offers volume, fullscreen and course progress visibility while retaining pause; Esc returns to Pause before resuming. The shared controls update the existing preferences.
+
+Movement Lab has no menu or registered-level entry. Unity moved its prefab/GUID from Resources to Editor fixtures; authoring/regression tools load it explicitly from that location. This preserves mechanical/animation test coverage without shipping a playable lab. No route/artwork or persistent-data format changes. Expanded validation: 108 of 109 cases passed, with one obsolete 14-platform lab count in the menu cleanup test. After adapting that test to the shipped Golden River while retaining decorative-collider/resource checks, all 12 focused cases passed. The Editor prefab GUID is unchanged. The updated Windows build and retired-prefab package exclusion audit passed. Round settings were inspected in actual player captures at 640x360 and 960x540; the main menu capture confirms the removed lab entry. Pause controls now draw above the recovery blackout, so settings remain usable during a water sequence.
+
 ## Escape pause, volume slider and selected splash - 2026-11-22
 
 The owner requests Esc to open/close pause. It now shares Pause with P; the pause menu's Main menu button returns to the title, while controller bindings remain unchanged. All 118 selected tests passed after this control update. They also request a horizontal volume slider; it provides immediate one-percent adjustment with delayed preference writes and focus/suspension/quit flush, preserving the existing settings format. All 47 focused slider/pause/desktop tests passed.

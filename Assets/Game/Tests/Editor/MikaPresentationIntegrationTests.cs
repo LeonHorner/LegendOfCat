@@ -81,7 +81,7 @@ public class MikaPresentationIntegrationTests
         scene = SceneManager.CreateScene("Mika integration physics", new CreateSceneParameters(LocalPhysicsMode.Physics2D));
         SceneManager.SetActiveScene(scene);
         physics = scene.GetPhysicsScene2D();
-        var prefab = Resources.Load<GameObject>("MovementCourse");
+        var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab");
         Assert.That(prefab, Is.Not.Null);
         course = UnityEngine.Object.Instantiate(prefab);
         var component = course.GetComponent(Runtime("MovementCourse"));
@@ -114,7 +114,7 @@ public class MikaPresentationIntegrationTests
             var placement = new GameObject("Transformed course placement");
             placement.transform.position = new Vector3(scale < 1 ? -240 : 240, 7, 0);
             placement.transform.localScale = Vector3.one * scale;
-            var placed = UnityEngine.Object.Instantiate(Resources.Load<GameObject>("MovementCourse"), placement.transform, false);
+            var placed = UnityEngine.Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab"), placement.transform, false);
             try {
                 var component = placed.GetComponent(Runtime("MovementCourse"));
                 var cat = (Component)Read(component, "Cat");

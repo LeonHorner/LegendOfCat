@@ -99,14 +99,14 @@ public class MenuMovementIntegrationTests
         .Select(a => a.GetType(name)).First(t => t != null);
     static object Field(object target, string name) => target.GetType()
         .GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
-    static void Call(object target, string name) => target.GetType()
-        .GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Invoke(target, null);
+    static void Call(object target, string name, params object[] args) => target.GetType()
+        .GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Invoke(target, args);
 
     static UnityEngine.Object[] SceneryResources(Component course)
     {
         var study = course.GetComponentInChildren(RuntimeType("SceneryRenderer"));
         Assert.That(study, Is.Not.Null);
-        // Check synchronously after OpenCourse, before deferred destruction could hide a collider.
+        // Check synchronously after level entry, before deferred destruction could hide a collider.
         Assert.That(course.GetComponentsInChildren<Collider>(true), Is.Empty);
         var filters = course.GetComponentsInChildren<MeshFilter>(true);
         Assert.That(filters.Length, Is.GreaterThan(0));
@@ -115,8 +115,6 @@ public class MenuMovementIntegrationTests
             Assert.That(filter.sharedMesh, Is.Not.Null, filter.name);
             Assert.That(filter.GetComponent<MeshRenderer>().sharedMaterial, Is.Not.Null, filter.name);
         }
-        Assert.That(course.GetComponentsInChildren<Collider2D>(true), Has.Length.EqualTo(15),
-            "Only fourteen gameplay platforms and Mika may have colliders.");
         var quad = filters.First(f => f.name.StartsWith("Mirrored scenery tile")).sharedMesh;
         Assert.That(quad.bounds.center, Is.EqualTo(Vector3.zero));
         Assert.That(quad.bounds.size, Is.EqualTo(new Vector3(1, 1, 0)));
@@ -874,12 +872,12 @@ public class MenuMovementIntegrationTests
         yield return null;
         var platform = Field(screen, "platform");
         Assert.That(platform, Is.Not.Null);
-        Call(screen, "OpenCourse");
+        Call(screen, "OpenLevel", "golden-river");
         var course = (Component)Field(screen, "course");
         Assert.That(course, Is.Not.Null);
         var scenery = SceneryResources(course);
         var sourceArt = Resources.LoadAll<UnityEngine.Object>("BackgroundStudy");
-        Call(screen, "OpenCourse");
+        Call(screen, "OpenLevel", "golden-river");
         Assert.That(Field(screen, "course"), Is.SameAs(course), "Repeated entry must not create another course.");
         var cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
         var spawnX = cat.GetComponent<Rigidbody2D>().position.x;
@@ -942,7 +940,7 @@ public class MenuMovementIntegrationTests
         yield return null; // Also allow resources queued by OnDestroy to finish destruction.
         Assert.That(scenery.All(o => !o), Is.True, "Closing the course must release every generated scenery resource.");
         Assert.That(sourceArt.All(o => o), Is.True, "Imported artwork/materials must survive closing.");
-        Call(screen, "OpenCourse");
+        Call(screen, "OpenLevel", "golden-river");
         var next = (Component)Field(screen, "course");
         Assert.That(next, Is.Not.Null);
         Assert.That(next, Is.Not.SameAs(course), "Re-entry must create a new course.");
@@ -958,7 +956,7 @@ public class MenuMovementIntegrationTests
     }
 
     [UnityTest]
-    public IEnumerator CombatMenuRoundTripPreservesMovementLabAndStopsAudio()
+    public IEnumerator CombatMenuRoundTripPreservesGoldenRiverAndStopsAudio()
     {
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         yield return new EnterPlayMode();
@@ -970,7 +968,7 @@ public class MenuMovementIntegrationTests
         Assert.That(arena, Is.Not.Null);
         Call(screen, "OpenStompArena");
         Assert.That(Field(screen, "stompArena"), Is.SameAs(arena));
-        Call(screen, "OpenCourse");
+        Call(screen, "OpenLevel", "golden-river");
         Assert.That(Field(screen, "course"), Is.Null, "Only one lab may own gameplay input.");
         var cat = (Component)arena.GetType().GetProperty("Cat").GetValue(arena);
         var audio = cat.GetComponent<AudioSource>();
@@ -985,7 +983,7 @@ public class MenuMovementIntegrationTests
         Assert.That(Field(screen, "stompArena"), Is.Null);
         yield return null;
         Assert.That(arena == null, Is.True);
-        Call(screen, "OpenCourse");
+        Call(screen, "OpenLevel", "golden-river");
         var course = (Component)Field(screen, "course");
         Assert.That(course, Is.Not.Null);
         Assert.That(course.GetComponentInChildren(RuntimeType("SceneryRenderer")), Is.Not.Null);

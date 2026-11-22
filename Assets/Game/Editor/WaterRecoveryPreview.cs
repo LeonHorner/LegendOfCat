@@ -38,7 +38,7 @@ public static class WaterRecoveryPreview
         }
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        Object.Instantiate(Resources.Load<GameObject>("MovementCourse"));
+        Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab"));
         EditorApplication.isPlaying = true;
         // Once Play starts, use this menu again to place Mika over the opening gap.
     }
@@ -48,7 +48,7 @@ public static class WaterRecoveryPreview
     {
         Prepare();
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        var root = Object.Instantiate(Resources.Load<GameObject>("MovementCourse"));
+        var root = Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab"));
         var course = root.GetComponent<MovementCourse>();
         Invoke(course, "Awake"); Invoke(course.Cat, "Awake");
         var scenery = root.GetComponentInChildren<SceneryRenderer>();

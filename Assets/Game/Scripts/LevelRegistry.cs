@@ -6,7 +6,6 @@ public static class LevelRegistry
 {
     static readonly Dictionary<string, Func<MovementCourse>> levels =
         new Dictionary<string, Func<MovementCourse>>(StringComparer.Ordinal) {
-            { "movement-lab", () => UnityEngine.Object.Instantiate(Resources.Load<MovementCourse>("MovementCourse")) },
             { "golden-river", CreateGoldenRiver }
         };
 

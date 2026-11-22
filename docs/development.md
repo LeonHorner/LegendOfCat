@@ -50,7 +50,7 @@ Run Unity in batch mode with `-executeMethod BuildGame.BuildPreview` and
 Keep the entire output folder with the executable; Unity players are not single-file applications.
 Preview-only buttons show the update pop-up and simulate downloads/errors without networking,
 installing updates or quitting to an updater. Preview settings use a separate persistent data
-directory (`LeonHorner/LegendOfCat Preview`). The painted menu, Settings and movement-lab entry
+directory (`LeonHorner/LegendOfCat Preview`). The painted menu, Settings and Golden River entry
 are the same UI as the release build; simulation tools are compiled out of release builds.
 
 ## Official Unity agent connection
@@ -63,8 +63,7 @@ No tests are run by connecting MCP. Follow the ready-PR automatic validation rul
 
 ## Design references
 
-**Movement lab (prototype) > Enter movement lab** opens the reusable movement lab. See [Movement prototype](design/movement-prototype.md)
-for controls, course geometry, jump reach and the prefab regeneration command.
+The Movement Lab is retired from player menus/LevelRegistry and its prefab is Editor-only at `Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab`. See [Movement prototype](design/movement-prototype.md) for historical geometry/physics references. Editor regeneration targets that fixture, never player Resources.
 
 Read the [game direction](design/game-direction.md), [art direction](design/art-direction.md) and [implementation plan](design/implementation-plan.md) before gameplay or visual work. The Unity adventure reimagines the earlier Java game rather than copying its gameplay specification.
 
@@ -88,12 +87,7 @@ bounded scaling and scrollable content. Buttons are at least 48 physical pixels 
 Tab/Shift+Tab or arrow keys move focus; Enter/Space activates buttons. A gold border
 marks focus independently of text color. A short page opacity transition leaves input
 immediate; scenery does not move. Update dialogs trap menu interaction and offer
-Later as their initial focus. **Movement lab (prototype)** opens an introduction explaining
-the temporary course and unfinished campaign; **Enter movement lab** starts it. The menu's
-single OnGUI implementation skips all painting while the lab is active. The menu component
-continues receiving update-service messages, preserving settings and once-per-version reminders.
-Escape or P opens/closes pause. Return with **Main menu** in the pause menu or controller Start; the lab stops immediately, its input
-actions are disabled and the painted menu resumes with fresh keyboard navigation state.
+Later as their initial focus. Golden River launches directly from the menu. Esc returns title subpages to their parent; an update notice dismisses before the underlying page changes. During gameplay Esc or P opens/closes Pause. Round Settings exposes volume, fullscreen and course progress visibility without resuming; Esc returns from Settings to Pause first. Main menu returns to the title, immediately stopping input/audio. Update messages and persistent preferences remain intact.
 
 Open `Assets/Game/Scenes/Main.unity` in the pinned Editor and enter Play Mode to inspect the
 combined flow. Verify menu keyboard focus, entry, run/jump/retry, return, then Settings and

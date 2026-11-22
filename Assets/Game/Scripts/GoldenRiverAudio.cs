@@ -19,7 +19,7 @@ public sealed class GoldenRiverAudio : MonoBehaviour
         river = Source("River ambience", .14f);
         river.clip = Resources.Load<AudioClip>("GoldenRiverAudio/river-loop");
         river.loop = true;
-        wind = Source("Passing wind", .75f);
+        wind = Source("Passing wind", .4f);
         landmark = Source("Checkpoint sound", .7f);
         gusts = new[] { Resources.Load<AudioClip>("GoldenRiverAudio/wind-01"),
             Resources.Load<AudioClip>("GoldenRiverAudio/wind-02"),

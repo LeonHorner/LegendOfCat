@@ -1056,3 +1056,10 @@ Source: jump-into-water.flac by yurkobb, published 2015-07-06, https://freesound
 ## Volume slider presentation - 2026-11-22
 
 The owner requested a slider instead of discrete volume buttons. The original procedural menu palette supplies a thin centered rail and thumb; no external artwork, new font or image generator was used. Actual Windows player settings views are retained under docs/design/level-one-audio-review/volume-slider-640.png and volume-slider-960.png. Existing underlying art provenance/licenses are unchanged.
+
+
+## Wind mix trim and retired movement fixture - 2026-11-22
+
+The owner requests less prominent wind: source volume changes from 0.75 to 0.4 (about -5.5 dB), retaining all four approved original synthesized files, envelopes and random scheduling. No new recording/model/assets introduced.
+
+The owner requests removing the Movement Lab from the game. Unity AssetDatabase moved Assets/Game/Resources/MovementCourse.prefab to Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab, preserving its original GUID and source data. The prefab remains Editor-only for authoring/regression coverage and is no longer a registered/selectable player level. Existing asset provenance/licenses remain unchanged. Round settings reuse the existing procedural menu palette and controls; no new artwork/font/model.

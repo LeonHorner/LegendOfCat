@@ -47,6 +47,51 @@ public class GoldenRiverAtmosphereTests
     }
 
     [Test]
+    public void RetiredLabIsNotRegisteredOrPackedAsAResource()
+    {
+        var ids = (System.Collections.Generic.IEnumerable<string>)Runtime("LevelRegistry").GetProperty("Ids").GetValue(null);
+        Assert.That(ids, Does.Not.Contain("movement-lab"));
+        Assert.That(ids, Does.Contain("golden-river"));
+        Assert.That(Resources.Load<GameObject>("MovementCourse"), Is.Null);
+        Assert.That(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab"), Is.Not.Null);
+    }
+
+    [TestCase("settings", "menu")]
+    [TestCase("sound-credits", "settings")]
+    [TestCase("updates", "settings")]
+    public void MenuBackReturnsToItsParentWithoutChangingUpdateState(string page, string parent)
+    {
+        var host = new GameObject("Menu back regression");
+        var menu = host.AddComponent(Runtime("StarterScreen"));
+        try {
+            menu.GetType().GetField("page", Methods).SetValue(menu, page);
+            menu.GetType().GetField("state", Methods).SetValue(menu, "downloading");
+            Assert.That(Call(menu, "BackFromMenu"), Is.True);
+            Assert.That(Field(menu, "page"), Is.EqualTo(parent));
+            Assert.That(Field(menu, "state"), Is.EqualTo("downloading"), "Back must not cancel an update download.");
+            while ((bool)Call(menu, "BackFromMenu")) { }
+            Assert.That(Field(menu, "page"), Is.EqualTo("menu"));
+        } finally { UnityEngine.Object.DestroyImmediate(host); }
+    }
+
+    [Test]
+    public void MenuBackDismissesUpdateNoticeFirstAndPreservesItsUnderlyingPage()
+    {
+        var host = new GameObject("Update notice back regression");
+        var menu = host.AddComponent(Runtime("StarterScreen"));
+        try {
+            menu.GetType().GetField("page", Methods).SetValue(menu, "settings");
+            menu.GetType().GetField("popup", Methods).SetValue(menu, true);
+            Assert.That(Call(menu, "BackFromMenu"), Is.True);
+            Assert.That(Field(menu, "popup"), Is.False);
+            Assert.That(Field(menu, "page"), Is.EqualTo("settings"));
+            Assert.That(Call(menu, "BackFromMenu"), Is.True);
+            Assert.That(Field(menu, "page"), Is.EqualTo("menu"));
+            Assert.That(Call(menu, "BackFromMenu"), Is.False, "Escape at the main menu must not quit.");
+        } finally { UnityEngine.Object.DestroyImmediate(host); }
+    }
+
+    [Test]
     public void VolumeSliderUpdatesMixerImmediatelyAndSavesAfterDragging()
     {
         string directory = Path.Combine(Path.GetTempPath(), "LegendOfCat-slider-" + Guid.NewGuid().ToString("N"));
@@ -181,7 +226,6 @@ public class GoldenRiverAtmosphereTests
             Assert.That(bank, Does.Contain(wind.clip));
             var firstGust = wind.clip;
             Assert.That(wind.isPlaying, Is.True);
-            Assert.That(wind.volume, Is.GreaterThan(river.volume * 4));
             river.Pause();
             float gustEnergy = 0;
             for (int i = 0; i < 30; i++) { yield return null; gustEnergy += Energy(); }
@@ -306,7 +350,7 @@ public class GoldenRiverAtmosphereTests
             Call(menu, "OnApplicationFocus", false);
             Call(menu, "OnApplicationPause", true);
             foreach (string mode in new[] { "course", "rangedArena", "stompArena" }) {
-                if (mode == "course") Call(menu, "OpenLevel", "movement-lab");
+                if (mode == "course") Call(menu, "OpenLevel", "golden-river");
                 else Call(menu, mode == "rangedArena" ? "OpenRangedArena" : "OpenStompArena");
                 var owner = (Component)Field(menu, mode);
                 var run = Read(owner, "Run");
@@ -350,6 +394,15 @@ public class GoldenRiverAtmosphereTests
                     Assert.That(Read(run, "Paused"), Is.EqualTo(paused), "Escape must toggle the existing pause in " + mode);
                     Assert.That(cat.GetComponent<Rigidbody2D>().simulated, Is.EqualTo(!paused));
                 }
+                Call(menu, "OpenGameplaySettings");
+                Assert.That(Field(menu, "gameplaySettings"), Is.True);
+                float settingsTime = (float)Read(run, "ElapsedSeconds");
+                Call(run, "Advance", 10f);
+                Assert.That(Read(run, "ElapsedSeconds"), Is.EqualTo(settingsTime));
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Escape)); InputSystem.Update();
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState()); InputSystem.Update();
+                Assert.That(Field(menu, "gameplaySettings"), Is.False);
+                Assert.That(Read(run, "Paused"), Is.True, "Esc from round settings returns to pause without resuming.");
                 Call(menu, "OnApplicationFocus", false);
                 Assert.That(Read(run, "Paused"), Is.True, "An existing manual pause must stay paused.");
                 Call(menu, mode == "course" ? "CloseCourse" : mode == "rangedArena" ? "CloseRangedArena" : "CloseStompArena");
