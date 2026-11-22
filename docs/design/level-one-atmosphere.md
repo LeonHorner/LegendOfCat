@@ -1,0 +1,151 @@
+# Golden River audio and completion
+
+## Quieter wind, hierarchical back navigation and round settings - 2026-11-22
+
+The owner found the wind too loud: reduce its source mix from 0.75 to 0.4 (about -5.5 dB) without changing the approved clips or timing. The actual mixer/pause lifecycle regression passed after this gain change. They also request Esc back navigation across menus, complete removal of the player-facing Movement Lab and relevant settings within pause. Settings/credits/updates now return to their parent; update notices dismiss first. A round settings subview offers volume, fullscreen and course progress visibility while retaining pause; Esc returns to Pause before resuming. The shared controls update the existing preferences.
+
+Movement Lab has no menu or registered-level entry. Unity moved its prefab/GUID from Resources to Editor fixtures; authoring/regression tools load it explicitly from that location. This preserves mechanical/animation test coverage without shipping a playable lab. No route/artwork or persistent-data format changes. Expanded validation: 108 of 109 cases passed, with one obsolete 14-platform lab count in the menu cleanup test. After adapting that test to the shipped Golden River while retaining decorative-collider/resource checks, all 12 focused cases passed. The Editor prefab GUID is unchanged. The updated Windows build and retired-prefab package exclusion audit passed. Round settings were inspected in actual player captures at 640x360 and 960x540; the main menu capture confirms the removed lab entry. Pause controls now draw above the recovery blackout, so settings remain usable during a water sequence.
+
+## Escape pause, volume slider and selected splash - 2026-11-22
+
+The owner requests Esc to open/close pause. It now shares Pause with P; the pause menu's Main menu button returns to the title, while controller bindings remain unchanged. All 118 selected tests passed after this control update. They also request a horizontal volume slider; it provides immediate one-percent adjustment with delayed preference writes and focus/suspension/quit flush, preserving the existing settings format. All 47 focused slider/pause/desktop tests passed.
+
+The requested water-entry cue was auditioned first. The owner revised initial approval to quieter/softer, rejected the strongly softened version as too soft, then explicitly approved water-entry-splash-quiet.wav with its clear natural attack. WaterRecovery owns the one-shot source, freezes it immediately on pause and stops it on retry/menu/disable. No shark or completion sound is added. Source/processing/CC0 provenance: art/audio/water-entry-review/README.md and ASSETS.md. All 120 selected Unity tests passed after the water integration, including real mixed splash playback and sample-position lifecycle behavior. The fresh Windows preview and seven-clip/44-painting package audits passed. A cosmetic rail-alignment adjustment was compiled and visually reviewed after those behavior checks; final full exact-head cross-platform validation remains pending while draft.
+
+## Full world pause correction - 2026-11-22
+
+The owner reports continued background/platform movement after focus return, while expecting the same frozen world as normal pause. Both paths use the existing course toggle. Platforms now synchronize kinematic simulation immediately, retain their phase, and re-enable on explicit resume or retry. Course-owned animation time replaces global shader time for water, willow/mill and fish ripples; recovery surface ripples use their frozen sequence time. Camera smoothing and Mika presentation do not advance while paused. No global time-scale change or new artwork. Tests compare actual rendered frames and all support positions/phases across focus/manual pause, then verify resume/retry.
+
+Validation: the expanded run covered 76 cases and passed 75, including the actual GPU frame/platform freeze regression. Its remaining synthetic P test was routed to the Editor rather than the game; the corrected harness explicitly routes keyboard input to the Game view and restores both routing settings afterward. All four focused GoldenRiverAtmosphereTests then passed, including the real P binding after focus restoration. No production input binding needed changing. The fresh full-world Windows preview build and six-clip package audit passed.
+
+## Approved checkpoint integration and background pause - 2026-11-22
+
+The owner approved the long-shimmer checkpoint audition and explicitly requested integration. Runtime checkpoint.wav is a byte-identical copy; retain TommasoMotteran CC BY 4.0 attribution with all adaptation notices, including bell-layer omission and extended early shimmer. River/wind unchanged.
+
+The owner also requested automatic pause whenever the game loses focus. The menu host now sends an idempotent pause request through each active prototype's existing pause path on focus loss/application suspension. Returning focus does not auto-resume; idle menus and completed runs remain unaffected. Golden River audio synchronizes pause immediately, avoiding a final background sound if no later frame runs. Existing movement/encounter pause behavior is preserved; no global time-scale or settings format change.
+
+## Completion recommendation - not approved or implemented
+
+The owner questions whether the legacy basket ending fits the current adventure. Proposed approximately three-second Golden River finish at the existing safe sunlit gate: Mika stops briefly, looks back toward the valley, lifts the tail and walks forward into warm light; a single gold paw glow marks arrival at the gate, then the existing results menu appears. Sound direction: one broad warm resolving success chord with an airy shiny entrance and a soft tail, avoiding the repeated bell notes rejected in checkpoint review. Keep environmental sound restrained beneath it. No new boss, collectible, route requirement or campaign/save behavior.
+
+This is a recommendation only, not permission to implement new Mika poses, scenic artwork, animation timing or a completion cue. Review any new Mika animation using the existing art-direction gates; audition the actual completion sound separately before integration. The existing immediate completion state/menu and absence of a separate completion sound remain current behavior.
+
+## Longer checkpoint entrance shimmer - 2026-11-22
+
+The owner finds the warm-body correction much better but wants a longer shiny entrance. Standalone `checkpoint-achievement-long-shimmer.wav` stretches only the gated early high layer from nominally 0.8 to 1.45 seconds, preserving pitch, low body and total cue length; the omitted middle layer and excluded late ringing stay excluded. See the source review README for processing/CC BY 4.0 attribution and checks. Owner hearing remains required; runtime/river/wind unchanged.
+
+## Diagnosed repeating checkpoint bell layer - 2026-11-22
+
+The owner identifies the delayed repeated bing in diagnostic B and more clearly at the end of C. New standalone `checkpoint-achievement-warm-body.wav` omits the middle crossover band and fades upper air by 0.8 seconds, keeping the low foundation. This is intentionally stronger than the unsuccessful narrow notches and may reduce the musical brightness; owner hearing remains required before integration. See the source review README for exact preparation, same TommasoMotteran CC BY 4.0 attribution and technical checks. Runtime, river and wind unchanged.
+
+## Residual checkpoint background bing - 2026-11-22
+
+The owner still hears a quiet background bing in the reduced-knock audition. New standalone `checkpoint-achievement-reduced-ring.wav` uses narrow attenuation of five measured upper resonances, keeping the earlier cue/timing and low foundation. The spectral peaks are candidate targets, not verified identification of the subjective defect. Source/processing/rights/checks: art/audio/checkpoint-achievement-reference/README.md. Await owner hearing before runtime replacement; river/wind unchanged.
+
+## Checkpoint upper-band knocking correction - 2026-11-22
+
+The owner reports knocking among the checkpoint cue's higher tones. A standalone `art/audio/checkpoint-achievement-reference/checkpoint-achievement-reduced-knock.wav` attenuates upper-band transients and bright ringing while preserving the selected cue's duration/entrance. Same TommasoMotteran CC BY 4.0 source and attribution; preparation/limits are in the review README. Owner hearing remains the gate before runtime replacement. No new Unity integration, wind/river change or final sound acceptance.
+
+## Shorter crest and irregular in-game wind - 2026-11-22
+
+After hearing the long continuous-air study, the owner requested a shorter loud part and several irregular in-game variations. This authorizes the same-timbre runtime revision: four deterministic filtered-noise variants with 11.5–14-second lengths, earlier/steeper decay, slightly different air-band balance, independent noise seeds and strengths. Random selection excludes the previous clip; complete gusts have 10–24-second quiet gaps. River/checkpoint stay unchanged. The earlier field-recording wind and forest proposals are superseded. No new timbre approval is inferred beyond this scoped request. Keep PR #89 draft pending in-game acceptance.
+
+## Longer wind correction - 2026-11-22
+
+The owner rejected all four forest gusts as rain-like and asked for longer receding wind. Those proposals are not selected. A single 17-second continuous filtered-noise study in `art/audio/long-wind-review` replaces leaf texture with slowly shifting air bands, a gentle rise and long release. Standalone listening only; runtime wind/repetition remains unchanged pending selection. River and checkpoint remain unchanged.
+
+## Current in-game wind feedback — 2026-11-22
+
+The owner reports repetitive wind and a thunderstorm-like ending. The current fixed two-clip A/B alternation and identical eight-second envelopes need revision. New standalone proposals in `art/audio/wind-variety-review` use another CC0 tree/leaf-wind recording, four distinct sections and lengths/envelopes, and stronger low-rumble filtering. The owner must hear these before replacement in Unity; no runtime change in this audition revision. After selection, vary the bank without immediate repeats and retain quiet intervals rather than a fixed A/B sequence. River/checkpoint review remains unchanged. Do not treat the previous wind approval as approval of replacement timbres.
+
+## Current in-game review authorization — 2026-11-22
+
+The owner explicitly asked to integrate the current soft-start checkpoint and selected river/wind so they can judge the feel in-game. They asked for occasional clearly audible wind and quiet water underneath. This authorizes the scoped playable mix even though final acceptance remains open; earlier standalone-only notes do not block this request. Movement remains silent. Current setup, initial mix values, licensing, main integration and focused preview steps are in [the audio playtest guide](level-one-audio-playtest.md). Keep the feature draft until the in-game review and later final checks are complete.
+
+## Current gentler entrance — 2026-11-22
+
+The owner still finds the entrance abrupt and offered to install free tools. No additional tool is needed for this edit: the existing PCM preparation/FFmpeg workflow can shape the entry. Current standalone `art/audio/checkpoint-achievement-reference/checkpoint-achievement-soft-start.wav` uses a 220 ms sine-squared rise instead of the previous 20 ms linear entry, retaining the same opening-effect cut, main sound and ending. About 2.58 seconds, no repetition. No Unity integration; explicit listening approval remains required. River/wind selections and deferred movement remain unchanged.
+
+## Current entrance correction — 2026-11-22
+
+The owner found the attributed achievement alternative closer to the target but disliked its opening sound. The new standalone `art/audio/checkpoint-achievement-reference/checkpoint-achievement-clean-start.wav` removes the first 0.4 seconds and gives the new entrance a 20 ms fade; the remaining main sound and existing tail are preserved. About 2.58 seconds, once continuously. No new timbre search or wholesale redesign is authorized by this feedback. This rendered correction still needs listening approval and stays outside Unity Assets/gameplay. River/wind remain selected; movement remains deferred. The TommasoMotteran CC BY 4.0 source and required credit remain applicable.
+
+## Current concrete achievement reference — 2026-11-22
+
+The owner supplied [Achievement Unlock by Universfield](https://pixabay.com/sound-effects/film-special-effects-achievement-unlock-243762/) and asked for this direction. Its page describes a triumphant orchestral achievement fanfare; use this concrete reference to guide further review instead of treating earlier crystal-only answers as a fixed synthesis specification. The actual audio was not acquired/analyzed, so no aural match is claimed.
+
+The Pixabay recording is not committed. The new separate three-second audition is `art/audio/checkpoint-achievement-reference/checkpoint-achievement-audition.wav`, adapted with attribution from TommasoMotteran's CC BY 4.0 Fantasy Achievement Unlock - Magical Stinger. The retained source, changes, license and credits are in that folder's README. This is an alternate listening candidate, not a copy/reconstruction of the supplied reference and not yet accepted. No gameplay integration. River/wind remain approved; movement remains deferred.
+
+## Current correction: crystals and soft bells only — 2026-11-22
+
+The owner changed questionnaire answer 2 to B only: crystals and soft bells, without choir. Preserve answer 1 A+B (success/reward plus magical awakening), answer 3 B (immediate burst and soft decay), and a single continuous 2–3-second cue without repetitions/pauses. The choir selection/candidate below is superseded.
+
+Current standalone proposal: `art/audio/checkpoint-crystal-review/checkpoint-crystal-bloom.wav`, one 2.7-second original crystal/soft-bell arrival with fine sparks and a continuous spatial decay. It contains no choral source and awaits explicit listening approval outside Unity Assets/gameplay. River and wind approvals remain; movement stays deferred.
+
+## Current owner-selected choir/crystal direction — 2026-11-22
+
+The owner rejected the previous fanfare-like sound and requested a completely different continuous 2–3-second cue without pauses between repeated examples. In the follow-up questions they selected success/reward plus awakening magic, wordless choir plus crystal/soft-bell color, and an immediate magical burst that softly fades. These selections replace the prior rapid arpeggio/fanfare direction.
+
+Current standalone candidate: `art/audio/checkpoint-choir-review/checkpoint-choir-crystal.wav`, one 2.7-second choral/crystal arrival using an attributable CC0 Breviceps source and original crystal synthesis. Source/license, transformations, retained source preview and exact reproduction are in its README. The rendered cue still needs listening approval; no Unity integration. River and wind remain approved, movement remains deferred.
+
+## Current checkpoint refinement — 2026-11-22
+
+The owner found the 0.75-second success gesture better but requested a more epic sound and allowed somewhat more length. The current standalone `art/audio/wind-and-magic-review/checkpoint-epic-audition.wav` repeats a new 1.65-second cue with a fuller warm foundation, resolving fanfare-like voicing and magical sparks. It is a proposed refinement, not an approved clip. Preserve the listening gate; do not integrate it yet. River and wind approvals remain; movement remains deferred. The previous strict short-duration target is relaxed by this feedback.
+
+## Latest checkpoint rejection — 2026-11-21
+
+The owner clarified “absolutely unsuitable” and rejected the short 0.6-second checkpoint variants. The replacement must be magical and clearly communicate that the player accomplished something. The new standalone `art/audio/wind-and-magic-review/checkpoint-success-audition.wav` presents one 0.75-second success gesture twice. It awaits listening approval and is not integrated. River and wind remain approved; movement sounds remain deferred. Earlier notes describing the short variants as awaiting selection are superseded by this rejection.
+
+## Owner selection and new sound direction — 2026-11-21
+
+Follow-up: the owner approved the wind audition. The magical checkpoint must be shorter to match the brief orange activation flash. New 0.6-second A/B cues in `art/audio/wind-and-magic-review/checkpoint-magic-short.wav` await listening approval. River and wind are selected; movement remains deferred. The earlier long magical cues are superseded. No new audio has been integrated during this audition revision.
+
+- The owner approved the standalone `art/audio/auditions-2026-11-21/river-natural.wav` excerpt as the river sound. Preserve that selection; final looping and in-game mix remain separate review steps.
+- Movement sounds may be unnecessary. Leave footsteps and the first candidate's jump/landing noises out for now; do not treat the earlier contact studies as selected.
+- Instead, audition occasional wind gusts that arrive gently and fade away. Wind is environmental, independent of Mika's movement, not a continuous rushing loop. Exact production spacing and mix have not been locked.
+- Checkpoint sound should be magical and match the orange illumination and sparks. The dry stone/wood audition direction is superseded. Present warm glowing and sparkling alternatives as standalone audio before integration.
+
+Current new auditions: `art/audio/wind-and-magic-review`. Wind and magical checkpoint clips remain unapproved and outside Unity Assets. River approval does not waive the listening gate for the other categories.
+
+## Owner rejection and audition gate — 2026-11-21
+
+The owner rejected the first water texture, movement sounds and checkpoint cue as unconvincing or unsuitable. The original sound candidate is not accepted. GoldenRiverAudio is no longer attached to the playable level; all five original clips have moved out of Resources into Editor-only rejected regression fixtures with their metadata preserved. Completion/menu functionality remains available without the candidate sounds.
+
+Before any further audio integration, present standalone listening samples outside Assets and obtain explicit owner approval of the actual clips. Do not substitute mixer tests, a running prototype or a new procedural pass for this listening gate. After clip approval, review levels, repetition, contact timing and pause/retry behavior in-game separately. Approval of an isolated clip does not establish final mix acceptance. Do not add constant footstep playback until the owner has heard and selected its sound and cadence.
+
+The implementation and executed checks below describe the first candidate and technical infrastructure. They do not establish sound approval. New auditions belong under art/audio, outside Unity import and player packaging.
+
+Issue #74 adds a reviewable first version of river ambience, restrained movement and checkpoint sounds, and a clear success state through the existing menu. Music is outside this initial pass. No campaign records or collectibles are saved.
+
+## First candidate (audio rejected)
+
+Golden River owns three audio sources: looping river ambience, a bounded movement voice, and a bounded checkpoint/success voice. The river becomes quieter at higher elevations. Pause preserves playback position; retry/restart clear transient voices and restart one ambience loop. Deactivating the level stops all sources immediately. Initial spawn and recovery respawns do not produce landing sounds. Master volume is adjustable in Settings with keyboard-accessible Quieter/Louder buttons; zero mutes all game sounds.
+
+The existing grounded exit freezes Mika and the elapsed timer, plays a short completion chime and opens the existing gameplay menu with “Golden River complete”. Retry, Restart and Main menu remain available; Pause cannot resume movement behind success. Retry/restart rearm completion. The immutable LevelCompletion value and Completed event expose only session level ID, elapsed seconds and retry count for future consumers. No save/unlock or collection logic subscribes yet.
+
+The original deterministic sound source is tools/generate-golden-river-audio.py. Run it from the repository root to recreate all five PCM files. Artwork, platforms and movement tuning retain their existing ownership.
+
+## Local preview
+
+Build with the pinned Editor using BuildGame.BuildPreview and -previewOutput followed by an absolute executable path. The normal menu starts the full Golden River course. For a focused success-menu review, launch the development player with --preview-view level-one-complete; it starts on the final bank and walks through the real exit. Existing --preview-capture can save a screenshot. Inspect both 960×540 and 640×360. This shortcut demonstrates presentation, not full-route traversal or human pacing.
+
+For deterministic screenshot dimensions add --preview-width 960 --preview-height 540 (or 640 and 360) with --preview-capture and an absolute PNG path. These arguments exist only in development previews.
+
+Menu schema 0 gains optional masterVolume with default 0.7; this compatible addition needs no version bump. See docs/data-migrations.md. Tests preserve unknown settings and protect invalid/future files.
+
+## Coordination
+
+This feature owns new level audio/completion code, its tests, generated sound sources and this document. MovementCourse receives scoped lifecycle hooks; StarterScreen.Presentation receives the completion menu integration. PR #79 owns cave geometry and PR #88 owns ranged combat. Both also touch shared entry points: integrate their changes sequentially and preserve their preview paths and asset credits. No scenes, prefabs, packages or project settings are edited. Each worktree owns its Unity Library.
+
+## Review gates
+
+- [ ] Review river ambience and jump, landing, checkpoint and success cues in actual gameplay audio.
+- [ ] Review the success menu at 960×540 and 640×360, including keyboard navigation.
+- [ ] Validate pause, retry, restart, replay and immediate audio cleanup on menu return.
+- [ ] Reconcile current main and compatible feature work; run exact-head Windows/Linux validation after feedback.
+
+This feature remains a draft until playable review and final validation. No merge or release is authorized.
+
+## Executed development checks
+
+Unity 6000.3.27f2 passed all 43 selected EditMode tests: GoldenRiverAtmosphereTests, MenuMovementIntegrationTests, MigrationTests and RunLifecycleTests. Coverage includes a complete real-physics main-route traversal, repeated exit signals, frozen success movement/timing, retry/restart, actual mixed audio output, paused sample position, resumed output, movement/checkpoint cues, immediate source cleanup and compatible volume persistence. Test reports are local artifacts, not release validation. Full exact-head Windows/Linux player/launcher/package validation remains pending player review.

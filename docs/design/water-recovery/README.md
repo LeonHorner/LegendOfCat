@@ -42,7 +42,7 @@ For quicker repetition, while playing the movement course select
 gap; normal falling triggers entry. Outside Play Mode the command opens an unsaved
 course preview after offering to save the current scene, then enters Play; invoke
 it again to drop Mika. R retries immediately; Backspace restarts the whole run;
-P pauses; Escape returns to the menu. Pause freezes the recovery clock. Movement
+Escape or P toggles pause; choose Main menu while paused to return. Pause freezes the recovery clock. Movement
 and jump cannot interrupt submersion. Manual retry clears all recovery effects.
 Water recovery attaches to MovementCourse alongside SceneryRenderer, including the Golden River route.
 
@@ -137,3 +137,7 @@ breach. The shark closes the distance faster and its open jaws pass beyond
 the edges of the frame. Blackout leads to the usual checkpoint recovery.
 
 [Watch the shark preview](shark.mp4) · [Artwork and prompt](shark-lunge-art.md)
+
+## Selected entry sound - 2026-11-22
+
+The owner approved the quieter clear-attack splash after rejecting the over-softened proposal. WaterRecovery owns a non-looping entry source and freezes/resumes it with pause; retry, disable and menu cleanup stop it immediately. Clip/source/processing/CC0 provenance: `art/audio/water-entry-review/README.md` and ASSETS.md. No separate shark or underwater-loop sound is selected.

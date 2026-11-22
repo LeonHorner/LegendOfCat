@@ -847,6 +847,96 @@ The existing near panorama is extended to 14332×1448 using an original generated
   weight across tick positions. No new image model or external asset was used.
 
 
+## Golden River audio review - 2026-11-21
+
+- Assets: Assets/Game/Resources/GoldenRiverAudio/{river,jump,land,checkpoint,complete}.wav.
+- Source: original procedural PCM authored with tools/generate-golden-river-audio.py; deterministic Python standard-library synthesis, no recordings, external samples or third-party music. Generator: OpenAI Codex-authored script; no generative audio model.
+- License: project PolyForm Noncommercial 1.0.0 license; source script and generated waveforms may be publicly redistributed under its terms.
+- Human creative direction: issue #74 requests restrained river ambience and meaningful jump/landing/checkpoint/completion sounds. The initial candidate uses cyclic filtered noise, soft contacts and short ascending chimes; no background music. Final timbre, mix and in-game presentation remain pending player review.
+
+
+## Golden River audio rejection and listening gate - 2026-11-21
+
+The owner rejected the original procedural river, movement and checkpoint candidate. All five original clips now live in Assets/Game/Tests/Editor/Fixtures/RejectedGoldenRiverAudio as Editor-only technical fixtures; they are not production-approved and are no longer loaded by the playable level. Their source and original license remain as recorded above. The existing generator now reproduces only these rejected fixtures.
+
+New sound candidates must first be presented as standalone auditions outside Assets and approved explicitly before any game integration. This applies to replacement water, movement, checkpoint and completion sounds. Technical test success is not artistic acceptance.
+
+
+## Standalone Golden River listening samples - 2026-11-21
+
+Location: art/audio/auditions-2026-11-21, outside Unity Assets and player packaging. Status: unapproved auditions only; no gameplay references.
+
+River: Park ambiences by Thimras, https://opengameart.org/content/park-ambiences, CC0 1.0. Movement: Fantozzi recordings from https://opengameart.org/content/fantozzis-footsteps-grasssand-stone, CC0 1.0. Original checkpoint studies: OpenAI Codex-authored deterministic modal synthesis, project PolyForm Noncommercial 1.0.0 license. No generative audio model. Third-party recordings and derivatives retain their CC0 license.
+
+Exact source URLs, checksums, excerpt times, processing, licenses, creative response to the rejection and reproduction steps are in the audition README and tools/prepare-golden-river-auditions.py. Integration requires the owner to hear and approve the actual clips first. These recordings are candidates, not approved cat-paw recordings or final loop/mix assets.
+
+
+## Golden River river approval and wind/magic auditions - 2026-11-21
+
+Owner decision: art/audio/auditions-2026-11-21/river-natural.wav is approved as the river sound; final loop/mix review remains. Movement sounds are deferred and may be omitted. The owner requested occasional softly fading wind instead, plus a magical checkpoint sound matching the orange glow and sparks. Dry material checkpoint taps are superseded.
+
+New unapproved standalone samples: art/audio/wind-and-magic-review/wind-gusts.wav and checkpoint-magic-comparison.wav. No new Unity import, gameplay references or integration. Wind source: Park ambiences by Thimras, https://opengameart.org/content/park-ambiences, CC0 1.0; source WAV SHA-256 5c381856745b4706e7eba55eb9271a61a530e90c05df8126adb2db89ecfa6c5a. Field recording and derivatives retain CC0.
+
+Checkpoint variants: original deterministic synthesis authored through OpenAI Codex, project PolyForm Noncommercial 1.0.0 license; no generative audio model or external sampled instrument. Preparation uses Python and FFmpeg. Exact excerpt times, processing, envelopes, synthesis decisions and reproduction are in the review README and tools/prepare-golden-river-wind-and-magic.py. Actual clips require owner listening approval before integration; fixed production wind intervals are not yet decided.
+
+
+## Approved wind and shortened magical checkpoint audition - 2026-11-21
+
+The owner approved wind-gusts.wav and requested a shorter checkpoint sound matching the brief orange flash. River and wind clips are selected; movement sounds remain deferred. New standalone checkpoint-magic-short.wav contains two 0.6-second variants with rapid bloom, concentrated sparks and compact reflections. It remains outside Assets and requires listening approval before integration. Source/generator: original deterministic OpenAI Codex-authored tools/prepare-short-checkpoint-audition.py, no external samples or generative audio model, project PolyForm Noncommercial 1.0.0 license. Earlier long magical cues are superseded; wind cadence and final mix remain review work.
+
+
+## Checkpoint rejection and short magical success audition - 2026-11-21
+
+The owner explicitly rejected the previous short checkpoint A/B as completely unsuitable. The replacement should be magical and clearly communicate accomplishment. New standalone checkpoint-success-cue.wav lasts 0.75 seconds; checkpoint-success-audition.wav repeats it twice for listening. Both remain in art/audio/wind-and-magic-review outside Assets, unapproved for integration. River and wind approvals remain; movement is deferred.
+
+Source/generator: original deterministic OpenAI Codex-authored tools/prepare-checkpoint-success-audition.py, project PolyForm Noncommercial 1.0.0 license, no external samples, copied tune or generative audio model. Creative decisions: rapid consonant rising glass/harp-like voices, warm resolving harmony and concentrated fine sparks with a compact fade. This is a proposed response to feedback, not a claim that the sound is accepted.
+
+
+## Fuller magical checkpoint success audition - 2026-11-22
+
+Owner feedback: the 0.75-second success direction is better, but should be more epic and may last somewhat longer. New art/audio/wind-and-magic-review/checkpoint-epic-success.wav lasts 1.65 seconds; checkpoint-epic-audition.wav repeats it twice. Both remain unapproved standalone review files outside Unity Assets and gameplay. River/wind selections remain approved; movement is deferred.
+
+Source/generator: original deterministic OpenAI Codex-authored tools/prepare-epic-checkpoint-audition.py using Python standard library; project PolyForm Noncommercial 1.0.0 license. No external samples, copied tune or generative audio model. Creative decisions: retain the rising glass-like success gesture, broaden its arrival with a low foundation and warm major voicing, add fine sparks and a gently fading stereo space. The owner must hear and approve the actual replacement before integration.
+
+
+## Wordless choir and crystal checkpoint audition - 2026-11-22
+
+Owner-selected direction after rejecting the previous fanfare: success/reward plus magical awakening; floating wordless choir plus crystal/soft bells; immediate magical burst and soft decay; one continuous 2-3-second cue without pauses or repeated blocks. New art/audio/checkpoint-choir-review/checkpoint-choir-crystal.wav lasts 2.7 seconds and remains unapproved outside Unity Assets/gameplay. River and wind remain selected; movement is deferred.
+
+Choral source: Short Choir by Breviceps, https://freesound.org/people/Breviceps/sounds/444491/, published 2018-10-24, CC0 1.0. The unmodified public high-quality MP3 preview is retained under the audition sources folder; SHA-256 6ee2b2b3db396c81ed6544f254b8470c6293e1d0eb349e7f896f1aa2ad8e5f83. It is third-party material, not a project recording. Source and choral derivatives retain CC0.
+
+Adaptation/original crystal design: OpenAI Codex-authored tools/prepare-choir-checkpoint-audition.py with Python and FFmpeg, project PolyForm Noncommercial 1.0.0 license for script/original synthesis, no generative audio model or copied tune. Creative decisions: harmonized immediate choral arrival, simultaneous crystal accents, fine sparks and continuous soft spatial decay. Exact processing, source URLs, licenses and reproduction are in the audition README. Direction choice does not approve the rendered clip; listening approval remains required before integration.
+
+
+## Crystal-only checkpoint correction - 2026-11-22
+
+The owner corrected sound-color answer 2 to B only: crystals and soft bells, without choir. Success/reward plus magical awakening, immediate burst/soft decay and a continuous 2-3-second format remain selected. The choir candidate is superseded. New standalone art/audio/checkpoint-crystal-review/checkpoint-crystal-bloom.wav lasts 2.7 seconds and remains unapproved outside Unity Assets/gameplay. River/wind approvals remain; movement stays deferred.
+
+Source/generator: original deterministic OpenAI Codex-authored tools/prepare-crystal-checkpoint-audition.py, Python standard library, project PolyForm Noncommercial 1.0.0 license; no external samples, third-party tune or generative audio model. This cue does not use the Breviceps choir source. Creative decisions: aligned soft crystal/bell arrival, subtle inharmonic modes, fine sparks and continuous stereo decay; no voice or stepped fanfare. Source, reproduction and listening gate are documented in the review README.
+
+
+## Concrete achievement reference and separate attributed audition - 2026-11-22
+
+Owner reference: Achievement Unlock by Universfield, https://pixabay.com/sound-effects/film-special-effects-achievement-unlock-243762/. Its page describes a triumphant orchestral achievement fanfare. The Pixabay recording is reference-only, not acquired, analyzed or committed; no aural match is claimed. Its Content License restricts standalone redistribution, so this is not a source asset for the public repository.
+
+Separate new audition: art/audio/checkpoint-achievement-reference/checkpoint-achievement-audition.wav, three seconds adapted from Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Published 2026-06-16. Required credit: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, CC BY 4.0; adapted for audition by lead-in removal, loudness adjustment, three-second excerpt and edge fades. No endorsement implied. Original and derivative retain CC BY 4.0. No sampled recreation of the Universfield reference.
+
+Unmodified public MP3 preview retained under the audition sources folder, SHA-256 689d41efd0585c2e034436d64c1ef00c655c2d2a92eec0103574ff9b1c5ed2e9. Preparation: FFmpeg through OpenAI Codex-authored tools/prepare-achievement-reference-audition.py, project license for script only. The source author describes handcrafted design with VST/royalty-free sounds and no AI; this adaptation uses no generative audio model. Exact source URL, processing, author/license and credits are in the audition README. This is an unapproved standalone alternative outside Unity Assets/gameplay; reference selection does not approve it. River/wind remain selected, movement remains deferred.
+
+
+## Achievement entrance correction - 2026-11-22
+
+Owner feedback: the attributed achievement direction is closer, but the opening sound is unwanted. New standalone art/audio/checkpoint-achievement-reference/checkpoint-achievement-clean-start.wav removes the first 0.4 seconds of the retained audition and adds a 20 ms entry fade; all subsequent main/tail PCM is unchanged. Approximately 2.58 seconds, not repeated. Still unapproved and outside Unity Assets/gameplay.
+
+Source remains Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Additional changes: opening-effect removal and short entry fade. Original/derivative retain CC BY 4.0, with required credit and earlier adaptation details in the audition README. Preparation: original OpenAI Codex-authored tools/prepare-achievement-clean-start.py, Python PCM editing; script under project license, no generative audio model or added sample. River/wind approvals and deferred movement remain unchanged.
+
+
+## Softer checkpoint entrance audition - 2026-11-22
+
+Owner feedback: the entrance is still abrupt. No extra tool installation is needed. New standalone art/audio/checkpoint-achievement-reference/checkpoint-achievement-soft-start.wav retains the 0.4-second opening-effect cut and changes only the entry to a 220 ms sine-squared rise, replacing the 20 ms linear fade. Main/tail PCM remains identical after the fade; approximately 2.58 seconds. Unapproved and outside Unity Assets/gameplay.
+
+Source/credit remains Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Additional adaptation: longer smooth entry fade; retain existing required attribution and source/change records. Preparation: OpenAI Codex-authored tools/prepare-achievement-clean-start.py --soft-start, Python PCM processing, project license for script, no new sample or generative audio model. River/wind approvals and deferred movement remain unchanged.
+
 ## Ranged combat lab primitives - 2026-11-15
 
 - Source: original procedural geometry in RangedArena.cs; authored with OpenAI
@@ -882,3 +972,94 @@ The local direct-attack trial shows the paw and orb indicators together, retaini
 their original procedural symbols and filled/hollow ammunition dots. The user
 requested a larger pause menu with directly visible input descriptions. No new
 external artwork or image generator is involved; the owner accepted this initial prototype on 2026-11-15.
+
+
+## Selected Golden River in-game sound review - 2026-11-22
+
+The owner explicitly authorized integrating the latest soft-entry checkpoint, selected river and wind for an in-game feel test. Water should stay quiet; gusts should become noticeable occasionally and fade. This is playable review authorization, not final mix acceptance or merge/release approval.
+
+Runtime assets: Assets/Game/Resources/GoldenRiverAudio/river-loop.wav (15.4-second loop from the selected Thimras river audition; omit audition edge fades and crossfade the same source over 0.6 seconds), wind-01.wav and wind-02.wav (the selected eight-second gusts, with their original envelopes), and checkpoint.wav (byte-for-byte copy of the selected checkpoint-achievement-soft-start.wav). Exact preparation: tools/prepare-level-one-audio.py. Source generation/model: Thimras field recordings and TommasoMotteran handcrafted stinger; no new generative audio model. Preparation uses OpenAI Codex-authored Python and Unity import settings.
+
+River/wind: Park ambiences by Thimras, https://opengameart.org/content/park-ambiences, CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/. Original download URLs/checksums and approved audition processing are recorded above and in the audition READMEs. Recordings and derivatives retain CC0.
+
+Required checkpoint attribution: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Adapted: excerpt, loudness adjustment, first 0.4-second removal, 220 ms smooth entry and retained ending fade. Source and derivative retain CC BY 4.0. No endorsement implied. Credit/source/license links appear in Settings > Sound credits. No Pixabay recording is included.
+
+Human decisions: keep movement sounds absent, quieter river background, more audible isolated passing wind, selected softened checkpoint entrance. Initial review mix/timing and reproducible build/playtest steps: docs/design/level-one-audio-playtest.md. Asset metadata is generated by the pinned Editor; all older rejected sounds stay Editor-only, and unselected audition sources remain outside Unity.
+
+
+## Varied forest wind audition - 2026-11-22
+
+The owner rejected the repetitive in-game wind and its thunderstorm-like ending. Replacement proposals remain outside Unity pending listening approval: art/audio/wind-variety-review. Source: Forest, close up of trees rustling in the wind.wav by Anya_Media, https://freesound.org/people/Anya_Media/sounds/523389/, published 2020-06-22, CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/. The unmodified public MP3 preview is retained with its SHA-256 in the review README; recordings and derivatives retain CC0.
+
+Prepared 2026-11-22 with Python/FFmpeg and OpenAI Codex-authored tools/prepare-varied-wind-auditions.py; no generative audio model. Human direction: varied passing gusts, gentle endings, reduced low rumble, quiet river unchanged. Four different sections have varied durations, envelopes and relative strengths; two 260 Hz high-pass stages reduce rumble and a 6 kHz low-pass softens the top. Runtime clips and credits are unchanged. Subjective sound acceptance and integration remain pending.
+
+
+## Long receding wind study - 2026-11-22
+
+The owner rejected the forest gusts as rain-like and requested longer receding wind. New standalone art/audio/long-wind-review/long-receding-wind.wav is 17 seconds, with a gentle rise and long continuous release, made from original deterministic filtered pink-noise synthesis in tools/prepare-long-wind-audition.py. Generator: OpenAI Codex-authored Python and FFmpeg, 2026-11-22; no generative audio model, external recording or sample. Original code and sound: project PolyForm Noncommercial 1.0.0 license. Human direction: avoid leaf/rain patter and thunder-like rumble; emphasize sustained passing air and slow retreat. Listening acceptance remains pending; runtime and existing river/checkpoint are unchanged. See review README for reproduction and processing.
+
+
+## Selected continuous-air runtime wind variations - 2026-11-22
+
+After hearing the 17-second wind study, the owner requested a shorter loud section and multiple irregular in-game variations, authorizing this scoped revision. Four original deterministic filtered-pink-noise variants replace the earlier Thimras wind clips in Assets/Game/Resources/GoldenRiverAudio/wind-01.wav through wind-04.wav. Lengths: 12.5, 14, 11.5 and 13.5 seconds. Earlier fourth-power cosine release, independent noise seeds, subtle air-band balance/frequency changes and peak strengths 0.32/0.288/0.304/0.272 preserve a long fading tail while shortening the loud crest. No field recordings, rain, leaves or thunder samples are used.
+
+Generator/source: original OpenAI Codex-authored tools/prepare-runtime-wind.py, Python and FFmpeg, prepared 2026-11-22; no generative audio model. Code and generated sounds follow the project PolyForm Noncommercial 1.0.0 license. Human decisions: shorten the loud part, retain the airy long retreat, vary environmental gusts irregularly. Runtime randomly excludes the previous clip and leaves 10-24-second quiet gaps. Settings credits now distinguish the original wind from the unchanged CC0 Thimras river and CC BY 4.0 TommasoMotteran checkpoint. Final in-game acceptance remains pending. Existing Unity metadata is preserved; new clip metadata comes from Editor import.
+
+
+## Checkpoint upper-band knock reduction audition - 2026-11-22
+
+The owner asks to remove knocking among the higher tones of the integrated checkpoint cue. Standalone proposal: art/audio/checkpoint-achievement-reference/checkpoint-achievement-reduced-knock.wav, 2.582 seconds, same stereo timing/soft entry. Source: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. The original retained preview and earlier excerpt/level/entrance adaptations remain documented above; new changes attenuate upper-band transient attacks and high-frequency ringing. Source/derivative retain CC BY 4.0; attribution required, no endorsement implied.
+
+Generator/processing: original OpenAI Codex-authored tools/prepare-checkpoint-reduced-knock.py, Python standard library, prepared 2026-11-22; no generative audio model, external added sample or replacement melody. Preparation code: project PolyForm Noncommercial 1.0.0. Human direction: remove the unwanted knocking/high-tone artifact while retaining the selected achievement cue. Mixed-source separation is approximate; explicit owner listening remains required. The runtime and player credits remain unchanged until selection.
+
+
+## Residual checkpoint ringing audition - 2026-11-22
+
+The owner still hears a very quiet background bing in the reduced-knock proposal. New standalone art/audio/checkpoint-achievement-reference/checkpoint-achievement-reduced-ring.wav attenuates five narrow measured resonances (1238, 1394, 1556, 1857 and 2336 Hz) in that proposal, without new sound, timing changes or normalization. Source: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Source/derivative retain CC BY 4.0; retain earlier adaptation notices and add narrow resonance attenuation. No endorsement implied.
+
+Prepared 2026-11-22 with original OpenAI Codex-authored tools/prepare-checkpoint-reduced-ring.py and FFmpeg; no generative audio model or new sample. Preparation code: project PolyForm Noncommercial 1.0.0. Human direction: remove the residual background bing while retaining the warm achievement body. Spectral analysis informs candidate bands but does not verify the subjective artifact; owner hearing remains required. Runtime audio and player credits remain unchanged.
+
+
+## Diagnosed checkpoint bell-layer reduction - 2026-11-22
+
+The owner hears the delayed repeating bing in diagnostic middle-band B and more clearly at the end of high-band C. New standalone art/audio/checkpoint-achievement-reference/checkpoint-achievement-warm-body.wav omits the middle band of a 12th-order crossover at 800/2500 Hz, keeps the low body and fades the half-level high band from 0.15 to 0.8 seconds. This is a stronger correction after unsuccessful narrow notches and deliberately loses more bright musical content. Listening acceptance is pending; no isolated-stem removal or final suitability is claimed. Runtime, river/wind and player credits unchanged.
+
+Source: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Retain previous excerpt/entry/transient adaptation notices and add middle-band omission/early upper-band fade. Source/derivative retain CC BY 4.0; attribution required, no endorsement implied. Prepared 2026-11-22 with original OpenAI Codex-authored tools/prepare-checkpoint-warm-body.py and Python/FFmpeg, no generative audio model or new samples. Preparation code follows the project PolyForm Noncommercial 1.0.0 license. Human direction: remove the delayed repeated bing, preserve the warm achievement body, present for listening first.
+
+
+## Longer checkpoint entrance shimmer audition - 2026-11-22
+
+The owner finds the warm-body correction much better but its shiny entrance too short. New standalone art/audio/checkpoint-achievement-reference/checkpoint-achievement-long-shimmer.wav keeps the low body and omitted middle layer, stretching only the early already-gated upper layer with pitch-preserving FFmpeg atempo=0.55, nominally 0.8 to 1.45 seconds. Later source ringing stays excluded, total cue duration stays 2.582 seconds. No new sample, notes, delay feedback or normalization added.
+
+Source: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Source/derivative retain CC BY 4.0; retain previous adaptation notices and add early-shimmer pitch-preserving stretching. No endorsement implied. Prepared 2026-11-22 with original OpenAI Codex-authored tools/prepare-checkpoint-warm-body.py --long-shimmer and Python/FFmpeg; no generative audio model. Preparation code follows the project PolyForm Noncommercial 1.0.0 license. Human decision: retain the improved warm-body correction but extend its shiny entrance. Listening acceptance pending; runtime, river/wind and player credits unchanged.
+
+
+## Approved long-shimmer checkpoint gameplay integration - 2026-11-22
+
+The owner approved checkpoint-achievement-long-shimmer.wav and requested gameplay integration. Assets/Game/Resources/GoldenRiverAudio/checkpoint.wav now copies that reviewed file byte-for-byte; existing Unity metadata retained. Exact source preparation and listening history are in art/audio/checkpoint-achievement-reference/README.md; tools/prepare-level-one-audio.py selects this final audition. Source: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Source and derivative retain CC BY 4.0, attribution required, no endorsement implied.
+
+Adaptations: excerpt/level and softer entry, upper-band transient attenuation, middle bell-layer omission, early upper-layer fade and pitch-preserving stretch of that early shimmer. Prepared with original OpenAI Codex-authored Python/FFmpeg tools, 2026-11-22, no generative audio model or added sample. Preparation code follows the project PolyForm Noncommercial 1.0.0 license. Human decisions: the stronger bell-free warm-body direction was much better; extend the shiny entrance; approve this resulting actual file for gameplay. Player credits reflect these changes. River/wind unchanged. No completion artwork, animation or sound created for the separate unapproved ending recommendation.
+
+
+## Pause-aware existing presentation - 2026-11-22
+
+The owner requests the whole world to freeze after losing focus, including moving platforms, as expected during normal pause. Existing water, mill/willow and fish-ripple shaders now receive the course animation clock; recovery surface ripples use the sequence clock. Existing Mika presentation and camera smoothing freeze, with no new frames, deformation, geometry, textures, sampled audio or image/audio generator. Platform pause/resume changes physics simulation state while preserving phase. All original artwork, source notices and licenses remain unchanged. This is a pause-correctness change, not acceptance of new artwork or the separate unapproved finish proposal.
+
+
+## Selected natural water-entry sound - 2026-11-22
+
+The owner requested a water-fall effect. Initial approval of the base splash was revised to quieter/softer before integration; the strongly softened version was rejected as too soft. The owner explicitly approved water-entry-splash-quiet.wav, keeping a clear natural attack at lower level. Runtime Assets/Game/Resources/GoldenRiverAudio/water-entry.wav is its byte-identical copy. Human direction: a recognizable, restrained plunge when Mika hits the river; no added shark or underwater loop.
+
+Source: jump-into-water.flac by yurkobb, published 2015-07-06, https://freesound.org/people/yurkobb/sounds/280219/, CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/. Public MP3 preview retained with checksum in art/audio/water-entry-review/README.md. The author describes a lake jump recorded on Zoom H1 and normalized; this project does not claim the recording. Source/derivatives retain CC0. Prepared 2026-11-22 with FFmpeg and original OpenAI Codex-authored tools/prepare-water-entry-audition.py --quiet, no generative audio model or new sample. Preparation code follows the project PolyForm Noncommercial 1.0.0 license. Adapted: excerpt, low/high filtering, level normalization, edge/tail fades and half-gain quiet version, preserving natural attack. Original and rejected auditions stay outside Unity; only the selected quiet clip is packed. Settings > Sound credits includes the optional source credit.
+
+
+## Volume slider presentation - 2026-11-22
+
+The owner requested a slider instead of discrete volume buttons. The original procedural menu palette supplies a thin centered rail and thumb; no external artwork, new font or image generator was used. Actual Windows player settings views are retained under docs/design/level-one-audio-review/volume-slider-640.png and volume-slider-960.png. Existing underlying art provenance/licenses are unchanged.
+
+
+## Wind mix trim and retired movement fixture - 2026-11-22
+
+The owner requests less prominent wind: source volume changes from 0.75 to 0.4 (about -5.5 dB), retaining all four approved original synthesized files, envelopes and random scheduling. No new recording/model/assets introduced.
+
+The owner requests removing the Movement Lab from the game. Unity AssetDatabase moved Assets/Game/Resources/MovementCourse.prefab to Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab, preserving its original GUID and source data. The prefab remains Editor-only for authoring/regression coverage and is no longer a registered/selectable player level. Existing asset provenance/licenses remain unchanged. Round settings reuse the existing procedural menu palette and controls; no new artwork/font/model.

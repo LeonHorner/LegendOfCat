@@ -59,6 +59,13 @@ non-string reminder is invalid and must not be overwritten. Reminder writes pres
 fields and go through the same validated atomic-save path. The chained migration tests use
 synthetic examples to verify the mechanism; they do not establish released gameplay schemas.
 
+Issue #74 adds optional menu schema-0 `masterVolume`, a finite number in [0, 1]
+defaulting to 0.7 when absent. This is a backward-compatible field addition with
+no version bump or migration. Invalid explicit values block writes and preserve
+the original; unknown fields and future-version files retain existing protection.
+The preference controls the Unity listener for all game sounds. No gameplay save
+format is introduced.
+
 ## Desktop display settings
 
 `display-settings.json` is independent from `menu-settings.json` and starts at schemaVersion 0. It stores `width` (640–16384), `height` (360–16384) and `fullscreen` (boolean). It uses `VersionedJsonFile` to preserve unknown fields and block writes to invalid, unreadable or newer files. A missing file defaults to a windowed 1280 × 720 player. Display settings never reset menu settings or game saves.

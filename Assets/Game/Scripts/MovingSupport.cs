@@ -31,6 +31,7 @@ public sealed class MovingSupport : MonoBehaviour
     public void ResetPhase()
     {
         if (!ready) return;
+        body.simulated = true;
         clock = 0; Velocity = Vector2.zero;
         body.linearVelocity = Vector2.zero;
         body.position = transform.parent.TransformPoint(origin);
@@ -52,5 +53,13 @@ public sealed class MovingSupport : MonoBehaviour
         Vector2 destination = transform.parent.TransformPoint(origin + offset);
         Velocity = (destination - body.position) / Time.fixedDeltaTime;
         body.MovePosition(destination);
+    }
+    public void SynchronizePause()
+    {
+        if (!body || !Cat) return;
+        body.simulated = !Cat.Paused;
+        if (!Cat.Paused) return;
+        body.linearVelocity = Vector2.zero;
+        Velocity = Vector2.zero;
     }
 }

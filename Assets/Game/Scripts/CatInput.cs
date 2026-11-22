@@ -33,9 +33,9 @@ public sealed class CatInput : MonoBehaviour
         fullRestart = actions.AddAction("FullRestart", InputActionType.Button, "<Keyboard>/backspace");
         fullRestart.AddBinding("<Gamepad>/leftShoulder");
         pause = actions.AddAction("Pause", InputActionType.Button, "<Keyboard>/p");
+        pause.AddBinding("<Keyboard>/escape");
         pause.AddBinding("<Gamepad>/rightShoulder");
-        menu = actions.AddAction("Menu", InputActionType.Button, "<Keyboard>/escape");
-        menu.AddBinding("<Gamepad>/start");
+        menu = actions.AddAction("Menu", InputActionType.Button, "<Gamepad>/start");
         pulse = actions.AddAction("Pulse", InputActionType.Button, "<Keyboard>/j");
         pulse.AddBinding("<Mouse>/leftButton");
         pulse.AddBinding("<Gamepad>/buttonWest");

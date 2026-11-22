@@ -326,8 +326,8 @@ public sealed class SceneryRendererTests
         }
         Assert.That(highest, Is.GreaterThan(3));
         if (SystemInfo.graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.Null) {
-            // Normal water must animate even without a script feeding its capture-time property.
-            ((Behaviour)study).enabled = false;
+            // Runtime animation uses the pause-aware scenery clock, not global shader time.
+            ((Behaviour)study).enabled = true;
             Study.GetMethod("ApplyView").Invoke(study, new object[] { 17f, 1f });
             Study.GetMethod("SetWaterTime").Invoke(study, new object[] { -1f });
             var start = Snapshot(view);
@@ -338,7 +338,7 @@ public sealed class SceneryRendererTests
                 difference += Mathf.Abs(start[i].r - finish[i].r) + Mathf.Abs(start[i].g - finish[i].g)
                     + Mathf.Abs(start[i].b - finish[i].b);
             Assert.That(difference / (640f * 60), Is.GreaterThan(12),
-                "The game clock must produce visible water flow without any per-frame script update.");
+                "The active scenery clock must produce visible water flow.");
         }
         UnityEngine.Object.Destroy(root);
         yield return null;

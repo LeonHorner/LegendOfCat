@@ -37,7 +37,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     MovementCourse course;
     StompArena stompArena;
     RangedArena rangedArena;
-    RunLifecycle ActiveRun => course != null ? course.Run : rangedArena != null ? rangedArena.Run : stompArena.Run;
+    RunLifecycle ActiveRun => course != null ? course.Run : rangedArena != null ? rangedArena.Run : stompArena != null ? stompArena.Run : null;
     VersionedJsonFile displayFile;
     bool fullscreen;
     DisplayState display;
@@ -87,8 +87,32 @@ public sealed partial class StarterScreen : MonoBehaviour
     }
 
     public bool ShowLevelProgress { get; private set; } = true;
+    public float MasterVolume { get; private set; } = .7f;
+    bool volumeDirty;
+    float volumeSaveAt;
 
-    void OpenCourse() => OpenLevel("movement-lab");
+    void SetMasterVolume(float value)
+    {
+        float adjusted = Mathf.Round(Mathf.Clamp01(value) * 100) / 100;
+        if (Mathf.Approximately(MasterVolume, adjusted)) return;
+        MasterVolume = adjusted;
+        AudioListener.volume = MasterVolume;
+        if (settingsFile == null) return;
+        settingsFile.Data["masterVolume"] = MasterVolume;
+        volumeDirty = true;
+        volumeSaveAt = Time.unscaledTime + .25f;
+    }
+    void SaveVolumePreference()
+    {
+        if (!volumeDirty) return;
+        volumeDirty = false;
+        try {
+            settingsFile.Save();
+        } catch (Exception) {
+            warning = "The sound preference could not be saved. Existing settings were preserved.";
+        }
+    }
+
     void OpenLevelOne() => OpenLevel("golden-river");
 
     public void OpenLevel(string id)
@@ -97,6 +121,8 @@ public sealed partial class StarterScreen : MonoBehaviour
         course = LevelRegistry.Create(id);
         course.Progress.Visible = ShowLevelProgress;
         course.BackToMenu = CloseCourse;
+        course.Cat.GetComponent<CatInput>().TogglePause = ToggleGameplayPause;
+        gameplaySettings = false;
     }
 
     void SetShowLevelProgress(bool visible)
@@ -116,6 +142,8 @@ public sealed partial class StarterScreen : MonoBehaviour
         if (course != null || stompArena != null || rangedArena != null || popup || applying) return;
         rangedArena = new GameObject("Ranged combat lab").AddComponent<RangedArena>();
         rangedArena.BackToMenu = CloseRangedArena;
+        rangedArena.Cat.GetComponent<CatInput>().TogglePause = ToggleGameplayPause;
+        gameplaySettings = false;
     }
 
     void CloseRangedArena()
@@ -134,6 +162,8 @@ public sealed partial class StarterScreen : MonoBehaviour
         if (course != null || stompArena != null || rangedArena != null || popup || applying) return;
         stompArena = new GameObject("Simple combat lab").AddComponent<StompArena>();
         stompArena.BackToMenu = CloseStompArena;
+        stompArena.Cat.GetComponent<CatInput>().TogglePause = ToggleGameplayPause;
+        gameplaySettings = false;
     }
 
     void CloseStompArena()
@@ -182,6 +212,8 @@ public sealed partial class StarterScreen : MonoBehaviour
         settingsFile = MenuSettings.Open(preferencesPath);
         preferences.lastOfferedVersion = (string)settingsFile.Data["lastOfferedVersion"];
         ShowLevelProgress = (bool)settingsFile.Data["showLevelProgress"];
+        MasterVolume = (float)settingsFile.Data["masterVolume"];
+        AudioListener.volume = MasterVolume;
         warning = settingsFile.Warning;
     }
     void Send(string command)
@@ -211,6 +243,7 @@ public sealed partial class StarterScreen : MonoBehaviour
 
     void Update()
     {
+        if (volumeDirty && Time.unscaledTime >= volumeSaveAt) SaveVolumePreference();
         if (display != null) {
             ObserveDisplay();
             if (FullscreenShortcutPressed(Keyboard.current))
@@ -267,7 +300,7 @@ public sealed partial class StarterScreen : MonoBehaviour
             // A real resize wakes graphics on hidden local capture windows before the first shot.
             Screen.SetResolution(1000, 700, FullScreenMode.Windowed);
             yield return new WaitForSecondsRealtime(1);
-            foreach (string viewName in new[] { "history", "history-bottom", "history-minimum", "history-wide", "history-narrow", "menu", "settings", "play", "popup", "checking", "available", "downloading", "ready", "current", "error", "warning", "development", "narrow", "cutout", "popup-narrow" }) {
+            foreach (string viewName in new[] { "history", "history-bottom", "history-minimum", "history-wide", "history-narrow", "menu", "settings", "popup", "checking", "available", "downloading", "ready", "current", "error", "warning", "development", "narrow", "cutout", "popup-narrow" }) {
                 popup = false; warning = ""; error = ""; previewUnsupported = false;
                 available = "0.1.0 (preview example)"; progress = 47;
                 state = viewName; page = "updates"; scroll = Vector2.zero; downloadedBytes = totalBytes = 0;
@@ -284,7 +317,7 @@ public sealed partial class StarterScreen : MonoBehaviour
                     Screen.SetResolution(viewName == "history-minimum" ? 960 : viewName == "history-wide" ? 2560 : viewName == "history-narrow" ? 540 : 1280,
                         viewName == "history-minimum" ? 540 : viewName == "history-wide" ? 1080 : 720, FullScreenMode.Windowed);
                 }
-                if (viewName == "menu" || viewName == "settings" || viewName == "play") page = viewName;
+                if (viewName == "menu" || viewName == "settings") page = viewName;
                 if (viewName == "narrow" || viewName == "cutout") page = "settings";
                 if (viewName == "popup" || viewName == "popup-narrow") { state = "available"; popup = true; }
                 if (viewName == "downloading") { downloadedBytes = 47000000; totalBytes = 100000000; }
@@ -318,27 +351,26 @@ public sealed partial class StarterScreen : MonoBehaviour
                 yield break;
             }
         }
-        else if (view == "course" || view == "course-end" || view == "course-paused" || view == "course-transformed") {
-            page = "play";
-            OpenCourse();
-            if (view == "course-transformed") {
-                course.transform.position = new Vector3(40, 4);
-                course.transform.localScale = Vector3.one * 1.5f;
-                course.Cat.RespawnAt(course.transform.TransformPoint(new Vector2(-3, 0.48f)));
-            }
-            if (view == "course-end") course.Cat.RespawnAt(new Vector2(100, 0.52f));
-            if (view == "course-paused") {
-                yield return new WaitForSecondsRealtime(0.3f);
-                course.TogglePause();
-            }
-        }
-        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale") {
+        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale" || view == "level-one-complete" || view == "level-one-audio" || view == "level-one-water" || view == "level-one-settings") {
             OpenLevelOne();
+            if (view == "level-one-audio")
+                course.Cat.RespawnAt(MovementCourse.LevelOneCheckpointSpawns[0] - Vector2.right * 5);
+            if (view == "level-one-water")
+                course.Cat.RespawnAt(new Vector2(20, -1.75f));
+            if (view == "level-one-settings") {
+                yield return null;
+                course.TogglePause(); OpenGameplaySettings();
+            }
+            if (view == "level-one-complete") {
+                course.Cat.RespawnAt(MovementCourse.LevelOneExit - Vector2.right * 3);
+                course.Cat.Motion.SetMove(1);
+                while (!course.HasReachedExit) yield return null;
+            }
             if (view == "level-one-finale") course.StartFinalePreview();
             if (view == "level-one-ascent") course.StartAscentPreview();
             if (view == "level-one-lift") course.StartVerticalLiftPreview();
         }
-        else if (view == "menu" || view == "settings" || view == "play") page = view;
+        else if (view == "menu" || view == "settings" || view == "sound-credits") page = view;
         else if (!string.IsNullOrEmpty(view)) {
             page = "updates";
             state = view;
@@ -352,6 +384,10 @@ public sealed partial class StarterScreen : MonoBehaviour
         }
         simulateCutout = args.Contains("--preview-cutout");
         string capture = Argument("--preview-capture");
+        if (int.TryParse(Argument("--preview-width"), out int captureWidth) &&
+            int.TryParse(Argument("--preview-height"), out int captureHeight))
+            Screen.SetResolution(Mathf.Clamp(captureWidth, 640, 3840),
+                Mathf.Clamp(captureHeight, 360, 2160), FullScreenMode.Windowed);
         if (string.IsNullOrEmpty(capture)) yield break;
         yield return new WaitForSecondsRealtime(12);
         yield return new WaitForEndOfFrame();
@@ -406,7 +442,48 @@ public sealed partial class StarterScreen : MonoBehaviour
         messages.Enqueue("{\"state\":\"ready\"}");
     }
 #endif
-    void OnApplicationQuit() { ObserveDisplay(true); platform?.Dispose(); }
+    void OnApplicationFocus(bool focused) { if (!focused) { SaveVolumePreference(); PauseForBackground(); } }
+    void OnApplicationPause(bool paused) { if (paused) { SaveVolumePreference(); PauseForBackground(); } }
+    void PauseForBackground()
+    {
+        if (ActiveRun == null || ActiveRun.Paused) return;
+        if (course != null) course.TogglePause();
+        else if (rangedArena != null) rangedArena.TogglePause();
+        else stompArena.TogglePause();
+        // Focus returning leaves the pause menu open until the player resumes.
+    }
+    bool BackFromMenu()
+    {
+        if (ActiveRun != null || applying || state == "applying") return false;
+        SaveVolumePreference();
+        if (popup) popup = false;
+        else if (page == "settings") page = "menu";
+        else if (page == "sound-credits" || page == "updates") page = "settings";
+        else return false;
+        previousFocus.Clear(); revealFocus = false; lastPage = null;
+        return true;
+    }
+    void OpenGameplaySettings()
+    {
+        if (ActiveRun == null || !ActiveRun.Paused) return;
+        gameplaySettings = true;
+        gameplayMenuVisible = false;
+    }
+    void CloseGameplaySettings()
+    {
+        SaveVolumePreference();
+        gameplaySettings = false;
+        gameplayMenuVisible = false;
+    }
+    void ToggleGameplayPause()
+    {
+        if (gameplaySettings && ActiveRun != null && ActiveRun.Paused) { CloseGameplaySettings(); return; }
+        gameplaySettings = false;
+        if (course != null) course.TogglePause();
+        else if (rangedArena != null) rangedArena.TogglePause();
+        else if (stompArena != null) stompArena.TogglePause();
+    }
+    void OnApplicationQuit() { SaveVolumePreference(); ObserveDisplay(true); platform?.Dispose(); }
     public static bool IsReleaseUrl(string url) => UpdatePolicy.IsReleaseUrl(url);
     string StatusText()
     {

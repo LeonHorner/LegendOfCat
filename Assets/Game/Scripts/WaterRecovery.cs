@@ -53,6 +53,8 @@ public sealed class WaterRecovery : MonoBehaviour
     Vector3 cameraStart, entry;
     float cameraSize, scale, facing;
     bool respawned, internalRespawn;
+    AudioSource entryAudio;
+    bool audioPaused;
 
     public void Initialize(CatController controller, Camera camera, Transform courseRoot, System.Action checkpointRetry)
     {
@@ -61,6 +63,8 @@ public sealed class WaterRecovery : MonoBehaviour
         original = cat.GetComponentInChildren<MikaSpritePresentation>();
         if (original) originalRenderer = original.GetComponent<SpriteRenderer>();
         cat.ReturnedToStart += OnRespawn;
+        if (Application.isPlaying && !FindFirstObjectByType<AudioListener>())
+            view.gameObject.AddComponent<AudioListener>();
     }
 
     public bool TryEnter()
@@ -96,6 +100,8 @@ public sealed class WaterRecovery : MonoBehaviour
         if (original) original.enabled = false;
         if (originalRenderer) originalRenderer.enabled = false;
         effects.SetActive(true);
+        audioPaused = false;
+        if (Application.isPlaying && entryAudio.clip) entryAudio.Play();
         Present();
     }
 
@@ -105,6 +111,11 @@ public sealed class WaterRecovery : MonoBehaviour
     {
         if (effects) return;
         effects = new GameObject("Mika water reaction and splash");
+        entryAudio = effects.AddComponent<AudioSource>();
+        entryAudio.playOnAwake = false;
+        entryAudio.spatialBlend = 0;
+        entryAudio.volume = .8f;
+        entryAudio.clip = Resources.Load<AudioClip>("GoldenRiverAudio/water-entry");
         effects.transform.SetParent(course, false);
         var texture = Resources.Load<Texture2D>("WaterRecovery/turn-reactions");
         drawings = new Sprite[8];
@@ -235,7 +246,14 @@ public sealed class WaterRecovery : MonoBehaviour
 
     void LateUpdate()
     {
+        SynchronizePause();
         if (CameraHeld) Present();
+    }
+    public void SynchronizePause()
+    {
+        if (!entryAudio || !cat || audioPaused == cat.Paused) return;
+        audioPaused = cat.Paused;
+        if (audioPaused) entryAudio.Pause(); else entryAudio.UnPause();
     }
 
     void Present()
@@ -265,6 +283,7 @@ public sealed class WaterRecovery : MonoBehaviour
         }
         submerge.SetFloat("_Surface", visualEntry.y);
         submerge.SetFloat("_SurfaceScale", scale);
+        submerge.SetFloat("_EffectTime", Elapsed);
         float breachFraming = HasSharkEncounter
             ? Mathf.SmoothStep(0, 1, Mathf.InverseLerp(SharkLaunchTime, 1.26f, Elapsed))
                 * (1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(2.02f, 2.48f, Elapsed)))
@@ -475,6 +494,8 @@ public sealed class WaterRecovery : MonoBehaviour
 
     public void Cancel()
     {
+        if (entryAudio) entryAudio.Stop();
+        audioPaused = false;
         if (!Active) return;
         Active = false;
         RestorePresentation();

@@ -5,8 +5,10 @@ public sealed partial class StarterScreen
 {
     GUIStyle titleStyle, headingStyle, textStyle, smallStyle, buttonStyle, panelStyle;
     GUIStyle runTimerStyle;
+    GUIStyle volumeTrackStyle, volumeThumbStyle;
     Texture2D runClockIcon, runClockHand;
     Texture2D backdrop, panelTexture, buttonTexture, hoverTexture, focusTexture;
+    Texture2D volumeTrackTexture;
     readonly List<string> focusable = new List<string>();
     readonly List<string> previousFocus = new List<string>();
     Vector2 popupScroll;
@@ -16,7 +18,7 @@ public sealed partial class StarterScreen
     bool simulateCutout;
     float guiScale = 1;
     bool revealFocus;
-    bool gameplayMenuVisible;
+    bool gameplayMenuVisible, gameplaySettings;
     Vector2 gameplayControlsScroll, gameplayMenuScroll;
     bool UpdatesSupported {
         get {
@@ -60,6 +62,16 @@ public sealed partial class StarterScreen
         buttonStyle.focused.background = focusTexture;
         buttonStyle.active.background = focusTexture;
         buttonStyle.normal.textColor = buttonStyle.hover.textColor = buttonStyle.focused.textColor = buttonStyle.active.textColor = Ink;
+        volumeTrackTexture = new Texture2D(5, 28) { hideFlags = HideFlags.HideAndDontSave };
+        for (int y = 0; y < 28; y++) for (int x = 0; x < 5; x++)
+            volumeTrackTexture.SetPixel(x, y, y < 9 || y > 18 ? Color.clear :
+                buttonTexture.GetPixel(x == 0 || x == 4 || y == 9 || y == 18 ? 0 : 2, 2));
+        volumeTrackTexture.Apply();
+        volumeTrackStyle = new GUIStyle(GUI.skin.horizontalSlider) { fixedHeight = 28, border = new RectOffset(2, 2, 0, 0), padding = new RectOffset(), margin = new RectOffset(0, 0, 4, 8) };
+        volumeTrackStyle.normal.background = volumeTrackTexture;
+        volumeThumbStyle = new GUIStyle(GUI.skin.horizontalSliderThumb) { fixedWidth = 24, fixedHeight = 28, border = new RectOffset(2, 2, 2, 2), margin = new RectOffset() };
+        volumeThumbStyle.normal.background = hoverTexture;
+        volumeThumbStyle.hover.background = volumeThumbStyle.active.background = volumeThumbStyle.focused.background = focusTexture;
         panelStyle = new GUIStyle { normal = { background = panelTexture }, border = new RectOffset(2, 2, 2, 2), padding = new RectOffset(24, 24, 20, 20) };
     }
 
@@ -101,6 +113,9 @@ public sealed partial class StarterScreen
             DrawGameplayMenu();
             return;
         }
+        if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape && BackFromMenu()) {
+            Event.current.Use(); GUI.FocusControl(null);
+        }
         gameplayMenuVisible = false;
         PrepareStyles();
         var oldColor = GUI.color;
@@ -140,36 +155,32 @@ public sealed partial class StarterScreen
             Label("Explore the current build and make yourself at home. Mika's campaign is still in development.");
             GUILayout.Space(18);
             if (Button("Golden River preview")) OpenLevelOne();
-            if (Button("Movement lab")) page = "play";
             if (Button("Simple combat lab")) OpenStompArena();
             if (Button("Ranged combat lab")) OpenRangedArena();
             if (Button(string.IsNullOrEmpty(available) ? "Settings" : "Settings - Update available")) page = "settings";
             if (Button("Quit")) Application.Quit();
-        } else if (page == "play") {
-            Label("Movement lab prototype", headingStyle);
-            Label("Run and jump through a longer painted river course with four checkpoints. Mika's campaign is still in development; this is a movement prototype.");
-            GUILayout.Space(16);
-            if (Button("Enter movement lab")) OpenCourse();
-            if (Button("Back to menu")) page = "menu";
         } else if (page == "settings") {
             Label("Settings", headingStyle);
             Label("A few comforts for the journey.");
+            DrawPlaySettings(false);
             GUI.enabled = false;
             Button("Language - Coming later");
             GUI.enabled = !popup;
-            if (display != null) {
-                GUILayout.Space(12);
-                Label("Display", headingStyle);
-                GUI.enabled = !popup && !display.Switching;
-                if (Button(fullscreen ? "Fullscreen: On" : "Fullscreen: Off"))
-                    SetFullscreen(!fullscreen);
-                GUI.enabled = !popup;
-                Label("Resize the window by dragging its borders. F11 or Alt+Enter toggles fullscreen.", smallStyle);
-            }
-            if (Button(ShowLevelProgress ? "Level progress bar: On" : "Level progress bar: Off"))
-                SetShowLevelProgress(!ShowLevelProgress);
+            if (Button("Sound credits")) page = "sound-credits";
             if (Button(string.IsNullOrEmpty(available) ? "Versions & updates" : "Versions & updates - Available")) page = "updates";
             if (Button("Back to menu")) page = "menu";
+        } else if (page == "sound-credits") {
+            Label("Sound credits", headingStyle);
+            Label("Checkpoint: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran. CC BY 4.0. Adapted: excerpt, softer entrance, bell-layer removal and extended shimmer.");
+            if (Button("Checkpoint source and author")) Application.OpenURL("https://freesound.org/people/TommasoMotteran/sounds/859080/");
+            if (Button("CC BY 4.0 license")) Application.OpenURL("https://creativecommons.org/licenses/by/4.0/");
+            Label("River: Park ambiences by Thimras. CC0 1.0. Adapted into a river loop.");
+            if (Button("River source")) Application.OpenURL("https://opengameart.org/content/park-ambiences");
+            Label("Water entry: jump-into-water.flac by yurkobb. CC0 1.0. Shortened and made quieter.");
+            if (Button("Water entry source")) Application.OpenURL("https://freesound.org/people/yurkobb/sounds/280219/");
+            if (Button("CC0 1.0 dedication")) Application.OpenURL("https://creativecommons.org/publicdomain/zero/1.0/");
+            Label("Wind: original continuous-air sound effects. PolyForm Noncommercial 1.0.0.");
+            if (Button("Back to settings")) page = "settings";
         } else {
             Label("Versions & updates", headingStyle);
             Label(StatusText());
@@ -321,11 +332,32 @@ public sealed partial class StarterScreen
         return hand;
     }
 
+    void DrawPlaySettings(bool inGame)
+    {
+        Label("Sound volume: " + Mathf.RoundToInt(MasterVolume * 100) + "%", smallStyle);
+        GUI.enabled = inGame || !popup;
+        GUI.SetNextControlName("Sound volume");
+        if (GUI.enabled) focusable.Add("Sound volume");
+        SetMasterVolume(GUILayout.HorizontalSlider(MasterVolume, 0, 1, volumeTrackStyle, volumeThumbStyle));
+        if (display != null) {
+            GUILayout.Space(12);
+            Label("Display", headingStyle);
+            GUI.enabled = (inGame || !popup) && !display.Switching;
+            if (Button(fullscreen ? "Fullscreen: On" : "Fullscreen: Off")) SetFullscreen(!fullscreen);
+            GUI.enabled = inGame || !popup;
+            if (!inGame) Label("Resize the window by dragging its borders. F11 or Alt+Enter toggles fullscreen.", smallStyle);
+        }
+        if ((!inGame || course != null) && Button(ShowLevelProgress ? "Level progress bar: On" : "Level progress bar: Off"))
+            SetShowLevelProgress(!ShowLevelProgress);
+    }
+
     void DrawGameplayMenu()
     {
-        bool finished = rangedArena != null ? rangedArena.Combat.Finished : stompArena != null && stompArena.Combat.Finished;
+        bool levelFinished = course != null && course.LevelOne && course.HasReachedExit;
+        bool finished = levelFinished || (rangedArena != null ? rangedArena.Combat.Finished : stompArena != null && stompArena.Combat.Finished);
         bool paused = ActiveRun?.Paused ?? false;
         if (!paused && !finished) {
+            gameplaySettings = false;
             if (gameplayMenuVisible) {
                 previousFocus.Clear();
                 GUI.FocusControl(null);
@@ -340,7 +372,8 @@ public sealed partial class StarterScreen
         var oldMatrix = GUI.matrix;
         var oldColor = GUI.color;
         int oldDepth = GUI.depth;
-        GUI.depth = -10;
+        // Keep pause controls above the water-recovery blackout.
+        GUI.depth = -2000;
         guiScale = 1;
         GUI.matrix = Matrix4x4.TRS(new Vector3(region.x, region.y), Quaternion.identity, Vector3.one);
         GUI.color = Color.white;
@@ -354,22 +387,34 @@ public sealed partial class StarterScreen
         }
         NavigateFocus(); focusable.Clear();
         GUILayout.BeginArea(new Rect((region.width - panelWidth) / 2, (region.height - panelHeight) / 2, panelWidth, panelHeight), panelStyle);
-        Label(finished ? (rangedArena != null || stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
-        GUILayout.Space(8);
-        if (wide) { GUILayout.BeginHorizontal(); GUILayout.BeginVertical(GUILayout.Width(220)); }
-        else gameplayMenuScroll = GUILayout.BeginScrollView(gameplayMenuScroll);
-        bool resume = !finished && Button("Resume", fixedNavigation: true);
-        bool retry = Button("Retry", fixedNavigation: true);
-        bool restart = Button("Restart", fixedNavigation: true);
-        bool menu = Button("Main menu", fixedNavigation: true);
-        if (wide) {
-            GUILayout.EndVertical(); GUILayout.Space(20); GUILayout.BeginVertical();
-            Label("Controls", textStyle);
-            gameplayControlsScroll = GUILayout.BeginScrollView(gameplayControlsScroll);
-        } else { GUILayout.Space(16); Label("Controls", textStyle); }
-        DrawGameplayControls();
-        if (wide) { GUILayout.EndScrollView(); GUILayout.EndVertical(); GUILayout.EndHorizontal(); }
-        else GUILayout.EndScrollView();
+        bool resume = false, retry = false, restart = false, menu = false, settings = false, back = false;
+        if (gameplaySettings) {
+            Label("Settings", headingStyle);
+            gameplayMenuScroll = GUILayout.BeginScrollView(gameplayMenuScroll);
+            DrawPlaySettings(true);
+            GUILayout.EndScrollView();
+            back = Button("Back to pause", fixedNavigation: true);
+        } else {
+            Label(levelFinished ? "Golden River complete" : finished ?
+                (rangedArena != null || stompArena.Combat.BossHealth == 0 ? "Target defeated" : "Try again") : "Paused", headingStyle);
+            if (levelFinished) Label("You made it through the valley.", smallStyle);
+            GUILayout.Space(8);
+            if (wide) { GUILayout.BeginHorizontal(); GUILayout.BeginVertical(GUILayout.Width(220)); }
+            else gameplayMenuScroll = GUILayout.BeginScrollView(gameplayMenuScroll);
+            resume = !finished && Button("Resume", fixedNavigation: true);
+            retry = Button("Retry", fixedNavigation: true);
+            restart = Button("Restart", fixedNavigation: true);
+            settings = !finished && Button("Settings", fixedNavigation: true);
+            menu = Button("Main menu", fixedNavigation: true);
+            if (wide) {
+                GUILayout.EndVertical(); GUILayout.Space(20); GUILayout.BeginVertical();
+                Label("Controls", textStyle);
+                gameplayControlsScroll = GUILayout.BeginScrollView(gameplayControlsScroll);
+            } else { GUILayout.Space(16); Label("Controls", textStyle); }
+            DrawGameplayControls();
+            if (wide) { GUILayout.EndScrollView(); GUILayout.EndVertical(); GUILayout.EndHorizontal(); }
+            else GUILayout.EndScrollView();
+        }
         GUILayout.EndArea();
         if (Event.current.type == EventType.Repaint) {
             previousFocus.Clear();
@@ -379,6 +424,8 @@ public sealed partial class StarterScreen
         GUI.color = oldColor;
         GUI.depth = oldDepth;
 
+        if (back) { CloseGameplaySettings(); return; }
+        if (settings) { OpenGameplaySettings(); return; }
         if (course != null) {
             if (resume) course.TogglePause();
             else if (retry) course.RetryCheckpoint();
@@ -402,7 +449,7 @@ public sealed partial class StarterScreen
         Label("Keyboard / mouse", textStyle);
         if (rangedArena != null)
             Label("J / Left mouse: paw pulse\nK / Right mouse: hold to charge the light orb, release to throw\nR: reload the last-used attack\nUsing the other attack interrupts reload.", smallStyle);
-        Label("Move: A/D or Left/Right arrows\nJump: Space, W or Up arrow\nPause / resume: P\nMain menu: Esc\nRestart run: Backspace", smallStyle);
+        Label("Move: A/D or Left/Right arrows\nJump: Space, W or Up arrow\nPause / resume: Esc or P\nMain menu: choose Main menu while paused\nRestart run: Backspace", smallStyle);
         Label(rangedArena != null ? "Retry: choose Retry in this menu" : "Retry checkpoint: R", smallStyle);
         GUILayout.Space(12);
         Label("Controller", textStyle);

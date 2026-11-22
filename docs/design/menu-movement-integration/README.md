@@ -1,5 +1,7 @@
 # Painted menu and movement integration
 
+Current controls (2026-11-22): Esc or P opens/closes pause; choose Main menu while paused to return. The earlier screenshots and Escape-return behavior below are historical.
+
 PR #30 incorporates merged PR #31 through a normal merge of main. The captures below
 come from the actual Unity 6000.3.27f1 Editor Game View on 2026-10-23; no new artwork
 or update-service implementation was introduced.

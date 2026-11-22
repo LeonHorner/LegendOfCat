@@ -114,7 +114,7 @@ The fresh Editor import produced no package-lock or asset-metadata changes.
 For local playtesting, build with `BuildGame.BuildPreview` and launch
 `LegendOfCatPreview.exe --preview-view level-one`; alternatively select
 **Golden River preview** from its menu. A/D or arrows move, Space jumps, R retries,
-Backspace restarts, P pauses and Escape returns to the menu. Keep the entire
+Backspace restarts, Escape or P toggles pause; Main menu in the pause menu returns to the menu. Keep the entire
 preview output directory together. This local development build is not a release.
 
 The local Windows development preview build completed successfully with the pinned

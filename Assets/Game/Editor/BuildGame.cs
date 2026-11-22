@@ -11,6 +11,14 @@ public static class BuildGame
 {
     const string ScenePath = "Assets/Game/Scenes/Main.unity";
 
+    static void ValidatePlayableResources(BuildReport report)
+    {
+        if (report.packedAssets.SelectMany(asset => asset.contents)
+            .Any(asset => asset.sourceAssetPath.Replace('\\', '/').EndsWith("/MovementCourse.prefab", StringComparison.Ordinal)))
+            throw new BuildFailedException("Player package contains the retired movement fixture.");
+        Debug.Log("Packed playable content verified: retired movement fixture excluded.");
+    }
+
     public static void ConfigureDesktop()
     {
         PlayerSettings.resizableWindow = true;
@@ -69,6 +77,8 @@ public static class BuildGame
         if (report.summary.result != BuildResult.Succeeded)
             throw new BuildFailedException("Unity player build failed.");
         BuildScenery.ValidatePackedArt(report);
+        GoldenRiverAudioImport.ValidatePackedAudio(report);
+        ValidatePlayableResources(report);
         // GameCI CLI requires this exact success marker for custom build methods.
         // Report success only after Unity and the packed-asset audit have passed.
         Debug.Log("Build succeeded!");
@@ -104,6 +114,8 @@ public static class BuildGame
             if (report.summary.result != BuildResult.Succeeded)
                 throw new BuildFailedException("Windows preview build failed.");
             BuildScenery.ValidatePackedArt(report);
+            GoldenRiverAudioImport.ValidatePackedAudio(report);
+            ValidatePlayableResources(report);
         }
         finally {
             PlayerSettings.companyName = company;

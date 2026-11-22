@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Reproducible visual evidence using the same course/prefab as the actual menu.
+// Reproducible visual evidence using the retained Editor-only movement fixture.
 public static class MikaMovementReview
 {
     [MenuItem("LegendOfCat/Mika/Record integrated movement review")]
@@ -39,7 +39,7 @@ public static class MikaMovementReview
         var previous = SceneManager.GetActiveScene();
         var scene = SceneManager.CreateScene("Integrated Mika review", new CreateSceneParameters(LocalPhysicsMode.Physics2D));
         SceneManager.SetActiveScene(scene);
-        var course = Object.Instantiate(Resources.Load<GameObject>("MovementCourse"));
+        var course = Object.Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Game/Tests/Editor/Fixtures/MovementCourse.prefab"));
         var cat = course.GetComponent<MovementCourse>().Cat;
         cat.GetComponent<CatInput>().enabled = false;
         cat.GetComponent<Rigidbody2D>().interpolation = RigidbodyInterpolation2D.None;
