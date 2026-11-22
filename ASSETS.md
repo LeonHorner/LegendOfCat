@@ -936,3 +936,39 @@ Source remains Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, 
 Owner feedback: the entrance is still abrupt. No extra tool installation is needed. New standalone art/audio/checkpoint-achievement-reference/checkpoint-achievement-soft-start.wav retains the 0.4-second opening-effect cut and changes only the entry to a 220 ms sine-squared rise, replacing the 20 ms linear fade. Main/tail PCM remains identical after the fade; approximately 2.58 seconds. Unapproved and outside Unity Assets/gameplay.
 
 Source/credit remains Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Additional adaptation: longer smooth entry fade; retain existing required attribution and source/change records. Preparation: OpenAI Codex-authored tools/prepare-achievement-clean-start.py --soft-start, Python PCM processing, project license for script, no new sample or generative audio model. River/wind approvals and deferred movement remain unchanged.
+
+## Ranged combat lab primitives - 2026-11-15
+
+- Source: original procedural geometry in RangedArena.cs; authored with OpenAI
+  Codex on 2026-11-15, no external asset or image-generation model used.
+- License: project-owned original code/geometry, under the repository license.
+- Human creative decisions: separate immediate paw pulse and charged arcing light
+  orb; J/K controls, height based on hold duration, movement-facing release.
+- Prototype interpretation: cool narrow pulse, warm round orb, growing charge,
+  square closed shield versus round open target, restrained hit/block marks.
+- Existing MikaOriginal artwork is reused with its recorded provenance unchanged.
+
+
+Ranged lab update (2026-11-15): the user selected a shared attack button, weapon
+switching, independent magazines and active-weapon-only reload. The original
+procedural presentation now labels the selected weapon, remaining rounds, charge
+and reload percentage; no additional external or generated artwork was used.
+
+The user requested filled/hollow ammunition dots on 2026-11-15. The HUD reuses
+the original procedural disc texture to draw cream circles with dark centers
+for spent rounds; no additional artwork or external asset was introduced.
+The follow-up HUD adds a reload progress bar and reuses the pulse/orb silhouettes
+as selected-weapon icons, alongside their English names.
+The compact weapon/ammo/reload HUD is anchored at bottom center at the user's
+request; the former upper control/debug panel is removed.
+
+Accepted initial visual revision (2026-11-15): the user selected an original
+procedural paw with a small light spark to replace the pulse HUD stripe. The paw
+uses five existing disc-texture stamps and a small cross-shaped spark. The
+permanent blue facing bar in front of Mika is removed. No external artwork, new
+image model or additional source asset was used.
+
+The local direct-attack trial shows the paw and orb indicators together, retaining
+their original procedural symbols and filled/hollow ammunition dots. The user
+requested a larger pause menu with directly visible input descriptions. No new
+external artwork or image generator is involved; the owner accepted this initial prototype on 2026-11-15.

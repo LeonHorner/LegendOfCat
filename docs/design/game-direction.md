@@ -29,3 +29,19 @@ The user approved a roughly two-minute ascent after the introduction, combining 
 On 2026-11-05 the measured ascent was 92.6 seconds (intro 62.2). The user approved additional varied traversal toward 110–140 seconds and diegetic paw-carved checkpoints: a tree at the first, a distinct ruin arch at the second. Current paws glow warm gold with a gentle pulse; passed paws stay dark orange without emission. No checkpoint toast. See golden-river-main-route/checkpoints-and-pacing.md.
 
 The user subsequently approved planning and implementing a 120–150-second final traversal after checkpoint 2: roof gardens, courtyard and crown switchbacks, physical rubble/wall obstacles, vertical and diagonal counterweight supports, and a safe sunlit gateway. Both the playable surfaces and the background express those places in the retained painted style. No enemies, abilities, third checkpoint or additional Easter Eggs are introduced. See golden-river-main-route/finale.md for implementation and acceptance boundaries.
+
+
+## Ranged prototype decision - 2026-11-15
+
+After rejecting explicit weapon switching and F/Q beside WASD, the user accepted
+J/left mouse for an immediate paw pulse and K/right mouse hold/release for the
+arcing light orb. Both magazines appear together with paw/orb icons and ammo dots.
+Pulse has 8 shots / 0.2-second recovery / 1-second reload; orb has 3 shots /
+0.4-second recovery after throw / 1.5-second reload. Only the last-used attack
+reloads; using the other interrupts charge/reload. R reloads early. Movement and
+jump stay free; mouse position does not aim. The enlarged pause menu shows keys
+beside its actions. See [prototype rules](ranged-prototype.md).
+
+The user accepted this initial prototype and its visual layout, allowing tests
+and final PR validation to resume. No production owl/dragon encounters, mobile
+touch controls, merging or release are authorized by that acceptance.
