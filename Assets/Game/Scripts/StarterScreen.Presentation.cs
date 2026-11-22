@@ -5,8 +5,10 @@ public sealed partial class StarterScreen
 {
     GUIStyle titleStyle, headingStyle, textStyle, smallStyle, buttonStyle, panelStyle;
     GUIStyle runTimerStyle;
+    GUIStyle volumeTrackStyle, volumeThumbStyle;
     Texture2D runClockIcon, runClockHand;
     Texture2D backdrop, panelTexture, buttonTexture, hoverTexture, focusTexture;
+    Texture2D volumeTrackTexture;
     readonly List<string> focusable = new List<string>();
     readonly List<string> previousFocus = new List<string>();
     Vector2 popupScroll;
@@ -60,6 +62,16 @@ public sealed partial class StarterScreen
         buttonStyle.focused.background = focusTexture;
         buttonStyle.active.background = focusTexture;
         buttonStyle.normal.textColor = buttonStyle.hover.textColor = buttonStyle.focused.textColor = buttonStyle.active.textColor = Ink;
+        volumeTrackTexture = new Texture2D(5, 28) { hideFlags = HideFlags.HideAndDontSave };
+        for (int y = 0; y < 28; y++) for (int x = 0; x < 5; x++)
+            volumeTrackTexture.SetPixel(x, y, y < 9 || y > 18 ? Color.clear :
+                buttonTexture.GetPixel(x == 0 || x == 4 || y == 9 || y == 18 ? 0 : 2, 2));
+        volumeTrackTexture.Apply();
+        volumeTrackStyle = new GUIStyle(GUI.skin.horizontalSlider) { fixedHeight = 28, border = new RectOffset(2, 2, 0, 0), padding = new RectOffset(), margin = new RectOffset(0, 0, 4, 8) };
+        volumeTrackStyle.normal.background = volumeTrackTexture;
+        volumeThumbStyle = new GUIStyle(GUI.skin.horizontalSliderThumb) { fixedWidth = 24, fixedHeight = 28, border = new RectOffset(2, 2, 2, 2), margin = new RectOffset() };
+        volumeThumbStyle.normal.background = hoverTexture;
+        volumeThumbStyle.hover.background = volumeThumbStyle.active.background = volumeThumbStyle.focused.background = focusTexture;
         panelStyle = new GUIStyle { normal = { background = panelTexture }, border = new RectOffset(2, 2, 2, 2), padding = new RectOffset(24, 24, 20, 20) };
     }
 
@@ -155,12 +167,10 @@ public sealed partial class StarterScreen
             Label("Settings", headingStyle);
             Label("A few comforts for the journey.");
             Label("Sound volume: " + Mathf.RoundToInt(MasterVolume * 100) + "%", smallStyle);
-            GUILayout.BeginHorizontal();
-            GUI.enabled = !popup && MasterVolume > 0;
-            if (Button("Quieter")) SetMasterVolume(MasterVolume - .1f);
-            GUI.enabled = !popup && MasterVolume < 1;
-            if (Button("Louder")) SetMasterVolume(MasterVolume + .1f);
-            GUILayout.EndHorizontal();
+            GUI.enabled = !popup;
+            GUI.SetNextControlName("Sound volume");
+            if (GUI.enabled) focusable.Add("Sound volume");
+            SetMasterVolume(GUILayout.HorizontalSlider(MasterVolume, 0, 1, volumeTrackStyle, volumeThumbStyle));
             GUI.enabled = false;
             Button("Language - Coming later");
             GUI.enabled = !popup;
@@ -180,11 +190,13 @@ public sealed partial class StarterScreen
             if (Button("Back to menu")) page = "menu";
         } else if (page == "sound-credits") {
             Label("Sound credits", headingStyle);
-            Label("Checkpoint: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran. CC BY 4.0. Adapted with a shorter excerpt and softer entrance.");
+            Label("Checkpoint: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran. CC BY 4.0. Adapted: excerpt, softer entrance, bell-layer removal and extended shimmer.");
             if (Button("Checkpoint source and author")) Application.OpenURL("https://freesound.org/people/TommasoMotteran/sounds/859080/");
             if (Button("CC BY 4.0 license")) Application.OpenURL("https://creativecommons.org/licenses/by/4.0/");
             Label("River: Park ambiences by Thimras. CC0 1.0. Adapted into a river loop.");
             if (Button("River source")) Application.OpenURL("https://opengameart.org/content/park-ambiences");
+            Label("Water entry: jump-into-water.flac by yurkobb. CC0 1.0. Shortened and made quieter.");
+            if (Button("Water entry source")) Application.OpenURL("https://freesound.org/people/yurkobb/sounds/280219/");
             if (Button("CC0 1.0 dedication")) Application.OpenURL("https://creativecommons.org/publicdomain/zero/1.0/");
             Label("Wind: original continuous-air sound effects. PolyForm Noncommercial 1.0.0.");
             if (Button("Back to settings")) page = "settings";
@@ -423,7 +435,7 @@ public sealed partial class StarterScreen
         Label("Keyboard / mouse", textStyle);
         if (rangedArena != null)
             Label("J / Left mouse: paw pulse\nK / Right mouse: hold to charge the light orb, release to throw\nR: reload the last-used attack\nUsing the other attack interrupts reload.", smallStyle);
-        Label("Move: A/D or Left/Right arrows\nJump: Space, W or Up arrow\nPause / resume: P\nMain menu: Esc\nRestart run: Backspace", smallStyle);
+        Label("Move: A/D or Left/Right arrows\nJump: Space, W or Up arrow\nPause / resume: Esc or P\nMain menu: choose Main menu while paused\nRestart run: Backspace", smallStyle);
         Label(rangedArena != null ? "Retry: choose Retry in this menu" : "Retry checkpoint: R", smallStyle);
         GUILayout.Space(12);
         Label("Controller", textStyle);

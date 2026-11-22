@@ -34,8 +34,8 @@ Shader "LegendOfCat/StudyWater"
             }
             fixed4 frag(Output i) : SV_Target {
                 fixed4 painted = tex2D(_MainTex, i.uv);
-                // Normal Play advances in the shader; capture/tests may supply an explicit time.
-                float time = (_UseCaptureTime > 0.5 ? _WaterTime : _Time.y);
+                // Course-owned time freezes with pause; captures may override it.
+                float time = _WaterTime;
                 float water = WaterMask(painted.rgb);
                 float phase = i.world.x * 2.0 + i.world.y * 10.0 - time * 2.2;
                 float secondary = i.world.x * 3.4 - i.world.y * 7.0 + time * 1.3;

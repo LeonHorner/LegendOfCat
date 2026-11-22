@@ -56,7 +56,7 @@ public sealed class GoldenRiverAudio : MonoBehaviour
         StopSources();
         // A separate completion sound has not been selected; retain the success UI.
     }
-    void LateUpdate()
+    public void SynchronizePause()
     {
         if (!course) return;
         bool paused = course.Run.Paused;
@@ -66,7 +66,12 @@ public sealed class GoldenRiverAudio : MonoBehaviour
             }
             wasPaused = paused;
         }
-        if (paused || finished) return;
+    }
+    void LateUpdate()
+    {
+        if (!course) return;
+        SynchronizePause();
+        if (course.Run.Paused || finished) return;
         if (course.Run.Checkpoint > previousCheckpoint && checkpoint && Application.isPlaying) {
             landmark.Stop(); landmark.clip = checkpoint; landmark.Play();
         }

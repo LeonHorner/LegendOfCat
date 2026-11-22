@@ -420,6 +420,7 @@ public sealed class MovementCourse : MonoBehaviour
             if (LevelOne) {
                 Completion = new LevelCompletion("golden-river", Run.ElapsedSeconds, Run.Retries);
                 Cat.SetPaused(true);
+                foreach (var support in supports) support.SynchronizePause();
                 Completed?.Invoke(Completion);
             }
             ExitReached?.Invoke();
@@ -460,6 +461,8 @@ public sealed class MovementCourse : MonoBehaviour
     {
         if (LevelOne && HasReachedExit) return;
         Cat.SetPaused(Run.TogglePause());
+        foreach (var support in supports) support.SynchronizePause();
+        GetComponent<GoldenRiverAudio>()?.SynchronizePause();
     }
 
     void LateUpdate()
@@ -468,6 +471,7 @@ public sealed class MovementCourse : MonoBehaviour
             courseCamera.rect = MenuLayout.Letterbox16By9(Screen.width, Screen.height);
             courseCamera.aspect = 16f / 9f;
         }
+        if (Cat.Paused) return;
         var velocity = Cat.Motion.Velocity;
         if (originalMika) return;
         if (Mathf.Abs(velocity.x) > 0.1f) facing = Mathf.Sign(velocity.x);

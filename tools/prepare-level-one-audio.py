@@ -39,6 +39,9 @@ write("river-loop.wav", rate, channels, loop)
 
 runpy.run_path("tools/prepare-runtime-wind.py")
 
-# Preserve the chosen 220 ms soft-entry checkpoint audition byte-for-byte.
-shutil.copyfile("art/audio/checkpoint-achievement-reference/checkpoint-achievement-soft-start.wav",
+# Preserve the approved warm-body cue with longer entrance shimmer byte-for-byte.
+shutil.copyfile("art/audio/checkpoint-achievement-reference/checkpoint-achievement-long-shimmer.wav",
                 OUT / "checkpoint.wav")
+
+# The owner selected the quieter natural attack after rejecting the softened version.
+shutil.copyfile("art/audio/water-entry-review/water-entry-splash-quiet.wav", OUT / "water-entry.wav")

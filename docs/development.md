@@ -92,7 +92,7 @@ Later as their initial focus. **Movement lab (prototype)** opens an introduction
 the temporary course and unfinished campaign; **Enter movement lab** starts it. The menu's
 single OnGUI implementation skips all painting while the lab is active. The menu component
 continues receiving update-service messages, preserving settings and once-per-version reminders.
-Return with **Back to menu**, Escape or controller Start; the lab stops immediately, its input
+Escape or P opens/closes pause. Return with **Main menu** in the pause menu or controller Start; the lab stops immediately, its input
 actions are disabled and the painted menu resumes with fresh keyboard navigation state.
 
 Open `Assets/Game/Scenes/Main.unity` in the pinned Editor and enter Play Mode to inspect the

@@ -66,7 +66,7 @@ public sealed class MikaSpritePresentation : MonoBehaviour
 
     public void RenderPose(float deltaTime)
     {
-        if (!controller) return;
+        if (!controller || controller.Paused) return;
         Vector3 position = controller.transform.position;
         Animation.LandingSoon = false;
         if (shape && !controller.Grounded && controller.Motion.Velocity.y < 0) {

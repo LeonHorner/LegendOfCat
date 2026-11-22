@@ -1,5 +1,29 @@
 # Golden River audio and completion
 
+## Escape pause, volume slider and selected splash - 2026-11-22
+
+The owner requests Esc to open/close pause. It now shares Pause with P; the pause menu's Main menu button returns to the title, while controller bindings remain unchanged. All 118 selected tests passed after this control update. They also request a horizontal volume slider; it provides immediate one-percent adjustment with delayed preference writes and focus/suspension/quit flush, preserving the existing settings format. All 47 focused slider/pause/desktop tests passed.
+
+The requested water-entry cue was auditioned first. The owner revised initial approval to quieter/softer, rejected the strongly softened version as too soft, then explicitly approved water-entry-splash-quiet.wav with its clear natural attack. WaterRecovery owns the one-shot source, freezes it immediately on pause and stops it on retry/menu/disable. No shark or completion sound is added. Source/processing/CC0 provenance: art/audio/water-entry-review/README.md and ASSETS.md. All 120 selected Unity tests passed after the water integration, including real mixed splash playback and sample-position lifecycle behavior. The fresh Windows preview and seven-clip/44-painting package audits passed. A cosmetic rail-alignment adjustment was compiled and visually reviewed after those behavior checks; final full exact-head cross-platform validation remains pending while draft.
+
+## Full world pause correction - 2026-11-22
+
+The owner reports continued background/platform movement after focus return, while expecting the same frozen world as normal pause. Both paths use the existing course toggle. Platforms now synchronize kinematic simulation immediately, retain their phase, and re-enable on explicit resume or retry. Course-owned animation time replaces global shader time for water, willow/mill and fish ripples; recovery surface ripples use their frozen sequence time. Camera smoothing and Mika presentation do not advance while paused. No global time-scale change or new artwork. Tests compare actual rendered frames and all support positions/phases across focus/manual pause, then verify resume/retry.
+
+Validation: the expanded run covered 76 cases and passed 75, including the actual GPU frame/platform freeze regression. Its remaining synthetic P test was routed to the Editor rather than the game; the corrected harness explicitly routes keyboard input to the Game view and restores both routing settings afterward. All four focused GoldenRiverAtmosphereTests then passed, including the real P binding after focus restoration. No production input binding needed changing. The fresh full-world Windows preview build and six-clip package audit passed.
+
+## Approved checkpoint integration and background pause - 2026-11-22
+
+The owner approved the long-shimmer checkpoint audition and explicitly requested integration. Runtime checkpoint.wav is a byte-identical copy; retain TommasoMotteran CC BY 4.0 attribution with all adaptation notices, including bell-layer omission and extended early shimmer. River/wind unchanged.
+
+The owner also requested automatic pause whenever the game loses focus. The menu host now sends an idempotent pause request through each active prototype's existing pause path on focus loss/application suspension. Returning focus does not auto-resume; idle menus and completed runs remain unaffected. Golden River audio synchronizes pause immediately, avoiding a final background sound if no later frame runs. Existing movement/encounter pause behavior is preserved; no global time-scale or settings format change.
+
+## Completion recommendation - not approved or implemented
+
+The owner questions whether the legacy basket ending fits the current adventure. Proposed approximately three-second Golden River finish at the existing safe sunlit gate: Mika stops briefly, looks back toward the valley, lifts the tail and walks forward into warm light; a single gold paw glow marks arrival at the gate, then the existing results menu appears. Sound direction: one broad warm resolving success chord with an airy shiny entrance and a soft tail, avoiding the repeated bell notes rejected in checkpoint review. Keep environmental sound restrained beneath it. No new boss, collectible, route requirement or campaign/save behavior.
+
+This is a recommendation only, not permission to implement new Mika poses, scenic artwork, animation timing or a completion cue. Review any new Mika animation using the existing art-direction gates; audition the actual completion sound separately before integration. The existing immediate completion state/menu and absence of a separate completion sound remain current behavior.
+
 ## Longer checkpoint entrance shimmer - 2026-11-22
 
 The owner finds the warm-body correction much better but wants a longer shiny entrance. Standalone `checkpoint-achievement-long-shimmer.wav` stretches only the gated early high layer from nominally 0.8 to 1.45 seconds, preserving pitch, low body and total cue length; the omitted middle layer and excluded late ringing stay excluded. See the source review README for processing/CC BY 4.0 attribution and checks. Owner hearing remains required; runtime/river/wind unchanged.

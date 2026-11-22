@@ -601,8 +601,15 @@ public sealed class SceneryRenderer : MonoBehaviour
     {
         waterCaptureTime = seconds;
         UpdateFish(seconds >= 0 ? seconds : fishClock);
+        ApplyAnimationTime();
+    }
+
+    void ApplyAnimationTime()
+    {
+        float seconds = waterCaptureTime >= 0 ? waterCaptureTime : fishClock;
         riverFrontMaterial.SetFloat("_WaterTime", seconds);
-        riverFrontMaterial.SetFloat("_UseCaptureTime", seconds >= 0 ? 1 : 0);
+        riverFrontMaterial.SetFloat("_UseCaptureTime", 1);
+        if (landmarkMaterial) landmarkMaterial.SetFloat("_SceneryTime", seconds);
     }
 
     public void ApplyViewport(int width, int height)
@@ -614,8 +621,8 @@ public sealed class SceneryRenderer : MonoBehaviour
     void FixedUpdate()
     {
         if (!Cat || Cat.Paused) return;
-        if (RouteLandmarks && !Cat.Paused) {
-            fishClock += Time.fixedDeltaTime;
+        fishClock += Time.fixedDeltaTime;
+        if (RouteLandmarks) {
             if (waterCaptureTime < 0) UpdateFish(fishClock);
         }
 
@@ -626,6 +633,7 @@ public sealed class SceneryRenderer : MonoBehaviour
         if (!View) return;
         ApplyViewport(Screen.width, Screen.height);
         ApplyView(View.transform.position.x, View.transform.position.y);
+        ApplyAnimationTime();
     }
 
     void OnDestroy()

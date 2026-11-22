@@ -8,7 +8,7 @@ using UnityEngine;
 public static class GoldenRiverAudioImport
 {
     const string Folder = "Assets/Game/Resources/GoldenRiverAudio/";
-    static readonly string[] Names = { "river-loop", "wind-01", "wind-02", "wind-03", "wind-04", "checkpoint" };
+    static readonly string[] Names = { "river-loop", "wind-01", "wind-02", "wind-03", "wind-04", "checkpoint", "water-entry" };
 
     public static void Prepare()
     {
@@ -19,7 +19,7 @@ public static class GoldenRiverAudioImport
             if (!importer) throw new BuildFailedException("Missing selected level sound: " + path);
             var settings = importer.defaultSampleSettings;
             settings.loadType = AudioClipLoadType.DecompressOnLoad;
-            settings.compressionFormat = name == "checkpoint" ? AudioCompressionFormat.PCM : AudioCompressionFormat.Vorbis;
+            settings.compressionFormat = name == "checkpoint" || name == "water-entry" ? AudioCompressionFormat.PCM : AudioCompressionFormat.Vorbis;
             settings.quality = .8f;
             settings.preloadAudioData = true;
             importer.defaultSampleSettings = settings;
@@ -39,7 +39,7 @@ public static class GoldenRiverAudioImport
                 throw new BuildFailedException("Player package is missing selected sound: " + name);
         if (packed.Any(path => path.Contains("RejectedGoldenRiverAudio") || path.StartsWith("art/audio/", StringComparison.Ordinal)))
             throw new BuildFailedException("Player package contains rejected or review-only sound sources.");
-        Debug.Log("Packed audio verified: six selected clips; rejected and review-only sources excluded.");
+        Debug.Log("Packed audio verified: seven selected clips; rejected and review-only sources excluded.");
     }
 
     public static void BuildPreview()

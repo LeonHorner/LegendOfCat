@@ -37,7 +37,7 @@ public sealed partial class StarterScreen : MonoBehaviour
     MovementCourse course;
     StompArena stompArena;
     RangedArena rangedArena;
-    RunLifecycle ActiveRun => course != null ? course.Run : rangedArena != null ? rangedArena.Run : stompArena.Run;
+    RunLifecycle ActiveRun => course != null ? course.Run : rangedArena != null ? rangedArena.Run : stompArena != null ? stompArena.Run : null;
     VersionedJsonFile displayFile;
     bool fullscreen;
     DisplayState display;
@@ -88,13 +88,25 @@ public sealed partial class StarterScreen : MonoBehaviour
 
     public bool ShowLevelProgress { get; private set; } = true;
     public float MasterVolume { get; private set; } = .7f;
+    bool volumeDirty;
+    float volumeSaveAt;
 
     void SetMasterVolume(float value)
     {
-        MasterVolume = Mathf.Round(Mathf.Clamp01(value) * 10) / 10;
+        float adjusted = Mathf.Round(Mathf.Clamp01(value) * 100) / 100;
+        if (Mathf.Approximately(MasterVolume, adjusted)) return;
+        MasterVolume = adjusted;
         AudioListener.volume = MasterVolume;
+        if (settingsFile == null) return;
+        settingsFile.Data["masterVolume"] = MasterVolume;
+        volumeDirty = true;
+        volumeSaveAt = Time.unscaledTime + .25f;
+    }
+    void SaveVolumePreference()
+    {
+        if (!volumeDirty) return;
+        volumeDirty = false;
         try {
-            settingsFile.Data["masterVolume"] = MasterVolume;
             settingsFile.Save();
         } catch (Exception) {
             warning = "The sound preference could not be saved. Existing settings were preserved.";
@@ -226,6 +238,7 @@ public sealed partial class StarterScreen : MonoBehaviour
 
     void Update()
     {
+        if (volumeDirty && Time.unscaledTime >= volumeSaveAt) SaveVolumePreference();
         if (display != null) {
             ObserveDisplay();
             if (FullscreenShortcutPressed(Keyboard.current))
@@ -347,10 +360,12 @@ public sealed partial class StarterScreen : MonoBehaviour
                 course.TogglePause();
             }
         }
-        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale" || view == "level-one-complete" || view == "level-one-audio") {
+        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale" || view == "level-one-complete" || view == "level-one-audio" || view == "level-one-water") {
             OpenLevelOne();
             if (view == "level-one-audio")
                 course.Cat.RespawnAt(MovementCourse.LevelOneCheckpointSpawns[0] - Vector2.right * 5);
+            if (view == "level-one-water")
+                course.Cat.RespawnAt(new Vector2(20, -1.75f));
             if (view == "level-one-complete") {
                 course.Cat.RespawnAt(MovementCourse.LevelOneExit - Vector2.right * 3);
                 course.Cat.Motion.SetMove(1);
@@ -432,7 +447,17 @@ public sealed partial class StarterScreen : MonoBehaviour
         messages.Enqueue("{\"state\":\"ready\"}");
     }
 #endif
-    void OnApplicationQuit() { ObserveDisplay(true); platform?.Dispose(); }
+    void OnApplicationFocus(bool focused) { if (!focused) { SaveVolumePreference(); PauseForBackground(); } }
+    void OnApplicationPause(bool paused) { if (paused) { SaveVolumePreference(); PauseForBackground(); } }
+    void PauseForBackground()
+    {
+        if (ActiveRun == null || ActiveRun.Paused) return;
+        if (course != null) course.TogglePause();
+        else if (rangedArena != null) rangedArena.TogglePause();
+        else stompArena.TogglePause();
+        // Focus returning leaves the pause menu open until the player resumes.
+    }
+    void OnApplicationQuit() { SaveVolumePreference(); ObserveDisplay(true); platform?.Dispose(); }
     public static bool IsReleaseUrl(string url) => UpdatePolicy.IsReleaseUrl(url);
     string StatusText()
     {

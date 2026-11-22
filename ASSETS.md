@@ -1032,3 +1032,27 @@ Source: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https:/
 The owner finds the warm-body correction much better but its shiny entrance too short. New standalone art/audio/checkpoint-achievement-reference/checkpoint-achievement-long-shimmer.wav keeps the low body and omitted middle layer, stretching only the early already-gated upper layer with pitch-preserving FFmpeg atempo=0.55, nominally 0.8 to 1.45 seconds. Later source ringing stays excluded, total cue duration stays 2.582 seconds. No new sample, notes, delay feedback or normalization added.
 
 Source: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Source/derivative retain CC BY 4.0; retain previous adaptation notices and add early-shimmer pitch-preserving stretching. No endorsement implied. Prepared 2026-11-22 with original OpenAI Codex-authored tools/prepare-checkpoint-warm-body.py --long-shimmer and Python/FFmpeg; no generative audio model. Preparation code follows the project PolyForm Noncommercial 1.0.0 license. Human decision: retain the improved warm-body correction but extend its shiny entrance. Listening acceptance pending; runtime, river/wind and player credits unchanged.
+
+
+## Approved long-shimmer checkpoint gameplay integration - 2026-11-22
+
+The owner approved checkpoint-achievement-long-shimmer.wav and requested gameplay integration. Assets/Game/Resources/GoldenRiverAudio/checkpoint.wav now copies that reviewed file byte-for-byte; existing Unity metadata retained. Exact source preparation and listening history are in art/audio/checkpoint-achievement-reference/README.md; tools/prepare-level-one-audio.py selects this final audition. Source: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Source and derivative retain CC BY 4.0, attribution required, no endorsement implied.
+
+Adaptations: excerpt/level and softer entry, upper-band transient attenuation, middle bell-layer omission, early upper-layer fade and pitch-preserving stretch of that early shimmer. Prepared with original OpenAI Codex-authored Python/FFmpeg tools, 2026-11-22, no generative audio model or added sample. Preparation code follows the project PolyForm Noncommercial 1.0.0 license. Human decisions: the stronger bell-free warm-body direction was much better; extend the shiny entrance; approve this resulting actual file for gameplay. Player credits reflect these changes. River/wind unchanged. No completion artwork, animation or sound created for the separate unapproved ending recommendation.
+
+
+## Pause-aware existing presentation - 2026-11-22
+
+The owner requests the whole world to freeze after losing focus, including moving platforms, as expected during normal pause. Existing water, mill/willow and fish-ripple shaders now receive the course animation clock; recovery surface ripples use the sequence clock. Existing Mika presentation and camera smoothing freeze, with no new frames, deformation, geometry, textures, sampled audio or image/audio generator. Platform pause/resume changes physics simulation state while preserving phase. All original artwork, source notices and licenses remain unchanged. This is a pause-correctness change, not acceptance of new artwork or the separate unapproved finish proposal.
+
+
+## Selected natural water-entry sound - 2026-11-22
+
+The owner requested a water-fall effect. Initial approval of the base splash was revised to quieter/softer before integration; the strongly softened version was rejected as too soft. The owner explicitly approved water-entry-splash-quiet.wav, keeping a clear natural attack at lower level. Runtime Assets/Game/Resources/GoldenRiverAudio/water-entry.wav is its byte-identical copy. Human direction: a recognizable, restrained plunge when Mika hits the river; no added shark or underwater loop.
+
+Source: jump-into-water.flac by yurkobb, published 2015-07-06, https://freesound.org/people/yurkobb/sounds/280219/, CC0 1.0 https://creativecommons.org/publicdomain/zero/1.0/. Public MP3 preview retained with checksum in art/audio/water-entry-review/README.md. The author describes a lake jump recorded on Zoom H1 and normalized; this project does not claim the recording. Source/derivatives retain CC0. Prepared 2026-11-22 with FFmpeg and original OpenAI Codex-authored tools/prepare-water-entry-audition.py --quiet, no generative audio model or new sample. Preparation code follows the project PolyForm Noncommercial 1.0.0 license. Adapted: excerpt, low/high filtering, level normalization, edge/tail fades and half-gain quiet version, preserving natural attack. Original and rejected auditions stay outside Unity; only the selected quiet clip is packed. Settings > Sound credits includes the optional source credit.
+
+
+## Volume slider presentation - 2026-11-22
+
+The owner requested a slider instead of discrete volume buttons. The original procedural menu palette supplies a thin centered rail and thumb; no external artwork, new font or image generator was used. Actual Windows player settings views are retained under docs/design/level-one-audio-review/volume-slider-640.png and volume-slider-960.png. Existing underlying art provenance/licenses are unchanged.

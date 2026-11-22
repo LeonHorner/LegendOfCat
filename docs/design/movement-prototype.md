@@ -1,7 +1,7 @@
 # Movement prototype
 
 Issue #9 supplies a temporary movement lab through **Movement lab (prototype) > Enter movement lab**
-on the painted menu integrated from PR #31. Return with **Back to menu**, Escape or controller Start.
+on the painted menu integrated from PR #31. Escape or P opens/closes pause. Return through **Main menu** in the pause menu or controller Start.
 This is a tuning baseline, not approval of final character art, campaign geometry or difficulty.
 No traversal ability beyond running and jumping is introduced.
 
@@ -11,7 +11,7 @@ The `Gameplay` Input System map defines Move (axis), Jump, Retry, FullRestart, P
 `CatInput` owns keyboard/controller bindings and forwards values and press/release callbacks
 to `CatMotion`. The motor and collision controller contain no device polling.
 Keyboard: A/D or arrows, Space/W/Up to jump, R to retry at the active checkpoint,
-Backspace to restart the run, P to pause/resume, Escape to return.
+Backspace to restart the run, Escape or P to pause/resume; choose Main menu while paused to return.
 Controller: stick/D-pad, South button to jump, Select to retry, left shoulder to
 restart, right shoulder to pause/resume, Start to return.
 Future touch bindings can drive the same actions; touch UI and mobile builds are outside this prototype.

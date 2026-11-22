@@ -138,6 +138,7 @@ public sealed class CatController : MonoBehaviour
         // Freeze motor timers and preserve held input along with physics momentum.
         // Respawn and focus loss still clear input explicitly.
         body.simulated = !value && !Recovering;
+        GetComponent<WaterRecovery>()?.SynchronizePause();
     }
     void OnDisable()
     {

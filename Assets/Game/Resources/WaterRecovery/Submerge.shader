@@ -4,6 +4,7 @@ Shader "LegendOfCat/WaterRecovery/Submerge"
         _MainTex ("Reaction drawing", 2D) = "white" {}
         _Surface ("Water surface", Float) = -3.25
         _SurfaceScale ("Water contact scale", Float) = 1
+        [HideInInspector] _EffectTime ("Recovery time", Float) = 0
     }
     SubShader {
         Tags { "Queue"="Transparent" "RenderType"="Transparent" }
@@ -14,7 +15,7 @@ Shader "LegendOfCat/WaterRecovery/Submerge"
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            sampler2D _MainTex; float _Surface, _SurfaceScale;
+            sampler2D _MainTex; float _Surface, _SurfaceScale, _EffectTime;
             struct Input { float4 vertex : POSITION; float2 uv : TEXCOORD0; float4 color : COLOR; };
             struct Output { float4 vertex : SV_POSITION; float2 uv : TEXCOORD0; float2 world : TEXCOORD1; float4 color : COLOR; };
             Output vert(Input v) {
@@ -22,7 +23,7 @@ Shader "LegendOfCat/WaterRecovery/Submerge"
                 o.world = mul(unity_ObjectToWorld, v.vertex).xy; o.color = v.color; return o;
             }
             fixed4 frag(Output i) : SV_Target {
-                float surface = _Surface + sin(i.world.x * 14 + _Time.y * 3) * 0.015 * _SurfaceScale;
+                float surface = _Surface + sin(i.world.x * 14 + _EffectTime * 3) * 0.015 * _SurfaceScale;
                 float height = (i.world.y - surface) / max(_SurfaceScale, 0.001);
                 clip(height + 0.045);
                 fixed4 color = tex2D(_MainTex, i.uv) * i.color;
