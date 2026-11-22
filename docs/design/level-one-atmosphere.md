@@ -1,5 +1,11 @@
 # Golden River audio and completion
 
+## Current correction: crystals and soft bells only — 2026-11-22
+
+The owner changed questionnaire answer 2 to B only: crystals and soft bells, without choir. Preserve answer 1 A+B (success/reward plus magical awakening), answer 3 B (immediate burst and soft decay), and a single continuous 2–3-second cue without repetitions/pauses. The choir selection/candidate below is superseded.
+
+Current standalone proposal: `art/audio/checkpoint-crystal-review/checkpoint-crystal-bloom.wav`, one 2.7-second original crystal/soft-bell arrival with fine sparks and a continuous spatial decay. It contains no choral source and awaits explicit listening approval outside Unity Assets/gameplay. River and wind approvals remain; movement stays deferred.
+
 ## Current owner-selected choir/crystal direction — 2026-11-22
 
 The owner rejected the previous fanfare-like sound and requested a completely different continuous 2–3-second cue without pauses between repeated examples. In the follow-up questions they selected success/reward plus awakening magic, wordless choir plus crystal/soft-bell color, and an immediate magical burst that softly fades. These selections replace the prior rapid arpeggio/fanfare direction.

@@ -906,3 +906,10 @@ Owner-selected direction after rejecting the previous fanfare: success/reward pl
 Choral source: Short Choir by Breviceps, https://freesound.org/people/Breviceps/sounds/444491/, published 2018-10-24, CC0 1.0. The unmodified public high-quality MP3 preview is retained under the audition sources folder; SHA-256 6ee2b2b3db396c81ed6544f254b8470c6293e1d0eb349e7f896f1aa2ad8e5f83. It is third-party material, not a project recording. Source and choral derivatives retain CC0.
 
 Adaptation/original crystal design: OpenAI Codex-authored tools/prepare-choir-checkpoint-audition.py with Python and FFmpeg, project PolyForm Noncommercial 1.0.0 license for script/original synthesis, no generative audio model or copied tune. Creative decisions: harmonized immediate choral arrival, simultaneous crystal accents, fine sparks and continuous soft spatial decay. Exact processing, source URLs, licenses and reproduction are in the audition README. Direction choice does not approve the rendered clip; listening approval remains required before integration.
+
+
+## Crystal-only checkpoint correction - 2026-11-22
+
+The owner corrected sound-color answer 2 to B only: crystals and soft bells, without choir. Success/reward plus magical awakening, immediate burst/soft decay and a continuous 2-3-second format remain selected. The choir candidate is superseded. New standalone art/audio/checkpoint-crystal-review/checkpoint-crystal-bloom.wav lasts 2.7 seconds and remains unapproved outside Unity Assets/gameplay. River/wind approvals remain; movement stays deferred.
+
+Source/generator: original deterministic OpenAI Codex-authored tools/prepare-crystal-checkpoint-audition.py, Python standard library, project PolyForm Noncommercial 1.0.0 license; no external samples, third-party tune or generative audio model. This cue does not use the Breviceps choir source. Creative decisions: aligned soft crystal/bell arrival, subtle inharmonic modes, fine sparks and continuous stereo decay; no voice or stepped fanfare. Source, reproduction and listening gate are documented in the review README.

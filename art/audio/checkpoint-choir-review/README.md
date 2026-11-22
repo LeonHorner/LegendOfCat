@@ -1,5 +1,7 @@
 # Checkpoint choir and crystal audition — 2026-11-22
 
+Superseded: the owner corrected answer 2 to B only (crystals and soft bells), removing choir from the desired timbre. This candidate is historical and not approved for integration. The replacement is in `art/audio/checkpoint-crystal-review`.
+
 ## Owner-selected direction
 
 After rejecting the previous fanfare-like direction, the owner selected:
