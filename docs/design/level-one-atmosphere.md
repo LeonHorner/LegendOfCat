@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Longer wind correction - 2026-11-22
+
+The owner rejected all four forest gusts as rain-like and asked for longer receding wind. Those proposals are not selected. A single 17-second continuous filtered-noise study in `art/audio/long-wind-review` replaces leaf texture with slowly shifting air bands, a gentle rise and long release. Standalone listening only; runtime wind/repetition remains unchanged pending selection. River and checkpoint remain unchanged.
+
 ## Current in-game wind feedback — 2026-11-22
 
 The owner reports repetitive wind and a thunderstorm-like ending. The current fixed two-clip A/B alternation and identical eight-second envelopes need revision. New standalone proposals in `art/audio/wind-variety-review` use another CC0 tree/leaf-wind recording, four distinct sections and lengths/envelopes, and stronger low-rumble filtering. The owner must hear these before replacement in Unity; no runtime change in this audition revision. After selection, vary the bank without immediate repeats and retain quiet intervals rather than a fixed A/B sequence. River/checkpoint review remains unchanged. Do not treat the previous wind approval as approval of replacement timbres.
