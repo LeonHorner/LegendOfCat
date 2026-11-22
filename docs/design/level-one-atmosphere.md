@@ -1,5 +1,11 @@
 # Golden River audio and completion
 
+## Current concrete achievement reference — 2026-11-22
+
+The owner supplied [Achievement Unlock by Universfield](https://pixabay.com/sound-effects/film-special-effects-achievement-unlock-243762/) and asked for this direction. Its page describes a triumphant orchestral achievement fanfare; use this concrete reference to guide further review instead of treating earlier crystal-only answers as a fixed synthesis specification. The actual audio was not acquired/analyzed, so no aural match is claimed.
+
+The Pixabay recording is not committed. The new separate three-second audition is `art/audio/checkpoint-achievement-reference/checkpoint-achievement-audition.wav`, adapted with attribution from TommasoMotteran's CC BY 4.0 Fantasy Achievement Unlock - Magical Stinger. The retained source, changes, license and credits are in that folder's README. This is an alternate listening candidate, not a copy/reconstruction of the supplied reference and not yet accepted. No gameplay integration. River/wind remain approved; movement remains deferred.
+
 ## Current correction: crystals and soft bells only — 2026-11-22
 
 The owner changed questionnaire answer 2 to B only: crystals and soft bells, without choir. Preserve answer 1 A+B (success/reward plus magical awakening), answer 3 B (immediate burst and soft decay), and a single continuous 2–3-second cue without repetitions/pauses. The choir selection/candidate below is superseded.
