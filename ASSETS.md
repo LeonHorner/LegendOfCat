@@ -890,3 +890,10 @@ The owner approved wind-gusts.wav and requested a shorter checkpoint sound match
 The owner explicitly rejected the previous short checkpoint A/B as completely unsuitable. The replacement should be magical and clearly communicate accomplishment. New standalone checkpoint-success-cue.wav lasts 0.75 seconds; checkpoint-success-audition.wav repeats it twice for listening. Both remain in art/audio/wind-and-magic-review outside Assets, unapproved for integration. River and wind approvals remain; movement is deferred.
 
 Source/generator: original deterministic OpenAI Codex-authored tools/prepare-checkpoint-success-audition.py, project PolyForm Noncommercial 1.0.0 license, no external samples, copied tune or generative audio model. Creative decisions: rapid consonant rising glass/harp-like voices, warm resolving harmony and concentrated fine sparks with a compact fade. This is a proposed response to feedback, not a claim that the sound is accepted.
+
+
+## Fuller magical checkpoint success audition - 2026-11-22
+
+Owner feedback: the 0.75-second success direction is better, but should be more epic and may last somewhat longer. New art/audio/wind-and-magic-review/checkpoint-epic-success.wav lasts 1.65 seconds; checkpoint-epic-audition.wav repeats it twice. Both remain unapproved standalone review files outside Unity Assets and gameplay. River/wind selections remain approved; movement is deferred.
+
+Source/generator: original deterministic OpenAI Codex-authored tools/prepare-epic-checkpoint-audition.py using Python standard library; project PolyForm Noncommercial 1.0.0 license. No external samples, copied tune or generative audio model. Creative decisions: retain the rising glass-like success gesture, broaden its arrival with a low foundation and warm major voicing, add fine sparks and a gently fading stereo space. The owner must hear and approve the actual replacement before integration.

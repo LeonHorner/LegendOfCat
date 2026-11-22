@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Current checkpoint refinement — 2026-11-22
+
+The owner found the 0.75-second success gesture better but requested a more epic sound and allowed somewhat more length. The current standalone `art/audio/wind-and-magic-review/checkpoint-epic-audition.wav` repeats a new 1.65-second cue with a fuller warm foundation, resolving fanfare-like voicing and magical sparks. It is a proposed refinement, not an approved clip. Preserve the listening gate; do not integrate it yet. River and wind approvals remain; movement remains deferred. The previous strict short-duration target is relaxed by this feedback.
+
 ## Latest checkpoint rejection — 2026-11-21
 
 The owner clarified “absolutely unsuitable” and rejected the short 0.6-second checkpoint variants. The replacement must be magical and clearly communicate that the player accomplished something. The new standalone `art/audio/wind-and-magic-review/checkpoint-success-audition.wav` presents one 0.75-second success gesture twice. It awaits listening approval and is not integrated. River and wind remain approved; movement sounds remain deferred. Earlier notes describing the short variants as awaiting selection are superseded by this rejection.

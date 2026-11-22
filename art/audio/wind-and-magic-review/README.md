@@ -1,5 +1,11 @@
 # Wind and magical checkpoint auditions
 
+## Current fuller success audition — 2026-11-22
+
+The owner preferred the 0.75-second success direction but asked for a more epic character and allowed somewhat more duration. That feedback is not final clip approval. `checkpoint-epic-success.wav` is a new 1.65-second candidate; `checkpoint-epic-audition.wav` repeats it at 0.2 and 3.2 seconds. The rising glass-like gesture now arrives over a rounded low foundation and fuller major voicing, with fine sparks and a spacious but fading stereo tail. These describe intent, not a claim of owner acceptance.
+
+Source: original deterministic OpenAI Codex-authored `tools/prepare-epic-checkpoint-audition.py`, Python standard library, project PolyForm Noncommercial 1.0.0 license. Prepared 2026-11-22. No external samples, copied tune or generative audio model. Run the script from the repository root to reproduce both WAVs. Both remain outside Unity Assets and gameplay until explicit listening approval. River and wind remain selected; movement is deferred. Earlier auditions below are historical comparisons.
+
 ## Latest rejection and new success cue
 
 The owner explicitly confirmed that the 0.6-second magical A/B cues were completely unsuitable. They are rejected, not approved pending routine integration. The requested replacement must sound magical and clearly communicate an accomplishment while staying short. River and wind approval remains intact; movement remains deferred.
