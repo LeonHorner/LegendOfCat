@@ -1,5 +1,11 @@
 # Achievement reference and alternate listening sample — 2026-11-22
 
+## Current listening revision: remove the opening effect
+
+The owner said this direction is better but identified the sound at the beginning as the problem. Keep the main sound and existing tail, and change only the entrance. `checkpoint-achievement-clean-start.wav` removes the first 0.4 seconds of the retained audition and applies a 20 ms entry fade. Its remaining duration is about 2.58 seconds. All subsequent samples, including the existing final fade, retain the exact original audition PCM. Reproduce with `python tools/prepare-achievement-clean-start.py` after preparing the base audition.
+
+The new file remains a listening proposal outside Unity Assets/gameplay, not approved for integration. The source is still **Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran**, under **CC BY 4.0**, with source/license links and required attribution below. Additional changes for this version: opening-effect removal and a 20 ms entry fade. No new sound, synthesis, reverb, gain adjustment or external material is layered over it. Direction approval does not approve this rendered revision.
+
 The owner supplied [Achievement Unlock by Universfield on Pixabay](https://pixabay.com/sound-effects/film-special-effects-achievement-unlock-243762/) and asked for this direction instead of the previous crystal-only experiment. Its page describes a triumphant orchestral achievement fanfare. This is the current concrete style reference, superseding interpretations based only on the earlier timbre questionnaire. The actual Pixabay audio was not acquired or analyzed: direct page access encountered a browser challenge. Do not claim an aural or waveform comparison to that recording.
 
 The Pixabay reference remains a link only. Its [Content License](https://pixabay.com/service/terms/) prohibits distributing essentially unchanged content as a standalone audio file; this repository requires redistributable source assets. No Pixabay recording, transcription, reconstructed melody or altered copy is committed here.

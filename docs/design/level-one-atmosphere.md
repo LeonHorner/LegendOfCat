@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Current entrance correction — 2026-11-22
+
+The owner found the attributed achievement alternative closer to the target but disliked its opening sound. The new standalone `art/audio/checkpoint-achievement-reference/checkpoint-achievement-clean-start.wav` removes the first 0.4 seconds and gives the new entrance a 20 ms fade; the remaining main sound and existing tail are preserved. About 2.58 seconds, once continuously. No new timbre search or wholesale redesign is authorized by this feedback. This rendered correction still needs listening approval and stays outside Unity Assets/gameplay. River/wind remain selected; movement remains deferred. The TommasoMotteran CC BY 4.0 source and required credit remain applicable.
+
 ## Current concrete achievement reference — 2026-11-22
 
 The owner supplied [Achievement Unlock by Universfield](https://pixabay.com/sound-effects/film-special-effects-achievement-unlock-243762/) and asked for this direction. Its page describes a triumphant orchestral achievement fanfare; use this concrete reference to guide further review instead of treating earlier crystal-only answers as a fixed synthesis specification. The actual audio was not acquired/analyzed, so no aural match is claimed.
