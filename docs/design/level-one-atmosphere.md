@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Longer checkpoint entrance shimmer - 2026-11-22
+
+The owner finds the warm-body correction much better but wants a longer shiny entrance. Standalone `checkpoint-achievement-long-shimmer.wav` stretches only the gated early high layer from nominally 0.8 to 1.45 seconds, preserving pitch, low body and total cue length; the omitted middle layer and excluded late ringing stay excluded. See the source review README for processing/CC BY 4.0 attribution and checks. Owner hearing remains required; runtime/river/wind unchanged.
+
 ## Diagnosed repeating checkpoint bell layer - 2026-11-22
 
 The owner identifies the delayed repeated bing in diagnostic B and more clearly at the end of C. New standalone `checkpoint-achievement-warm-body.wav` omits the middle crossover band and fades upper air by 0.8 seconds, keeping the low foundation. This is intentionally stronger than the unsuccessful narrow notches and may reduce the musical brightness; owner hearing remains required before integration. See the source review README for exact preparation, same TommasoMotteran CC BY 4.0 attribution and technical checks. Runtime, river and wind unchanged.

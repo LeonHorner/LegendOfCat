@@ -1,5 +1,13 @@
 # Achievement reference and alternate listening sample — 2026-11-22
 
+## Current listening revision: longer entrance shimmer
+
+The owner finds the warm-body correction much better but its shiny entrance too short. `checkpoint-achievement-long-shimmer.wav` keeps the omitted middle band and the same low body, and lengthens only the already gated early high layer with pitch-preserving FFmpeg `atempo=0.55`. Its original fade reaches silence at 0.8 seconds before stretching, so the entrance now nominally lasts about 1.45 seconds; later source ringing stays excluded. No additional notes, delay feedback, looping, new source or gain normalization is added. The complete cue remains 2.582 seconds. Audible suitability and absence of the perceived bing still require owner hearing.
+
+Reproduce: `python tools/prepare-checkpoint-warm-body.py --long-shimmer`. Prepared 2026-11-22 with original OpenAI Codex-authored Python/FFmpeg processing, no generative audio model. Same source/derivative license and attribution: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Retain earlier adaptation notices and add pitch-preserving early-shimmer stretching. No endorsement implied. Preparation code follows the project PolyForm Noncommercial 1.0.0 license.
+
+Checked duration/rate/stereo, zero edges, no clipping (peak 0.1971), and unchanged late upper-band RMS after 1.7 seconds relative to the previous warm-body correction. Historical audition files remain untouched. Standalone only: runtime, river/wind and player credits unchanged pending hearing approval; no fresh Unity tests run.
+
 ## Current standalone correction: remove the diagnosed bell layer
 
 The owner describes a delayed regularly repeating bing, identifies it in diagnostic B (900–2500 Hz), and more clearly at the end of C (>2500 Hz). The earlier narrow-notch correction did not remove it sufficiently. `checkpoint-achievement-warm-body.wav` therefore takes a stronger, broader approach: a 12th-order three-way crossover at 800 and 2500 Hz, omit the middle output, keep the low body, and retain the high output only at half level during the entrance, fading it completely from 0.15 to 0.8 seconds. This deliberately sacrifices more bright musical content to remove the diagnosed layer; listening must establish whether the result still feels like the desired achievement cue. No guarantee of isolated stem removal is claimed.
