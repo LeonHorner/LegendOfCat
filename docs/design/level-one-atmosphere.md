@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Diagnosed repeating checkpoint bell layer - 2026-11-22
+
+The owner identifies the delayed repeated bing in diagnostic B and more clearly at the end of C. New standalone `checkpoint-achievement-warm-body.wav` omits the middle crossover band and fades upper air by 0.8 seconds, keeping the low foundation. This is intentionally stronger than the unsuccessful narrow notches and may reduce the musical brightness; owner hearing remains required before integration. See the source review README for exact preparation, same TommasoMotteran CC BY 4.0 attribution and technical checks. Runtime, river and wind unchanged.
+
 ## Residual checkpoint background bing - 2026-11-22
 
 The owner still hears a quiet background bing in the reduced-knock audition. New standalone `checkpoint-achievement-reduced-ring.wav` uses narrow attenuation of five measured upper resonances, keeping the earlier cue/timing and low foundation. The spectral peaks are candidate targets, not verified identification of the subjective defect. Source/processing/rights/checks: art/audio/checkpoint-achievement-reference/README.md. Await owner hearing before runtime replacement; river/wind unchanged.
