@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Current in-game review authorization — 2026-11-22
+
+The owner explicitly asked to integrate the current soft-start checkpoint and selected river/wind so they can judge the feel in-game. They asked for occasional clearly audible wind and quiet water underneath. This authorizes the scoped playable mix even though final acceptance remains open; earlier standalone-only notes do not block this request. Movement remains silent. Current setup, initial mix values, licensing, main integration and focused preview steps are in [the audio playtest guide](level-one-audio-playtest.md). Keep the feature draft until the in-game review and later final checks are complete.
+
 ## Current gentler entrance — 2026-11-22
 
 The owner still finds the entrance abrupt and offered to install free tools. No additional tool is needed for this edit: the existing PCM preparation/FFmpeg workflow can shape the entry. Current standalone `art/audio/checkpoint-achievement-reference/checkpoint-achievement-soft-start.wav` uses a 220 ms sine-squared rise instead of the previous 20 ms linear entry, retaining the same opening-effect cut, main sound and ending. About 2.58 seconds, no repetition. No Unity integration; explicit listening approval remains required. River/wind selections and deferred movement remain unchanged.

@@ -347,8 +347,10 @@ public sealed partial class StarterScreen : MonoBehaviour
                 course.TogglePause();
             }
         }
-        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale" || view == "level-one-complete") {
+        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale" || view == "level-one-complete" || view == "level-one-audio") {
             OpenLevelOne();
+            if (view == "level-one-audio")
+                course.Cat.RespawnAt(MovementCourse.LevelOneCheckpointSpawns[0] - Vector2.right * 5);
             if (view == "level-one-complete") {
                 course.Cat.RespawnAt(MovementCourse.LevelOneExit - Vector2.right * 3);
                 course.Cat.Motion.SetMove(1);
@@ -358,7 +360,7 @@ public sealed partial class StarterScreen : MonoBehaviour
             if (view == "level-one-ascent") course.StartAscentPreview();
             if (view == "level-one-lift") course.StartVerticalLiftPreview();
         }
-        else if (view == "menu" || view == "settings" || view == "play") page = view;
+        else if (view == "menu" || view == "settings" || view == "play" || view == "sound-credits") page = view;
         else if (!string.IsNullOrEmpty(view)) {
             page = "updates";
             state = view;
@@ -372,11 +374,11 @@ public sealed partial class StarterScreen : MonoBehaviour
         }
         simulateCutout = args.Contains("--preview-cutout");
         string capture = Argument("--preview-capture");
-        if (string.IsNullOrEmpty(capture)) yield break;
         if (int.TryParse(Argument("--preview-width"), out int captureWidth) &&
             int.TryParse(Argument("--preview-height"), out int captureHeight))
             Screen.SetResolution(Mathf.Clamp(captureWidth, 640, 3840),
                 Mathf.Clamp(captureHeight, 360, 2160), FullScreenMode.Windowed);
+        if (string.IsNullOrEmpty(capture)) yield break;
         yield return new WaitForSecondsRealtime(12);
         yield return new WaitForEndOfFrame();
         ScreenCapture.CaptureScreenshot(capture);

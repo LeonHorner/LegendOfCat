@@ -69,6 +69,7 @@ public static class BuildGame
         if (report.summary.result != BuildResult.Succeeded)
             throw new BuildFailedException("Unity player build failed.");
         BuildScenery.ValidatePackedArt(report);
+        GoldenRiverAudioImport.ValidatePackedAudio(report);
         // GameCI CLI requires this exact success marker for custom build methods.
         // Report success only after Unity and the packed-asset audit have passed.
         Debug.Log("Build succeeded!");
@@ -104,6 +105,7 @@ public static class BuildGame
             if (report.summary.result != BuildResult.Succeeded)
                 throw new BuildFailedException("Windows preview build failed.");
             BuildScenery.ValidatePackedArt(report);
+            GoldenRiverAudioImport.ValidatePackedAudio(report);
         }
         finally {
             PlayerSettings.companyName = company;

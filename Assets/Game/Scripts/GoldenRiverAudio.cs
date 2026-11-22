@@ -1,33 +1,33 @@
 using UnityEngine;
 
-// Course-owned sources: no global music manager or listener pause state.
+// Three level-owned voices; wind is environmental, never driven by movement.
 [DefaultExecutionOrder(100)]
 public sealed class GoldenRiverAudio : MonoBehaviour
 {
     MovementCourse course;
-    AudioSource river, movement, landmark;
-    AudioClip jump, land, checkpoint, complete;
-    bool previousGrounded, hasStood, wasPaused, finished;
-    int previousCheckpoint;
+    AudioSource river, wind, landmark;
+    AudioClip checkpoint;
+    AudioClip[] gusts;
+    readonly System.Random variation = new System.Random();
+    int previousCheckpoint, nextGust;
+    float windWait, gustAge = -1;
+    bool wasPaused, finished;
 
     public void Initialize(MovementCourse owner)
     {
         course = owner;
-        river = Source("River ambience", .22f);
-        river.clip = Resources.Load<AudioClip>("GoldenRiverAudio/river");
+        river = Source("River ambience", .14f);
+        river.clip = Resources.Load<AudioClip>("GoldenRiverAudio/river-loop");
         river.loop = true;
-        movement = Source("Movement sounds", .35f);
-        landmark = Source("Landmark sounds", .45f);
-        jump = Resources.Load<AudioClip>("GoldenRiverAudio/jump");
-        land = Resources.Load<AudioClip>("GoldenRiverAudio/land");
+        wind = Source("Passing wind", .75f);
+        landmark = Source("Checkpoint sound", .7f);
+        gusts = new[] { Resources.Load<AudioClip>("GoldenRiverAudio/wind-01"),
+            Resources.Load<AudioClip>("GoldenRiverAudio/wind-02") };
         checkpoint = Resources.Load<AudioClip>("GoldenRiverAudio/checkpoint");
-        complete = Resources.Load<AudioClip>("GoldenRiverAudio/complete");
         course.Run.ResetTransientState += ResetSounds;
         course.ExitReached += Finish;
-        course.Cat.ReturnedToStart += ResetContact;
         ResetSounds();
     }
-
     AudioSource Source(string label, float volume)
     {
         var child = new GameObject(label);
@@ -38,70 +38,71 @@ public sealed class GoldenRiverAudio : MonoBehaviour
         source.volume = volume;
         return source;
     }
-
-    void ResetContact() { previousGrounded = hasStood = false; }
-
     void ResetSounds()
     {
-        river.Stop(); movement.Stop(); landmark.Stop();
-        ResetContact();
+        StopSources();
         previousCheckpoint = course.Run.Checkpoint;
         wasPaused = finished = false;
-        if (isActiveAndEnabled && Application.isPlaying) river.Play();
+        nextGust = 0;
+        gustAge = -1;
+        windWait = 4;
+        if (isActiveAndEnabled && Application.isPlaying && river.clip) river.Play();
     }
-
     void Finish()
     {
-        if (finished) return;
         finished = true;
-        river.Stop(); movement.Stop(); landmark.Stop();
-        Play(landmark, complete);
+        StopSources();
+        // A separate completion sound has not been selected; retain the success UI.
     }
-
-    static void Play(AudioSource source, AudioClip clip)
-    {
-        // One movement voice and one landmark voice bound overlap without stacking.
-        if (!clip || !Application.isPlaying) return;
-        source.Stop(); source.clip = clip; source.Play();
-    }
-
     void LateUpdate()
     {
         if (!course) return;
         bool paused = course.Run.Paused;
         if (paused != wasPaused) {
-            foreach (var source in new[] { river, movement, landmark }) {
+            foreach (var source in new[] { river, wind, landmark }) {
                 if (paused) source.Pause(); else source.UnPause();
             }
             wasPaused = paused;
         }
         if (paused || finished) return;
-        if (course.Run.Checkpoint > previousCheckpoint) Play(landmark, checkpoint);
+        if (course.Run.Checkpoint > previousCheckpoint && checkpoint && Application.isPlaying) {
+            landmark.Stop(); landmark.clip = checkpoint; landmark.Play();
+        }
         previousCheckpoint = course.Run.Checkpoint;
-        if (course.Cat.Recovering) { ResetContact(); return; }
-        bool grounded = course.Cat.Grounded;
-        if (hasStood && previousGrounded && !grounded && course.Cat.PresentationVelocity.y > .1f)
-            Play(movement, jump);
-        else if (hasStood && !previousGrounded && grounded) Play(movement, land);
-        hasStood |= grounded;
-        previousGrounded = grounded;
-        // Keep the distant river audible above the valley without dominating the ascent.
         float height = course.transform.InverseTransformPoint(course.Cat.transform.position).y;
-        river.volume = Mathf.Lerp(.22f, .07f, Mathf.InverseLerp(0, 14, height));
+        river.volume = Mathf.Lerp(.14f, .06f, Mathf.InverseLerp(0, 14, height));
+        AdvanceAmbience(Time.deltaTime);
     }
-
-    void OnDisable()
+    void AdvanceAmbience(float deltaSeconds)
+    {
+        if (course.Run.Paused || finished || !isActiveAndEnabled) return;
+        if (gustAge >= 0) {
+            gustAge += deltaSeconds;
+            if (gustAge >= wind.clip.length) {
+                wind.Stop(); gustAge = -1;
+                windWait = 8 + (float)variation.NextDouble() * 8;
+            }
+            return;
+        }
+        windWait -= deltaSeconds;
+        if (windWait > 0) return;
+        wind.clip = gusts[nextGust];
+        nextGust = (nextGust + 1) % gusts.Length;
+        if (!wind.clip) { windWait = 8; return; }
+        gustAge = 0;
+        if (Application.isPlaying) wind.Play();
+    }
+    void StopSources()
     {
         if (river) river.Stop();
-        if (movement) movement.Stop();
+        if (wind) wind.Stop();
         if (landmark) landmark.Stop();
     }
-
+    void OnDisable() => StopSources();
     void OnDestroy()
     {
         if (!course) return;
         course.Run.ResetTransientState -= ResetSounds;
         course.ExitReached -= Finish;
-        if (course.Cat) course.Cat.ReturnedToStart -= ResetContact;
     }
 }
