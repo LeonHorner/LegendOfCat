@@ -929,3 +929,10 @@ Unmodified public MP3 preview retained under the audition sources folder, SHA-25
 Owner feedback: the attributed achievement direction is closer, but the opening sound is unwanted. New standalone art/audio/checkpoint-achievement-reference/checkpoint-achievement-clean-start.wav removes the first 0.4 seconds of the retained audition and adds a 20 ms entry fade; all subsequent main/tail PCM is unchanged. Approximately 2.58 seconds, not repeated. Still unapproved and outside Unity Assets/gameplay.
 
 Source remains Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Additional changes: opening-effect removal and short entry fade. Original/derivative retain CC BY 4.0, with required credit and earlier adaptation details in the audition README. Preparation: original OpenAI Codex-authored tools/prepare-achievement-clean-start.py, Python PCM editing; script under project license, no generative audio model or added sample. River/wind approvals and deferred movement remain unchanged.
+
+
+## Softer checkpoint entrance audition - 2026-11-22
+
+Owner feedback: the entrance is still abrupt. No extra tool installation is needed. New standalone art/audio/checkpoint-achievement-reference/checkpoint-achievement-soft-start.wav retains the 0.4-second opening-effect cut and changes only the entry to a 220 ms sine-squared rise, replacing the 20 ms linear fade. Main/tail PCM remains identical after the fade; approximately 2.58 seconds. Unapproved and outside Unity Assets/gameplay.
+
+Source/credit remains Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. Additional adaptation: longer smooth entry fade; retain existing required attribution and source/change records. Preparation: OpenAI Codex-authored tools/prepare-achievement-clean-start.py --soft-start, Python PCM processing, project license for script, no new sample or generative audio model. River/wind approvals and deferred movement remain unchanged.

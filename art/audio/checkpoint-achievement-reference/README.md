@@ -1,5 +1,11 @@
 # Achievement reference and alternate listening sample — 2026-11-22
 
+## Latest revision: gentler entry
+
+The owner still finds the opening too abrupt. `checkpoint-achievement-soft-start.wav` keeps the same 0.4-second opening-effect removal but replaces the 20 ms linear entry with a 220 ms sine-squared rise. Main sound and existing ending remain byte-identical to the retained audition after this fade; duration remains about 2.58 seconds. Reproduce with `python tools/prepare-achievement-clean-start.py --soft-start`. This needs no new installed tools and remains a standalone proposal outside Unity, pending explicit listening approval.
+
+The source and attribution remain TommasoMotteran's **Fantasy Achievement Unlock - Magical Stinger**, **CC BY 4.0**, with links and required credit below. Additional changes for this version: opening-effect removal and a longer smooth entry fade. No new sampled or generated sound is introduced.
+
 ## Current listening revision: remove the opening effect
 
 The owner said this direction is better but identified the sound at the beginning as the problem. Keep the main sound and existing tail, and change only the entrance. `checkpoint-achievement-clean-start.wav` removes the first 0.4 seconds of the retained audition and applies a 20 ms entry fade. Its remaining duration is about 2.58 seconds. All subsequent samples, including the existing final fade, retain the exact original audition PCM. Reproduce with `python tools/prepare-achievement-clean-start.py` after preparing the base audition.

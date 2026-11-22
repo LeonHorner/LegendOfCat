@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Current gentler entrance — 2026-11-22
+
+The owner still finds the entrance abrupt and offered to install free tools. No additional tool is needed for this edit: the existing PCM preparation/FFmpeg workflow can shape the entry. Current standalone `art/audio/checkpoint-achievement-reference/checkpoint-achievement-soft-start.wav` uses a 220 ms sine-squared rise instead of the previous 20 ms linear entry, retaining the same opening-effect cut, main sound and ending. About 2.58 seconds, no repetition. No Unity integration; explicit listening approval remains required. River/wind selections and deferred movement remain unchanged.
+
 ## Current entrance correction — 2026-11-22
 
 The owner found the attributed achievement alternative closer to the target but disliked its opening sound. The new standalone `art/audio/checkpoint-achievement-reference/checkpoint-achievement-clean-start.wav` removes the first 0.4 seconds and gives the new entrance a 20 ms fade; the remaining main sound and existing tail are preserved. About 2.58 seconds, once continuously. No new timbre search or wholesale redesign is authorized by this feedback. This rendered correction still needs listening approval and stays outside Unity Assets/gameplay. River/wind remain selected; movement remains deferred. The TommasoMotteran CC BY 4.0 source and required credit remain applicable.
