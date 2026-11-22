@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Current in-game wind feedback — 2026-11-22
+
+The owner reports repetitive wind and a thunderstorm-like ending. The current fixed two-clip A/B alternation and identical eight-second envelopes need revision. New standalone proposals in `art/audio/wind-variety-review` use another CC0 tree/leaf-wind recording, four distinct sections and lengths/envelopes, and stronger low-rumble filtering. The owner must hear these before replacement in Unity; no runtime change in this audition revision. After selection, vary the bank without immediate repeats and retain quiet intervals rather than a fixed A/B sequence. River/checkpoint review remains unchanged. Do not treat the previous wind approval as approval of replacement timbres.
+
 ## Current in-game review authorization — 2026-11-22
 
 The owner explicitly asked to integrate the current soft-start checkpoint and selected river/wind so they can judge the feel in-game. They asked for occasional clearly audible wind and quiet water underneath. This authorizes the scoped playable mix even though final acceptance remains open; earlier standalone-only notes do not block this request. Movement remains silent. Current setup, initial mix values, licensing, main integration and focused preview steps are in [the audio playtest guide](level-one-audio-playtest.md). Keep the feature draft until the in-game review and later final checks are complete.
