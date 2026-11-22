@@ -1,5 +1,13 @@
 # Achievement reference and alternate listening sample — 2026-11-22
 
+## Current standalone correction: reduce upper-band knocking
+
+The owner reports knocking in the checkpoint cue, particularly among the higher tones, and asks to remove it. `checkpoint-achievement-reduced-knock.wav` is a separate proposed correction of the currently integrated soft-start clip, retaining its 2.582-second length and entrance. It attenuates brief upper-band broadband attacks with a stereo-linked time/frequency median mask (2048-sample transform, 256-sample hop, 31-frame temporal and 17-bin frequency medians). Processing blends in above 900 Hz, reaches full strength at 1800 Hz, and adds a gentle shelf reaching -9 dB at 3600 Hz. No loudness normalization, new sound or source is added. A mixed stereo source does not allow guaranteed isolated removal; owner listening must establish whether the unwanted knocking is sufficiently removed while retaining the achievement character.
+
+Prepared 2026-11-22 with original OpenAI Codex-authored `tools/prepare-checkpoint-reduced-knock.py`, Python standard library, no generative audio model. Source/derivative: Fantasy Achievement Unlock - Magical Stinger by TommasoMotteran, https://freesound.org/people/TommasoMotteran/sounds/859080/, CC BY 4.0 https://creativecommons.org/licenses/by/4.0/. New adaptation notice: upper-band transient attenuation and reduced high-frequency ringing, in addition to the earlier excerpt, level and entrance changes. Preserve attribution; no endorsement implied. Preparation code follows the project PolyForm Noncommercial 1.0.0 license.
+
+Reproduce with `python tools/prepare-checkpoint-reduced-knock.py`. Only this standalone review file is written; runtime audio, wind/river and player credits are unchanged pending owner listening approval. Duration/stereo/rate/peak and zero-edge checks plus independent FFT round-trip verification were performed; no Unity change or fresh Unity validation is claimed for this audition.
+
 ## Latest revision: gentler entry
 
 The owner still finds the opening too abrupt. `checkpoint-achievement-soft-start.wav` keeps the same 0.4-second opening-effect removal but replaces the 20 ms linear entry with a 220 ms sine-squared rise. Main sound and existing ending remain byte-identical to the retained audition after this fade; duration remains about 2.58 seconds. Reproduce with `python tools/prepare-achievement-clean-start.py --soft-start`. This needs no new installed tools and remains a standalone proposal outside Unity, pending explicit listening approval.

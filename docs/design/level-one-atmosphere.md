@@ -1,5 +1,9 @@
 # Golden River audio and completion
 
+## Checkpoint upper-band knocking correction - 2026-11-22
+
+The owner reports knocking among the checkpoint cue's higher tones. A standalone `art/audio/checkpoint-achievement-reference/checkpoint-achievement-reduced-knock.wav` attenuates upper-band transients and bright ringing while preserving the selected cue's duration/entrance. Same TommasoMotteran CC BY 4.0 source and attribution; preparation/limits are in the review README. Owner hearing remains the gate before runtime replacement. No new Unity integration, wind/river change or final sound acceptance.
+
 ## Shorter crest and irregular in-game wind - 2026-11-22
 
 After hearing the long continuous-air study, the owner requested a shorter loud part and several irregular in-game variations. This authorizes the same-timbre runtime revision: four deterministic filtered-noise variants with 11.5–14-second lengths, earlier/steeper decay, slightly different air-band balance, independent noise seeds and strengths. Random selection excludes the previous clip; complete gusts have 10–24-second quiet gaps. River/checkpoint stay unchanged. The earlier field-recording wind and forest proposals are superseded. No new timbre approval is inferred beyond this scoped request. Keep PR #89 draft pending in-game acceptance.
