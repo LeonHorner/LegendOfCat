@@ -1,5 +1,11 @@
 # Golden River audio and completion
 
+## Current owner-selected choir/crystal direction — 2026-11-22
+
+The owner rejected the previous fanfare-like sound and requested a completely different continuous 2–3-second cue without pauses between repeated examples. In the follow-up questions they selected success/reward plus awakening magic, wordless choir plus crystal/soft-bell color, and an immediate magical burst that softly fades. These selections replace the prior rapid arpeggio/fanfare direction.
+
+Current standalone candidate: `art/audio/checkpoint-choir-review/checkpoint-choir-crystal.wav`, one 2.7-second choral/crystal arrival using an attributable CC0 Breviceps source and original crystal synthesis. Source/license, transformations, retained source preview and exact reproduction are in its README. The rendered cue still needs listening approval; no Unity integration. River and wind remain approved, movement remains deferred.
+
 ## Current checkpoint refinement — 2026-11-22
 
 The owner found the 0.75-second success gesture better but requested a more epic sound and allowed somewhat more length. The current standalone `art/audio/wind-and-magic-review/checkpoint-epic-audition.wav` repeats a new 1.65-second cue with a fuller warm foundation, resolving fanfare-like voicing and magical sparks. It is a proposed refinement, not an approved clip. Preserve the listening gate; do not integrate it yet. River and wind approvals remain; movement remains deferred. The previous strict short-duration target is relaxed by this feedback.

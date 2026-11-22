@@ -897,3 +897,12 @@ Source/generator: original deterministic OpenAI Codex-authored tools/prepare-che
 Owner feedback: the 0.75-second success direction is better, but should be more epic and may last somewhat longer. New art/audio/wind-and-magic-review/checkpoint-epic-success.wav lasts 1.65 seconds; checkpoint-epic-audition.wav repeats it twice. Both remain unapproved standalone review files outside Unity Assets and gameplay. River/wind selections remain approved; movement is deferred.
 
 Source/generator: original deterministic OpenAI Codex-authored tools/prepare-epic-checkpoint-audition.py using Python standard library; project PolyForm Noncommercial 1.0.0 license. No external samples, copied tune or generative audio model. Creative decisions: retain the rising glass-like success gesture, broaden its arrival with a low foundation and warm major voicing, add fine sparks and a gently fading stereo space. The owner must hear and approve the actual replacement before integration.
+
+
+## Wordless choir and crystal checkpoint audition - 2026-11-22
+
+Owner-selected direction after rejecting the previous fanfare: success/reward plus magical awakening; floating wordless choir plus crystal/soft bells; immediate magical burst and soft decay; one continuous 2-3-second cue without pauses or repeated blocks. New art/audio/checkpoint-choir-review/checkpoint-choir-crystal.wav lasts 2.7 seconds and remains unapproved outside Unity Assets/gameplay. River and wind remain selected; movement is deferred.
+
+Choral source: Short Choir by Breviceps, https://freesound.org/people/Breviceps/sounds/444491/, published 2018-10-24, CC0 1.0. The unmodified public high-quality MP3 preview is retained under the audition sources folder; SHA-256 6ee2b2b3db396c81ed6544f254b8470c6293e1d0eb349e7f896f1aa2ad8e5f83. It is third-party material, not a project recording. Source and choral derivatives retain CC0.
+
+Adaptation/original crystal design: OpenAI Codex-authored tools/prepare-choir-checkpoint-audition.py with Python and FFmpeg, project PolyForm Noncommercial 1.0.0 license for script/original synthesis, no generative audio model or copied tune. Creative decisions: harmonized immediate choral arrival, simultaneous crystal accents, fine sparks and continuous soft spatial decay. Exact processing, source URLs, licenses and reproduction are in the audition README. Direction choice does not approve the rendered clip; listening approval remains required before integration.
