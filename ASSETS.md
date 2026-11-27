@@ -980,3 +980,39 @@ Two original transparent paintings from OpenAI built-in image generation (exact 
 The November 21 playtest revision reuses these paintings. The rooted pillar frames the descending entrance. The spillway opens onto a low stone path, and the cave bed rises into a single Golden River bank at the far mouth.
 
 The unused left-bank concept painting and entrance modules 0, 1, 2 and 4 now live in Assets/Game/Art/GoldenRiverArchive with their original Unity metadata. The matching four coverage masks are archived there as well. The connected cave uses modules 3 and 5.
+
+## Ranged combat lab primitives - 2026-11-15
+
+- Source: original procedural geometry in RangedArena.cs; authored with OpenAI
+  Codex on 2026-11-15, no external asset or image-generation model used.
+- License: project-owned original code/geometry, under the repository license.
+- Human creative decisions: separate immediate paw pulse and charged arcing light
+  orb; J/K controls, height based on hold duration, movement-facing release.
+- Prototype interpretation: cool narrow pulse, warm round orb, growing charge,
+  square closed shield versus round open target, restrained hit/block marks.
+- Existing MikaOriginal artwork is reused with its recorded provenance unchanged.
+
+
+Ranged lab update (2026-11-15): the user selected a shared attack button, weapon
+switching, independent magazines and active-weapon-only reload. The original
+procedural presentation now labels the selected weapon, remaining rounds, charge
+and reload percentage; no additional external or generated artwork was used.
+
+The user requested filled/hollow ammunition dots on 2026-11-15. The HUD reuses
+the original procedural disc texture to draw cream circles with dark centers
+for spent rounds; no additional artwork or external asset was introduced.
+The follow-up HUD adds a reload progress bar and reuses the pulse/orb silhouettes
+as selected-weapon icons, alongside their English names.
+The compact weapon/ammo/reload HUD is anchored at bottom center at the user's
+request; the former upper control/debug panel is removed.
+
+Accepted initial visual revision (2026-11-15): the user selected an original
+procedural paw with a small light spark to replace the pulse HUD stripe. The paw
+uses five existing disc-texture stamps and a small cross-shaped spark. The
+permanent blue facing bar in front of Mika is removed. No external artwork, new
+image model or additional source asset was used.
+
+The local direct-attack trial shows the paw and orb indicators together, retaining
+their original procedural symbols and filled/hollow ammunition dots. The user
+requested a larger pause menu with directly visible input descriptions. No new
+external artwork or image generator is involved; the owner accepted this initial prototype on 2026-11-15.
