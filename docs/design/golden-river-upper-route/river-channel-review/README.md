@@ -8,7 +8,7 @@ The cave under Golden River is a secret shortcut between ascent banks 10 and 39.
 2. **Waterfall crossing.** Four shelves cross the falls: 2.4 to 3.2 units wide, with gaps of 3.4 to 4.2 units. The jumps keep about 25 to 35 percent of Mika's reach in reserve, against the Golden River target of 20 percent. A miss drops onto the catch below the shelves. A wall at the spillway closes it, so the only way on is back up the catch steps to the first shelf. The painted pool sits below the catch floor, so no water appears where Mika can fall through.
 3. **Spillway.** A short level breather past the broken spillway.
 4. **Seep shelves.** Six shelves climb toward daylight: one narrow landing, one long flat jump, rises of up to 1.5 units and one wide resting shelf. Two gullies below never lead forward. The first returns up the spillway slope. The second has a rock column back up to the wide shelf.
-5. **Daylight bank.** A hollow in the bank needs a hop out. The last climb to bank 39 is about 33 degrees, well inside the walkable limit of about 45 degrees.
+5. **Daylight bank.** A hollow in the bank needs a hop out. The last climb to bank 39 is about 30 degrees, well inside the walkable limit of about 45 degrees.
 
 Over both jump sections, the camera lowers so that the floor a miss would land on is in view before takeoff.
 

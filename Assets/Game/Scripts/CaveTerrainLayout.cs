@@ -147,8 +147,9 @@ public static class CaveTerrainLayout
         new Vector2(205.12f,-6.65f),new Vector2(206.2f,-6.65f),new Vector2(208,-6.05f),
         new Vector2(212.4f,-3.88f),new Vector2(214,-3.5f),new Vector2(217.1f,-3.5f),
         new Vector2(219.5f,-2.15f),new Vector2(222.1f,-2.15f),new Vector2(224.5f,-.85f),
-        // The last climb stays near 33 degrees, well inside the walkable slope limit.
-        new Vector2(225.6f,-.7f),new Vector2(233.2f,4.3f),
+        // The last climb stays near 30 degrees, well inside the walkable slope limit, and passes
+        // low enough under surface bank 38 (whose underside is about 5.4) for Mika's head.
+        new Vector2(225.6f,-.7f),new Vector2(234.2f,4.1f),
         new Vector2(235.69f,5.205f),new Vector2(245.69f,5.205f)},.9f);
     // Two gullies under the seep shelves. Neither leads forward: the first returns up the
     // spillway slope, the second climbs a rock column back to the widest shelf.

@@ -13,6 +13,7 @@ public sealed class CaveSpeedPilot
     readonly Rigidbody2D body;
     readonly Type route;
     int next;
+    bool wasGrounded = true;
     public CaveSpeedPilot(Component course)
     {
         cat = (Component)course.GetType().GetProperty("Cat").GetValue(course);
@@ -26,8 +27,13 @@ public sealed class CaveSpeedPilot
     {
         motion.GetType().GetMethod("SetMove").Invoke(motion, new object[] { 1f });
         bool grounded = (bool)cat.GetType().GetProperty("Grounded").GetValue(cat);
+        float localY = body.position.y - .045f;
+        if (grounded != wasGrounded)
+            Debug.Log((grounded ? "Cave speed run landed at " : "Cave speed run left ground at ") + LocalX.ToString("F2") + ", " + localY.ToString("F2"));
+        wasGrounded = grounded;
         while (next < Takeoffs.Length && LocalX > Takeoffs[next] + 1.2f) next++;
         if (next < Takeoffs.Length && grounded && LocalX >= Takeoffs[next]) {
+            Debug.Log("Cave speed run takeoff " + next + " at " + LocalX.ToString("F2") + ", " + localY.ToString("F2"));
             cat.GetType().GetMethod("PressJump").Invoke(cat, null);
             next++;
         }
