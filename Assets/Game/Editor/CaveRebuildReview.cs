@@ -108,7 +108,7 @@ public static class CaveRebuildReview
         if(CaveRoute.ToLocal(cat.transform.localPosition).x>164.9f)throw new System.InvalidOperationException("The first seep gully leads forward.");
         WalkTo(146);
         // A miss over the second gully climbs the rock column back to the widest shelf.
-        DropToFloor(178,-11,CaveTerrainLayout.AlongFace(CaveTerrainLayout.SeepGully,178));
+        DropToFloor(180,-11.5f,CaveTerrainLayout.AlongFace(CaveTerrainLayout.SeepGully,180));
         cat.Motion.SetMove(1);for(int i=0;i<120;i++)Tick();cat.Motion.SetMove(0);
         if(CaveRoute.ToLocal(cat.transform.localPosition).x>184.5f)throw new System.InvalidOperationException("The second seep gully leads forward.");
         Reach(new Vector3(168.8f,CaveTerrainLayout.AlongFace(CaveTerrainLayout.SeepGully,168.8f),0));
