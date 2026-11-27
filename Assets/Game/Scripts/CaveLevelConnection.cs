@@ -157,7 +157,9 @@ public sealed partial class CaveEntryStudy
     void AddRecessedMouth()
     {
         var texture=Resources.Load<Texture2D>("GoldenRiver/Descent/concept-entry-recess-v1");if(!texture)return;
-        var material=RockMaterial(.52f);material.SetFloat("_Alcove",1);material.mainTexture=texture;material.SetFloat("_WorldMapped",0);
+        var material=RockMaterial(.52f);material.SetFloat("_Alcove",1);
+        // Drawn after the chamber wall, so its faded right edge blends onto that wall.
+        material.renderQueue=2001;material.mainTexture=texture;material.SetFloat("_WorldMapped",0);
         // The upper seam runs inside the opaque roof, rather than cutting across the
         // opening at a fixed height. The outer flank is permanent and behind Mika.
         var outline=new[]{new Vector2(5.9f,-24),new Vector2(36,-24),new Vector2(36,-7.8f),new Vector2(24,-7.9f),
@@ -256,18 +258,25 @@ public sealed partial class CaveEntryStudy
         var triangles=new int[(line.Count-1)*6];
         var limits=new Vector2[vertices.Length];
         float arc=start??line[0].x;
+        var along=new float[line.Count];
+        for(int i=1;i<line.Count;i++)along[i]=along[i-1]+Vector2.Distance(line[i],line[i-1]);
         for(int i=0;i<line.Count;i++){
             var p=line[i];
             if(i>0)arc+=Vector2.Distance(p,line[i-1]);
             Vector2 inside=ceiling?Vector2.up:Vector2.down;
+            float outside=1.52f;
             float body=depthIntoRock;
             if(!ceiling) {
                 // On steep faces the boulder rim turns with the rock, so walls get the same
-                // broken edge as the floors instead of a bare flat face.
-                var tangent=(line[Mathf.Min(i+1,line.Count-1)]-line[Mathf.Max(0,i-1)]).normalized;
+                // broken edge as the floors instead of a bare flat face. The direction follows
+                // the face over a few metres and the rim is shallower there, so corners and
+                // small zigzags never fan the strip into stretched streaks.
+                var tangent=(PointAlong(line,along,along[i]+1.6f)-PointAlong(line,along,along[i]-1.6f)).normalized;
                 var normal=new Vector2(tangent.y,-tangent.x);
                 float steep=Mathf.SmoothStep(0,1,Mathf.InverseLerp(.55f,.85f,Mathf.Abs(tangent.y)));
                 inside=Vector2.Lerp(Vector2.down,normal,steep).normalized;
+                body=Mathf.Lerp(depthIntoRock,Mathf.Min(depthIntoRock,1.35f),steep);
+                outside=Mathf.Lerp(1.52f,.55f,steep);
             }
             if(ceiling) {
                 // Preserve the river cover and both playable landings above the thin roof.
@@ -281,9 +290,9 @@ public sealed partial class CaveEntryStudy
                 }
             }
             int j=2*i;
-            vertices[j]=(Vector3)(p-inside*1.52f)+Vector3.forward*depth;
+            vertices[j]=(Vector3)(p-inside*outside)+Vector3.forward*depth;
             vertices[j+1]=(Vector3)(p+inside*body)+Vector3.forward*depth;
-            uv[j]=new Vector2(arc,-1.52f); uv[j+1]=new Vector2(arc,body);
+            uv[j]=new Vector2(arc,-outside); uv[j+1]=new Vector2(arc,body);
             limits[j]=limits[j+1]=new Vector2(body,0);
             if(i+1==line.Count)continue;
             int t=6*i;
@@ -292,6 +301,13 @@ public sealed partial class CaveEntryStudy
         }
         SetStripMesh("Water-worn rock margin",vertices,uv,triangles,material,limits);
         return arc;
+    }
+    static Vector2 PointAlong(IList<Vector2> line,float[] along,float distance)
+    {
+        if(distance<=0)return line[0];
+        for(int i=1;i<line.Count;i++)if(along[i]>=distance)
+            return Vector2.Lerp(line[i-1],line[i],Mathf.InverseLerp(along[i-1],along[i],distance));
+        return line[line.Count-1];
     }
     void AddPaintedBanks()
     {
@@ -313,7 +329,10 @@ public sealed partial class CaveEntryStudy
         }
         DrawBankFace(approach, paint, true);
         DrawBankFace(CaveTerrainLayout.EntranceCrown, paint, overhang:true);
-        DrawBankFace(CaveTerrainLayout.ExitBank, paint);
+        // The exit bank begins on the seep lip, where it grows out of the cave rock rather than
+        // ending in the air, so its start fades into the rim instead of showing a painted bank end.
+        var exit=new List<Vector2>{new Vector2(184.75f,-9.55f)};exit.AddRange(CaveTerrainLayout.ExitBank);
+        DrawBankFace(exit, paint, buriedStart:2.2f);
         // The upper path ends on the exit cliff: give both of its treads the same painted
         // bank as the surrounding surface banks instead of bare cut stone.
         // The higher tread's rounded end overlaps the lower one in front of it.
@@ -323,7 +342,7 @@ public sealed partial class CaveEntryStudy
                 DrawBankFace(new[]{new Vector2(tread.x,tread.y),new Vector2(tread.x+tread.z*.5f,tread.y),new Vector2(tread.x+tread.z,tread.y)},paint,depthOffset:.004f*i);
             }
     }
-    void DrawBankFace(IList<Vector2> face, Material paint, bool upstream=false, bool overhang=false, float depthOffset=0)
+    void DrawBankFace(IList<Vector2> face, Material paint, bool upstream=false, bool overhang=false, float depthOffset=0, float buriedStart=0)
     {
         // Sample the river bank painting at a constant scale along the physical contour.
         var vertices = new Vector3[face.Count*2];
@@ -332,7 +351,7 @@ public sealed partial class CaveEntryStudy
         var limits = new Vector2[vertices.Length];
         for (int i=0;i<face.Count;i++) {
             var p=face[i]; int j=2*i;
-            if(i==0 && !overhang)p.x-=.84f;
+            if(i==0 && !overhang && buriedStart<=0)p.x-=.84f;
             if(i+1==face.Count)p.x+=.84f;
             float depth=(upstream ? Mathf.Lerp(-1.815f,-3.055f,Mathf.InverseLerp(-5.9f,-3.4f,p.x)) : -3.055f)+depthOffset;
             float thickness=5;
@@ -351,7 +370,7 @@ public sealed partial class CaveEntryStudy
         }
         var renderer=SetStripMesh("Painted riverbank contour",vertices,uv,triangles,paint,limits);
         var properties=new MaterialPropertyBlock();
-        properties.SetVector("_BankEnds",new Vector4(face[0].x-.84f,face[face.Count-1].x+.84f,0,0));
+        properties.SetVector("_BankEnds",new Vector4(face[0].x-(buriedStart>0?0:.84f),face[face.Count-1].x+.84f,buriedStart,0));
         renderer.SetPropertyBlock(properties);
     }
     MeshRenderer SetStripMesh(string label,Vector3[] vertices,Vector2[] uv,int[] triangles,Material material,Vector2[] limits=null)

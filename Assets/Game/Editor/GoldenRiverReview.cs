@@ -128,11 +128,11 @@ public static class GoldenRiverReview
                 CaveRoute.ToCourse(new Vector2(183,-9.08f)),CaveRoute.ToCourse(new Vector2(33,-11.48f)),
                 CaveRoute.ToCourse(new Vector2(106,-18.08f)),CaveRoute.ToCourse(new Vector2(170,-12.08f)),
                 CaveRoute.ToCourse(new Vector2(203,-7.62f)),CaveRoute.ToCourse(new Vector2(243,5.725f)),
-                CaveRoute.ToCourse(new Vector2(189,5.275f)) };
+                CaveRoute.ToCourse(new Vector2(189,5.275f)),CaveRoute.ToCourse(new Vector2(246,.5f)) };
             names = new[] { "descent-entrance", "descent-entry-bank", "descent-risk", "descent-catch", "descent-niche", "descent-rejoin", "channel-sill", "return-bench", "exit-mouth", "approach", "daylight", "spillway-approach", "surface-reference",
                 "outflow-rock", "spillway-foot", "inner-exit", "arch-foot", "seep-floor", "upper-lip", "seep-shelves",
                 "fix1-approach-end", "fix2-entrance-crown", "fix3-spillway-tread", "fix4-bed-join", "fix5-seep-wall",
-                "fix6-plant-bed", "fix6-plant-falls", "fix6-plant-seep", "fix7-exit-mouth", "fix8-river-edge", "fix9-upper-end" };
+                "fix6-plant-bed", "fix6-plant-falls", "fix6-plant-seep", "fix7-exit-mouth", "fix8-river-edge", "fix9-upper-end", "fix8-river-shore" };
         }
         try {
             for (int index = 0; index < points.Length; index++) {

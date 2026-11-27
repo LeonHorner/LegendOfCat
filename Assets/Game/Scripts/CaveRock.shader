@@ -112,6 +112,8 @@ Shader "LegendOfCat/CaveRock"
                 // stays solid; the opening is cut by its outline, not faded.
                 float spill=smoothstep(194,205,world.x);
                 rock=lerp(rock,rock*float3(1.45,1.3,1.05)+float3(.05,.04,.01),spill*.8);
+                // The wall is dark, so the glow is added as light, strongest at the opening.
+                rock+=float3(.34,.23,.10)*spill*spill*(1-smoothstep(-6,-2,world.y)*.5);
                 return fixed4(rock,1);
             }
 
@@ -139,7 +141,8 @@ Shader "LegendOfCat/CaveRock"
                 float other=frac(phase+.5);
                 float blend=smoothstep(.04,.22,min(phase,1-phase));
                 float left=i.world.x-_BankEnds.x, right=_BankEnds.y-i.world.x;
-                float endDist=min(left,right);
+                // A buried start (z>0) has no painted end: it fades into the rock over z metres.
+                float endDist=_BankEnds.z>0 ? right : min(left,right);
                 float sheltered=(1-smoothstep(-10,-1.8,i.world.y-i.uv.y))*smoothstep(.15,1.45,endDist);
                 fixed4 bank=0;
                 if (sheltered<1) {
@@ -158,7 +161,8 @@ Shader "LegendOfCat/CaveRock"
                 }
                 clip(bank.a-.40);
                 float depth=i.uv.y+.17*sin(i.world.x*1.2);
-                c=fixed4(bank.rgb,bank.a*smoothstep(-2.36,-.95,depth)*smoothstep(0,min(.65,i.limit),i.uv.y+i.limit));
+                float buried=_BankEnds.z>0 ? smoothstep(0,_BankEnds.z,left) : 1;
+                c=fixed4(bank.rgb,bank.a*buried*smoothstep(-2.36,-.95,depth)*smoothstep(0,min(.65,i.limit),i.uv.y+i.limit));
                 clip(c.a-.025);
             #elif defined(CAVE_WALL)
                 c=chamber(i.world);
@@ -176,8 +180,11 @@ Shader "LegendOfCat/CaveRock"
                         c.rgb=lerp(baseRock.rgb,c.rgb,feather*detail);
                     }
                 }
-                if(_Alcove>.5)
+                if(_Alcove>.5) {
                     c.rgb=lerp(c.rgb,baseRock.rgb,smoothstep(18,34,i.world.x));
+                    // Hand over to the chamber wall behind instead of ending at a hard vertical edge.
+                    c.a*=1-smoothstep(29,35.6,i.world.x);
+                }
                 if(_Cutout>.5)clip(c.a-.95);
             #endif
                 float shade=1-smoothstep(-10,-1,i.world.y);

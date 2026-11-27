@@ -7,11 +7,11 @@ Paul's play session reported nine visual problems. Each now has a review still (
 1. The approach shore's plain stone body is tucked behind its painted bank, so no flat slab shows past the boulders.
 2. The entrance crown no longer has the concept-roof and entry-module paintings over it. It uses the same painted bank and cliff stone as the exit.
 3. The first spillway tread is the bank stone itself, so its separate root shelf was removed.
-4. Adjoining rock beds continue one texture run, so no seam appears where two banks meet. On steep faces the boulder rim turns with the rock.
+4. Adjoining rock beds continue one texture run, so no seam appears where two banks meet. On steep faces the boulder rim turns with the rock. The turn follows the face over a few metres and the rim is shallower there, so corners do not smear the painting into streaks.
 5. The wall at the end of the second seep gully is a broken, leaning face instead of a straight wall. It still cannot be climbed.
-6. The plant spot with a coloured strip is checked in the `fix6` stills.
-7. The back wall no longer fades into the valley. It ends at a ragged rock mouth with a boulder lip, and daylight warms the last metres of wall.
-8. On the upper path, the river now runs on until it meets the exit shore's rock.
+6. The coloured strip was the painted end of the exit bank, buried in the seep lip beside the fern and mushroom plant. The exit bank now starts on the lip and fades into the rock rim instead. The rim painting's hidden transparent pixels were also recoloured, so filtering no longer shows red fringes. The entrance alcove now fades onto the chamber wall instead of ending at a lighter vertical band.
+7. The back wall no longer fades into the valley. It ends at a ragged rock mouth with a boulder lip, and warm daylight lights the last metres of wall.
+8. On the upper path, the river now runs on until it meets the exit shore's rock (also `fix8-river-shore`, framed at the water line).
 9. The end of the upper path, on the exit cliff, has painted bank tops like the surrounding banks instead of bare cut stone with a grass strip.
 
 ## Playability revision: secret shortcut, 2026-11-27

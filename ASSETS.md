@@ -981,6 +981,8 @@ The November 21 playtest revision reuses these paintings. The rooted pillar fram
 
 The unused left-bank concept painting and entrance modules 0, 1, 2 and 4 now live in Assets/Game/Art/GoldenRiverArchive with their original Unity metadata. The matching four coverage masks are archived there as well. The connected cave uses modules 3 and 5.
 
+On 2026-11-27 the nearly transparent pixels of mossy-bedrock.png (alpha below 48, always clipped by the cave shaders) were recoloured from their opaque neighbours. Their stray red values showed as fringes along the rock silhouette when filtered. Alpha and every visible pixel are unchanged.
+
 On 2026-11-27 the standalone entrance study was removed. Its eight paintings (entry-study-floor-v1, entry-study-left-v2, entry-study-rear-v1, entry-study-right-v2, entry-study-valley-v1, discovery-ceiling-v2, discovery-floor-v2 and discovery-rear-v1) moved to Assets/Game/Art/GoldenRiverArchive with their original metadata and no longer ship. The connected cave shifts the fern grotto painting down so its pool sits below the catch floor, and mutes the cave backdrop. No new artwork was added.
 
 ## Ranged combat lab primitives - 2026-11-15
