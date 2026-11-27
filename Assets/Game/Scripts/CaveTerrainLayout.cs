@@ -71,8 +71,10 @@ public static class CaveTerrainLayout
         const float floor=-1.245f;
         var outline=new List<Vector2>{new Vector2(left+.12f,floor)};
         for(int i=0;i<=24;i++){float x=Mathf.Lerp(ApproachRiseStart,ApproachRiseEnd,i/24f);outline.Add(new Vector2(x,ApproachHeight(x)));}
-        outline.AddRange(new[]{new Vector2(-2.2f,-.045f),new Vector2(-2.2f,Bottom),new Vector2(left-.7f,Bottom),
-            new Vector2(left-.7f,-4.8f),new Vector2(left-.35f,-3.5f),new Vector2(left-.45f,-2.8f),new Vector2(left-.12f,-1.7f),new Vector2(left,-1.36f)});
+        // The painted bank's rounded end owns the silhouette; the plain stone body stays tucked
+        // behind it so no flat slab shows past the boulders.
+        outline.AddRange(new[]{new Vector2(-2.2f,-.045f),new Vector2(-2.2f,Bottom),new Vector2(left+.75f,Bottom),
+            new Vector2(left+.75f,-4.8f),new Vector2(left+.85f,-3.5f),new Vector2(left+.7f,-2.6f),new Vector2(left+.45f,-1.75f),new Vector2(left+.2f,-1.36f)});
         return new Section("Connected approach shore",outline.ToArray(),new Vector3(left+.12f,floor,ApproachRiseStart-left-.12f));
     }
     public static float RiverbedSurface(float x)=>-4.45f+.16f*Mathf.Sin(x*2.7f)+.07f*Mathf.Sin(x*5.9f);
@@ -159,7 +161,11 @@ public static class CaveTerrainLayout
         new Vector2(145.4f,-16.1f),new Vector2(149,-18.55f),new Vector2(153,-18.4f),new Vector2(158,-17.7f),
         new Vector2(164.6f,-17.6f),new Vector2(164.9f,-14.9f),new Vector2(165.3f,-14.6f),new Vector2(167,-14.6f),
         new Vector2(167.2f,-14.9f),new Vector2(167.6f,-16.4f),
-        new Vector2(172,-16.1f),new Vector2(178,-15.3f),new Vector2(184.4f,-14.6f),
+        new Vector2(172,-16.1f),new Vector2(178,-15.3f),new Vector2(185.05f,-14.6f),
+        // A broken rock face rather than a straight wall. It leans back under the lip, so the
+        // gully still never leads forward, and the lip still meets the last seep shelf.
+        new Vector2(185.3f,-13.5f),new Vector2(184.95f,-12.7f),new Vector2(185.2f,-11.7f),
+        new Vector2(184.7f,-10.8f),new Vector2(184.85f,-10.2f),new Vector2(184.45f,-9.75f),
         new Vector2(184.6f,-9.6f),new Vector2(184.75f,-9.55f),ExitBank[0]};
 
     // Adjacent banks share endpoints, so both the painted rim and the collider continue across each join.
@@ -208,7 +214,8 @@ public static class CaveTerrainLayout
         result.Add(ChannelBed("Upper seep bank",
             SeepGully));
         foreach (var tread in Floors)
-            if (tread.x<113 || tread.x>=147 && tread.x<187) result.Add(RootShelf(tread));
+            // The first spillway tread is the bank stone itself, so it carries no separate shelf.
+            if (tread.x<111 || tread.x>=147 && tread.x<187) result.Add(RootShelf(tread));
         var exitOutline=new List<Vector2>(ExitBank);
         var end=ExitBank[ExitBank.Length-1];
         exitOutline.AddRange(RoundedEdge(new[]{end+new Vector2(.03f,-.22f),end+new Vector2(-.18f,-1.15f),

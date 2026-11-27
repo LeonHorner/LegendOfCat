@@ -121,9 +121,18 @@ public static class GoldenRiverReview
                 CaveRoute.ToCourse(new Vector2(75,-16.08f)),CaveRoute.ToCourse(new Vector2(128,-15.43f)),
                 CaveRoute.ToCourse(new Vector2(201,-7.62f)),CaveRoute.ToCourse(new Vector2(208,-5.45f)),
                 CaveRoute.ToCourse(new Vector2(160,-17.1f)),CaveRoute.ToCourse(new Vector2(8.8f,1.275f)),
-                CaveRoute.ToCourse(new Vector2(157,-14.28f)) };
+                CaveRoute.ToCourse(new Vector2(157,-14.28f)),
+                // Spots from the 2026-11-27 visual review, in the order they were reported.
+                CaveRoute.ToCourse(new Vector2(-16.2f,-.72f)),CaveRoute.ToCourse(new Vector2(12,1.475f)),
+                CaveRoute.ToCourse(new Vector2(114,-18.18f)),CaveRoute.ToCourse(new Vector2(144,-15.58f)),
+                CaveRoute.ToCourse(new Vector2(183,-9.08f)),CaveRoute.ToCourse(new Vector2(33,-11.48f)),
+                CaveRoute.ToCourse(new Vector2(106,-18.08f)),CaveRoute.ToCourse(new Vector2(170,-12.08f)),
+                CaveRoute.ToCourse(new Vector2(203,-7.62f)),CaveRoute.ToCourse(new Vector2(243,5.725f)),
+                CaveRoute.ToCourse(new Vector2(189,5.275f)) };
             names = new[] { "descent-entrance", "descent-entry-bank", "descent-risk", "descent-catch", "descent-niche", "descent-rejoin", "channel-sill", "return-bench", "exit-mouth", "approach", "daylight", "spillway-approach", "surface-reference",
-                "outflow-rock", "spillway-foot", "inner-exit", "arch-foot", "seep-floor", "upper-lip", "seep-shelves" };
+                "outflow-rock", "spillway-foot", "inner-exit", "arch-foot", "seep-floor", "upper-lip", "seep-shelves",
+                "fix1-approach-end", "fix2-entrance-crown", "fix3-spillway-tread", "fix4-bed-join", "fix5-seep-wall",
+                "fix6-plant-bed", "fix6-plant-falls", "fix6-plant-seep", "fix7-exit-mouth", "fix8-river-edge", "fix9-upper-end" };
         }
         try {
             for (int index = 0; index < points.Length; index++) {

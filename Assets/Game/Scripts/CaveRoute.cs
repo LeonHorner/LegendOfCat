@@ -21,7 +21,8 @@ public static class CaveRoute
     public static readonly Vector2[][] ShoreOpenings={
         new[]{new Vector2(-5.6f,-2.8f),new Vector2(12,-2.8f),new Vector2(13.4f,-4.8f),new Vector2(22,-8),
             new Vector2(22,-44),new Vector2(-18,-44),new Vector2(-18,-8),new Vector2(-7.7f,-5.1f)},
-        new[]{new Vector2(185,-2.8f),new Vector2(246.5f,-2.8f),new Vector2(249.8f,-6),new Vector2(251,-44),new Vector2(183,-44),new Vector2(183,-6)}};
+        // The river runs on until it meets the exit shore's rock, so no open gap shows beside it.
+        new[]{new Vector2(185,-2.8f),new Vector2(247.6f,-2.8f),new Vector2(249.2f,-6),new Vector2(249.3f,-44),new Vector2(183,-44),new Vector2(183,-6)}};
     // Only recovery solids intersecting the actual entrance/exit air are carved.
     public static readonly Vector2[][] Openings={Box(3.8f,-12,9,12),Box(185,-14,50.6f,17.5f)};
     public static bool InOpening(Vector2 local){foreach(var p in ShoreOpenings)if(Contains(p,local))return true;return false;}

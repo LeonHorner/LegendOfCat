@@ -108,10 +108,11 @@ Shader "LegendOfCat/CaveRock"
                 rock+=float3(.15,.13,.21)*(1-smoothstep(.04,.3,luma));
                 luma=dot(rock,float3(.299,.587,.114));
                 rock=lerp(rock,lerp(luma.xxx,rock,.62)*.9,1-stream);
-                float opening=world.x+.65*sin(world.y*1.1)+.24*sin(world.y*2.3);
-                float alpha=1-smoothstep(197.5,205,opening);
-                clip(alpha-.015);
-                return fixed4(rock,alpha);
+                // Daylight from the mouth warms the last few metres of wall. The wall itself
+                // stays solid; the opening is cut by its outline, not faded.
+                float spill=smoothstep(194,205,world.x);
+                rock=lerp(rock,rock*float3(1.45,1.3,1.05)+float3(.05,.04,.01),spill*.8);
+                return fixed4(rock,1);
             }
 
             fixed4 frag(Output i):SV_Target{

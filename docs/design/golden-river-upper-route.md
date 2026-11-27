@@ -1,5 +1,19 @@
 # Golden River upper route
 
+## Visual pass, 2026-11-27
+
+Paul's play session reported nine visual problems. Each now has a review still (`fix1` to `fix9` in `GoldenRiverReview -upperReview`):
+
+1. The approach shore's plain stone body is tucked behind its painted bank, so no flat slab shows past the boulders.
+2. The entrance crown no longer has the concept-roof and entry-module paintings over it. It uses the same painted bank and cliff stone as the exit.
+3. The first spillway tread is the bank stone itself, so its separate root shelf was removed.
+4. Adjoining rock beds continue one texture run, so no seam appears where two banks meet. On steep faces the boulder rim turns with the rock.
+5. The wall at the end of the second seep gully is a broken, leaning face instead of a straight wall. It still cannot be climbed.
+6. The plant spot with a coloured strip is checked in the `fix6` stills.
+7. The back wall no longer fades into the valley. It ends at a ragged rock mouth with a boulder lip, and daylight warms the last metres of wall.
+8. On the upper path, the river now runs on until it meets the exit shore's rock.
+9. The end of the upper path, on the exit cliff, has painted bank tops like the surrounding banks instead of bare cut stone with a grass strip.
+
 ## Playability revision: secret shortcut, 2026-11-27
 
 A playability review found the cave could be walked end to end, nothing could fail, the waterfall pool was fake water, players entered by accident and the route was slower than the surface. Paul accepted every proposed change and chose a secret shortcut: the cave is harder and faster than the surface. The [current route, timing check and frame-time logging](golden-river-upper-route/river-channel-review/README.md) supersede the sections below. The standalone entrance study, the rejected bank-49 route code and the review media of earlier prototypes were removed. Their paintings are in `Assets/Game/Art/GoldenRiverArchive`.
