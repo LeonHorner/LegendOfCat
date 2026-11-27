@@ -7,7 +7,7 @@ public sealed class CaveSpeedPilot
 {
     // Local cave x of each takeoff: boulder, four waterfall shelves and the bank, six seep shelves, daylight hollow.
     public static readonly float[] Takeoffs = { 24.3f, 80.65f, 87.65f, 94.05f, 100.65f, 107.45f,
-        145f, 151.25f, 157.75f, 164.05f, 172.25f, 178.25f, 196.3f };
+        145f, 151.25f, 157.75f, 164.05f, 172.25f, 178.25f, 195.9f };
     readonly Component cat;
     readonly object motion;
     readonly Rigidbody2D body;
@@ -31,8 +31,8 @@ public sealed class CaveSpeedPilot
         if (grounded != wasGrounded)
             Debug.Log((grounded ? "Cave speed run landed at " : "Cave speed run left ground at ") + LocalX.ToString("F2") + ", " + localY.ToString("F2"));
         wasGrounded = grounded;
-        while (next < Takeoffs.Length && LocalX > Takeoffs[next] + 1.2f) next++;
-        if (next < Takeoffs.Length && grounded && LocalX >= Takeoffs[next]) {
+        // Like a player, press jump at the takeoff point; coyote time covers a step past the edge.
+        if (next < Takeoffs.Length && LocalX >= Takeoffs[next]) {
             Debug.Log("Cave speed run takeoff " + next + " at " + LocalX.ToString("F2") + ", " + localY.ToString("F2"));
             cat.GetType().GetMethod("PressJump").Invoke(cat, null);
             next++;

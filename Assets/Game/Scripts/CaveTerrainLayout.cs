@@ -143,7 +143,9 @@ public static class CaveTerrainLayout
     // Broad rests divide the outer bank into a shaded hollow, the daylight sill and the last climb.
     public static readonly Vector2[] ExitBank=RoundedEdge(new[] {
         new Vector2(188,-8.14f),new Vector2(192.6f,-8.14f),new Vector2(193,-9.7f),
-        new Vector2(197.6f,-9.7f),new Vector2(198,-8.14f),new Vector2(202.7f,-8.14f),
+        // A near-vertical riser, so leaving the hollow takes a hop.
+        new Vector2(197.55f,-9.7f),new Vector2(197.65f,-9.6f),new Vector2(197.7f,-8.3f),
+        new Vector2(197.8f,-8.14f),new Vector2(202.7f,-8.14f),
         new Vector2(205.12f,-6.65f),new Vector2(206.2f,-6.65f),new Vector2(208,-6.05f),
         new Vector2(212.4f,-3.88f),new Vector2(214,-3.5f),new Vector2(217.1f,-3.5f),
         new Vector2(219.5f,-2.15f),new Vector2(222.1f,-2.15f),new Vector2(224.5f,-.85f),
@@ -173,8 +175,8 @@ public static class CaveTerrainLayout
         var result=new List<Section>{ApproachShore(),new Section("Entrance shore",LeftShore),
             new Section("Massive entrance overhang",EntryRoof)};
         result.Add(ChannelBed("Fountain channel bed",new Vector2(20.34f,-12),
-            new Vector2(25.2f,-12),new Vector2(25.9f,-10.95f),new Vector2(28.5f,-10.95f),
-            new Vector2(29.2f,-12),new Vector2(35.5f,-12),new Vector2(36.65f,-12.3f),
+            new Vector2(25.2f,-12),new Vector2(25.35f,-11.9f),new Vector2(25.55f,-11.1f),new Vector2(25.75f,-10.95f),
+            new Vector2(28,-10.95f),new Vector2(28.2f,-11.1f),new Vector2(28.4f,-11.9f),new Vector2(28.55f,-12),new Vector2(35.5f,-12),new Vector2(36.65f,-12.3f),
             new Vector2(37.9f,-12.3f),new Vector2(39.5f,-12.67f),new Vector2(56.1f,-12.67f),
             new Vector2(58.1f,-13.6f),new Vector2(60.2f,-13.6f),new Vector2(64,-15),new Vector2(66,-17.4f),new Vector2(71,-16.4f),
             new Vector2(73,-18.05f),new Vector2(77.8f,-21.3f)));
