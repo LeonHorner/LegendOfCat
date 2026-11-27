@@ -112,17 +112,18 @@ public static class GoldenRiverReview
         bool upperReview = System.Array.IndexOf(args, "-upperReview") >= 0;
         if (upperReview) {
             points = new[] { CaveRoute.Entrance,CaveRoute.ToCourse(new Vector2(10,CaveTerrainLayout.AlongFace(CaveTerrainLayout.LeftShore,10)+.52f)),
-                CaveRoute.ToCourse(new Vector2(98.7f,-19.5f)),CaveRoute.ToCourse(new Vector2(101.5f,-26)),
+                CaveRoute.ToCourse(new Vector2(93,-19.38f)),CaveRoute.ToCourse(new Vector2(101.5f,-26)),
                 CaveRoute.ToCourse(new Vector2(48,-12.16f)),CaveRoute.Rejoin,
-                CaveRoute.ToCourse(new Vector2(28,-12.27f)),CaveRoute.ToCourse(new Vector2(135,-15.58f)),
+                CaveRoute.ToCourse(new Vector2(27.2f,-10.43f)),CaveRoute.ToCourse(new Vector2(135,-15.58f)),
                 CaveRoute.ToCourse(new Vector2(215,-2.98f)), CaveRoute.Approach,
-                CaveRoute.ToCourse(new Vector2(226,-.32f)), CaveRoute.ToCourse(new Vector2(121,-16.83f)),
+                CaveRoute.ToCourse(new Vector2(226,-.36f)), CaveRoute.ToCourse(new Vector2(121,-16.83f)),
                 new Vector2(MovementCourse.AscentPlatforms[4].x,MovementCourse.AscentPlatforms[4].y+1.27f),
                 CaveRoute.ToCourse(new Vector2(75,-16.08f)),CaveRoute.ToCourse(new Vector2(128,-15.43f)),
                 CaveRoute.ToCourse(new Vector2(201,-7.62f)),CaveRoute.ToCourse(new Vector2(208,-5.45f)),
-                CaveRoute.ToCourse(new Vector2(162,-16.31f)),CaveRoute.ToCourse(new Vector2(8.8f,1.275f)) };
+                CaveRoute.ToCourse(new Vector2(160,-17.1f)),CaveRoute.ToCourse(new Vector2(8.8f,1.275f)),
+                CaveRoute.ToCourse(new Vector2(157,-14.28f)) };
             names = new[] { "descent-entrance", "descent-entry-bank", "descent-risk", "descent-catch", "descent-niche", "descent-rejoin", "channel-sill", "return-bench", "exit-mouth", "approach", "daylight", "spillway-approach", "surface-reference",
-                "outflow-rock", "spillway-foot", "inner-exit", "arch-foot", "seep-floor", "upper-lip" };
+                "outflow-rock", "spillway-foot", "inner-exit", "arch-foot", "seep-floor", "upper-lip", "seep-shelves" };
         }
         try {
             for (int index = 0; index < points.Length; index++) {
@@ -280,7 +281,7 @@ public static class GoldenRiverReview
         course.RestartRun();
         if(!full) course.Cat.RespawnAt(CaveRoute.Entrance);
         if (catchOnly) {
-            course.Cat.RespawnAt(CaveRoute.ToCourse(new Vector2(98.7f,-19.5f)));
+            course.Cat.RespawnAt(CaveRoute.ToCourse(new Vector2(99.4f,-18.08f)));
         }
         var movers=course.GetComponentsInChildren<MovingSupport>();
         foreach(var mover in movers){mover.SendMessage("Start");mover.ResetPhase();}

@@ -42,6 +42,49 @@ public sealed class UpperRouteTests
         yield return new ExitPlayMode();
     }
 
+    // The cave is a secret shortcut: a fast run through it must beat a fast run along the surface
+    // between the same two banks. Both runs hold right and only jump at edges.
+    [UnityTest]
+    public IEnumerator CaveIsFasterThanTheSurfaceAtFullSpeed()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        yield return new EnterPlayMode();
+        var route = Runtime("CaveRoute");
+        var entrance = (Vector2)route.GetProperty("Entrance").GetValue(null);
+        float rejoin = ((Vector2)route.GetProperty("Rejoin").GetValue(null)).x;
+        float Run(bool cave)
+        {
+            root = new GameObject("Shortcut timing"); root.SetActive(false);
+            var course = root.AddComponent(Runtime("MovementCourse"));
+            course.GetType().GetField("LevelOne").SetValue(course, true); root.SetActive(true);
+            var cat = (Component)Get(course, "Cat");
+            ((Behaviour)cat.GetComponent(Runtime("CatInput"))).enabled = false;
+            var movers = root.GetComponentsInChildren(Runtime("MovingSupport"));
+            foreach (var mover in movers) Call(mover, "Start");
+            Call(cat, "RespawnAt", entrance);
+            var surface = new UpperLevelPhysicsPilot(course, false);
+            var shortcut = new CaveSpeedPilot(course);
+            var body = cat.GetComponent<Rigidbody2D>();
+            var oldMode = Physics2D.simulationMode; Physics2D.simulationMode = SimulationMode2D.Script;
+            try {
+                Physics2D.SyncTransforms();
+                for (int tick = 0; tick < 6000; tick++) {
+                    if (body.position.x >= rejoin && body.position.y > 4) return tick * Time.fixedDeltaTime;
+                    foreach (var mover in movers) Call(mover, "FixedUpdate");
+                    if (cave) shortcut.Command(); else surface.Command();
+                    Call(cat, "FixedUpdate"); Physics2D.Simulate(Time.fixedDeltaTime); Call(course, "Update");
+                    Assert.That((int)Get(Get(course, "Run"), "Retries"), Is.Zero, (cave ? "Cave" : "Surface") + " run fell at " + body.position);
+                }
+                Assert.Fail((cave ? "Cave" : "Surface") + " run stopped at " + body.position);
+                return 0;
+            } finally { Physics2D.simulationMode = oldMode; UnityEngine.Object.DestroyImmediate(root); }
+        }
+        float surfaceSeconds = Run(false), caveSeconds = Run(true);
+        Debug.Log($"Entrance to rejoin at full speed: surface {surfaceSeconds:F2} s, cave {caveSeconds:F2} s.");
+        Assert.That(caveSeconds, Is.LessThan(surfaceSeconds), "The cave must be the faster route.");
+        yield return new ExitPlayMode();
+    }
+
     [UnityTest]
     public IEnumerator ConnectedCaveSupportsTraversalCatchReverseWaterAndLifecycle()
     {

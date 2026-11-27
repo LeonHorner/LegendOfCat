@@ -1,5 +1,9 @@
 # Golden River upper route
 
+## Playability revision: secret shortcut, 2026-11-27
+
+A playability review found the cave could be walked end to end, nothing could fail, the waterfall pool was fake water, players entered by accident and the route was slower than the surface. Paul accepted every proposed change and chose a secret shortcut: the cave is harder and faster than the surface. The [current route, timing check and frame-time logging](golden-river-upper-route/river-channel-review/README.md) supersede the sections below. The standalone entrance study, the rejected bank-49 route code and the review media of earlier prototypes were removed. Their paintings are in `Assets/Game/Art/GoldenRiverArchive`.
+
 ## River-carved slate playtest — 2026-11-20
 
 A walkable bank descends from the main route past the fountain. Rooted shelves cross a fern-lined waterfall, and a broken spillway leads up through the daylight arch. The [Linux debug start, recordings and review notes](golden-river-upper-route/river-channel-review/README.md) describe the current candidate for issue #72.

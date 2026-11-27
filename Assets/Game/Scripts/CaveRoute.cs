@@ -35,13 +35,14 @@ public static class CaveRoute
     public static float Ceiling(float x)
     {
         if(x<18)return -8.6f;
-        if(x<34)return Mathf.Lerp(-8.6f,-8.2f,Mathf.InverseLerp(29,34,x));
+        // The first hall leaves room for a full jump from the boulder (roof raised by about one unit).
+        if(x<34)return Mathf.Lerp(Mathf.Lerp(-8.6f,-7.1f,Mathf.InverseLerp(18,24,x)),-6.9f,Mathf.InverseLerp(24,34,x));
         // The roof opens over the fountain, drops across the deep cleft, and
         // rises with the channel towards the far bank. Keep rock above the roof.
         var bay = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(34, 46, x));
         var fissure = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(58, 86, x));
         var climb = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(107, 174, x));
-        float bed = -8.2f + 2.65f * bay - 7.6f * fissure + 7.3f * climb;
+        float bed = -6.9f + 1.35f * bay - 7.6f * fissure + 7.3f * climb;
         float erosion = (.43f * Mathf.Sin(x * .27f) + .19f * Mathf.Sin(x * .81f)) * bay;
         return Mathf.Lerp(bed + erosion, -4.6f, Mathf.InverseLerp(178, 183, x));
     }

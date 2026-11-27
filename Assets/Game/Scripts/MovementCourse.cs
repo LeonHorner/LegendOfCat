@@ -348,8 +348,10 @@ public sealed class MovementCourse : MonoBehaviour
         if (LevelOne) {
             var caveRoot=new GameObject("Integrated river cave");caveRoot.SetActive(false);caveRoot.transform.SetParent(transform,false);
             caveRoot.transform.localPosition=new Vector3(CaveRoute.Origin,CaveRoute.VerticalOffset,0);
-            var cave=caveRoot.AddComponent<CaveEntryStudy>();cave.Embedded=true;caveRoot.SetActive(true);
+            var cave=caveRoot.AddComponent<CaveEntryStudy>();caveRoot.SetActive(true);
             cave.AttachToLevel(Cat,courseCamera,follow,sceneryRenderer,transform);
+            var frameLog=gameObject.AddComponent<FrameTimeLog>();frameLog.Cat=Cat.transform;
+            frameLog.InCave=coursePoint=>{var caveLocal=CaveRoute.ToLocal(coursePoint);return caveLocal.x>3&&caveLocal.x<236&&caveLocal.y< -1&&CaveRoute.IsDry(coursePoint);};
         }
         for (int i = 0; i < ActiveCheckpoints.Length; i++) {
             var point = ActiveCheckpoints[i];
@@ -368,17 +370,6 @@ public sealed class MovementCourse : MonoBehaviour
         }
         // Main-route landmarks and platform silhouettes communicate progression without floating labels.
         if (!LevelOne) Label("FINISH / return or retry", LabFinish + Vector2.up * .48f);
-    }
-    void CreateDescentFloor(Vector3 p, SceneryRenderer scenery, string name)
-    {
-        var floor = Block(name, p, new Vector2(p.z, 1.5f), Color.gray);
-        floor.GetComponent<SpriteRenderer>().enabled = false;
-        var collision = floor.AddComponent<BoxCollider2D>();
-        bool niche = p == UpperRoute.Platforms[UpperRoute.LookoutIndex];
-        float depth = niche ? 3 : .5f;
-        collision.size = new Vector2(1, depth / 1.5f);
-        collision.offset = new Vector2(0, (.75f-depth/2) / 1.5f);
-        scenery.AddDescentTerrain(p);
     }
     GameObject Block(string name, Vector2 position, Vector2 size, Color color)
     {

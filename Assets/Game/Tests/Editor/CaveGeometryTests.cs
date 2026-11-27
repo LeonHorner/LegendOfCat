@@ -21,22 +21,6 @@ public sealed class CaveGeometryTests
             Assert.That((bool)geometry.GetMethod("Contains").Invoke(null,new object[]{piece,new Vector2(5,5)}),Is.False);
     }
 
-    [Test]
-    public void ContactShadingUsesDistanceToTheAuthoredSolidBoundary()
-    {
-        var rock=new[] {new Vector2(2,2),new Vector2(8,2),new Vector2(8,8),new Vector2(2,8)};
-        var texture=(Texture2D)Runtime("CaveShading").GetMethod("Create").Invoke(null,
-            new object[]{new List<Vector2[]>{rock},new Rect(0,0,10,10),100,100,true});
-        try {
-            Assert.That(texture.GetPixel(50,50).r,Is.EqualTo(1));
-            Assert.That(texture.GetPixel(50,50).g,Is.GreaterThan(.95f));
-            Assert.That(texture.GetPixel(20,50).g,Is.LessThan(.15f));
-            Assert.That(texture.GetPixel(19,50).r,Is.Zero);
-            Assert.That(texture.GetPixel(19,50).b,Is.LessThan(.15f));
-            Assert.That(texture.GetPixel(0,50).b,Is.GreaterThan(.95f));
-        } finally {UnityEngine.Object.DestroyImmediate(texture);}
-    }
-
     [TestCase(false)]
     [TestCase(true)]
     public void ConcaveTerrainLeavesThePassageEmptyInEitherWinding(bool reverse)

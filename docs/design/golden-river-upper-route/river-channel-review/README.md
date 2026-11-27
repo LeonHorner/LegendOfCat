@@ -1,35 +1,27 @@
-# River-carved cave playtest
+# River cave playtest
 
-At ascent bank 10, walk right down the mossy slope to enter the cave, or jump from the lip to follow the surface. The slope works in both directions. Follow the dry fountain's outflow to rooted shelves above a fern-lined waterfall. A lower catch offers a way back onto the shelves. Farther along, a low stone path crosses the threshold of a broken spillway. Missing a high shelf above the seep drops Mika into a shallow gully with a walkable way to daylight. A mossy bank with level rests leads back to surface bank 39.
+The cave under Golden River is a secret shortcut between ascent banks 10 and 39. Jumping the gap at bank 10 keeps Mika on the surface, as at every other bank. Dropping off the bank edge instead lands on the dry slope into the cave.
+
+## Route, 2026-11-27 revision
+
+1. **Entrance and fountain hall.** The slope leads to a hall with a knee-high boulder to hop and the rooted fountain. The roof over the boulder is about one unit higher than before, so a full jump clears it.
+2. **Waterfall crossing.** Four shelves cross the falls: 2.4 to 3.2 units wide, with gaps of 3.4 to 4.2 units. The jumps keep about 25 to 35 percent of Mika's reach in reserve, against the Golden River target of 20 percent. A miss drops onto the catch below the shelves. A wall at the spillway closes it, so the only way on is back up the catch steps to the first shelf. The painted pool sits below the catch floor, so no water appears where Mika can fall through.
+3. **Spillway.** A short level breather past the broken spillway.
+4. **Seep shelves.** Six shelves climb toward daylight: one narrow landing, one long flat jump, rises of up to 1.5 units and one wide resting shelf. Two gullies below never lead forward. The first returns up the spillway slope. The second has a rock column back up to the wide shelf.
+5. **Daylight bank.** A hollow in the bank needs a hop out. The last climb to bank 39 is about 33 degrees, well inside the walkable limit of about 45 degrees.
+
+Over both jump sections, the camera lowers so that the floor a miss would land on is in view before takeoff.
+
+## Timing
+
+`UpperRouteTests.CaveIsFasterThanTheSurfaceAtFullSpeed` runs both routes from the bank 10 lip to bank 39. Both runs hold right and only jump at edges. The test fails unless the cave is faster. The surface run and the cave's takeoff points are in `UpperLevelPhysicsPilot` and `CaveSpeedPilot`. Scripted times prove reachability and relative speed. They are not human timings.
+
+## Frame pacing during real play
+
+Start any build with `--frame-log <folder>` and play through Golden River. On quit, `frame-times.csv` holds every frame's duration and Mika's position. `frame-summary.txt` compares the cave with the surface: median, 95th and 99th percentile, worst frame, and the number of frames over 25 ms and over 34 ms. See [the earlier camera draw measurements](performance.md) for GPU cost per view.
 
 ## Play on Linux
 
-Open a Linux cave development player directly to start at the lip. Use A/D or the arrow keys to move and Space to jump. Relaunch the executable for another entrance start. R retries from the first main checkpoint. The standard Golden River menu and the normal campaign start remain available through the regular game.
+Build the cave preview with `BuildGame.BuildLinuxCavePreview` (it also re-bakes the cave masks) and run the executable. It starts at the bank 10 lip. Use A/D or the arrow keys to move and Space to jump. R returns to the first main checkpoint. The regular game starts at the beginning.
 
-To reproduce the local executable, use the Unity version in ProjectSettings/ProjectVersion.txt with Linux standalone build support. Run the following from the project root with the Editor executable in UNITY_EDITOR. Use a project copy with its own Library when the main working copy is open in Unity. The graphics device must support the existing wide landscape panorama.
-
-```sh
-mkdir -p artifacts/cave-perf-linux
-"$UNITY_EDITOR" -batchmode -quit -projectPath "$PWD" -buildTarget Linux64 \
-  -executeMethod BuildGame.BuildLinuxCavePreview \
-  -previewOutput "$PWD/artifacts/cave-perf-linux/GoldenRiverCave.x86_64" \
-  -logFile "$PWD/artifacts/cave-perf-linux/build.log"
-./artifacts/cave-perf-linux/GoldenRiverCave.x86_64
-```
-
-## In-game evidence
-
-The two full-level recordings use real movement input and fixed-step simulation. Each frame represents four 0.02-second steps and plays at 12.5 frames per second. Both routes reach the exit with both main checkpoints.
-
-- [Cave entrance to far rejoin](cave-route.mp4), 41.20 simulated seconds.
-- [Whole level through the cave](full-cave.mp4), 5 min 39 s.
-- [Whole level along the surface](full-surface.mp4), 5 min 34 s.
-- [Missed crossing and local catch](catch.mp4), 3 s.
-- [Gameplay at 640 × 360](route-640.jpg) and [the same views in grayscale](route-640-gray.jpg). The rows show the surface reference and bank tip, both entrance lips, the descent and fountain, the waterfall and recovery catch, the spillway threshold and seep floor, the inner and outer mouth, and the climb into daylight.
-- [Surface approach](approach-960.png), [entrance](descent-entrance-960.png), [fountain](descent-niche-960.png), [waterfall](descent-risk-960.png), [spillway opening](return-bench-960.png), [exit arch](arch-foot-960.png) and [rejoin](descent-rejoin-960.png) at 960 × 540.
-
-The rounded entrance lip and grassy upper path use Golden River’s bank painting. At the far mouth a single mossy bank stands out against the valley. Mossy bedrock takes over as the descent passes into shade. A continuous fluted edge with hanging roots follows the ceiling around the far bluff. The broken spillway rests on its stone footing with the foreground path below its opening. The jumping shelves use the same root paintings and stone outlines as Golden River. Ferns, fiddleheads and bracket fungi mark the dry banks. The waterfall moves while the game runs and freezes when paused. Mika follows the incline only when the stone supports both sides of the grounded stance. The controller checks include a fall between the seep shelves, a landing at the former exit pocket and walking uphill from both. They also exercise the upper entrance path, both choices at the fork, the recovery climb, pause, retry, restart and the river’s water-entry sequence.
-
-Player review remains open for entrance discovery, perceived difficulty, first-play timing, texture continuity and the composition of the climb. Exact-head desktop packaging and merge-ready validation follow player review on the draft PR.
-
-[Linux render timings and build-size comparison](performance.md) · [Paintings, generation prompts and provenance](../river-channel-assets.json)
+Review images and recordings of earlier cave prototypes were removed on 2026-11-27 to keep the repository small. They remain in Git history at commit `02b664e`.

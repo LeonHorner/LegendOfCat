@@ -11,7 +11,7 @@ public sealed partial class CaveEntryStudy
     public void AttachToLevel(CatController cat,Camera view,CatCamera follow,SceneryRenderer scenery,Transform frame)
     {
         var started=Time.realtimeSinceStartupAsDouble;
-        Cat=cat;View=view;Follow=follow;levelFrame=frame;AddLand();
+        Cat=cat;View=view;Follow=follow;levelFrame=frame;AddEmbeddedLand();
         var presentation=cat.GetComponentInChildren<MikaSpritePresentation>();
         if (presentation) presentation.RiverbankTerrain=TerrainCollider;
         if(Debug.isDebugBuild)Debug.Log("Cave terrain startup: "+((Time.realtimeSinceStartupAsDouble-started)*1000).ToString("F1")+" ms");started=Time.realtimeSinceStartupAsDouble;
@@ -34,10 +34,20 @@ public sealed partial class CaveEntryStudy
         if(!travelling&&p.y<-.5f&&CaveRoute.IsDry(coursePosition))travelling=true;
         if(!travelling)return null;
         if(p.x<3.2f&&p.y>-.5f||p.x>235.69f&&p.y>4.9f||p.x>250){travelling=false;return null;}
-        float target=GuideHeight(p)+CaveRoute.VerticalOffset;
+        float target=GuideHeight(p)+ShelfLookDown(p)+CaveRoute.VerticalOffset;
         if(p.x>=14&&p.x<=203.5f)target=Mathf.Min(target,-10.15f);
         else if(p.x>203.5f&&p.x<210)target=Mathf.Lerp(Mathf.Min(target,-10.15f),target,Mathf.SmoothStep(0,1,Mathf.InverseLerp(203.5f,210,p.x)));
         return target;
+    }
+    // Over a jump section, frame the floor a miss would land on before takeoff.
+    // The offset fades once Mika drops into the catch, so the way back up stays in view.
+    static float ShelfLookDown(Vector2 p)
+    {
+        float waterfall=Mathf.InverseLerp(74,78,p.x)*(1-Mathf.InverseLerp(108,112,p.x));
+        waterfall*=Mathf.InverseLerp(-22.5f,-21.5f,p.y);
+        float floor=CaveTerrainLayout.AlongFace(CaveTerrainLayout.SeepGully,p.x);
+        float seep=Mathf.InverseLerp(146,149,p.x)*(1-Mathf.InverseLerp(184,186,p.x))*Mathf.InverseLerp(floor+1,floor+2,p.y);
+        return -5.2f*waterfall-2.2f*seep;
     }
     void RegisterMaterial(Material material)
     {
@@ -45,7 +55,6 @@ public sealed partial class CaveEntryStudy
         if(material.HasProperty("_TerrainStone"))material.SetTexture("_TerrainStone",Resources.Load<Texture2D>("GoldenRiver/Descent/terrain-stone-v1"));
         if(material.HasProperty("_Origin"))material.SetVector("_Origin",new Vector4(transform.position.x,transform.position.y,transform.lossyScale.x,1));
     }
-    Vector2[] EmbeddedContour(string name,Vector2[] source)=>source;
     Material RockMaterial(float shade=1)
     {
         var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/cave-rock-material"));owned.Add(material);RegisterMaterial(material);
@@ -129,9 +138,9 @@ public sealed partial class CaveEntryStudy
         Plant(1,61.1f,-13.6f,1.75f);
         Plant(0,78,-18.5f,1.7f);
         Plant(0,96,-26.5f,2.1f);
-        Plant(2,108,-20,2.6f);
-        Plant(1,150,-15,1.4f);
-        Plant(2,169,-10.9f,2.5f);
+        Plant(2,105.3f,-18.6f,2.2f);
+        Plant(1,150.3f,-14.8f,1.4f);
+        Plant(2,169.3f,-12.6f,2.5f);
         Plant(0,188,-8.14f,2.15f);
     }
     bool SolidAt(Vector2 point)

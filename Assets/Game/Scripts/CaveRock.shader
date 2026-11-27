@@ -77,6 +77,7 @@ Shader "LegendOfCat/CaveRock"
                 float2 fold=float2(world.x/46+.04*sin(world.y*.19),world.y/23+.09*cos(world.x*.10));
                 float2 rockUV=float2(.04,.09)+float2(.50,.83)*(1-abs(frac(fold*.5)*2-1));
                 fixed3 rock=tex2D(_RootWall,rockUV).rgb*1.15;
+                float stream=0;
                 if (world.x>106 && world.x<152) {
                     float2 uv=(world-float2(106,-26))/float2(46,23);
                     float roots=smoothstep(0,.16,uv.x)*(1-smoothstep(.86,1,uv.x));
@@ -90,15 +91,23 @@ Shader "LegendOfCat/CaveRock"
                     if(world.x<42) rock=lerp(baseStone(world).rgb,rock,smoothstep(33,42,world.x));
                 }
                 if (world.x>79 && world.x<113) {
-                    float2 uv=(world-float2(80,-25.3))/float2(32,16);
-                    float stream=(1-smoothstep(.011,.034,abs(uv.x-.508)))*smoothstep(.13,.18,uv.y)*(1-smoothstep(.89,.94,uv.y));
+                    // The painted pool sits below the catch floor, so no water appears where Mika can fall through.
+                    float2 uv=(world-float2(80,-29.6))/float2(32,16);
+                    stream=(1-smoothstep(.011,.034,abs(uv.x-.508)))*smoothstep(.13,.18,uv.y)*(1-smoothstep(.89,.94,uv.y));
                     float ripples=sin(uv.y*170+_StreamClock*10);
                     uv.y+=stream*ripples*.006;
-                    float3 falls=tex2D(_Falls,saturate(uv)).rgb*(1.52+stream*ripples*.16);
+                    float3 falls=tex2D(_Falls,saturate(uv)).rgb*(1.3+stream*(.22+ripples*.16));
                     float grotto=smoothstep(0,.17,uv.x+seam)*(1-smoothstep(.82,1,uv.x+seam));
                     grotto*=smoothstep(-.045,.08,uv.y)*(1-smoothstep(.93,1.05,uv.y));
                     rock=lerp(rock,falls,grotto);
+                    stream*=grotto;
                 }
+                // Keep the backdrop quieter than the playable stone: lift black voids to a dim
+                // violet wall, then mute colour so painted moss never reads as a ledge.
+                float luma=dot(rock,float3(.299,.587,.114));
+                rock+=float3(.15,.13,.21)*(1-smoothstep(.04,.3,luma));
+                luma=dot(rock,float3(.299,.587,.114));
+                rock=lerp(rock,lerp(luma.xxx,rock,.62)*.9,1-stream);
                 float opening=world.x+.65*sin(world.y*1.1)+.24*sin(world.y*2.3);
                 float alpha=1-smoothstep(197.5,205,opening);
                 clip(alpha-.015);

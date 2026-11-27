@@ -96,7 +96,6 @@ public sealed partial class StarterScreen
 
     void OnGUI()
     {
-        if (entryStudy != null) return;
         if (course != null || stompArena != null || rangedArena != null) {
             DrawRunTimer(ActiveRun.ElapsedSeconds);
             DrawGameplayMenu();
@@ -443,7 +442,6 @@ public sealed partial class StarterScreen
     void OnDestroy()
     {
         if (course != null) { course.gameObject.SetActive(false); Destroy(course.gameObject); }
-        if (entryStudy != null) { entryStudy.gameObject.SetActive(false); Destroy(entryStudy.gameObject); }
         if (stompArena != null) { stompArena.gameObject.SetActive(false); Destroy(stompArena.gameObject); }
         if (rangedArena != null) { rangedArena.gameObject.SetActive(false); Destroy(rangedArena.gameObject); }
         foreach (var texture in new[] { panelTexture, buttonTexture, hoverTexture, focusTexture, runClockHand })

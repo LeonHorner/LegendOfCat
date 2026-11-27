@@ -19,30 +19,33 @@ public static class CaveTerrainLayout
         public Section(string name,Vector2[] outline,params Vector3[] treads){Name=name;Outline=outline;Treads=treads;}
     }
     public static readonly Vector3[] Floors={
-        // A flood bench breaks into shorter shelves above the concealed catch.
+        // A flood bench breaks into shorter shelves above the fountain outflow.
         new Vector3(58.7f,-13.6f,7.6f), new Vector3(68,-15,4.9f),
         new Vector3(74,-16.6f,3), new Vector3(77,-18.5f,4),
-        new Vector3(83,-20,5), new Vector3(89,-21.3f,4), new Vector3(95.5f,-20,4.5f),
-        new Vector3(103,-20,3), new Vector3(107.5f,-20,4.8f),
-        // Climb the inside of the abandoned channel. Broad benches interrupt the precision jumps.
-        new Vector3(113.7f,-18.7f,3.9f), new Vector3(119.1f,-17.35f,6.5f),
+        // Four precise shelves cross the waterfall. A miss drops onto the catch and costs a climb back.
+        new Vector3(85.2f,-19.9f,2.8f), new Vector3(92,-19.9f,2.4f),
+        new Vector3(97.8f,-18.6f,3.2f), new Vector3(104.8f,-18.6f,3),
+        // The spillway path is a short level breather.
+        new Vector3(111.6f,-18.7f,6), new Vector3(119.1f,-17.35f,6.5f),
         new Vector3(127,-15.95f,3.6f), new Vector3(132,-16.05f,7.2f),
-        new Vector3(141,-16.1f,4.4f), new Vector3(147,-15,4.2f),
-        new Vector3(152.6f,-13.65f,6.8f), new Vector3(160.7f,-12.25f,3.8f),
-        new Vector3(165.8f,-10.9f,6.4f), new Vector3(173.5f,-9.6f,6),
-        new Vector3(181,-8.14f,4), new Vector3(187,-8.14f,5.6f),
-        new Vector3(194,-9.54f,4.4f), new Vector3(199.6f,-8.14f,3.4f),
-        new Vector3(204.18f,-6.65f,1.8f), new Vector3(214,-3.5f,3.6f),
-        new Vector3(219,-2.15f,3.7f), new Vector3(224,-.85f,3.1f),
-        new Vector3(235.69f,5.205f,10)
+        new Vector3(141,-16.1f,4.4f),
+        // Six varied seep shelves climb to daylight over two separate gullies.
+        new Vector3(148.8f,-14.8f,2.8f), new Vector3(155.7f,-14.8f,2.4f),
+        new Vector3(161.4f,-13.3f,3), new Vector3(168,-12.6f,4.6f),
+        new Vector3(176,-11.1f,2.6f), new Vector3(181.4f,-9.6f,2.8f),
+        new Vector3(187,-8.14f,5.6f), new Vector3(193.4f,-9.7f,3.8f),
+        new Vector3(198.4f,-8.14f,4), new Vector3(204.18f,-6.65f,1.8f),
+        new Vector3(214,-3.5f,3.6f), new Vector3(219,-2.15f,3.7f),
+        new Vector3(223.6f,-.85f,2), new Vector3(235.69f,5.205f,10)
     };
     public static readonly Vector3[] Recovery={new Vector3(96.1f,CatchHeight,7.9f),new Vector3(91.7f,-25.2f,2.3f),
         new Vector3(87,-23.9f,3),new Vector3(84,-22.6f,1),new Vector3(77.8f,-21.3f,4.4f)};
     public static readonly Vector2[][] RecoveryAir={Box(78,-28,27,8.5f)};
-    public static readonly Vector2[] LeftShore=RoundWetShore(new[]{new Vector2(-2.65f,-.045f),new Vector2(2.45f,-.045f),
-        new Vector2(2.75f,-.058f),new Vector2(3.05f,-.11f),new Vector2(3.35f,-.21f),
-        new Vector2(3.7f,-.38f),new Vector2(4.1f,-.64f),new Vector2(5,-1.37f),
-        new Vector2(8,-3.85f), new Vector2(12,-6.95f), new Vector2(16,-9.57f),
+    public static readonly Vector2[] LeftShore=RoundWetShore(new[]{new Vector2(-2.65f,-.045f),new Vector2(2.9f,-.045f),
+        // A clear bank edge, like every other surface gap. Only a deliberate drop finds the cave.
+        new Vector2(3.05f,-.1f),new Vector2(3.15f,-.35f),new Vector2(3.2f,-.8f),
+        new Vector2(3.26f,-1.3f),new Vector2(3.45f,-1.6f),new Vector2(3.9f,-1.8f),new Vector2(5,-2.2f),
+        new Vector2(8,-3.95f), new Vector2(12,-6.95f), new Vector2(16,-9.57f),
         new Vector2(18.5f,-11.46f), new Vector2(19.7f,-12), new Vector2(20.34f,-12),new Vector2(20.34f,Bottom),new Vector2(-14,Bottom),
         new Vector2(-14,-7),new Vector2(-11.8f,-6.4f),new Vector2(-10.6f,-5.9f),new Vector2(-10.1f,-5.4f),
         new Vector2(-9.7f,-5.3f),new Vector2(-9.1f,-4.9f),new Vector2(-8.9f,-4.4f),new Vector2(-8.2f,-4.2f),
@@ -96,7 +99,7 @@ public static class CaveTerrainLayout
         new Vector2(5.99f,.64f),new Vector2(5.98f,.48f),new Vector2(6.12f,.23f),
         new Vector2(6.45f,.02f),new Vector2(7,-.18f),new Vector2(8,-.55f),new Vector2(10,-1.8f),
         new Vector2(12,-3.45f),new Vector2(14,-4.4f),new Vector2(16,-5.6f),new Vector2(18,-6.7f),
-        new Vector2(20,-7.3f),new Vector2(24,-8.2f),new Vector2(29,-8.6f),new Vector2(34,-8.2f)},1.4f);
+        new Vector2(20,-7.3f),new Vector2(24,-7.1f),new Vector2(29,-7f),new Vector2(34,-6.9f)},1.4f);
     public static readonly Vector2[] DaylightSoffit=RoundedEdge(new[] {
         new Vector2(183,-4.6f),new Vector2(187.8f,-4.71f),new Vector2(192,-4.88f),
         new Vector2(198,-4.54f),new Vector2(202.4f,-4.66f),new Vector2(204.35f,-4.43f),
@@ -139,13 +142,22 @@ public static class CaveTerrainLayout
     }
     // Broad rests divide the outer bank into a shaded hollow, the daylight sill and the last climb.
     public static readonly Vector2[] ExitBank=RoundedEdge(new[] {
-        new Vector2(188,-8.14f),new Vector2(192.6f,-8.14f),new Vector2(195,-9.54f),
-        new Vector2(198.4f,-9.54f),new Vector2(200.4f,-8.14f),new Vector2(202.7f,-8.14f),
+        new Vector2(188,-8.14f),new Vector2(192.6f,-8.14f),new Vector2(193,-9.7f),
+        new Vector2(197.6f,-9.7f),new Vector2(198,-8.14f),new Vector2(202.7f,-8.14f),
         new Vector2(205.12f,-6.65f),new Vector2(206.2f,-6.65f),new Vector2(208,-6.05f),
         new Vector2(212.4f,-3.88f),new Vector2(214,-3.5f),new Vector2(217.1f,-3.5f),
         new Vector2(219.5f,-2.15f),new Vector2(222.1f,-2.15f),new Vector2(224.5f,-.85f),
-        new Vector2(227.1f,-.85f),new Vector2(228.4f,-.35f),new Vector2(233.8f,4.46f),
+        // The last climb stays near 33 degrees, well inside the walkable slope limit.
+        new Vector2(225.6f,-.7f),new Vector2(233.2f,4.3f),
         new Vector2(235.69f,5.205f),new Vector2(245.69f,5.205f)},.9f);
+    // Two gullies under the seep shelves. Neither leads forward: the first returns up the
+    // spillway slope, the second climbs a rock column back to the widest shelf.
+    public static readonly Vector2[] SeepGully={
+        new Vector2(145.4f,-16.1f),new Vector2(149,-18.55f),new Vector2(153,-18.4f),new Vector2(158,-17.7f),
+        new Vector2(164.6f,-17.6f),new Vector2(164.9f,-14.9f),new Vector2(165.3f,-14.6f),new Vector2(167,-14.6f),
+        new Vector2(167.2f,-14.9f),new Vector2(167.6f,-16.4f),
+        new Vector2(172,-16.1f),new Vector2(178,-15.3f),new Vector2(184.4f,-14.6f),
+        new Vector2(184.6f,-9.6f),new Vector2(184.75f,-9.55f),ExitBank[0]};
 
     // Adjacent banks share endpoints, so both the painted rim and the collider continue across each join.
     static Section ChannelBed(string name,params Vector2[] crest)
@@ -160,8 +172,8 @@ public static class CaveTerrainLayout
         var result=new List<Section>{ApproachShore(),new Section("Entrance shore",LeftShore),
             new Section("Massive entrance overhang",EntryRoof)};
         result.Add(ChannelBed("Fountain channel bed",new Vector2(20.34f,-12),
-            new Vector2(24.8f,-12),new Vector2(26.7f,-12.78f),new Vector2(29.1f,-12.78f),
-            new Vector2(30.85f,-12),new Vector2(35.5f,-12),new Vector2(36.65f,-12.3f),
+            new Vector2(25.2f,-12),new Vector2(25.9f,-10.95f),new Vector2(28.5f,-10.95f),
+            new Vector2(29.2f,-12),new Vector2(35.5f,-12),new Vector2(36.65f,-12.3f),
             new Vector2(37.9f,-12.3f),new Vector2(39.5f,-12.67f),new Vector2(56.1f,-12.67f),
             new Vector2(58.1f,-13.6f),new Vector2(60.2f,-13.6f),new Vector2(64,-15),new Vector2(66,-17.4f),new Vector2(71,-16.4f),
             new Vector2(73,-18.05f),new Vector2(77.8f,-21.3f)));
@@ -186,14 +198,12 @@ public static class CaveTerrainLayout
         }
         result.Add(ChannelBed("Lower catch footing",catchEdge.ToArray()));
         result.Add(ChannelBed("Spillway bank",
-            new Vector2(104,CatchHeight),new Vector2(107,-25.6f),new Vector2(111,-22.8f),new Vector2(115.75f,-18.7f),
-            new Vector2(117.6f,-18.7f),new Vector2(120,-17.35f),new Vector2(125.3f,-17.35f),
+            new Vector2(104,CatchHeight),new Vector2(104.3f,-22.4f),new Vector2(105.2f,-21.9f),new Vector2(109.6f,-21.9f),
+            new Vector2(110,-20.4f),new Vector2(111,-20.4f),new Vector2(111.4f,-18.7f),new Vector2(117.6f,-18.7f),new Vector2(120,-17.35f),new Vector2(125.3f,-17.35f),
             new Vector2(127.7f,-15.95f),new Vector2(130.6f,-15.95f),new Vector2(133.2f,-16.12f),
             new Vector2(138.7f,-16.05f),new Vector2(141.8f,-16.22f),new Vector2(145.4f,-16.1f)));
         result.Add(ChannelBed("Upper seep bank",
-            new Vector2(145.4f,-16.1f),new Vector2(149,-18.55f),new Vector2(153,-18.25f),new Vector2(158,-16.1f),
-            new Vector2(161.4f,-16.85f),new Vector2(164,-16.75f),new Vector2(168.8f,-14.8f),
-            new Vector2(175,-13.55f),new Vector2(181,-12.35f),new Vector2(184.5f,-11.4f),ExitBank[0]));
+            SeepGully));
         foreach (var tread in Floors)
             if (tread.x<113 || tread.x>=147 && tread.x<187) result.Add(RootShelf(tread));
         var exitOutline=new List<Vector2>(ExitBank);
@@ -212,18 +222,30 @@ public static class CaveTerrainLayout
     }
     public static List<Vector3> Path()
     {
-        var result=new List<Vector3>{new Vector3(2.6f,-.045f,0),new Vector3(21.9f,-12,0),new Vector3(28.4f,-12.78f,0),new Vector3(34,-12,1),new Vector3(37.5f,-12.3f,0),
-            new Vector3(44,-12.67f,0),new Vector3(55.8f,-12.67f,0)};
-        float previous=-12.67f,end=57.106f;
-        for(int i=0;i<Floors.Length;i++){var p=Floors[i];bool right=i+1==Floors.Length||Floors[i+1].x>=p.x;
-            float target=right?p.x+p.z-.7f:p.x+.7f;
-            bool jump=p.y>previous+.15f||Mathf.Abs(p.y-previous)<.15f&&p.x>end+.1f;
+        var result=new List<Vector3>{new Vector3(2.6f,-.045f,0),new Vector3(21.9f,-12,0),new Vector3(23.6f,-12,0),new Vector3(27.8f,-10.95f,1),
+            new Vector3(34,-12,0),new Vector3(37.5f,-12.3f,0),new Vector3(44,-12.67f,0),new Vector3(55.8f,-12.67f,0)};
+        float previous=-12.67f,end=57.106f,previousTarget=55.8f;
+        for(int i=0;i<Floors.Length;i++){var p=Floors[i];
+            float target=p.x+p.z-.7f;
+            // Jump up, or across any gap wider than a walk-off clears.
+            bool jump=p.y>previous+.15f||p.x>end+1.5f||Mathf.Abs(p.y-previous)<.15f&&p.x>end+.1f;
             if (p.x>=113 && p.x<147) jump=false;
             if (p.x>=187) {
                 target=p.x+p.z*.5f;
-                result.Add(new Vector3(target,AlongFace(ExitBank,target),0));
+                result.Add(new Vector3(target,AlongFace(ExitBank,target),MaxSlope(ExitBank,previousTarget,target)>46?1:0));
             } else result.Add(new Vector3(target,p.y,jump?1:0));
-            previous=p.y;end=p.x+p.z;}
+            previous=p.y;end=p.x+p.z;previousTarget=target;}
         var exit=CaveRoute.ToLocal(CaveRoute.Rejoin);result.Add(new Vector3(exit.x,exit.y-.52f,0));return result;
+    }
+    // Steepest rising segment, in degrees, between two positions along a face.
+    public static float MaxSlope(Vector2[] face,float from,float to)
+    {
+        float steepest=0;
+        for(int i=1;i<face.Length;i++){
+            var a=face[i-1];var b=face[i];
+            if(b.x<=from||a.x>=to||b.x-a.x<.0001f)continue;
+            steepest=Mathf.Max(steepest,Mathf.Atan2(b.y-a.y,b.x-a.x)*Mathf.Rad2Deg);
+        }
+        return steepest;
     }
 }

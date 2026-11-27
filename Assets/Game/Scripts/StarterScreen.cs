@@ -35,7 +35,6 @@ public sealed partial class StarterScreen : MonoBehaviour
     long downloadedBytes, totalBytes;
     Vector2 scroll;
     MovementCourse course;
-    CaveEntryStudy entryStudy;
     StompArena stompArena;
     RangedArena rangedArena;
     RunLifecycle ActiveRun => course != null ? course.Run : rangedArena != null ? rangedArena.Run : stompArena.Run;
@@ -339,15 +338,11 @@ public sealed partial class StarterScreen : MonoBehaviour
                 course.TogglePause();
             }
         }
-        else if(view=="cave-entry-study") {
-            entryStudy=new GameObject("Cave entrance review").AddComponent<CaveEntryStudy>();
-            entryStudy.BackToMenu=()=>{entryStudy.gameObject.SetActive(false);Destroy(entryStudy.gameObject);entryStudy=null;page="menu";lastPage=null;};
-        }
-        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale" || view == "level-one-garden" || view == "level-one-descent") {
+        else if (view == "level-one" || view == "level-one-ascent" || view == "level-one-lift" || view == "level-one-finale" || view == "level-one-descent") {
             OpenLevelOne();
             if (view == "level-one-finale") course.StartFinalePreview();
             if (view == "level-one-ascent") course.StartAscentPreview();
-            if (view == "level-one-garden" || view == "level-one-descent") course.StartDescentPreview();
+            if (view == "level-one-descent") course.StartDescentPreview();
             if (view == "level-one-lift") course.StartVerticalLiftPreview();
         }
         else if (view == "menu" || view == "settings" || view == "play") page = view;
