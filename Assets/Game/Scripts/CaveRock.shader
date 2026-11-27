@@ -77,6 +77,7 @@ Shader "LegendOfCat/CaveRock"
                 float2 fold=float2(world.x/46+.04*sin(world.y*.19),world.y/23+.09*cos(world.x*.10));
                 float2 rockUV=float2(.04,.09)+float2(.50,.83)*(1-abs(frac(fold*.5)*2-1));
                 fixed3 rock=tex2D(_RootWall,rockUV).rgb*1.15;
+                float stream=0;
                 if (world.x>106 && world.x<152) {
                     float2 uv=(world-float2(106,-26))/float2(46,23);
                     float roots=smoothstep(0,.16,uv.x)*(1-smoothstep(.86,1,uv.x));
@@ -90,19 +91,30 @@ Shader "LegendOfCat/CaveRock"
                     if(world.x<42) rock=lerp(baseStone(world).rgb,rock,smoothstep(33,42,world.x));
                 }
                 if (world.x>79 && world.x<113) {
-                    float2 uv=(world-float2(80,-25.3))/float2(32,16);
-                    float stream=(1-smoothstep(.011,.034,abs(uv.x-.508)))*smoothstep(.13,.18,uv.y)*(1-smoothstep(.89,.94,uv.y));
+                    // The painted pool sits below the catch floor, so no water appears where Mika can fall through.
+                    float2 uv=(world-float2(80,-29.6))/float2(32,16);
+                    stream=(1-smoothstep(.011,.034,abs(uv.x-.508)))*smoothstep(.13,.18,uv.y)*(1-smoothstep(.89,.94,uv.y));
                     float ripples=sin(uv.y*170+_StreamClock*10);
                     uv.y+=stream*ripples*.006;
-                    float3 falls=tex2D(_Falls,saturate(uv)).rgb*(1.52+stream*ripples*.16);
+                    float3 falls=tex2D(_Falls,saturate(uv)).rgb*(1.3+stream*(.22+ripples*.16));
                     float grotto=smoothstep(0,.17,uv.x+seam)*(1-smoothstep(.82,1,uv.x+seam));
                     grotto*=smoothstep(-.045,.08,uv.y)*(1-smoothstep(.93,1.05,uv.y));
                     rock=lerp(rock,falls,grotto);
+                    stream*=grotto;
                 }
-                float opening=world.x+.65*sin(world.y*1.1)+.24*sin(world.y*2.3);
-                float alpha=1-smoothstep(197.5,205,opening);
-                clip(alpha-.015);
-                return fixed4(rock,alpha);
+                // Keep the backdrop quieter than the playable stone: lift black voids to a dim
+                // violet wall, then mute colour so painted moss never reads as a ledge.
+                float luma=dot(rock,float3(.299,.587,.114));
+                rock+=float3(.15,.13,.21)*(1-smoothstep(.04,.3,luma));
+                luma=dot(rock,float3(.299,.587,.114));
+                rock=lerp(rock,lerp(luma.xxx,rock,.62)*.9,1-stream);
+                // Daylight from the mouth warms the last few metres of wall. The wall itself
+                // stays solid; the opening is cut by its outline, not faded.
+                float spill=smoothstep(194,205,world.x);
+                rock=lerp(rock,rock*float3(1.45,1.3,1.05)+float3(.05,.04,.01),spill*.8);
+                // The wall is dark, so the glow is added as light, strongest at the opening.
+                rock+=float3(.34,.23,.10)*spill*spill*(1-smoothstep(-6,-2,world.y)*.5);
+                return fixed4(rock,1);
             }
 
             fixed4 frag(Output i):SV_Target{
@@ -129,7 +141,8 @@ Shader "LegendOfCat/CaveRock"
                 float other=frac(phase+.5);
                 float blend=smoothstep(.04,.22,min(phase,1-phase));
                 float left=i.world.x-_BankEnds.x, right=_BankEnds.y-i.world.x;
-                float endDist=min(left,right);
+                // A buried start (z>0) has no painted end: it fades into the rock over z metres.
+                float endDist=_BankEnds.z>0 ? right : min(left,right);
                 float sheltered=(1-smoothstep(-10,-1.8,i.world.y-i.uv.y))*smoothstep(.15,1.45,endDist);
                 fixed4 bank=0;
                 if (sheltered<1) {
@@ -148,7 +161,8 @@ Shader "LegendOfCat/CaveRock"
                 }
                 clip(bank.a-.40);
                 float depth=i.uv.y+.17*sin(i.world.x*1.2);
-                c=fixed4(bank.rgb,bank.a*smoothstep(-2.36,-.95,depth)*smoothstep(0,min(.65,i.limit),i.uv.y+i.limit));
+                float buried=_BankEnds.z>0 ? smoothstep(0,_BankEnds.z,left) : 1;
+                c=fixed4(bank.rgb,bank.a*buried*smoothstep(-2.36,-.95,depth)*smoothstep(0,min(.65,i.limit),i.uv.y+i.limit));
                 clip(c.a-.025);
             #elif defined(CAVE_WALL)
                 c=chamber(i.world);
@@ -166,8 +180,11 @@ Shader "LegendOfCat/CaveRock"
                         c.rgb=lerp(baseRock.rgb,c.rgb,feather*detail);
                     }
                 }
-                if(_Alcove>.5)
+                if(_Alcove>.5) {
                     c.rgb=lerp(c.rgb,baseRock.rgb,smoothstep(18,34,i.world.x));
+                    // Hand over to the chamber wall behind instead of ending at a hard vertical edge.
+                    c.a*=1-smoothstep(29,35.6,i.world.x);
+                }
                 if(_Cutout>.5)clip(c.a-.95);
             #endif
                 float shade=1-smoothstep(-10,-1,i.world.y);

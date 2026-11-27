@@ -11,7 +11,7 @@ public sealed partial class CaveEntryStudy
     public void AttachToLevel(CatController cat,Camera view,CatCamera follow,SceneryRenderer scenery,Transform frame)
     {
         var started=Time.realtimeSinceStartupAsDouble;
-        Cat=cat;View=view;Follow=follow;levelFrame=frame;AddLand();
+        Cat=cat;View=view;Follow=follow;levelFrame=frame;AddEmbeddedLand();
         var presentation=cat.GetComponentInChildren<MikaSpritePresentation>();
         if (presentation) presentation.RiverbankTerrain=TerrainCollider;
         if(Debug.isDebugBuild)Debug.Log("Cave terrain startup: "+((Time.realtimeSinceStartupAsDouble-started)*1000).ToString("F1")+" ms");started=Time.realtimeSinceStartupAsDouble;
@@ -34,10 +34,20 @@ public sealed partial class CaveEntryStudy
         if(!travelling&&p.y<-.5f&&CaveRoute.IsDry(coursePosition))travelling=true;
         if(!travelling)return null;
         if(p.x<3.2f&&p.y>-.5f||p.x>235.69f&&p.y>4.9f||p.x>250){travelling=false;return null;}
-        float target=GuideHeight(p)+CaveRoute.VerticalOffset;
+        float target=GuideHeight(p)+ShelfLookDown(p)+CaveRoute.VerticalOffset;
         if(p.x>=14&&p.x<=203.5f)target=Mathf.Min(target,-10.15f);
         else if(p.x>203.5f&&p.x<210)target=Mathf.Lerp(Mathf.Min(target,-10.15f),target,Mathf.SmoothStep(0,1,Mathf.InverseLerp(203.5f,210,p.x)));
         return target;
+    }
+    // Over a jump section, frame the floor a miss would land on before takeoff.
+    // The offset fades once Mika drops into the catch, so the way back up stays in view.
+    static float ShelfLookDown(Vector2 p)
+    {
+        float waterfall=Mathf.InverseLerp(74,78,p.x)*(1-Mathf.InverseLerp(108,112,p.x));
+        waterfall*=Mathf.InverseLerp(-22.5f,-21.5f,p.y);
+        float floor=CaveTerrainLayout.AlongFace(CaveTerrainLayout.SeepGully,p.x);
+        float seep=Mathf.InverseLerp(146,149,p.x)*(1-Mathf.InverseLerp(184,186,p.x))*Mathf.InverseLerp(floor+1,floor+2,p.y);
+        return -5.2f*waterfall-2.2f*seep;
     }
     void RegisterMaterial(Material material)
     {
@@ -45,7 +55,6 @@ public sealed partial class CaveEntryStudy
         if(material.HasProperty("_TerrainStone"))material.SetTexture("_TerrainStone",Resources.Load<Texture2D>("GoldenRiver/Descent/terrain-stone-v1"));
         if(material.HasProperty("_Origin"))material.SetVector("_Origin",new Vector4(transform.position.x,transform.position.y,transform.lossyScale.x,1));
     }
-    Vector2[] EmbeddedContour(string name,Vector2[] source)=>source;
     Material RockMaterial(float shade=1)
     {
         var material=new Material(Resources.Load<Material>("GoldenRiver/Descent/cave-rock-material"));owned.Add(material);RegisterMaterial(material);
@@ -82,26 +91,33 @@ public sealed partial class CaveEntryStudy
             var item=new GameObject(section.Name+" collision source");item.transform.SetParent(transform,false);
             var collider=item.AddComponent<PolygonCollider2D>();collider.points=section.Outline;collider.compositeOperation=Collider2D.CompositeOperation.Merge;
         }
-        TerrainCollider.GenerateGeometry();Physics2D.SyncTransforms();AddEntranceDetails();AddAuthoredEntrance();AddExposedGrass();AddPaintedBanks();AddCaveMargins();
+        TerrainCollider.GenerateGeometry();Physics2D.SyncTransforms();AddExposedGrass();AddPaintedBanks();AddCaveMargins();
         var background=RockMaterial(.52f);
         grottoWall = background;
         background.SetTexture("_Falls", Resources.Load<Texture2D>("GoldenRiver/Descent/fern-falls"));
         background.EnableKeyword("CAVE_WALL");
         background.SetTexture("_RootWall", Resources.Load<Texture2D>("GoldenRiver/Descent/rooted-channel-wall"));
         background.SetTexture("_Fissure", Resources.Load<Texture2D>("GoldenRiver/Descent/fountain-fissure-wall"));
-        // The opaque interior writes depth before Unity draws the surface panoramas behind it.
-        // Only the last few metres need transparency to reveal the valley.
-        const float daylightStart=196.5f;
-        var rear=new[]{new Vector2(8,-42),new Vector2(daylightStart,-42),new Vector2(daylightStart,-4.5f),new Vector2(34,-4.5f),
+        // The back wall stays solid up to a ragged mouth just inside the exit bluff, so the cave
+        // ends at a clear rock opening and the valley is only seen through it.
+        var mouthEdge=new[]{new Vector2(205.45f,-12),new Vector2(205.2f,-9.3f),new Vector2(205.55f,-8.2f),
+            new Vector2(205.05f,-7.1f),new Vector2(205.3f,-6.2f),new Vector2(204.85f,-5.3f),new Vector2(204.95f,-4.6f),new Vector2(204.6f,-4.5f)};
+        var rear=new List<Vector2>{new Vector2(8,-42),new Vector2(205.45f,-42)};
+        rear.AddRange(mouthEdge);
+        rear.AddRange(new[]{new Vector2(34,-4.5f),
             new Vector2(18,-8.4f),new Vector2(14,-6.8f),new Vector2(12.3f,-5.7f),new Vector2(11.8f,-6.1f),
             new Vector2(11.5f,-6.5f),new Vector2(11.1f,-6.4f),new Vector2(10.8f,-6.8f),new Vector2(10.2f,-7.2f),
             new Vector2(10.4f,-7.6f),new Vector2(10,-7.9f),new Vector2(9.7f,-8.2f),new Vector2(9.8f,-8.7f),
-            new Vector2(9.4f,-8.9f),new Vector2(9,-9.1f),new Vector2(9.1f,-9.5f),new Vector2(8.8f,-9.7f),new Vector2(8.7f,-10.1f),new Vector2(8,-10.5f)};
-        MeshObject("Permanent recessed cave rock",rear,new Rect(0,0,24,24),2,background);
-        var daylight=new Material(background){renderQueue=(int)UnityEngine.Rendering.RenderQueue.Transparent};
-        owned.Add(daylight);
-        var mouth=Rect.MinMaxRect(daylightStart,-42,206,-4.5f);
-        MeshObject("Daylight behind the exit bank",Rectangle(mouth),mouth,2,daylight);
+            new Vector2(9.4f,-8.9f),new Vector2(9,-9.1f),new Vector2(9.1f,-9.5f),new Vector2(8.8f,-9.7f),new Vector2(8.7f,-10.1f),new Vector2(8,-10.5f)});
+        MeshObject("Permanent recessed cave rock",rear.ToArray(),new Rect(0,0,24,24),2,background);
+        // A boulder lip frames the opening against the daylight.
+        var lip=RockMaterial(.85f);
+        lip.mainTexture=Resources.Load<Texture2D>("GoldenRiver/Descent/mossy-bedrock");
+        lip.EnableKeyword("CAVE_RIM");
+        lip.SetFloat("_RockMargin",1);
+        lip.renderQueue=2450;
+        var lipLine=new List<Vector2>(mouthEdge);lipLine.Reverse();
+        DrawRockEdge(lipLine,lip,false,1.9f,1.3f);
         Painting("Disused spring spillway",new Rect(125.9f,-16.8f,14.4f,7.2f),1.45f,"GoldenRiver/Descent/old-spillway");
         AddUnderstory();
         AddRecessedMouth();
@@ -129,29 +145,21 @@ public sealed partial class CaveEntryStudy
         Plant(1,61.1f,-13.6f,1.75f);
         Plant(0,78,-18.5f,1.7f);
         Plant(0,96,-26.5f,2.1f);
-        Plant(2,108,-20,2.6f);
-        Plant(1,150,-15,1.4f);
-        Plant(2,169,-10.9f,2.5f);
+        Plant(2,105.3f,-18.6f,2.2f);
+        Plant(1,150.3f,-14.8f,1.4f);
+        Plant(2,169.3f,-12.6f,2.5f);
         Plant(0,188,-8.14f,2.15f);
     }
     bool SolidAt(Vector2 point)
     {
         foreach(var section in terrain)if(CaveRoute.Contains(section.Outline,point))return true;return false;
     }
-    void AddAuthoredEntrance()
-    {
-        // These paintings are registered to the solid outlines, never to the camera.
-        // They supply whole cliff faces instead of repeating a small material patch.
-        var frame = new Rect(5.5f,-9,18,11);
-        var material = RockMaterial();
-        material.mainTexture = Resources.Load<Texture2D>("GoldenRiver/Descent/concept-entry-roof-v1");
-        material.SetFloat("_WorldMapped",0); material.SetFloat("_Cutout",1); material.SetFloat("_AuthoredFace",1);
-        MeshObject("Authored overhang",CaveTerrainLayout.EntryRoof,frame,-3.045f,material);
-    }
     void AddRecessedMouth()
     {
         var texture=Resources.Load<Texture2D>("GoldenRiver/Descent/concept-entry-recess-v1");if(!texture)return;
-        var material=RockMaterial(.52f);material.SetFloat("_Alcove",1);material.mainTexture=texture;material.SetFloat("_WorldMapped",0);
+        var material=RockMaterial(.52f);material.SetFloat("_Alcove",1);
+        // Drawn after the chamber wall, so its faded right edge blends onto that wall.
+        material.renderQueue=2001;material.mainTexture=texture;material.SetFloat("_WorldMapped",0);
         // The upper seam runs inside the opaque roof, rather than cutting across the
         // opening at a fixed height. The outer flank is permanent and behind Mika.
         var outline=new[]{new Vector2(5.9f,-24),new Vector2(36,-24),new Vector2(36,-7.8f),new Vector2(24,-7.9f),
@@ -159,19 +167,6 @@ public sealed partial class CaveEntryStudy
             new Vector2(10,-1.55f),new Vector2(8,-.35f),new Vector2(7,.03f),new Vector2(6.4f,.32f),
             new Vector2(6.7f,-1.4f),new Vector2(6.8f,-4.5f),new Vector2(6.1f,-8),new Vector2(5.9f,-11.6f)};
         MeshObject("Layered recessed entrance alcove",outline,new Rect(5.9f,-20,30.1f,20.06667f),1.8f,material);
-    }
-    void AddEntranceDetails()
-    {
-        var frames=CaveTerrainLayout.EntranceFrames;
-        foreach(int i in CaveTerrainLayout.PaintedEntranceModules){
-            var texture=Resources.Load<Texture2D>("GoldenRiver/Descent/entry-module-"+i+"-v1");if(!texture)continue;
-            var material=RockMaterial();material.mainTexture=texture;material.SetFloat("_WorldMapped",0);material.SetFloat("_Cutout",1);
-            var outline=CaveTerrainLayout.EntryRoof;
-            var boundary=Resources.Load<Texture2D>("GoldenRiver/Descent/entry-boundary-"+i+"-v1");
-            if(!boundary){boundary=EntranceBoundary(outline,frames[i]);owned.Add(boundary);}
-            material.SetTexture("_EdgeMask",boundary);
-            MeshObject("Native entrance stone module "+i,outline,frames[i],-3.01f-i*.001f,material);
-        }
     }
     public static Texture2D EntranceBoundary(Vector2[] outline,Rect frame,bool readable=false)
     {
@@ -193,7 +188,7 @@ public sealed partial class CaveEntryStudy
     void AddExposedGrass()
     {
         var exposed=new List<Vector3>();
-        foreach(var section in terrain)if(section.Shelf==null && section.Name!="Connected approach shore")foreach(var tread in section.Treads){
+        foreach(var section in terrain)if(section.Shelf==null && section.Name!="Connected approach shore" && section.Name!="Main exit cliff")foreach(var tread in section.Treads){
             var cuts=new List<float>{tread.x,tread.x+tread.z};float line=tread.y+.005f;
             foreach(var solid in terrain)for(int i=0;i<solid.Outline.Length;i++){
                 var a=solid.Outline[i];var b=solid.Outline[(i+1)%solid.Outline.Length];
@@ -227,15 +222,22 @@ public sealed partial class CaveEntryStudy
         bed.EnableKeyword("CAVE_RIM");
         bed.SetFloat("_RockMargin",1);
         bed.renderQueue=2450;
+        // Adjoining beds continue one texture run, so no seam appears where two banks meet.
+        float run=0;Vector2? joint=null;
         foreach (var section in terrain)
-            if (section.ExposedBed!=null) DrawRockEdge(section.ExposedBed,bed,false,-3.025f);
+            if (section.ExposedBed!=null) {
+                var line=section.ExposedBed;
+                if(joint==null||(line[0]-joint.Value).sqrMagnitude>.0001f)run=line[0].x;
+                run=DrawRockEdge(line,bed,false,-3.025f,3.55f,run);
+                joint=line[line.Length-1];
+            }
         // This inset ledge seats the entire ruined drain behind the playable shelves.
         var plinth=new[]{new Vector2(120,-20),new Vector2(123.6f,-17.15f),new Vector2(126.2f,-15.81f),
             new Vector2(128,-15.72f),new Vector2(134,-15.95f),new Vector2(138.5f,-15.85f),
             new Vector2(140.5f,-16.35f),new Vector2(143,-18.8f),new Vector2(146,-20)};
         var backing=new List<Vector2>(plinth){new Vector2(146,-26),new Vector2(120,-26)};
         MeshObject("Spillway stone footing",backing.ToArray(),new Rect(120,-26,26,10),1.38f,RockMaterial(.75f));
-        DrawRockEdge(plinth,bed,false,1.31f);
+        DrawRockEdge(plinth,bed,false,1.31f,3.55f,plinth[0].x);
 
         var vault=RockMaterial();
         vault.mainTexture=Resources.Load<Texture2D>("GoldenRiver/Descent/rooted-vault");
@@ -246,20 +248,36 @@ public sealed partial class CaveEntryStudy
         var soffit=new List<Vector2>(CaveTerrainLayout.EntranceSoffit);
         for(float x=34.25f;x<183;x+=.25f)soffit.Add(new Vector2(x,CaveRoute.Ceiling(x)));
         soffit.AddRange(CaveTerrainLayout.DaylightSoffit);
-        DrawRockEdge(soffit,vault,true,-3.052f);
+        DrawRockEdge(soffit,vault,true,-3.052f,3.55f,soffit[0].x);
     }
-    void DrawRockEdge(IList<Vector2> line,Material material,bool ceiling,float depth)
+    // Returns the texture run at the end of the line, so a following line can continue it.
+    float DrawRockEdge(IList<Vector2> line,Material material,bool ceiling,float depth,float depthIntoRock=3.55f,float? start=null)
     {
         var vertices=new Vector3[line.Count*2];
         var uv=new Vector2[vertices.Length];
         var triangles=new int[(line.Count-1)*6];
         var limits=new Vector2[vertices.Length];
-        float arc=line[0].x;
+        float arc=start??line[0].x;
+        var along=new float[line.Count];
+        for(int i=1;i<line.Count;i++)along[i]=along[i-1]+Vector2.Distance(line[i],line[i-1]);
         for(int i=0;i<line.Count;i++){
             var p=line[i];
             if(i>0)arc+=Vector2.Distance(p,line[i-1]);
             Vector2 inside=ceiling?Vector2.up:Vector2.down;
-            float body=3.55f;
+            float outside=1.52f;
+            float body=depthIntoRock;
+            if(!ceiling) {
+                // On steep faces the boulder rim turns with the rock, so walls get the same
+                // broken edge as the floors instead of a bare flat face. The direction follows
+                // the face over a few metres and the rim is shallower there, so corners and
+                // small zigzags never fan the strip into stretched streaks.
+                var tangent=(PointAlong(line,along,along[i]+1.6f)-PointAlong(line,along,along[i]-1.6f)).normalized;
+                var normal=new Vector2(tangent.y,-tangent.x);
+                float steep=Mathf.SmoothStep(0,1,Mathf.InverseLerp(.55f,.85f,Mathf.Abs(tangent.y)));
+                inside=Vector2.Lerp(Vector2.down,normal,steep).normalized;
+                body=Mathf.Lerp(depthIntoRock,Mathf.Min(depthIntoRock,1.35f),steep);
+                outside=Mathf.Lerp(1.52f,.55f,steep);
+            }
             if(ceiling) {
                 // Preserve the river cover and both playable landings above the thin roof.
                 float top=p.x<18 ? .72f : p.x<186 ? CaveTerrainLayout.RiverbedSurface(p.x) : 4.155f;
@@ -272,9 +290,9 @@ public sealed partial class CaveEntryStudy
                 }
             }
             int j=2*i;
-            vertices[j]=(Vector3)(p-inside*1.52f)+Vector3.forward*depth;
+            vertices[j]=(Vector3)(p-inside*outside)+Vector3.forward*depth;
             vertices[j+1]=(Vector3)(p+inside*body)+Vector3.forward*depth;
-            uv[j]=new Vector2(arc,-1.52f); uv[j+1]=new Vector2(arc,body);
+            uv[j]=new Vector2(arc,-outside); uv[j+1]=new Vector2(arc,body);
             limits[j]=limits[j+1]=new Vector2(body,0);
             if(i+1==line.Count)continue;
             int t=6*i;
@@ -282,6 +300,14 @@ public sealed partial class CaveEntryStudy
             triangles[t+3]=j+2;triangles[t+4]=j+1;triangles[t+5]=j+3;
         }
         SetStripMesh("Water-worn rock margin",vertices,uv,triangles,material,limits);
+        return arc;
+    }
+    static Vector2 PointAlong(IList<Vector2> line,float[] along,float distance)
+    {
+        if(distance<=0)return line[0];
+        for(int i=1;i<line.Count;i++)if(along[i]>=distance)
+            return Vector2.Lerp(line[i-1],line[i],Mathf.InverseLerp(along[i-1],along[i],distance));
+        return line[line.Count-1];
     }
     void AddPaintedBanks()
     {
@@ -303,9 +329,20 @@ public sealed partial class CaveEntryStudy
         }
         DrawBankFace(approach, paint, true);
         DrawBankFace(CaveTerrainLayout.EntranceCrown, paint, overhang:true);
-        DrawBankFace(CaveTerrainLayout.ExitBank, paint);
+        // The exit bank begins on the seep lip, where it grows out of the cave rock rather than
+        // ending in the air, so its start fades into the rim instead of showing a painted bank end.
+        var exit=new List<Vector2>{new Vector2(184.75f,-9.55f)};exit.AddRange(CaveTerrainLayout.ExitBank);
+        DrawBankFace(exit, paint, buriedStart:2.2f);
+        // The upper path ends on the exit cliff: give both of its treads the same painted
+        // bank as the surrounding surface banks instead of bare cut stone.
+        // The higher tread's rounded end overlaps the lower one in front of it.
+        foreach(var section in terrain)if(section.Name=="Main exit cliff")
+            for(int i=0;i<section.Treads.Length;i++){
+                var tread=section.Treads[i];
+                DrawBankFace(new[]{new Vector2(tread.x,tread.y),new Vector2(tread.x+tread.z*.5f,tread.y),new Vector2(tread.x+tread.z,tread.y)},paint,depthOffset:.004f*i);
+            }
     }
-    void DrawBankFace(IList<Vector2> face, Material paint, bool upstream=false, bool overhang=false)
+    void DrawBankFace(IList<Vector2> face, Material paint, bool upstream=false, bool overhang=false, float depthOffset=0, float buriedStart=0)
     {
         // Sample the river bank painting at a constant scale along the physical contour.
         var vertices = new Vector3[face.Count*2];
@@ -314,9 +351,9 @@ public sealed partial class CaveEntryStudy
         var limits = new Vector2[vertices.Length];
         for (int i=0;i<face.Count;i++) {
             var p=face[i]; int j=2*i;
-            if(i==0 && !overhang)p.x-=.84f;
+            if(i==0 && !overhang && buriedStart<=0)p.x-=.84f;
             if(i+1==face.Count)p.x+=.84f;
-            float depth=upstream ? Mathf.Lerp(-1.815f,-3.055f,Mathf.InverseLerp(-5.9f,-3.4f,p.x)) : -3.055f;
+            float depth=(upstream ? Mathf.Lerp(-1.815f,-3.055f,Mathf.InverseLerp(-5.9f,-3.4f,p.x)) : -3.055f)+depthOffset;
             float thickness=5;
             if(overhang){
                 float soffit=CaveTerrainLayout.AlongFace(CaveTerrainLayout.EntranceSoffit,p.x);
@@ -333,7 +370,7 @@ public sealed partial class CaveEntryStudy
         }
         var renderer=SetStripMesh("Painted riverbank contour",vertices,uv,triangles,paint,limits);
         var properties=new MaterialPropertyBlock();
-        properties.SetVector("_BankEnds",new Vector4(face[0].x-.84f,face[face.Count-1].x+.84f,0,0));
+        properties.SetVector("_BankEnds",new Vector4(face[0].x-(buriedStart>0?0:.84f),face[face.Count-1].x+.84f,buriedStart,0));
         renderer.SetPropertyBlock(properties);
     }
     MeshRenderer SetStripMesh(string label,Vector3[] vertices,Vector2[] uv,int[] triangles,Material material,Vector2[] limits=null)

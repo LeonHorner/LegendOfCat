@@ -21,7 +21,8 @@ public static class CaveRoute
     public static readonly Vector2[][] ShoreOpenings={
         new[]{new Vector2(-5.6f,-2.8f),new Vector2(12,-2.8f),new Vector2(13.4f,-4.8f),new Vector2(22,-8),
             new Vector2(22,-44),new Vector2(-18,-44),new Vector2(-18,-8),new Vector2(-7.7f,-5.1f)},
-        new[]{new Vector2(185,-2.8f),new Vector2(246.5f,-2.8f),new Vector2(249.8f,-6),new Vector2(251,-44),new Vector2(183,-44),new Vector2(183,-6)}};
+        // The river runs on until it meets the exit shore's rock, so no open gap shows beside it.
+        new[]{new Vector2(185,-2.8f),new Vector2(247.6f,-2.8f),new Vector2(249.2f,-6),new Vector2(249.3f,-44),new Vector2(183,-44),new Vector2(183,-6)}};
     // Only recovery solids intersecting the actual entrance/exit air are carved.
     public static readonly Vector2[][] Openings={Box(3.8f,-12,9,12),Box(185,-14,50.6f,17.5f)};
     public static bool InOpening(Vector2 local){foreach(var p in ShoreOpenings)if(Contains(p,local))return true;return false;}
@@ -35,13 +36,14 @@ public static class CaveRoute
     public static float Ceiling(float x)
     {
         if(x<18)return -8.6f;
-        if(x<34)return Mathf.Lerp(-8.6f,-8.2f,Mathf.InverseLerp(29,34,x));
+        // The first hall leaves room for a full jump from the boulder (roof raised by about one unit).
+        if(x<34)return Mathf.Lerp(Mathf.Lerp(-8.6f,-7.1f,Mathf.InverseLerp(18,24,x)),-6.9f,Mathf.InverseLerp(24,34,x));
         // The roof opens over the fountain, drops across the deep cleft, and
         // rises with the channel towards the far bank. Keep rock above the roof.
         var bay = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(34, 46, x));
         var fissure = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(58, 86, x));
         var climb = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(107, 174, x));
-        float bed = -8.2f + 2.65f * bay - 7.6f * fissure + 7.3f * climb;
+        float bed = -6.9f + 1.35f * bay - 7.6f * fissure + 7.3f * climb;
         float erosion = (.43f * Mathf.Sin(x * .27f) + .19f * Mathf.Sin(x * .81f)) * bay;
         return Mathf.Lerp(bed + erosion, -4.6f, Mathf.InverseLerp(178, 183, x));
     }

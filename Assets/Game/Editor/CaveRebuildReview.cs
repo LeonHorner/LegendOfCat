@@ -94,27 +94,45 @@ public static class CaveRebuildReview
             }
             throw new System.InvalidOperationException("Walk from "+start+" to "+x+" stopped at "+CaveRoute.ToLocal(cat.transform.localPosition));
         }
-        WalkTo(195); WalkTo(240);
+        WalkTo(200); WalkTo(240);
         DropToFloor(203.5f,-5.8f,CaveTerrainLayout.AlongFace(CaveTerrainLayout.ExitBank,203.5f));
-        WalkTo(196); WalkTo(216);
-        // A missed jump between the two high shelves used to drop Mika into a narrow V.
-        DropToFloor(160.05f,-12,-16.6f);
-        WalkTo(153); WalkTo(190); WalkTo(211);
+        WalkTo(199.5f); WalkTo(216);
+        // The daylight hollow needs a hop out; walking alone stays inside it.
+        cat.RespawnAt(CaveRoute.ToCourse(new Vector2(195.3f,-9.2f)));for(int i=0;i<20;i++)Tick();
+        cat.Motion.SetMove(1);for(int i=0;i<60;i++)Tick();cat.Motion.SetMove(0);
+        if(CaveRoute.ToLocal(cat.transform.localPosition).x>197.9f)throw new System.InvalidOperationException("The daylight hollow can be left without a hop.");
+        Reach(new Vector3(200.4f,-8.14f,1));
+        // A miss over the first seep gully returns only backwards, up the spillway slope.
+        DropToFloor(160,-12,CaveTerrainLayout.AlongFace(CaveTerrainLayout.SeepGully,160));
+        cat.Motion.SetMove(1);for(int i=0;i<120;i++)Tick();cat.Motion.SetMove(0);
+        if(CaveRoute.ToLocal(cat.transform.localPosition).x>164.9f)throw new System.InvalidOperationException("The first seep gully leads forward.");
+        WalkTo(146);
+        // A miss over the second gully climbs the rock column back to the widest shelf.
+        DropToFloor(180,-11.5f,CaveTerrainLayout.AlongFace(CaveTerrainLayout.SeepGully,180));
+        cat.Motion.SetMove(1);for(int i=0;i<120;i++)Tick();cat.Motion.SetMove(0);
+        // The broken end face starts at x 185.05, so a cat pressed against it stays left of 185.2.
+        if(CaveRoute.ToLocal(cat.transform.localPosition).x>185.2f)throw new System.InvalidOperationException("The second seep gully leads forward: "+CaveRoute.ToLocal(cat.transform.localPosition));
+        Reach(new Vector3(168.8f,CaveTerrainLayout.AlongFace(CaveTerrainLayout.SeepGully,168.8f),0));
+        Reach(new Vector3(166.1f,-14.6f,1));Reach(new Vector3(170.5f,-12.6f,1));
         DropToFloor(8,.755f+1.5f,.755f);
         WalkTo(14); WalkTo(7);
-        Debug.Log("Both reported pockets have walkable exits. The daylight bank and upper entrance crown pass in both directions.");
+        Debug.Log("Seep gullies return backwards only. The daylight bank and upper entrance crown pass in both directions.");
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(101.5f,-19.49f)));for(int i=0;i<100;i++)Tick();
         if(!cat.Grounded||Mathf.Abs(CaveRoute.ToLocal(cat.transform.localPosition).y-(CaveTerrainLayout.CatchHeight+.51f))>.2f)throw new System.InvalidOperationException("The local miss did not reach its catch.");
-        WalkTo(106); Reach(new Vector3(81.8f,-21.3f,0));
-        Reach(new Vector3(87.3f,-20,1));Reach(new Vector3(92.3f,-21.3f,0));Reach(new Vector3(98.7f,-20,1));
+        // The spillway wall closes the catch, so a miss costs the climb back.
+        cat.Motion.SetMove(1);for(int i=0;i<60;i++)Tick();cat.Motion.SetMove(0);
+        if(CaveRoute.ToLocal(cat.transform.localPosition).x>104.2f)throw new System.InvalidOperationException("The catch leads forward past the spillway wall.");
+        Reach(new Vector3(81.9f,-21.3f,0));
+        Reach(new Vector3(87.3f,-19.9f,1));Reach(new Vector3(93.7f,-19.9f,1));Reach(new Vector3(100.3f,-18.6f,1));
         Debug.Log("Shared cave local recovery geometry passed.");
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(31,-11.49f)));for(int i=0;i<15;i++)Tick();
         Reach(new Vector3(35.3f,-12,0));Reach(new Vector3(31,-12,0));
         Debug.Log("Shared cave formerly mismatched seam passed in both directions without jumping.");
         cat.RespawnAt(CaveRoute.ToCourse(new Vector2(21.6f,-11.49f)));for(int i=0;i<15;i++)Tick();
         if(capture){motion="entrance-reverse";motionTick=0;recording=true;System.IO.Directory.CreateDirectory("artifacts/cave-rebuild-review/"+motion);}
-        Reach(new Vector3(2.6f,-.045f,0));
-        Debug.Log("Shared cave entrance can be climbed continuously without jumping.");
+        Reach(new Vector3(4.4f,CaveTerrainLayout.AlongFace(CaveTerrainLayout.LeftShore,4.4f),0));
+        Reach(new Vector3(2.4f,-.045f,1));
+        Debug.Log("Shared cave entrance climbs back with one hop at the bank edge.");
         Reach(new Vector3(-10,-1.245f,0));Reach(new Vector3(2.6f,-.045f,0));
         Debug.Log("Connected approach shore passed in both directions.");
         if(capture){recording=false;System.IO.File.WriteAllText("artifacts/cave-rebuild-review/"+motion+"/frames.txt",((motionTick+4)/5).ToString());}

@@ -35,13 +35,6 @@ public static class CaveGeometry
             new Vector2(rect.xMax-b,rect.yMax),new Vector2(rect.xMin+b,rect.yMax),
             new Vector2(rect.xMin,rect.yMax-b),new Vector2(rect.xMin,rect.yMin+b)};
     }
-    public static List<Vector2[]> Carve(Vector2[] source, bool rescue=true)
-    {
-        var pieces=new List<Vector2[]> {source};
-        foreach(var hole in UpperRoute.PortalContours) pieces=Subtract(pieces,hole);
-        if(rescue) foreach(var hole in UpperRoute.RescueAir) pieces=Subtract(pieces,Bevel(hole,.8f));
-        return pieces;
-    }
     public static List<Vector2[]> Subtract(List<Vector2[]> pieces, Vector2[] hole)
     {
         var result=new List<Vector2[]>();

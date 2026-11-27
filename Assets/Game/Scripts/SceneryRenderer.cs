@@ -462,8 +462,8 @@ public sealed partial class SceneryRenderer : MonoBehaviour
     }
 
     Texture2D descentCoverage;
-    Rect? descentWorldBounds;
-    public void SetDescentCoverage(Texture2D coverage,Rect? worldBounds=null)
+    Rect descentWorldBounds;
+    public void SetDescentCoverage(Texture2D coverage,Rect worldBounds)
     {
         descentCoverage = coverage;
         descentWorldBounds=worldBounds;
@@ -475,7 +475,7 @@ public sealed partial class SceneryRenderer : MonoBehaviour
     void UpdateDescentCoverage()
     {
         if (!descentCoverage) return;
-        var bounds = descentWorldBounds??new Rect(UpperRoute.Origin+UpperRoute.MaskBounds.x,UpperRoute.MaskBounds.y,UpperRoute.MaskBounds.width,UpperRoute.MaskBounds.height);
+        var bounds = descentWorldBounds;
         var minimum = transform.TransformPoint(new Vector3(bounds.xMin, bounds.yMin));
         var maximum = transform.TransformPoint(new Vector3(bounds.xMax, bounds.yMax));
         var rect = new Vector4(minimum.x, minimum.y, maximum.x - minimum.x, maximum.y - minimum.y);
@@ -659,7 +659,6 @@ public sealed partial class SceneryRenderer : MonoBehaviour
         foreach (var material in materials) Release(material);
         foreach (var mesh in terrainMeshes) Release(mesh);
         Release(quadMesh);
-        Release(caveDistances);
         Release(terrainMaterial); Release(cornerMaterial); Release(riverFrontMaterial); Release(landmarkMaterial); Release(fortressMaterial); Release(finaleMaterial);
     }
 
