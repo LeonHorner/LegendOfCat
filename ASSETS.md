@@ -979,7 +979,7 @@ Two original transparent paintings from OpenAI built-in image generation (exact 
 
 The November 21 playtest revision reuses these paintings. The rooted pillar frames the descending entrance. The spillway opens onto a low stone path, and the cave bed rises into a single Golden River bank at the far mouth.
 
-The unused left-bank concept painting and entrance modules 0, 1, 2 and 4 now live in Assets/Game/Art/GoldenRiverArchive with their original Unity metadata. The matching four coverage masks are archived there as well. The connected cave uses modules 3 and 5.
+The unused left-bank concept painting and entrance modules 0, 1, 2 and 4 now live in Assets/Game/Art/GoldenRiverArchive with their original Unity metadata. The matching four coverage masks are archived there as well. Modules 3 and 5 and concept-entry-roof-v1 stayed in Resources, but the 2026-11-27 visual pass stopped drawing them in the cave: the entrance crown now uses the shared bank painting and cliff stone. Their boundary masks are still baked.
 
 On 2026-11-27 the nearly transparent pixels of mossy-bedrock.png (alpha below 48, always clipped by the cave shaders) were recoloured from their opaque neighbours. Their stray red values showed as fringes along the rock silhouette when filtered. Alpha and every visible pixel are unchanged.
 
